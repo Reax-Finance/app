@@ -6,16 +6,16 @@ export default function syx() {
   return (
     <>
     <Head>
-				<title>SYX | SyntheX</title>
+				<title>REAX | Reax</title>
 				<link rel="icon" type="image/x-icon" href="/logo32.png"></link>
 			</Head>
       <Box pt='90px'>
         <Flex gap={4} align='center'>
-          <Image src='/SYX.svg' w={20} alt='SYX Token Logo'/>
+          <Image src='/REAX.svg' w={20} alt='SYX Token Logo'/>
           <Box>
-            <Heading size={"lg"}>SyntheX Token</Heading>  
+            <Heading size={"lg"}>REAX Token</Heading>  
             <Text mt={2} color='whiteAlpha.700'>
-              SYX is the protocol token for SyntheX. Earn protocol fees, participate in governance, be a part of SyntheX
+              REAX is the protocol token for Reax. Earn protocol fees, participate in governance, be a part of Reax
             </Text>
           </Box>
         </Flex>

@@ -1,47 +1,20 @@
 import {
 	Box,
-	CardHeader,
 	Heading,
 	Text,
 	Flex,
-	Button,
-	Skeleton,
-	Tooltip,
 	Tag,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { useAccount, useNetwork } from "wagmi";
-import { ESYX_PRICE, tokenFormatter, dollarFormatter } from "../src/const";
-import { getContract } from "../src/contract";
-import Big from "big.js";
-import { useContext } from "react";
-import { AppDataContext } from "../components/context/AppDataProvider";
-import { TokenContext } from "../components/context/TokenContext";
-
-import {
-	Table,
-	Thead,
-	Tbody,
-	Tfoot,
-	Tr,
-	Th,
-	Td,
-	TableCaption,
-	TableContainer,
-	Image,
-	IconButton,
-} from "@chakra-ui/react";
+import React from "react";
+import { Image } from "@chakra-ui/react";
 import Head from "next/head";
 import { motion } from "framer-motion";
 
 export default function Earn() {
-	const { address, isConnected, isConnecting } = useAccount();
-	const { chain: connectedChain } = useNetwork();
-
 	return (
 		<>
 			<Head>
-				<title>Earn | SyntheX</title>
+				<title>Earn | Reax</title>
 				<link rel="icon" type="image/x-icon" href="/logo32.png"></link>
 			</Head>
 			<Box textAlign={"left"} pt="100px" maxW={"1200px"}>

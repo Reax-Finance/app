@@ -114,7 +114,7 @@ export default function Claim() {
 					address: pools[0].rewardTokens[0].id, // The address that the token is at.
 					symbol: "esSYX", // A ticker symbol or shorthand, up to 5 chars.
 					decimals: 18, // The number of decimals in the token
-					image: "https://app.synthex.finance/esSYX.svg", // A string url of the token logo
+					image: "https://app.reax.one/veREAX.svg", // A string url of the token logo
 				},
 			},
 		});

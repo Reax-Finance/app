@@ -7,7 +7,7 @@ export default function escrow() {
   return (
     <>
     <Head>
-				<title>esSYX | SyntheX</title>
+				<title>veREAX | Reax</title>
 				<link rel="icon" type="image/x-icon" href="/logo32.png"></link>
 			</Head>
       <Box pt='90px'>
@@ -16,7 +16,7 @@ export default function escrow() {
           <Box>
             <Heading size={"lg"}>Vest</Heading>  
             <Text mt={2} color='whiteAlpha.700'>
-              Escrow SYX to esSYX to earn a share of protocol revenue in WETH 
+              Escrow REAX to veREAX to earn a share of protocol revenue in WETH 
             </Text>
           </Box>
         </Flex>

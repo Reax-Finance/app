@@ -28,7 +28,7 @@ import { PROJECT_ID, APP_NAME, mantleTestnet } from "../src/const";
 
 const _chains = []
 
-if(process.env.NEXT_PUBLIC_NETWORK == 'testnet'){
+if(!process.env.NEXT_PUBLIC_NETWORK || process.env.NEXT_PUBLIC_NETWORK == 'testnet'){
 	_chains.push(mantleTestnet);
 } else {
 	// _chains.push(arbitrum);

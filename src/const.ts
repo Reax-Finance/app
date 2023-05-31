@@ -39,7 +39,7 @@ const _WETH_ADDRESS: any = {
 export const ESYX_PRICE = 0.005;
 
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
-export const APP_NAME = 'Synthex';
+export const APP_NAME = 'Reax';
 
 const _Endpoints: any = {
 	[ChainID.ARB]: process.env.NEXT_PUBLIC_GRAPH_URL_42161,

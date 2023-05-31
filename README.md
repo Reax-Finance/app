@@ -12,7 +12,4 @@
 
 `yarn build`
 
-Serve `/dist`# app-2
-# app-2
-# contracts
-# app
+Serve `/dist`

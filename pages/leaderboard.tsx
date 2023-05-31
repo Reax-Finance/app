@@ -15,10 +15,8 @@ import {
   Text
 } from '@chakra-ui/react'
 import { AppDataContext } from '../components/context/AppDataProvider';
-import { tokenFormatter, dollarFormatter } from '../src/const';
-import { FaBurn, FaMedal } from 'react-icons/fa';
-import { FaMagic } from 'react-icons/fa';
-import { RiMagicFill } from 'react-icons/ri';
+import { dollarFormatter } from '../src/const';
+import { FaMedal } from 'react-icons/fa';
 import Head from 'next/head';
 import { MdRefresh } from 'react-icons/md';
 import { useAccount } from 'wagmi';
@@ -117,7 +115,7 @@ export default function Leaderboard() {
   return (
     <>
     <Head>
-				<title>Rewards | SyntheX</title>
+				<title>Rewards | REAX</title>
 				<link rel="icon" type="image/x-icon" href="/logo32.png"></link>
 			</Head>
     <Box pt={'100px'}>
