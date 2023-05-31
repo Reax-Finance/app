@@ -1,4 +1,4 @@
-# SyntheX Frontend
+# REAX Frontend
 
 ### How to run
 
