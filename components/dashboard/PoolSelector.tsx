@@ -10,6 +10,7 @@ import {
 	Image,
 	Text,
 	Tag,
+	ModalOverlay,
 } from "@chakra-ui/react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { motion, Variants } from "framer-motion";
@@ -55,7 +56,7 @@ export default function PoolSelector() {
 
 	return (
 		<Box>
-			<Box id="menu-list-123" h='50px'>
+			<Box id="menu-list-123" h='40px'>
 				<motion.nav
 					initial={false}
 					animate={isOpen ? "open" : "closed"}
@@ -70,25 +71,18 @@ export default function PoolSelector() {
 								<Flex align={"center"} mb={4} gap={10}>
 									<Flex>
 										<Box textAlign={'left'}>
-										{/* <Text fontSize={'sm'} color='whiteAlpha.600'>Market Name</Text> */}
 										<Flex gap={4}>
-
-										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '3xl'}} fontWeight='semibold'
-										// fontFamily='MonumentExtended'
-										>
+										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '3xl'}} fontWeight='bold'>
 											{pools[tradingPool].name}
 										</Heading>
-										{/* <Text fontSize={'xs'}>Earning</Text> */}
-										{/* <Tag mt={2}>10% APY</Tag> */}
-
 										</Flex>
 										</Box>
 									</Flex>
-									<Flex align={'center'}>
-									<Text fontSize={'xs'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'All Markets' : 'Tap To Close'}</Text>
+									<Flex align={'center'} color={'whiteAlpha.700'} >
+									<Text fontSize={'xs'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'View All Markets' : 'Tap To Close'}</Text>
 									<motion.div
 										variants={{
-											open: { rotate: 180 },
+											open: { rotate: 180, marginBottom: '4px' },
 											closed: { rotate: 0 },
 										}}
 										transition={{ duration: 0.2 }}
@@ -101,13 +95,13 @@ export default function PoolSelector() {
 								</Flex>
 							</motion.button>
 						) : (
-							<Skeleton height="30px" width="200px" rounded={8} />
+							<Skeleton height="30px" width="200px" rounded={0} />
 						)}
 					</Flex>
 					<motion.ul
 						variants={{
 							open: {
-								clipPath: "inset(0% 0% 0% 0% round 10px)",
+								clipPath: "inset(0% 0% 0% 0%)",
 								transition: {
 									type: "spring",
 									bounce: 0,
@@ -117,7 +111,7 @@ export default function PoolSelector() {
 								},
 							},
 							closed: {
-								clipPath: "inset(10% 50% 90% 50% round 10px)",
+								clipPath: "inset(00% 50% 90% 50%)",
 								transition: {
 									type: "spring",
 									bounce: 0,
@@ -131,14 +125,16 @@ export default function PoolSelector() {
 							display: "flex",
 							flexDirection: "column",
 							position: "relative",
-							width: "100%",
+							width: "450px",
 							zIndex: '100',
-							backgroundColor: "black",
-							border: "2px solid gray",
-							borderRadius: "10px"
+							borderRadius: '0px',
+							background: "linear-gradient(45deg, transparent 10px, #1D1F24 0) bottom left, linear-gradient(-135deg, transparent 10px, #1D1F24 0) top right",
+							backgroundRepeat: 'no-repeat',
+							backgroundSize: '100% 50%',
 						}}
+						
 					>
-						<Box shadow={'xl'} bg={'whiteAlpha.200'} borderRadius="10px">
+						<Box shadow={'xl'}>
 						<motion.div
 							variants={{
 								open: {
@@ -157,7 +153,9 @@ export default function PoolSelector() {
 							}}
 							style={{
 								padding: "4px 10px",
-								borderRadius: '8px 8px 0 0'
+								background: "linear-gradient(-135deg, transparent 10px, #2B2E32 0) top right",
+								backgroundRepeat: 'no-repeat',
+								backgroundSize: '100% 100%',
 							}}
 						>
 							<Input
@@ -190,7 +188,6 @@ export default function PoolSelector() {
 										cursor="pointer"
 										px={4}
 										my={0}
-										// p={'12px'}
 									>
 										<Flex
 											paddingY={1}
@@ -200,7 +197,7 @@ export default function PoolSelector() {
 										>
 											<Box>
 												<Heading fontSize={"xl"}>
-													{pool.name} ({pool.symbol})
+													{pool.name}
 												</Heading>
 												<Flex
 													justify={"start"}

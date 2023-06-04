@@ -19,12 +19,9 @@ import {
 	InputGroup,
 	NumberInput,
 	NumberInputField,
-	Select,
 	Divider,
-	IconButton,
-	Tag,
 } from "@chakra-ui/react";
-import { PARTNER_ASSETS, PARTNER_ASSET_COLOR, PARTNER_ASSET_COLOR_GRADIENTS, PARTNER_ASSET_LOGOS, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { PARTNER_ASSETS, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -99,29 +96,10 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	return (
 		<>
-		{/* {partner && <Tr color={PARTNER_ASSET_COLOR[partner]} bgGradient={`linear(to-r, ${PARTNER_ASSET_COLOR_GRADIENTS[partner][0]}, ${PARTNER_ASSET_COLOR_GRADIENTS[partner][1]})`} h={'28px'} p={0} m={0}>
-			<Td py={0} border={0}>
-				<Flex align={'center'} gap={2} borderBottom={'1px solid'} py={1}>
-					<Image
-						src={PARTNER_ASSET_LOGOS[partner]}
-						h={'22px'}
-						alt="lodestar logo"
-						/>
-					<Text fontWeight={'bold'} fontSize={'sm'}>
-						{partner}
-					</Text>
-				</Flex>
-			</Td>
-			<Td py={0} border={0} >
-			</Td>
-		</Tr>} */}
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				// borderLeft="2px"
-				// borderColor="transparent"
 				_hover={{ borderColor: "primary.400", bg: "whiteAlpha.100" }}
-				// bgGradient={partner ? `linear(to-r, ${PARTNER_ASSET_COLOR_GRADIENTS[partner][0]}, ${PARTNER_ASSET_COLOR_GRADIENTS[partner][1]})` : 'linear(to-r, transparent, transparent)'}
 			>
 				<TdBox
 					isFirst={index == 0}
@@ -194,8 +172,8 @@ export default function CollateralModal({ collateral, index }: any) {
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
 				<ModalContent
 					width={"30rem"}
-					bgColor="bg2"
-					rounded={16}
+					bgColor="bg1"
+					rounded={0}
 					border="2px"
 					borderColor={"whiteAlpha.100"}
 					mx={2}
@@ -318,12 +296,6 @@ export default function CollateralModal({ collateral, index }: any) {
 									</InputGroup>
 							
 						</Box>
-
-						{/* <Text mt={16} mb={12} color="gray.400">
-										To deposit {collateral.token.symbol} you
-										need to approve the contract to spend
-										your tokens.
-									</Text> */}
 
 						<Tabs onChange={selectTab}>
 							<TabList>

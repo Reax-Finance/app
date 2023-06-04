@@ -11,7 +11,8 @@ import {
 	Flex,
 	Box,
 	Heading,
-	Text
+	Text,
+	Tfoot
 } from "@chakra-ui/react";
 import { AppDataContext } from "../context/AppDataProvider";
 import {
@@ -31,6 +32,7 @@ import ThBox from "./ThBox";
 import Big from "big.js";
 import { ESYX_PRICE } from "../../src/const";
 import APRInfo from "../infos/APRInfo";
+import TdBox from "./TdBox";
 
 const pageSize = 5;
 
@@ -42,47 +44,12 @@ export default function CollateralTable() {
 			pagesCount: Math.ceil((pools[tradingPool]?.synths?.length ?? 1) / pageSize) ?? 1,
 			initialState: { currentPage: 1 }
 		}
-	);
-
-	const esSyxApr = () => {
-		if (!pools[tradingPool]) return "0";
-		if (Big(pools[tradingPool]?.totalDebtUSD).eq(0)) return "0";
-		return Big(pools[tradingPool]?.rewardSpeeds[0])
-			.div(1e18)
-			.mul(365 * 24 * 60 * 60 * ESYX_PRICE)
-			.div(pools[tradingPool]?.totalDebtUSD)
-			.mul(100)
-			.toFixed(2);
-	};
-
-	const debtBurnApr = () => {
-		if (!pools[tradingPool]) return "0";
-		if (Big(pools[tradingPool]?.totalDebtUSD).eq(0)) return "0";
-		return Big(pools[tradingPool]?.averageDailyBurn ?? 0)
-			.mul(365)
-			.div(pools[tradingPool]?.totalDebtUSD)
-			.mul(100)
-			.toFixed(2);
-	};
+	);	
 
 	return (
 		<Box>
-			<Box bg={'whiteAlpha.50'} roundedTop={16} px={5} pt={4} pb={4}>
-			<Flex align={'center'} justify={'space-between'}>
-			<Heading size={'md'} color={'secondary.300'}>Synthetic Assets</Heading>
-			<APRInfo
-										debtBurnApr={debtBurnApr()}
-										esSyxApr={esSyxApr()}
-									>
-			<Box cursor={'help'} textAlign={'right'}>
-				<Text fontSize={'xs'} color={'whiteAlpha.600'}>Rewards APR</Text>
-				<Heading size={'md'} color={'secondary.300'}>{(
-														Number(debtBurnApr()) +
-														Number(esSyxApr())
-													).toFixed(2)}%</Heading>
-			</Box>
-			</APRInfo>
-			</Flex>
+			<Box className="cutoutcornersboxright" px={5} pt={6} pb={6}>
+				<Heading size={'md'} color={'secondary.300'}>Synthetic Assets</Heading>			
 			</Box>
 			{pools[tradingPool]?.synths.length > 0 ? (
 				<TableContainer>

@@ -65,7 +65,7 @@ export default function _index({ children }: any) {
 
 	return (
 		<Box>
-			{process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <Flex align={'center'} justify={'center'} bgColor="whiteAlpha.300" color={'whiteAlpha.600'}>
+			{/* {process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <Flex align={'center'} justify={'center'} bgColor="#2B2E32" color={'whiteAlpha.700'}>
 				<Text
 					textAlign={'center'} 
 					fontSize={'sm'}
@@ -73,8 +73,7 @@ export default function _index({ children }: any) {
 					p={3}>
 					This is a testnet. Please do not send real assets to these addresses
 				</Text>
-				{/* <Button size={'xs'} rounded='full' onClick={() => switchNetwork!(42161)}>Switch to Arbitrum Mainnet</Button> */}
-			</Flex>}
+			</Flex>} */}
 			{(status == 'fetching' || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
 
 			<Box bgColor="gray.800" color={'gray.400'}>
@@ -89,16 +88,13 @@ export default function _index({ children }: any) {
 				</Text>
 			)}
 			</Box>
-			<Box bgGradient={'linear(to-b, bg1, bg1)'} zIndex={0}>
+			<Box bgGradient={'linear(to-b, blackAlpha.500, blackAlpha.800)'} zIndex={0}>
 				<Flex
 					justify={'center'}
 					flexDirection={{ sm: 'column', md: 'row' }}
 					minH="96vh"
 					maxW={'100%'}
 					>
-					<Box position={'absolute'} bottom={0} width='100%' zIndex={1}>
-					<Particles quantity={60} />
-					</Box>
 					<Box zIndex={2} minW={{sm: '0', md: '0', lg: '1200px'}} w={'100%'} px={{sm: '4', md: '0'}}>
 						<Flex justify='center'>
 							<Box minW={'0'} w='100%' maxW={'1200px'}>

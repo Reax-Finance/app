@@ -8,6 +8,7 @@ import {
 	useDisclosure,
 	Divider,
 	Link,
+	Heading,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { getContract, send, estimateGas } from "../../src/contract";
@@ -32,6 +33,7 @@ const Big = require("big.js");
 import { ExternalLinkIcon, InfoIcon } from "@chakra-ui/icons";
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import useUpdateData from "../utils/useUpdateData";
+import SelectBody from "./SelectBody";
 
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(1);
@@ -390,21 +392,6 @@ function Swap() {
 		else return 0
 	}
 
-	// const _setUseReferral = () => {
-	// 	if (useReferral) {
-	// 		setReferral("");
-	// 		setUseReferral(false);
-	// 	} else {
-	// 		const { ref: refCode } = router.query;
-	// 		if (refCode) {
-	// 			setReferral(refCode as string);
-	// 		} else {
-	// 			setReferral("");
-	// 		}
-	// 		setUseReferral(true);
-	// 	}
-	// };
-
 	const isValid = () => {
 		if (referral == "" || referral == null) return true;
 		try {
@@ -430,10 +417,14 @@ function Swap() {
 				<link rel="icon" type="image/x-icon" href="/veREAX.svg"></link>
 			</Head>
 			{pools[tradingPool] ? (
-				<Box shadow='2xl' rounded={16}>
-					<Box px="5" py={10} roundedTop={15} 
-						// bg={"whiteAlpha.100"}
-					>
+				<Box>
+					<Box p="5">
+						<Heading size={'md'}>Synthetic Swap</Heading>
+						<Text color={'whiteAlpha.500'} mt={1} fontSize={'sm'}>Zero Slippage, Infinite Liquidity</Text>
+					</Box>
+
+					{/* Input */}
+					<Box px="5" bg={'blackAlpha.400'} pb={10} pt={8}>
 						<Flex align="center" justify={"space-between"}>
 							<InputGroup width={"70%"}>
 								<Input
@@ -484,30 +475,31 @@ function Swap() {
 						</Flex>
 					</Box>
 
-					<Flex px="5" mt={-5} align='center'>
+					{/* Switch */}
+					<Flex px="5" my={-4} align='center'>
 						<Divider w={'10px'} border='1px' borderColor={'whiteAlpha.300'} />
 						<Button
-							bg="whiteAlpha.50"
-							border={'2px'}
-							borderColor={'whiteAlpha.300'}
 							_hover={{ bg: "whiteAlpha.50" }}
-							rounded="100%"
+							rounded={'0'}
 							onClick={switchTokens}
 							variant="unstyled"
-							w={"40px"}
-							h={"40px"}
+							size={'sm'}
 							display="flex"
 							alignItems="center"
 							justifyContent="center"
+							bg={'whiteAlpha.300'}
+							transform={"rotate(45deg)"}
+							mx={1.5}
 						>
-							<MdOutlineSwapVert size={"18px"} />
+							<Box  transform="rotate(-45deg)">
+							<MdOutlineSwapVert size={"20px"} />
+							</Box>
 						</Button>
 						<Divider border='1px' borderColor={'whiteAlpha.300'} />
-
 					</Flex>
 
-					<Box px="5" pt={7} roundedBottom={15} bg={"whiteAlpha"}>
-						{/* Output */}
+					{/* Output */}
+					<Box px="5" py={10} pb={14} bg={'blackAlpha.400'}>
 						<Flex align="center" justify={"space-between"}>
 							<InputGroup width={"70%"}>
 								<Input
@@ -552,16 +544,19 @@ function Swap() {
 								</Text>
 							</Flex>
 						</Flex>
-					
-					{ gas > 0 && <Box pb={10} pt={5}>
+					</Box>
+
+					<Box px="5">
+
+					{ gas > 0 && <Box pb={10}>
 						<Flex
 							justify="space-between"
 							align={"center"}
-							mt={12}
+							mt={5}
 							mb={!isOpen ? !account ? '-4' : '-6' : '0'}
 							bg="whiteAlpha.50"
 							color="whiteAlpha.700"
-							rounded={16}
+							// rounded={16}
 							px={4}
 							py={2}
 							cursor="pointer"
@@ -605,7 +600,7 @@ function Swap() {
 								}}
 							>
 								{isOpen && 	
-								<Box border={'2px'} borderColor='whiteAlpha.200' mt={2} px={4} py={2} rounded={16} fontSize='sm' color={'whiteAlpha.500'}>
+								<Box border={'2px'} borderColor='whiteAlpha.200' mt={2} px={4} py={2} fontSize='sm' color={'whiteAlpha.500'}>
 									<Flex justify={'space-between'}>
 									<Text>Price Impact</Text>
 									<Text>{100*(Number(inputToken().burnFee) + Number(outputToken().mintFee)) / 10000} %</Text>
@@ -626,53 +621,13 @@ function Swap() {
 								</Box>}
 							</motion.div>
 						</Box>
-
-						{/* <Box py={5}>
-						{!account && (
-							<>
-								{" "}
-								<Flex mt={isOpen ? 8 : 3} mb={3} gap={2} align={"center"}>
-									<Text
-										fontSize={"sm"}
-										color="gray.400"
-										fontWeight={"bold"}
-									>
-										Use Referral Code
-									</Text>
-									<Switch
-										colorScheme={"primary"}
-										isChecked={useReferral}
-										onChange={_setUseReferral}
-									/>
-								</Flex>
-								<Collapse in={useReferral} animateOpacity>
-									<Box mb={2} >
-										<Input
-											placeholder="Referral Code"
-											value={referral!}
-											onChange={(e) =>
-												setReferral(e.target.value)
-											}
-											isInvalid={!isValid()}
-											errorBorderColor="red.400"
-											colorScheme={"primary"}
-										/>
-									</Box>
-								</Collapse>{" "}
-							</>
-						)}
-						</Box> */}
 						</Box>}
-
+						<Box mt={!gas ? 8 : 0} mb={5} className="swapButton">
 						<Button
-							mt={!gas ? 14 : 0}
-							mb={5}
 							size="lg"
 							fontSize={"xl"}
 							width={"100%"}
-							// bgColor={"primary.400"}
-							bgGradient="linear(to-b, primary.400, primary.400)"
-							rounded={16}
+							rounded={0}
 							onClick={exchange}
 							isDisabled={
 								loading ||
@@ -685,9 +640,13 @@ function Swap() {
 							_hover={{ opacity: 0.6 }}
 							color="white"
 							height={"55px"}
+							_disabled={{
+								color: 'whiteAlpha.700',
+							}}
 						>
 							{pools[tradingPool].paused ? 'Market Paused Till 5PM EDT' : !isValid() ? 'Invalid Referral' : validateInput() > 0 ? ERROR_MSG[validateInput()] : "Swap"}
 						</Button>
+						</Box>
 						{hash && <Box mt={-5} pb={4}>
 						<Response
 							response={response}
@@ -696,7 +655,9 @@ function Swap() {
 							confirmed={confirmed}
 						/>
 						</Box>}
+
 					</Box>
+
 				</Box>
 			) : (
 				<SwapSkeleton />
@@ -715,42 +676,6 @@ function Swap() {
 				onTokenSelected={onOutputTokenSelected}
 			/>
 		</>
-	);
-}
-
-export function SelectBody({ asset, onOpen }: any) {
-	return (
-		<Box cursor="pointer" onClick={onOpen}>
-			<Flex
-				justify={"space-between"}
-				align={"center"}
-				bg="whiteAlpha.200"
-				rounded={"full"}
-				shadow={"2xl"}
-				border={"2px"}
-				borderColor="whiteAlpha.200"
-				px={1}
-				py={1}
-				pr={2}
-				gap={1}
-				mr={-1}
-			>
-				<Image
-					src={"/icons/" + asset?.token.symbol + ".svg"}
-					height={34}
-					style={{margin: "4px"}}
-					width={34}
-					alt={asset?.symbol}
-				/>
-
-				<Text fontSize="xl" color="whiteAlpha.600" fontWeight={"bold"}>
-					{asset.token.symbol}
-				</Text>
-				<Box>
-					<RiArrowDropDownLine size={30} />
-				</Box>
-			</Flex>
-		</Box>
 	);
 }
 

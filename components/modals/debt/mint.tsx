@@ -202,34 +202,15 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 		}
 	};
 
-	// const _setUseReferral = () => {
-	// 	if (useReferral) {
-	// 		setReferral("");
-	// 		setUseReferral(false);
-	// 	} else {
-	// 		const { ref: refCode } = router.query;
-	// 		if (refCode) {
-	// 			setReferral(refCode as string);
-	// 		} else {
-	// 			setReferral("");
-	// 		}
-	// 		setUseReferral(true);
-	// 	}
-	// };
-
 	return (
-		<Box roundedBottom={16} px={5} pb={5} pt={0.5} bg="blackAlpha.200">
+		<Box px={5} pb={5} pt={0.5} bg="bg2">
 			<Box
-				// border="1px"
-				// borderColor={"gray.700"}
 				mt={6}
-				// mb={2}
 				rounded={8}
-				// p={2}
 			>
 				<Tooltip label={`Fee for Minting and Burning ${asset.token.symbol}`}>
 				<Flex justify="space-between">
-						<Text fontSize={"md"} color="blackAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Mint / Burn Fee
 						</Text>
 
@@ -252,20 +233,17 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				<Text
 					mt={6}
 					fontSize={"sm"}
-					color="blackAlpha.600"
+					color="whiteAlpha.600"
 					fontWeight={"bold"}
 				>
 					Transaction Overview
 				</Text>
 				<Box
-					// border="1px"
-					// borderColor={"gray.700"}
 					my={4}
 					rounded={8}
-					// p={2}
 				>
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="blackAlpha.600">
+						<Text fontSize={"md"} color="whiteAlpha.600">
 							Health Factor
 						</Text>
 						<Text fontSize={"md"}>
@@ -287,7 +265,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 					</Flex>
 					<Divider my={2} />
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="blackAlpha.600">
+						<Text fontSize={"md"} color="whiteAlpha.600">
 							Available to issue
 						</Text>
 						<Text fontSize={"md"}>
@@ -304,40 +282,6 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 						</Text>
 					</Flex>
 				</Box>
-
-				{/* {!account && (
-					<>
-						{" "}
-						<Flex mt={6} gap={2} align={"center"}>
-							<Text
-								fontSize={"sm"}
-								color="blackAlpha.600"
-								fontWeight={"bold"}
-							>
-								Use Referral Code
-							</Text>
-							<Switch
-								colorScheme={"primary"}
-								isChecked={useReferral}
-								onChange={_setUseReferral}
-							/>
-						</Flex>
-						<Collapse in={useReferral} animateOpacity>
-							<Box mt={3}>
-								<Input
-									placeholder="Referral Code"
-									value={referral!}
-									onChange={(e) =>
-										setReferral(e.target.value)
-									}
-									isInvalid={!isValid()}
-									errorBorderColor="red.400"
-									colorScheme={"primary"}
-								/>
-							</Box>
-						</Collapse>{" "}
-					</>
-				)} */}
 			</Box>
 
 			<Flex mt={2} justify="space-between"></Flex>
@@ -359,7 +303,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				mt={4}
 				onClick={mint}
 				size="lg"
-				rounded={16}
+				rounded={0}
 				_hover={{
 					opacity: "0.5",
 				}}
@@ -389,13 +333,6 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				hash={hash}
 				confirmed={confirmed}
 			/>
-			{/* <Box mx={-4}>
-				<InfoFooter
-					message="
-						You can issue a new asset against your collateral. Debt is dynamic and depends on total debt of the pool.
-						"
-				/>
-			</Box> */}
 		</Box>
 	);
 };

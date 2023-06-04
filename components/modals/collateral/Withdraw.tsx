@@ -153,7 +153,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 
 	return (
 		<>
-			<Box bg={"blackAlpha.200"} roundedBottom={16} px={5} py={5}>
+			<Box bg={"bg2"} roundedBottom={16} px={5} py={5}>
 				<Box
 					// border="1px"
 					// borderColor={"gray.700"}
@@ -267,7 +267,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
                     mt={2}
                     onClick={withdraw}
                     size="lg"
-                    rounded={16}
+                    rounded={0}
                     _hover={{
                         opacity: "0.5",
                     }}

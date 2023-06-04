@@ -82,10 +82,6 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 			args
 		)
 			.then(async (res: any) => {
-				// setMessage("Confirming...");
-				// setResponse("Transaction sent! Waiting for confirmation");
-				// setHash(res.hash);
-				// decode logs
 				const response = await res.wait(1);
 				const decodedLogs = response.logs.map((log: any) =>
 				{
@@ -105,13 +101,6 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 				updateSynthWalletBalance(asset.token.id, pools[tradingPool].id, decodedLogs[decodedLogs.length - 2].args.value.toString(), true);
 				setAmount('0');
 				setConfirmed(true);
-
-				// setMessage("Transaction Successful!");
-				// setResponse(
-				// 	`You have burned ${tokenFormatter.format(
-				// 		amountNumber
-				// 	)} ${asset.token.symbol}`
-				// );
 
 				setLoading(false);
 				toast({
@@ -146,27 +135,20 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 					})
 				}
 				setLoading(false);
-				// setConfirmed(true);
-				// setResponse("Transaction failed. Please try again!");
-				// setMessage(JSON.stringify(err));
 			});
 	};
 
 	const { isConnected } = useAccount();
 
 	return (
-		<Box px={5} pb={5} pt={0.5} bg='blackAlpha.200'>
+		<Box px={5} pb={5} pt={0.5} bg='bg2'>
 		<Box
-				// border="1px"
-				// borderColor={"gray.700"}
 				mt={6}
-				// mb={2}
 				rounded={8}
-				// p={2}
 			>
 				<Tooltip label={`Fee for Minting and Burning ${asset.token.symbol}`}>
 				<Flex justify="space-between">
-						<Text fontSize={"md"} color="blackAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Mint / Burn Fee
 						</Text>
 
@@ -186,25 +168,22 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 			</Box>
 				<Box  >
 						<Box>
-						<Text mt={6} fontSize={"sm"} color='blackAlpha.600' fontWeight={'bold'}>
+						<Text mt={6} fontSize={"sm"} color='whiteAlpha.600' fontWeight={'bold'}>
 							Transaction Overview
 						</Text>
 						<Box
-							// border="1px"
-							// borderColor={"gray.700"}
 							my={4}
 							rounded={8}
-							// p={2}
 						>
 							<Flex justify="space-between">
-								<Text fontSize={"md"} color="blackAlpha.600">
+								<Text fontSize={"md"} color="whiteAlpha.600">
 									Health Factor
 								</Text>
 								<Text fontSize={"md"}>{(pools[tradingPool].userDebt/pools[tradingPool].userCollateral * 100).toFixed(1)} % {"->"} {((pools[tradingPool].userDebt - (amount*asset.priceUSD)) /(pools[tradingPool].userCollateral) * 100).toFixed(1)}%</Text>
 							</Flex>
 							<Divider my={2} />
 							<Flex justify="space-between">
-								<Text fontSize={"md"} color="blackAlpha.600">
+								<Text fontSize={"md"} color="whiteAlpha.600">
 									Available to issue
 								</Text>
 								<Text fontSize={"md"}>{dollarFormatter.format(pools[tradingPool].adjustedCollateral - pools[tradingPool].userDebt)} {"->"} {dollarFormatter.format(pools[tradingPool].adjustedCollateral + amount*asset.priceUSD - pools[tradingPool].userDebt)}</Text>
@@ -231,7 +210,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 							mt={4}
 							onClick={burn}
 							size="lg"
-							rounded={16}
+							rounded={0}
 							_hover={{
 								opacity: "0.5",
 							}}
@@ -255,14 +234,6 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 							hash={hash}
 							confirmed={confirmed}
 						/>
-						{/* <Box mx={-4}>
-
-					<InfoFooter
-						message="
-						You can issue a new asset against your collateral. Debt is dynamic and depends on total debt of the pool.
-						"
-						/>
-						</Box> */}
 		</Box>
 		</Box>
 	);

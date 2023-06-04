@@ -22,7 +22,7 @@ export const theme = extendTheme({
 		}
 	},
 	fonts: {
-		heading: `General Sans, sans-serif`,
+		heading: `Chakra Petch, sans-serif`,
 		body: `'Rubik', sans-serif`,
 	},
 	// styles,
@@ -55,8 +55,8 @@ export const theme = extendTheme({
 			800: '#F64E00',
 			900: '#F64E00',
 		},
-		bg1: "#071222",
-		bg2: "#0C1E3C",
+		bg1: "#2B2E32",
+		bg2: "#1D1F24",
 		bg3: '#001A31',
 		skyblue: "#92CAFF",
 	},

@@ -406,7 +406,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 
 	return (
 		<>
-			<Box bg={"blackAlpha.200"} roundedBottom={16} px={5} pt={5} pb={5}>
+			<Box bg={"bg2"} roundedBottom={16} px={5} pt={5} pb={5}>
 				<Box
 					// border="1px"
 					// borderColor={"gray.700"}
@@ -525,7 +525,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 						width="100%"
 						onClick={collateral.nonce ? approve : approveTx}
 						size="lg"
-						rounded={16}
+						rounded={0}
 						leftIcon={
 							validate().stage ==1 ? <Tooltip label='
 								Approve tokens to be used by the protocol.
@@ -542,11 +542,10 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 						bgColor={validate().stage == 1 ? "primary.400" : "primary.400"}
 						width="100%"
 						color="white"
-						colorScheme={'primary'}
+						rounded={0}
 						mt={2}
 						onClick={deposit}
 						size="lg"
-						rounded={16}
 					>
 						{isConnected && !activeChain?.unsupported ? (
 							Big(amountNumber > 0 ? amount : amountNumber).gt(max()) ? (

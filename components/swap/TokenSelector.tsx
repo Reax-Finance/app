@@ -86,11 +86,11 @@ function TokenSelector({
 				scrollBehavior={"inside"}
 				isCentered
 			>
-				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(30px)" />
-				<ModalContent maxH={"600px"} bgColor="bg3" rounded={16} border='2px' mx={2} borderColor={'whiteAlpha.500'}>
+				<ModalOverlay bg="blackAlpha.800" backdropFilter="blur(30px)" />
+				<ModalContent bg={'transparent'} bgGradient={'linear-gradient(-135deg, transparent 10px, bg1 0) '} shadow={'none'} rounded={0} maxH={"600px"} mx={2}>
 					<ModalHeader>Select a token</ModalHeader>
 					<Box mx={5} mb={5}>
-					<Select rounded={'full'} placeholder="Select debt pool" value={tradingPool} onChange={(e) => {
+					<Select className="swapButton" rounded={'0'} placeholder="Select debt pool" value={tradingPool} onChange={(e) => {
 						if(e.target.value !== ''){
 							setTradingPool(Number(e.target.value))
 							localStorage.setItem("tradingPool", e.target.value);
@@ -104,7 +104,7 @@ function TokenSelector({
 						</Box>
 						{/* <Divider/> */}
 					<ModalCloseButton rounded={'full'} mt={1} />
-					<ModalBody bgColor="whiteAlpha.100">
+					<ModalBody bg={'bg2'}>
 
 						{/* Token List */}
 						<Box mx={-6} mt={-2}>

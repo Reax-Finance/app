@@ -8,9 +8,7 @@ export default function IconBox({ children }: any) {
 			h={"40px"}
 			w={"40px"}
 			bg="whiteAlpha.200"
-			border={"2px"}
-			borderColor="whiteAlpha.50"
-			rounded={10}
+			rounded={0}
 		>
 			{children}
 		</Flex>

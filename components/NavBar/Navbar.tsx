@@ -143,10 +143,10 @@ function NavBar() {
 							path={"/swap"}
 							title="Swap"
 						></NavLocalLink>
-						<NavLocalLink
+						{/* <NavLocalLink
 							path={"/claim"}
 							title="Claim"
-						></NavLocalLink>
+						></NavLocalLink> */}
 						{/* <NavLocalLink
 							path={"/earn"}
 							title="Earn"

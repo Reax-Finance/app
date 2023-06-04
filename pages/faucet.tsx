@@ -17,7 +17,7 @@ import {
 import { AppDataContext } from "../components/context/AppDataProvider";
 import { useEffect } from "react";
 
-const nonMintable = ["ETH", "waArbUSDC"];
+const nonMintable = ["BIT"];
 
 const mintAmounts: any = {
 	"USDC": "100",
@@ -114,7 +114,7 @@ export default function Faucet() {
                 Note: This is a testnet faucet. These tokens are not real and have no value.
             </Text>
 
-			<TableContainer bg={'whiteAlpha.50'} border='2px' borderColor={'whiteAlpha.100'} rounded={8} pt={1}>
+			<TableContainer className="tableStyle" rounded={0}>
 				<Table variant="simple">
 					<Thead>
 						<Tr>
@@ -125,8 +125,8 @@ export default function Faucet() {
 					</Thead>
 					<Tbody>
                         {collaterals.map((collateral: any, index: number) => (
-                            <Tr key={index}>
-							<Td>
+                            <Tr  key={index}>
+							<Td style={index == collaterals.length - 1 ? {border: 0} : {}}>
                                 <Flex gap={2}>
                                 <Image src={`/icons/${collateral.token.symbol}.svg`} w='34px'/>
                                     <Box>
@@ -141,9 +141,9 @@ export default function Faucet() {
                                 </Flex>
                                 
                             </Td>
-							<Td>{mintAmounts[collateral.token.symbol]}</Td>
-							<Td isNumeric>
-                                <Button fontSize={'md'} rounded='full' onClick={() => _onOpen(collateral)}>Mint</Button>
+							<Td style={index == collaterals.length - 1 ? {border: 0} : {}}>{mintAmounts[collateral.token.symbol]}</Td>
+							<Td style={index == collaterals.length - 1 ? {border: 0} : {}} isNumeric>
+                                <Button size='sm' rounded='0' bg={'secondary.400'} onClick={() => _onOpen(collateral)}>Mint</Button>
                             </Td>
 						</Tr>
                         ))}
@@ -154,7 +154,7 @@ export default function Faucet() {
 
             {openedCollateral && <Modal isOpen={isOpen} onClose={onClose} isCentered>
             <ModalOverlay />
-            <ModalContent width={'400px'}>
+            <ModalContent rounded={0} width={'400px'}>
             <ModalHeader>{openedCollateral.token.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody >
@@ -172,7 +172,7 @@ export default function Faucet() {
             </ModalBody>
 
             <ModalFooter justifyContent={'center'}>
-                <Button isDisabled={!isConnected} size={'md'} loadingText="Minting" isLoading={loading} bg='secondary.400' color={'white'} mb={0} rounded={16} onClick={mint} width='100%'>
+                <Button isDisabled={!isConnected} size={'md'} loadingText="Minting" isLoading={loading} bg='secondary.400' color={'white'} mb={0} rounded={0} onClick={mint} width='100%'>
                 {isConnected ? 'Mint' : 'Please Connect Your Wallet'}
                 </Button>
             </ModalFooter>

@@ -5,15 +5,10 @@ const myCustomTheme: Theme = {
     modalOverlay: '...',
   },
   colors: {
-    accentColor: 'white',
+    accentColor: '#FF8A00',
     accentColorForeground: '#0A1931',
-    
-    connectButtonBackground: '#fff',
-    
+    connectButtonBackground: 'linear-gradient(45deg, transparent 6px, #FF8A00 0) bottom left, linear-gradient(-135deg, transparent 6px, #FF8A00 0) top right;',
     modalBackground: 'white',
-    // modalBorder: '#2D3748',
-    
-
     actionButtonBorder: "rgba(255, 255, 255, 0.04)",
     actionButtonBorderMobile: "rgba(255, 255, 255, 0.08)",
     actionButtonSecondaryBackground: "rgba(255, 255, 255, 0.08)",
@@ -44,14 +39,13 @@ const myCustomTheme: Theme = {
   },
   fonts: {
     body: '12px',
-
   },
   radii: {
-    actionButton: '20px',
-    connectButton: '20px',
-    menuButton: '20px',
-    modal: '20px',
-    modalMobile: '20px',
+    actionButton: '0px',
+    connectButton: '0px',
+    menuButton: '0px',
+    modal: '0px',
+    modalMobile: '0px',
   },
   shadows: {
     connectButton: "0px 4px 12px rgba(0, 0, 0, 0.1)",

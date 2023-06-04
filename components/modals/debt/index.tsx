@@ -94,7 +94,6 @@ export default function Debt({ synth, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				// borderLeft='2px' borderColor='transparent' 
 				_hover={{ bg: 'whiteAlpha.100' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
@@ -149,8 +148,8 @@ export default function Debt({ synth, index }: any) {
 			</Tr>
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
-				<ModalOverlay bg="whiteAlpha.400" backdropFilter="blur(30px)" />
-				<ModalContent width={"30rem"} bgColor="whiteAlpha.500" rounded={16} border='2px' mx={2} borderColor={'whiteAlpha.100'}>
+				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
+				<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
 					<ModalCloseButton rounded={"full"} mt={1} />
 					<ModalHeader>
 						<Flex

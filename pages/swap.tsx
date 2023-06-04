@@ -21,11 +21,11 @@ export default function swap() {
 					>
 						<Box
 							animation={"fadeIn 0.5s ease-in-out"}
-							bgColor={"bg2"}
-							border='2px'
-							borderColor='whiteAlpha.200'
-							// bgGradient={'linear(to-b, rgba(5, 104, 204, 0.25), rgba(5, 119, 230, 0.1))'}
-							rounded={16}
+							// bgColor={"whiteAlpha.100"}
+							className="cutoutcornersbox"
+							// border='2px'
+							// borderColor='whiteAlpha.200'
+							// rounded={16}
 							boxShadow={'xl'}
 						>
 							<Swap />

@@ -1,6 +1,7 @@
 import { Box, Divider, Flex, Text, Image, Tooltip } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { FaBurn } from "react-icons/fa";
+import { FcPlus } from "react-icons/fc";
+import { TbMoneybag } from "react-icons/tb";
 
 export default function APRInfo({ debtBurnApr, esSyxApr, children }: any) {
 	const [isLabelOpen, setIsLabelOpen] = useState(false);
@@ -8,7 +9,7 @@ export default function APRInfo({ debtBurnApr, esSyxApr, children }: any) {
 	return (
 		<>
 			<Tooltip
-				bg={"secondary.700"}
+				bg={"transparent"}
 				p={0}
 				rounded={8}
 				label={
@@ -32,32 +33,31 @@ function APRInfoBox({ debtBurnApr, esSyxApr }: any) {
 	return (
 		<>
 			<Box
-				rounded={8}
-				bg={"white"}
-				border="2px"
-				borderColor={"blackAlpha.300"}
+				rounded={0}
+				className="corneredBox2"
+				color={'white'}
 			>
-				<Box px={3} py={2} color={'black'}>
-					<Text color={"blackAlpha.700"}>Total APY</Text>
+				<Box px={3} py={2} className="cutoutcornersboxright">
+					<Text color={"whiteAlpha.700"}>Total APY</Text>
 					<Text fontSize={"lg"}>
 						{(Number(debtBurnApr) + Number(esSyxApr)).toFixed(2)} %
 					</Text>
 				</Box>
 
 				<Divider />
-				<Box px={3} py={1} bg="blackAlpha.100" roundedBottom={8}>
-					<Flex align={"center"} gap={2} mb={2} mt={2} color={'black'}>
-						<FaBurn size={"20px"} />
+				<Box px={3} py={1} roundedBottom={8}>
+					<Flex align={"center"} gap={2} mb={2} mt={2}>
+						<TbMoneybag size={"20px"} />
 						<Flex gap={2}>
 							<Text>{debtBurnApr} %</Text>
-							<Text color={"blackAlpha.700"}>Debt Burn</Text>
+							<Text color={"whiteAlpha.700"}>Debt Burn</Text>
 						</Flex>
 					</Flex>
-					<Flex align={"center"} gap={2} mb={2} color={'black'}>
+					<Flex align={"center"} gap={2} mb={2}>
 						<Image src="/veREAX.svg" w={5} alt={"veREAX"} />
 						<Flex gap={2}>
 							<Text>{esSyxApr} %</Text>
-							<Text color={"blackAlpha.700"}>veREAX</Text>
+							<Text color={"whiteAlpha.700"}>veREAX</Text>
 						</Flex>
 					</Flex>
 				</Box>

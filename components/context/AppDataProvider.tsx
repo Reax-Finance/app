@@ -543,7 +543,6 @@ function AppDataProvider({ children }: any) {
 				setStatus("ready");
 				setPools(_pools);
 				refreshData(_pools);
-				_setPortfolio(_pools);
 				resolve(0);
 			})
 			.catch(err => {
@@ -556,58 +555,6 @@ function AppDataProvider({ children }: any) {
 			})
 		});
 	};
-
-	const _setPortfolio = async (
-		_pools: any,
-		length: number = 1,
-	) => {
-		// let _portfolio: any = [];
-		// // 4 block /sec 
-		// const dailyBlocks = 4 * 60 * 60 * 24;
-		// const itf = new ethers.utils.Interface(getABI("MockToken", chain?.id!));
-		// // multicall for 7 days of data
-		// const multicall = await getContract("Multicall2", chain?.id!);
-
-		// // balances requests of all synths in pool
-		// const reqs = _pools.reduce((acc: any, pool: any) => {
-		// 	return acc.concat(
-		// 		pool.synths.map((synth: any) => {
-		// 			return {
-		// 				target: synth.token.id,
-		// 				callData: itf.encodeFunctionData("balanceOf", [address]),
-		// 			};
-		// 		})
-		// 	);
-		// }, []);
-
-		// console.log(reqs);
-
-		// // multicall for 7 days of data
-		// const provider = new ethers.providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc");
-		// const _block = await provider.getBlockNumber();
-
-		// console.log(
-		// 	Array.from({ length }, (_, i) => {
-		// 		return _block - dailyBlocks * i
-		// 	})
-		// );
-		// Promise.all(
-		// 	Array.from({ length }, (_, i) => {
-		// 		return multicall.callStatic.aggregate(reqs, {
-		// 			blockTag: _block - dailyBlocks * i,
-		// 		});
-		// 	})
-		// )
-		// 	.then((res: any) => {
-		// 		// parsing data
-		// 		console.log(res);
-		// 	})
-		// 	.catch((err: any) => {
-		// 		console.log(err);
-		// 	});
-
-		// setPortfolio(_portfolio);
-	}
 
 	const incrementNonce = async (_collateral: any) => {
 		let _pools = [...pools];
@@ -752,6 +699,10 @@ function AppDataProvider({ children }: any) {
 			{children}
 		</AppDataContext.Provider>
 	);
+}
+
+export const useAppData = () => {
+	return React.useContext(AppDataContext);
 }
 
 export { AppDataProvider, AppDataContext };

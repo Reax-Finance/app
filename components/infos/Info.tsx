@@ -8,9 +8,9 @@ export default function Info({ title, message, children }: any) {
 	return (
 		<>
 			<Tooltip
-				bg="bg2"
+				bg="transparent"
 				p={0}
-				rounded={8}
+				rounded={0}
 				label={<InfoBox title={title} message={message} />}
 				isOpen={isLabelOpen}
 			>
@@ -29,22 +29,21 @@ function InfoBox({ title, message }: any) {
 	return (
 		<>
 			<Box
-				rounded={8}
-				bg={"white"}
-				border="2px"
-				borderColor={"blackAlpha.300"}
+				rounded={0}
+				className="corneredBox2"
+				color={'white'}
 			>
-				<Box px={3} py={2}>
-					<Text fontSize={"lg"} color={"black"}>
+				<Box px={3} py={2} className="cutoutcornersboxright">
+					<Text fontSize={"lg"} >
 						{title}
 					</Text>
 				</Box>
 
 				<Divider />
-				<Box px={3} py={1} bg="blackAlpha.100" roundedBottom={8}>
+				<Box px={3} py={1} >
 					<Flex align={"center"} gap={2} mb={2} mt={2} color="white">
 						<Flex gap={2}>
-							<Text color={"blackAlpha.700"}>{message}</Text>
+							<Text color={"whiteAlpha.700"}>{message}</Text>
 						</Flex>
 					</Flex>
 				</Box>
