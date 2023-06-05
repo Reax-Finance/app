@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Info from "../infos/Info";
-import { Flex, Text, Box, Heading, Button, useToast } from "@chakra-ui/react";
+import { Flex, Text, Box, Heading, Button, useToast, Divider } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { IoMdAnalytics, IoMdCash } from "react-icons/io";
 import IconBox from "./IconBox";
