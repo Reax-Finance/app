@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { ChainID, chains } from "./chains";
 import { scrollTestnet, zkSyncTestnet } from 'wagmi/chains';
+import moment from 'moment';
 
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
@@ -89,6 +90,120 @@ export const numberFormatter = new Intl.NumberFormat("en-US", {
 	maximumSignificantDigits: 8,
 	roundingMode: "floor",
 } as any);
+
+// Timing in EDT
+export const MARKET_TIMINGS: any = {
+	"Stock Exchange": {
+		"Monday": {
+			"open": "09:30",
+			"close": "16:00"
+		}, 
+		"Tuesday": {
+			"open": "09:30",
+			"close": "16:00"
+		},
+		"Wednesday": {
+			"open": "09:30",
+			"close": "16:00"
+		},
+		"Thursday": {
+			"open": "09:30",
+			"close": "16:00"
+		},
+		"Friday": {
+			"open": "09:30",
+			"close": "16:00"
+		},
+		"Saturday": {
+			"open": "00:00",
+			"close": "00:01"
+		},
+		"Sunday": {
+			"open": "00:00",
+			"close": "00:01"
+		}
+	}, 
+	"Crypto Market": {
+		"Monday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Tuesday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Wednesday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Thursday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Friday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Saturday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Sunday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+	},
+	"Foreign Exchange": {
+		"Monday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Tuesday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Wednesday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Thursday": {
+			"open": "00:00",
+			"close": "23:59"
+		},
+		"Friday": {
+			"open": "00:00",
+			"close": "16:00"
+		},
+		"Saturday": {
+			"open": "00:00",
+			"close": "00:01"
+		},
+		"Sunday": {
+			"open": "15:00",
+			"close": "23:59"
+		},
+	},
+}
+
+// Check if market is open in EDT
+export const isMarketOpen = (marketName: string) => {
+	const now = new Date();
+	const day = now.toLocaleString("en-US", { weekday: "long" });
+	const time = now.toLocaleString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+	const open = MARKET_TIMINGS[marketName][day]["open"];
+	const close = MARKET_TIMINGS[marketName][day]["close"];
+	return time >= open && time <= close;
+}
+
+const nextDay = (day: string) => {
+	const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+	const index = days.indexOf(day);
+	if (index === 6) {
+		return days[0];
+	} else {
+		return days[index + 1];
+	}
+}
 
 export const numOrZero = (num: number) => {
 	if (num === undefined || num === null || isNaN(num)) return 0;

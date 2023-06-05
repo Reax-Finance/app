@@ -44,7 +44,7 @@ export default function NavLink({
 				</Flex>
 			</motion.div>
 		</Flex>
-		{isPath && <Box w='80%' h={'2px'} rounded='full' bg='primary.400'></Box>}
+		{isPath && <Box w='80%' h={'2px'} rounded='0' bg='primary.400'></Box>}
 		</Flex>
 	);
 };

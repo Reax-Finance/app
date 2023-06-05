@@ -8,7 +8,7 @@ import React, { useContext } from "react";
 import { AppDataContext } from "../components/context/AppDataProvider";
 import CollateralTable from "../components/dashboard/CollateralTable";
 import PoolSelector from "../components/dashboard/PoolSelector";
-import { dollarFormatter } from "../src/const";
+import { dollarFormatter, isMarketOpen } from "../src/const";
 import IssuanceTable from "../components/dashboard/IssuanceTable";
 import { motion } from "framer-motion";
 import Head from "next/head";
@@ -51,7 +51,9 @@ export default function TempPage() {
 				</Box>
 
 				<Box pb={"70px"} mt={5} w='100%'>
-					{!pools[tradingPool]?.paused ? (
+					{(pools[tradingPool]?.paused || !isMarketOpen(pools[tradingPool]?.name ?? 'Crypto Market')) ?(
+						<Paused />
+					) : (
 						<Flex
 							flexDir={{ sm: "column", md: "row" }}
 							align={"stretch"}
@@ -91,10 +93,6 @@ export default function TempPage() {
 								</motion.div>
 							</Box>
 						</Flex>
-					) : tradingPool == 0 ? (
-						<ForexPaused />
-					) : (
-						<Paused />
 					)}
 				</Box>
 				</Box>

@@ -20,7 +20,7 @@ import Image from "next/image";
 import { BigNumber, ethers } from "ethers";
 import TokenSelector from "./TokenSelector";
 import { RiArrowDropDownLine, RiArrowDropUpLine, RiArrowUpFill } from "react-icons/ri";
-import { PYTH_ENDPOINT, dollarFormatter, tokenFormatter } from "../../src/const";
+import { PYTH_ENDPOINT, dollarFormatter, isMarketOpen, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import Response from "../modals/_utils/Response";
@@ -38,7 +38,7 @@ import SelectBody from "./SelectBody";
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(1);
 	const [outputAssetIndex, setOutputAssetIndex] = useState(0);
-	const [inputAmount, setInputAmount] = useState(0);
+	const [inputAmount, setInputAmount] = useState<number>('' as any);
 	const [outputAmount, setOutputAmount] = useState(0);
 	const [nullValue, setNullValue] = useState(false);
 	const [gas, setGas] = useState(0);
@@ -634,7 +634,7 @@ function Swap() {
 								loading ||
 								validateInput() > 0 ||
 								!isValid() || 
-								pools[tradingPool].paused
+								pools[tradingPool].paused || !isMarketOpen(pools[tradingPool].name)
 							}
 							loadingText="Sign the transaction in your wallet"
 							isLoading={loading}
@@ -645,7 +645,7 @@ function Swap() {
 								color: 'whiteAlpha.700',
 							}}
 						>
-							{pools[tradingPool].paused ? 'Market Paused Till 5PM EDT' : !isValid() ? 'Invalid Referral' : validateInput() > 0 ? ERROR_MSG[validateInput()] : "Swap"}
+							{(pools[tradingPool].paused || !isMarketOpen(pools[tradingPool].name)) ? 'Market Paused' : !isValid() ? 'Invalid Referral' : validateInput() > 0 ? ERROR_MSG[validateInput()] : "Swap"}
 						</Button>
 						</Box>
 						{hash && <Box mt={-5} pb={4}>

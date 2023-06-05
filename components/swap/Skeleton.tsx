@@ -6,10 +6,8 @@ export default function SwapSkeleton() {
     <Box height={"382px"} shadow='2xl'>
 					<Flex
 						h={"40%"}
-						bg="whiteAlpha.500"
 						align={"center"}
 						px={5}
-						roundedTop="15"
 						justify="space-between"
 					>
 						<Skeleton
@@ -17,7 +15,6 @@ export default function SwapSkeleton() {
 							bgColor={"black"}
 							height={"50px"}
 							width={"250px"}
-							rounded={"8"}
 						></Skeleton>
 
 						<Box>
@@ -27,7 +24,6 @@ export default function SwapSkeleton() {
 								bgColor={"black"}
 								height={"30px"}
 								width={"150px"}
-								rounded={"8"}
 							></Skeleton>
 
 							<Skeleton
@@ -36,7 +32,6 @@ export default function SwapSkeleton() {
 								bgColor={"black"}
 								height={"20px"}
 								width={"150px"}
-								rounded={"8"}
 							></Skeleton>
 						</Box>
 					</Flex>
@@ -46,7 +41,6 @@ export default function SwapSkeleton() {
 						px={5}
 						h={"60%"}
 						bg="blackAlpha.100"
-						roundedBottom="15"
 					>
 						<Flex justify="space-between" align={"center"}>
 							<Skeleton
@@ -54,7 +48,6 @@ export default function SwapSkeleton() {
 								bgColor={"black"}
 								height={"50px"}
 								width={"250px"}
-								rounded={"8"}
 							></Skeleton>
 
 							<Box>
@@ -64,7 +57,6 @@ export default function SwapSkeleton() {
 									bgColor={"black"}
 									height={"30px"}
 									width={"150px"}
-									rounded={"8"}
 								></Skeleton>
 
 								<Skeleton
@@ -73,7 +65,6 @@ export default function SwapSkeleton() {
 									bgColor={"black"}
 									height={"20px"}
 									width={"150px"}
-									rounded={"8"}
 								></Skeleton>
 							</Box>
 						</Flex>
@@ -83,7 +74,6 @@ export default function SwapSkeleton() {
 							bgColor={"black"}
 							height={"60px"}
 							width={"100%"}
-							rounded={"8"}
 						></Skeleton>
 					</Flex>
 				</Box>

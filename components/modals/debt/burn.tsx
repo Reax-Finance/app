@@ -133,6 +133,15 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 						isClosable: true,
 						position: "top-right"
 					})
+				} else {
+					toast({
+						title: "Transaction Failed",
+						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
+						status: "error",
+						duration: 5000,
+						isClosable: true,
+						position: "top-right"
+					})
 				}
 				setLoading(false);
 			});

@@ -1,7 +1,7 @@
 {
   "contracts": {
     "SyntheX": {
-      "address": "0x9Fb5D7fC0Ecb82b8D48C889B044cfa762F502742",
+      "address": "0x6B34c03F802fdBe034aAd498183831e3edFB304b",
       "abi": "SyntheX",
       "constructorArguments": [],
       "block": "10106802",
@@ -49,7 +49,7 @@
       "latest": "0x4D8188de02b13A51da3Bc65a0c674a92d40DF874"
     },
     "VestedREAX": {
-      "address": "0xF93bC021EF251895D97Ed933A816Dd78423b987D",
+      "address": "0x1E00E80AB9972f6abEC677B715BA042240BA5305",
       "abi": "VestedREAX",
       "constructorArguments": [],
       "block": "10106829",

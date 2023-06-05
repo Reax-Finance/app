@@ -102,14 +102,10 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 		
 		const priceFeedUpdateData = await getUpdateData();
 		if(priceFeedUpdateData.length > 0) args.push(priceFeedUpdateData);
+		console.log(args);
 
 		send(pool, "mint", args)
 			.then(async (res: any) => {
-				// setMessage("Confirming...");
-				// setResponse("Transaction sent! Waiting for confirmation");
-				// setHash(res.hash);
-				// setConfirmed(true);
-				
 				// decode logs
 				const response = await res.wait(1);
 				const decodedLogs = response.logs.map((log: any) => {
@@ -164,12 +160,6 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 					isClosable: true,
 					position: "top-right",
 				})
-				// setMessage("Transaction Successful!");
-				// setResponse(
-				// 	`You have minted ${tokenFormatter.format(amountNumber)} ${
-				// 		asset.token.symbol
-				// 	}`
-				// );
 			})
 			.catch((err: any) => {
 				console.log(err);
@@ -182,11 +172,17 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 						isClosable: true,
 						position: "top-right"
 					})
+				} else {
+					toast({
+						title: "Transaction Failed",
+						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
+						status: "error",
+						duration: 5000,
+						isClosable: true,
+						position: "top-right"
+					})
 				}
 				setLoading(false);
-				// setConfirmed(true);
-				// setResponse("Transaction failed. Please try again!");
-				// setMessage(JSON.stringify(err));
 			});
 	};
 

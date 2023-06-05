@@ -99,7 +99,6 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			}
 		}
 		
-		console.log(collateral);
 		// check allowance if not native
 		if (!isNative) {
 			if (Big(collateral.allowance).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).eq(0)){
@@ -256,7 +255,6 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			});
 			
 		}).catch((err: any) => {
-			console.log(err);
 			if(err?.reason == "user rejected transaction"){
 				toast({
 					title: "Transaction Rejected",
@@ -266,11 +264,17 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 					isClosable: true,
 					position: "top-right"
 				})
+			} else {
+				toast({
+					title: "Transaction Failed",
+					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+					position: "top-right"
+				})
 			}
 			setLoading(false);
-			// setMessage(JSON.stringify(err));
-			// setConfirmed(true);
-			// setResponse("Transaction failed. Please try again!");
 		});
 	};
 
@@ -331,6 +335,15 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				toast({
 					title: "Transaction Rejected",
 					description: "You have rejected the transaction",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+					position: "top-right"
+				})
+			} else {
+				toast({
+					title: "Transaction Failed",
+					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
 					status: "error",
 					duration: 5000,
 					isClosable: true,
@@ -400,6 +413,15 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 					toast({
 						title: "Signature Rejected",
 						description: "You have rejected the signature",
+						status: "error",
+						duration: 5000,
+						isClosable: true,
+						position: "top-right"
+					})
+				} else {
+					toast({
+						title: "Transaction Failed",
+						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
 						status: "error",
 						duration: 5000,
 						isClosable: true,

@@ -43,14 +43,14 @@ export default function Debt({ synth, index }: any) {
 
 	const { pools, tradingPool, account } = useContext(AppDataContext);
 
-	const [amount, setAmount] = React.useState("0");
+	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [tabSelected, setTabSelected] = useState(0);
 
 	const { address } = useAccount();
 
 	const _onClose = () => {
-		setAmount("0");
+		setAmount("");
 		setAmountNumber(0);
 		onClose();
 	};

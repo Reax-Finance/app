@@ -266,7 +266,6 @@ export default function Position() {
                             ).toFixed(1)}{" "}
                             %
                         </Text>
-                        
                     </Box>
                 </motion.div>
                 

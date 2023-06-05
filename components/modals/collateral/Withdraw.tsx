@@ -123,12 +123,6 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 				isClosable: true,
 				position: 'top-right'
 			})
-
-			// setMessage(
-			// 	"Transaction Successful!"
-			// );
-			// setResponse(`You have withdrawn ${amount} ${collateral.token.symbol}.`);
-			
 		}).catch((err: any) => {
 			console.log(err);
 			if(err?.reason == "user rejected transaction"){
@@ -140,11 +134,17 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 					isClosable: true,
 					position: "top-right"
 				})
+			} else {
+				toast({
+					title: "Transaction Failed",
+					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+					position: "top-right"
+				})
 			}
 			setLoading(false);
-			// setMessage(JSON.stringify(err));
-			// setConfirmed(true);
-			// setResponse("Transaction failed. Please try again!");
 		});
 	};
 

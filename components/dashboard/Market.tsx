@@ -175,7 +175,7 @@ export default function Market() {
 
 				<Box textAlign={"right"}>
 					<Heading size={"sm"} color={"whiteAlpha.600"}>
-						Liquidity Rewards
+						Rewards
 					</Heading>
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
@@ -184,11 +184,10 @@ export default function Market() {
 								veREAX
 							</Text>
 						</Flex>
-						<Box mt={1} w={'100%'} className="outlinedButton">
+						<Box mt={2} w={'100%'} className="outlinedButton">
 						<Button
 							onClick={claim}
 							bg={'transparent'}
-							// variant={'unstyled'}
 							w="100%"
 							rounded={0}
 							size={"sm"}
