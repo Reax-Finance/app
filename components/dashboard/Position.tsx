@@ -88,7 +88,6 @@ export default function Position() {
                             flexDir={{ sm: "column", md: "row" }}
                             gap={{ sm: 10, md: 12 }}
                             zIndex={1}
-                            my={-2}
                         >
                             <Flex gap={3} align="start">
                                 <IconBox>
@@ -273,7 +272,7 @@ export default function Position() {
                 
             </Flex>
             <Box
-                            mt={2}
+                            // mt={2}
                             width={"100%"}
                             bg="whiteAlpha.200"
                         >
