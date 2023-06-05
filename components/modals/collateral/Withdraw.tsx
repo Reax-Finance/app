@@ -153,14 +153,8 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 
 	return (
 		<>
-			<Box bg={"bg2"} roundedBottom={16} px={5} py={5}>
-				<Box
-					// border="1px"
-					// borderColor={"gray.700"}
-					mt={4}
-					rounded={8}
-					// p={2}
-				>
+			<Box bg={"bg2"} px={5} py={5}>
+				<Box mt={4}>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
 						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
@@ -191,11 +185,6 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 					<Divider my={2} />
 
 					<Flex justify="space-between">
-						{/* <Text fontSize={"xs"} color="whiteAlpha.600">
-								1 {asset._mintedTokens[selectedAssetIndex].symbol} = {asset._mintedTokens[selectedAssetIndex].lastPriceUSD}{" "}
-								USD
-							</Text> */}
-
 							<Flex gap={1}>
 						<Tooltip label='Minimum Loan to Value Ratio'>
 

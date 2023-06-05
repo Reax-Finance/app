@@ -378,6 +378,21 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				setDeadline(_deadline);
 				setApprovedAmount(approveMax ? (Number.MAX_SAFE_INTEGER).toString() : _amount);
 				setApproveLoading(false);
+				toast({
+					title: "Approval Signed",
+					description: <Box>
+						<Text>
+							{`for ${_amount} ${collateral.token.symbol}`}
+						</Text>
+						<Text>
+							Please deposit to continue
+						</Text>
+					</Box>,
+					status: "info",
+					duration: 10000,
+					isClosable: true,
+					position: "top-right"
+				})
 			})
 			.catch((err: any) => {
 				console.log("err", JSON.stringify(err));
@@ -406,14 +421,8 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 
 	return (
 		<>
-			<Box bg={"bg2"} roundedBottom={16} px={5} pt={5} pb={5}>
-				<Box
-					// border="1px"
-					// borderColor={"gray.700"}
-					mt={4}
-					rounded={8}
-					// p={2}
-				>
+			<Box bg={"bg2"} px={5} pt={5} pb={5}>
+				<Box mt={4}>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
 						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>

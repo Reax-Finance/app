@@ -65,9 +65,9 @@ export default function Market() {
 	const toast = useToast();
 
 	useEffect(() => {
-		if (connectedChain) {
+		if (connectedChain && pools[tradingPool]) {
 			if (
-				synAccrued == null &&
+				
 				isConnected &&
 				!(connectedChain as any).unsupported &&
 				pools.length > 0
@@ -77,7 +77,7 @@ export default function Market() {
 						.getRewardsAccrued(
 							[pools[0].rewardTokens[0].id],
 							address,
-							pools.map((pool: any) => pool.id)
+							[pools[tradingPool].id]
 						)
 						.then((result) => {
 							setSynAccrued(result[0].toString());
@@ -85,7 +85,7 @@ export default function Market() {
 				});
 			}
 		}
-	}, [connectedChain, synAccrued, isConnected, pools, address]);
+	}, [connectedChain, synAccrued, isConnected, pools, address, tradingPool]);
 
 	const claim = async () => {
 		setClaiming(true);
@@ -130,6 +130,8 @@ export default function Market() {
 				display={{ sm: "block", md: "flex" }}
 				justifyContent={"space-between"}
 				alignContent={"start"}
+				mt={10}
+				mb={6}
 			>
 				<Box>
 					<PoolSelector />
@@ -179,22 +181,25 @@ export default function Market() {
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{synAccrued ? Big(synAccrued).div(10**18).toFixed(2) : '-'} </Text>
 							<Text fontSize={"2xl"} color={"whiteAlpha.400"}>
-								REAX
+								veREAX
 							</Text>
 						</Flex>
+						<Box mt={1} w={'100%'} className="outlinedButton">
 						<Button
 							onClick={claim}
-							mt={2}
-							variant={"outline"}
+							bg={'transparent'}
+							// variant={'unstyled'}
 							w="100%"
 							rounded={0}
 							size={"sm"}
                             isLoading={claiming}
                             loadingText={"Claiming"}
-                            disabled={synAccrued == null || synAccrued == 0}
+                            isDisabled={synAccrued == null || Number(synAccrued) == 0}
+							_hover={{ bg: "transparent" }}
 						>
 							Claim
 						</Button>
+						</Box>
 					</Box>
 				</Box>
 			</Box>

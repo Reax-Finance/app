@@ -39,7 +39,7 @@ export default function CollateralModal({ collateral, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [tabSelected, setTabSelected] = useState(0);
 
-	const [amount, setAmount] = React.useState("0");
+	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
@@ -174,8 +174,6 @@ export default function CollateralModal({ collateral, index }: any) {
 					width={"30rem"}
 					bgColor="bg1"
 					rounded={0}
-					border="2px"
-					borderColor={"whiteAlpha.100"}
 					mx={2}
 				>
 					<ModalCloseButton rounded={"full"} mt={1} />

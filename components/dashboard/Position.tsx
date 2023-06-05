@@ -43,13 +43,38 @@ export default function Position() {
             display={{ sm: "block", md: "block" }}
             className='positionTable'
         >
-            <Box p={5} className='cutoutcornersboxright'>
+            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='cutoutcornersboxright'>
                 <Heading fontSize={'xl'}>
                     <span className='gradienttext'>
                     Your Position
                     </span>
                 </Heading>
-            </Box>
+
+                <Info
+								message={`You can issue debt till you reach Collateral's Base LTV`}
+								title={"Borrow Capacity"}
+							>
+								<Flex
+									justify={{ sm: "start", md: "end" }}
+									align="center"
+									gap={1}
+									cursor={"help"}
+                                    fontSize={"sm"} 
+								>
+									<Text color="whiteAlpha.700">
+										Available to Mint: {" "}
+									</Text>
+									<Text
+										mr={0.5}
+										fontWeight="medium"
+									>
+										{dollarFormatter.format(
+											availableToIssue()
+										)}
+									</Text>
+								</Flex>
+							</Info>
+            </Flex>
             <Flex p={5} justifyContent={"space-between"} alignContent={"center"}>
                 <Flex flexDir={"column"} justify="center">
                     <motion.div
@@ -63,6 +88,7 @@ export default function Position() {
                             flexDir={{ sm: "column", md: "row" }}
                             gap={{ sm: 10, md: 12 }}
                             zIndex={1}
+                            my={-2}
                         >
                             <Flex gap={3} align="start">
                                 <IconBox>
@@ -78,7 +104,7 @@ export default function Position() {
 
                                 <Box cursor={'help'}>
                                     <Heading
-                                        size={"sm"}
+                                        size={"xs"}
                                         color="whiteAlpha.700"
                                         mb={0.5}
                                     >
@@ -86,7 +112,7 @@ export default function Position() {
                                     </Heading>
                                     <Flex
                                         fontWeight={"semibold"}
-                                        fontSize={"xl"}
+                                        fontSize={"lg"}
                                         gap={1}
                                         color={"whiteAlpha.800"}
                                     >
@@ -118,7 +144,7 @@ export default function Position() {
                                     <Box cursor={"help"}>
                                         <Heading
                                             mb={0.5}
-                                            size={"sm"}
+                                            size={"xs"}
                                             color="whiteAlpha.700"
                                         >
                                             Debt
@@ -126,7 +152,7 @@ export default function Position() {
                                         <Flex gap={2} align="center">
                                             <Flex
                                                 fontWeight={"semibold"}
-                                                fontSize={"xl"}
+                                                fontSize={"lg"}
                                                 gap={1}
                                                 color={"whiteAlpha.800"}
                                             >
@@ -147,11 +173,6 @@ export default function Position() {
 
                             {Big(pools[tradingPool]?.userDebt ?? 0).gt(0) && <Flex gap={3} align="start">
                                 <IconBox>
-                                    {/* <Image
-                                        h={"20px"}
-                                        src="/icon2.svg"
-                                        alt={"icon2"}
-                                    /> */}
                                     <IoMdAnalytics size={'20px'} />
                                 </IconBox>
 
@@ -164,7 +185,7 @@ export default function Position() {
                                     <Box cursor={"help"}>
                                         <Heading
                                             mb={0.5}
-                                            size={"sm"}
+                                            size={"xs"}
                                             color="whiteAlpha.700"
                                         >
                                             PnL
@@ -172,7 +193,7 @@ export default function Position() {
                                         <Flex gap={2} align="center">
                                             <Flex
                                                 fontWeight={"semibold"}
-                                                fontSize={"xl"}
+                                                fontSize={"lg"}
                                                 gap={1}
                                                 color={Big(totalPortfolioValue()).gt(pools[tradingPool]?.userDebt ?? 0) ? 'green.400' : 'red.400'}
                                             >
@@ -202,7 +223,7 @@ export default function Position() {
                 >
                     <Box
                         textAlign={{ sm: "left", md: "right" }}
-                        mt={{ sm: 16, md: 0 }}
+                        mt={{ sm: 16, md: 1.5 }}
                     >
                         <Info
                             message={`Your Debt Limit depends on your LTV %. Account would be liquidated if LTV is greater than your Collateral's Liquidation Threshold`}
@@ -213,7 +234,6 @@ export default function Position() {
                                 align="center"
                                 gap={1}
                                 cursor={"help"}
-                                mt={-1}
                             >
                                 <Heading
                                     size={"sm"}
@@ -233,7 +253,6 @@ export default function Position() {
                         <Text
                             fontWeight={"semibold"}
                             fontSize={"3xl"}
-                            mb={1}
                             color={
                                 pools[tradingPool]?.userCollateral > 0
                                     ? availableToIssue() > 1
@@ -248,31 +267,7 @@ export default function Position() {
                             ).toFixed(1)}{" "}
                             %
                         </Text>
-                        <Info
-								message={`You can issue debt till you reach Collateral's Base LTV`}
-								title={"Borrow Capacity"}
-							>
-								<Flex
-									justify={{ sm: "start", md: "end" }}
-									align="center"
-									gap={1}
-									cursor={"help"}
-                                    mb={-3}
-                                    fontSize={"xs"} 
-								>
-									<Text color="whiteAlpha.700">
-										Available: {" "}
-									</Text>
-									<Text
-										mr={0.5}
-										fontWeight="medium"
-									>
-										{dollarFormatter.format(
-											availableToIssue()
-										)}
-									</Text>
-								</Flex>
-							</Info>
+                        
                     </Box>
                 </motion.div>
                 

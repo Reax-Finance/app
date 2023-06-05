@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, useDisclosure, useToast } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
 import {
@@ -30,7 +30,8 @@ const mintAmounts: any = {
     "LINK": "10",
     "Link": "10",
     "wstETH": "10",
-    "ARB": '10'
+    "ARB": '10', 
+    "ETH": "0.1"
 };
 
 import Head from "next/head";
@@ -74,8 +75,6 @@ export default function Faucet() {
 				(item, index) => _collaterals.indexOf(item) === index
 			);
 
-            console.log(_collaterals);
-
 			setCollaterals(_collaterals);
 		}
 	});
@@ -85,16 +84,26 @@ export default function Faucet() {
         onOpen();
     }
 
+    const toast = useToast();
+
     const mint = async () => {
         setLoading(true);
         const token = await getContract("MockToken", chain?.id!, openedCollateral.token.id);
-        const amount = ethers.utils.parseEther(mintAmounts[openedCollateral.token.symbol]);
+        const amount = ethers.utils.parseUnits(mintAmounts[openedCollateral.token.symbol], openedCollateral.token.decimals);
         send(token, "mint", [address, amount])
             .then(async(res: any) => {
                 await res.wait(1);
                 setLoading(false);
                 updateCollateralWalletBalance(openedCollateral.token.id, pools[0].id, amount.toString(), false);
                 updateCollateralWalletBalance(openedCollateral.token.id, pools[1].id, amount.toString(), false);
+                toast({
+                    title: `Minted ${openedCollateral.token.symbol}`,
+                    description: `${mintAmounts[openedCollateral.token.symbol]} ${openedCollateral.token.symbol} minted to your wallet.`,
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                    position: 'top-right'
+                })
                 onClose();
             })
             .catch((err: any) => {

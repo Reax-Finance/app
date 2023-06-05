@@ -629,6 +629,7 @@ function Swap() {
 							width={"100%"}
 							rounded={0}
 							onClick={exchange}
+							bg={'transparent'}
 							isDisabled={
 								loading ||
 								validateInput() > 0 ||

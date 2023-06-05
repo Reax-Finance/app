@@ -60,3 +60,16 @@ body {
   background-repeat: no-repeat;
   background-size: 100% 50%;
 }
+
+.outlinedButton {
+  background: linear-gradient(45deg, transparent 5px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 5px, #ffffff10 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+/* hover for outlined button */
+.outlinedButton:hover {
+  background: linear-gradient(45deg, transparent 5px, #2B2E32 0) bottom left, linear-gradient(-135deg, transparent 5px, #2B2E32 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}

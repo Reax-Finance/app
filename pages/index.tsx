@@ -50,7 +50,7 @@ export default function TempPage() {
 					<Position/>
 				</Box>
 
-				<Box pb={"100px"} mt={5} w='100%'>
+				<Box pb={"70px"} mt={5} w='100%'>
 					{!pools[tradingPool]?.paused ? (
 						<Flex
 							flexDir={{ sm: "column", md: "row" }}
