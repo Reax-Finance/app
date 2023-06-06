@@ -409,6 +409,8 @@ function AppDataProvider({ children }: any) {
 			"any"
 		);
 
+		_pools = _pools.reverse();
+
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),
 			getABI("Multicall2", chainId),
