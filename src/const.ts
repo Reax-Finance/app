@@ -190,10 +190,11 @@ export const MARKET_TIMINGS: any = {
 // Check if market is open in EDT
 export const isMarketOpen = (marketName: string) => {
 	const now = new Date();
-	const day = now.toLocaleString("en-US", { weekday: "long" });
-	const time = now.toLocaleString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+	const day = now.toLocaleString("en-US", { timeZone: 'America/New_York', weekday: "long" });
+	const time = now.toLocaleString("en-US", { timeZone: 'America/New_York', hour: "2-digit", minute: "2-digit", hour12: false });
 	const open = MARKET_TIMINGS[marketName][day]["open"];
 	const close = MARKET_TIMINGS[marketName][day]["close"];
+	console.log(time, open, close);
 	return time >= open && time <= close;
 }
 

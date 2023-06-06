@@ -113,7 +113,6 @@ function TokenSelector({
 								<Box key={tokenIndex}>
 								<Divider/>
 								<Flex
-									
 									justify="space-between"
 									align={"center"}
 									py={3}
