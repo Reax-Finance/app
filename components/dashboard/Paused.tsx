@@ -8,15 +8,13 @@ export default function Paused() {
 		<>
 			<Flex
 				gap={3}
-				bg={"bg2"}
-				rounded="16"
+				rounded="0"
 				flexDir={"column"}
-				h="360px"
+				h="320px"
 				w={"100%"}
 				align="center"
 				justify={"center"}
-				border="2px"
-				borderColor={"whiteAlpha.200"}
+				className="cutoutcornersbox"
 			>
 				<Heading fontSize={"24px"}>Market Paused</Heading>
 				<Text
@@ -29,7 +27,7 @@ export default function Paused() {
 					through Friday
 				</Text>
 
-				<Text
+				{/* <Text
 					textAlign={"center"}
 					color="whiteAlpha.700"
 					maxW={"500px"}
@@ -39,7 +37,7 @@ export default function Paused() {
 					only from 5PM EDT on Sunday through 4PM EDT on Friday.
 					Additionally, some currencies might trade only during local
 					banking hours.
-				</Text>
+				</Text> */}
 			</Flex>
 		</>
 	);

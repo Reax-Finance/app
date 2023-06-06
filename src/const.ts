@@ -198,16 +198,6 @@ export const isMarketOpen = (marketName: string) => {
 	return time >= open && time <= close;
 }
 
-const nextDay = (day: string) => {
-	const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-	const index = days.indexOf(day);
-	if (index === 6) {
-		return days[0];
-	} else {
-		return days[index + 1];
-	}
-}
-
 export const numOrZero = (num: number) => {
 	if (num === undefined || num === null || isNaN(num)) return 0;
 	return num;

@@ -6,12 +6,8 @@ import Swap from "../components/swap/index";
 export default function swap() {
 	return (
 		<Flex >
-				<Box 
-				// bgImage='/center-glow.svg' bgRepeat={'no-repeat'} bgPos='50% 50%'
-				w='100%' h={'100%'} 
-				>
+			<Box w='100%' h={'100%'}>
 			<Flex justify={"center"} align="center" h={"88vh"}>
-
 				<Box w={"43%"} minW="400px" >
 					<motion.div
 						initial={{ opacity: 0, y: 15 }}
@@ -21,20 +17,15 @@ export default function swap() {
 					>
 						<Box
 							animation={"fadeIn 0.5s ease-in-out"}
-							// bgColor={"whiteAlpha.100"}
 							className="cutoutcornersbox"
-							// border='2px'
-							// borderColor='whiteAlpha.200'
-							// rounded={16}
 							boxShadow={'xl'}
 						>
 							<Swap />
 						</Box>
 					</motion.div>
 				</Box>
-
 			</Flex>
-				</Box>
+			</Box>
 		</Flex>
 	);
 }
