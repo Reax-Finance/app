@@ -1,7 +1,7 @@
 import * as React from "react";
 import axios from "axios";
 import { getAddress, getABI, getContract } from "../../src/contract";
-import { ADDRESS_ZERO, dollarFormatter, Endpoints, WETH_ADDRESS, query, tokenFormatter, query_leaderboard, query_referrals, PYTH_ENDPOINT } from '../../src/const';
+import { ADDRESS_ZERO, dollarFormatter, Endpoints, WETH_ADDRESS, query, tokenFormatter, query_leaderboard, query_referrals, PYTH_ENDPOINT, defaultChainId } from '../../src/const';
 import { ChainID, chainMapping } from "../../src/chains";
 import { BigNumber, ethers } from "ethers";
 import { useEffect } from 'react';
@@ -86,7 +86,7 @@ function AppDataProvider({ children }: any) {
 	}, [refresh, pools, random]); 
 
 	const fetchData = (_address: string | null): Promise<number> => {
-		let chainId = chain?.id!;
+		let chainId = chain?.id ?? defaultChainId;
 		if(chain?.unsupported) chainId = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? ChainID.ARB_GOERLI : ChainID.ARB;
 		console.log("fetching for chain", chainId);
 		return new Promise((resolve, reject) => {
@@ -189,6 +189,7 @@ function AppDataProvider({ children }: any) {
 	}
 
 	const refreshData = async (_pools = pools) => {
+		const chainId = chain?.id ?? defaultChainId;
 		if(!isConnected) return;
 		console.log("Refreshing data", address);
 		const reqs: any[] = [];
@@ -201,12 +202,12 @@ function AppDataProvider({ children }: any) {
 			"any"
 		);
 		const helper = new ethers.Contract(
-			getAddress("Multicall2", chain?.id!),
-			getABI("Multicall2", chain?.id!),
+			getAddress("Multicall2", chainId),
+			getABI("Multicall2", chainId),
 			provider.getSigner()
 		);
-		const pool = new ethers.Contract(_pools[0].id, getABI("Pool", chain?.id!), helper.provider);
-		const priceOracle = new ethers.Contract(_pools[0].oracle, getABI("PriceOracle", chain?.id!), helper.provider);
+		const pool = new ethers.Contract(_pools[0].id, getABI("Pool", chainId), helper.provider);
+		const priceOracle = new ethers.Contract(_pools[0].oracle, getABI("PriceOracle", chainId), helper.provider);
 		for(let i in _pools) {
 			for(let j in _pools[i].collaterals) {
 				reqs.push([
@@ -415,25 +416,25 @@ function AppDataProvider({ children }: any) {
 		_account: any,
 		_address: string
 	): Promise<number> => {
-		console.log("setting pools");
+		const chainId = chain?.id ?? defaultChainId;
 		const provider = new ethers.providers.Web3Provider(
 			(window as any).ethereum!,
 			"any"
 		);
 
 		const helper = new ethers.Contract(
-			getAddress("Multicall2", chain?.id!),
-			getABI("Multicall2", chain?.id!),
+			getAddress("Multicall2", chainId),
+			getABI("Multicall2", chainId),
 			provider.getSigner()
 		);
 		return new Promise(async (resolve, reject) => {
 			let calls: any[] = [];
-			const itf = new ethers.utils.Interface(getABI("MockToken", chain?.id!));
+			const itf = new ethers.utils.Interface(getABI("MockToken", chainId));
 
 			for (let i = 0; i < _pools.length; i++) {
 				for(let j = 0; j < _pools[i].collaterals.length; j++) {
 					const collateral = _pools[i].collaterals[j];
-					if(collateral.token.id == WETH_ADDRESS(chain?.id!)?.toLowerCase()) {
+					if(collateral.token.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
 						calls.push([
 							helper.address,
 							helper.interface.encodeFunctionData("getEthBalance", [
@@ -454,7 +455,7 @@ function AppDataProvider({ children }: any) {
 					]);
 					// nonces
 					try{
-						const _token = await getContract("MockToken", chain?.id!, collateral.token.id);
+						const _token = await getContract("MockToken", chainId, collateral.token.id);
 						let _nonce = (await _token.nonces(_address)).toString();
 						_pools[i].collaterals[j].nonce = _nonce;
 					} catch (err) {}
@@ -479,7 +480,7 @@ function AppDataProvider({ children }: any) {
 				// setting wallet balance and allowance
 				for (let i = 0; i < _pools.length; i++) {
 					for(let j = 0; j < _pools[i].collaterals.length; j++) {
-						if(_pools[i].collaterals[j].token.id == WETH_ADDRESS(chain?.id!)?.toLowerCase()) {
+						if(_pools[i].collaterals[j].token.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
 							_pools[i].collaterals[j].nativeBalance = BigNumber.from(
 								res.returnData[index]
 							).toString();

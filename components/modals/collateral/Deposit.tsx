@@ -10,7 +10,7 @@ import {
 	Tooltip,
 	Switch,
 } from "@chakra-ui/react";
-import { PARTNER_ASSETS, PARTNER_WARNINGS, dollarFormatter, numOrZero } from '../../../src/const';
+import { PARTNER_ASSETS, PARTNER_WARNINGS, defaultChainId, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
@@ -147,7 +147,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		setResponse(null);
 		setHash(null);
 		const poolId = pools[tradingPool].id;
-		const pool = await getContract("Pool", chain?.id!, poolId);
+		const pool = await getContract("Pool", chain?.id ?? defaultChainId, poolId);
 		const _amount = ethers.utils.parseUnits(Big(amount).toFixed(collateral.token.decimals, 0), collateral.token.decimals); 
 
 		let tx;
@@ -280,7 +280,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 
 	const approveTx = async () => {
 		setApproveLoading(true);
-		const collateralContract = await getContract("MockToken", chain?.id!, collateral.token.id);
+		const collateralContract = await getContract("MockToken", chain?.id ?? defaultChainId, collateral.token.id);
 		send(
 			collateralContract,
 			"approve",
@@ -357,14 +357,13 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		setApproveLoading(true);
 		console.log(collateral);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
-		// const _amount = Big(amount).round(collateral.token.decimals, 0).toString()
 		const _amount = Big(amount).toFixed(collateral.token.decimals, 0);
 		const value = approveMax ? ethers.constants.MaxUint256 : ethers.utils.parseUnits(_amount, collateral.token.decimals);
 		signTypedDataAsync({
 			domain: {
 				name: collateral.token.name,
 				version: "1",
-				chainId: chain?.id!,
+				chainId: chain?.id ?? defaultChainId,
 				verifyingContract: collateral.token.id,
 			},
 			types: {

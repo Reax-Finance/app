@@ -3,6 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getContract } from "../../src/contract";
 import { useNetwork } from 'wagmi';
+import { defaultChainId } from "../../src/const";
 
 const TokenContext = React.createContext<TokenValue>({} as TokenValue);
 
@@ -49,12 +50,12 @@ function TokenContextProvider({ children }: any) {
 
 	const fetchData = async (address: string) => {
 		// token unlocks
-		const essyx = await getContract("VestedREAX", chain?.id!);
+		const essyx = await getContract("VestedREAX", chain?.id ?? defaultChainId);
 		const tokenUnlocks = BigNumber.from(
 			await essyx.unlockRequestCount(address)
 		).toNumber();
 
-		const multicall = await getContract("Multicall2", chain?.id!);
+		const multicall = await getContract("Multicall2", chain?.id ?? defaultChainId);
 		let calls = [];
 
 		for (let i = 0; i < tokenUnlocks; i++) {
@@ -90,7 +91,7 @@ function TokenContextProvider({ children }: any) {
 			await essyx.balanceOf(address)
 		).toString();
 
-		const syn = await getContract("ReaxToken", chain?.id!);
+		const syn = await getContract("ReaxToken", chain?.id ?? defaultChainId);
 		const synBalance = BigNumber.from(
 			await syn.balanceOf(address)
 		).toString();

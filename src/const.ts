@@ -33,6 +33,8 @@ export const mantleTestnet = {
     testnet: true
 };
 
+export const defaultChainId = mantleTestnet.id;
+
 const _WETH_ADDRESS: any = {
 	[mantleTestnet.id]: "0x55f317247632d42584848064A0cC0190fE1f6c58"
 };
