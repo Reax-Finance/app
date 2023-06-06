@@ -175,7 +175,10 @@ export default function Market() {
 					</Flex>
 				</Box>
 
-				<Box textAlign={"right"}>
+				{
+					(pools[tradingPool]
+					?.userDebt > 0 || synAccrued > 0) &&
+					<Box textAlign={"right"}>
 					<Heading size={"sm"} color={"whiteAlpha.600"}>
 						Rewards
 					</Heading>
@@ -202,7 +205,7 @@ export default function Market() {
 						</Button>
 						</Box>
 					</Box>
-				</Box>
+				</Box>}
 			</Box>
 		</>
 	);

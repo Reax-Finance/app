@@ -239,7 +239,7 @@ export default function PoolSelector() {
 															index: number
 														) => (
 															<Box
-																mr={-4}
+																mr={-3}
 																key={index}
 															>
 																<Image

@@ -10,7 +10,7 @@ import {
 	Tooltip,
 	Switch,
 } from "@chakra-ui/react";
-import { PARTNER_ASSETS, PARTNER_WARNINGS, defaultChainId, dollarFormatter, numOrZero } from '../../../src/const';
+import { PARTNER_ASSETS, PARTNER_WARNINGS, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
@@ -147,7 +147,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		setResponse(null);
 		setHash(null);
 		const poolId = pools[tradingPool].id;
-		const pool = await getContract("Pool", chain?.id ?? defaultChainId, poolId);
+		const pool = await getContract("Pool", chain?.id ?? defaultChain.id, poolId);
 		const _amount = ethers.utils.parseUnits(Big(amount).toFixed(collateral.token.decimals, 0), collateral.token.decimals); 
 
 		let tx;
@@ -280,7 +280,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 
 	const approveTx = async () => {
 		setApproveLoading(true);
-		const collateralContract = await getContract("MockToken", chain?.id ?? defaultChainId, collateral.token.id);
+		const collateralContract = await getContract("MockToken", chain?.id ?? defaultChain.id, collateral.token.id);
 		send(
 			collateralContract,
 			"approve",
@@ -363,7 +363,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			domain: {
 				name: collateral.token.name,
 				version: "1",
-				chainId: chain?.id ?? defaultChainId,
+				chainId: chain?.id ?? defaultChain.id,
 				verifyingContract: collateral.token.id,
 			},
 			types: {

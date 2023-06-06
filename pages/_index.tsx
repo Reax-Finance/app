@@ -81,7 +81,7 @@ export default function _index({ children }: any) {
 				<Text
 					textAlign={'center'}
 					width="100%"
-					fontSize={'md'}
+					fontSize={'sm'}
 					fontWeight="bold"
 					p={2}>
 					{message}

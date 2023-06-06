@@ -1,7 +1,7 @@
 import * as React from "react";
 import axios from "axios";
 import { getAddress, getABI, getContract } from "../../src/contract";
-import { ADDRESS_ZERO, dollarFormatter, Endpoints, WETH_ADDRESS, query, tokenFormatter, query_leaderboard, query_referrals, PYTH_ENDPOINT, defaultChainId } from '../../src/const';
+import { ADDRESS_ZERO, dollarFormatter, Endpoints, WETH_ADDRESS, query, tokenFormatter, query_leaderboard, query_referrals, PYTH_ENDPOINT, defaultChain } from '../../src/const';
 import { ChainID, chainMapping } from "../../src/chains";
 import { BigNumber, ethers } from "ethers";
 import { useEffect } from 'react';
@@ -86,7 +86,7 @@ function AppDataProvider({ children }: any) {
 	}, [refresh, pools, random]); 
 
 	const fetchData = (_address: string | null): Promise<number> => {
-		let chainId = chain?.id ?? defaultChainId;
+		let chainId = chain?.id ?? defaultChain.id;
 		if(chain?.unsupported) chainId = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? ChainID.ARB_GOERLI : ChainID.ARB;
 		console.log("fetching for chain", chainId);
 		return new Promise((resolve, reject) => {
@@ -146,7 +146,7 @@ function AppDataProvider({ children }: any) {
 				.catch((err) => {
 					setStatus("error");
 					setMessage(
-						"Failed to fetch data. Please refresh the page or try again later."
+						"Failed to fetch data. Please ensure you are connected to Mantle and try again later."
 					);
 				});
 		});
@@ -181,8 +181,9 @@ function AppDataProvider({ children }: any) {
 
 	const refreshData = async (_pools = pools) => {
 		return new Promise(async (resolve, reject) => {
-			const chainId = chain?.id ?? defaultChainId;
-			if(!isConnected) return;
+			const chainId = chain?.id ?? defaultChain.id;
+			if(!isConnected) resolve(1);
+			if(chain?.unsupported) return Promise.resolve(1);
 			const reqs: any[] = [];
 			if(_pools.length == 0) {
 				console.log("No pools found", _pools);
@@ -403,7 +404,8 @@ function AppDataProvider({ children }: any) {
 		_address: string,
 		nTries: number = 0
 	): Promise<number> => {
-		const chainId = chain?.id ?? defaultChainId;
+		const chainId = chain?.id ?? defaultChain.id;
+		if(chain?.unsupported) return Promise.resolve(1);
 		const provider = new ethers.providers.Web3Provider(
 			(window as any).ethereum!,
 			"any"

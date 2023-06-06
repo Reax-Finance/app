@@ -33,7 +33,7 @@ export const mantleTestnet = {
     testnet: true
 };
 
-export const defaultChainId = mantleTestnet.id;
+export const defaultChain = mantleTestnet;
 
 const _WETH_ADDRESS: any = {
 	[mantleTestnet.id]: "0x55f317247632d42584848064A0cC0190fE1f6c58"
@@ -45,8 +45,6 @@ export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
 export const APP_NAME = 'Reax';
 
 const _Endpoints: any = {
-	[ChainID.ARB]: process.env.NEXT_PUBLIC_GRAPH_URL_42161,
-	[ChainID.ARB_GOERLI]: process.env.NEXT_PUBLIC_GRAPH_URL_421613,
 	[mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_5001,
 }
 
@@ -208,7 +206,7 @@ export const PARTNER_WARNINGS: any = {
 
 export const query = (address: string) => (
 	`{
-		pools {
+		pools (orderBy: symbol) {
 		  id
 		  name
 		  symbol
