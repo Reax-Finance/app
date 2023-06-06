@@ -5,8 +5,8 @@ const myCustomTheme: Theme = {
     modalOverlay: '...',
   },
   colors: {
-    accentColor: '#000000',
-    accentColorForeground: '#000000',
+    accentColor: '#F64E00',
+    accentColorForeground: '#ffffff',
     connectButtonBackground: '#F64E00',
     modalBackground: 'white',
     actionButtonBorder: "rgba(0, 0, 0, 0.1)",
