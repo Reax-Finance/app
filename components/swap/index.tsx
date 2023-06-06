@@ -252,7 +252,7 @@ function Swap() {
 
 
 	useEffect(() => {
-		if (pools[tradingPool] && !isNaN(Number(inputAmount)) && validateInput() == 0)
+		if (pools.length > 0 && !isNaN(Number(inputAmount)) && validateInput() == 0)
 			getContract("Pool", chain?.id!, pools[tradingPool].id).then(async (contract: any) => {
 
 				const priceFeedUpdateData = await getUpdateData();

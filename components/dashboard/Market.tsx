@@ -59,7 +59,7 @@ export default function Market() {
 	const [synAccrued, setSynAccrued] = useState<any>(null);
 	const [claiming, setClaiming] = useState(false);
 	const { chain: connectedChain } = useNetwork();
-	const { address, isConnected, isConnecting } = useAccount();
+	const { address, isConnected } = useAccount();
 
 	const { claimed } = useContext(TokenContext);
 	const toast = useToast();
@@ -67,7 +67,6 @@ export default function Market() {
 	useEffect(() => {
 		if (connectedChain && pools[tradingPool]) {
 			if (
-				
 				isConnected &&
 				!(connectedChain as any).unsupported &&
 				pools.length > 0
@@ -81,7 +80,10 @@ export default function Market() {
 						)
 						.then((result) => {
 							setSynAccrued(result[0].toString());
-						});
+						})
+						.catch((err) => {
+							console.log("Failed to getRewardsAccrued", err);
+						})
 				});
 			}
 		}
