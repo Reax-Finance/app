@@ -124,19 +124,6 @@ function AppDataProvider({ children }: any) {
 							const pool = pools[i];
 							// reverse pool.collaterals
 							pool.collaterals = pool.collaterals.reverse();
-							
-							// TODO: check average burn and revenue
-							// let averageDailyBurn = Big(0);
-							// let averageDailyRevenue = Big(0);
-							// for(let j = 0; j < pool.poolDayData.length; j++) {
-							// 	for(let k = 0; k < pool.poolDayData[j].synths.length; k++) {
-							// 		let synthDayData = pool.poolDayData[j].synths[k].synthDayData;
-							// 		averageDailyBurn = averageDailyBurn.plus(pool.poolDayData[j].dailyBurnUSD);
-							// 		averageDailyRevenue = averageDailyRevenue.plus(pool.poolDayData[j].dailyRevenueUSD);
-							// 	}
-							// }
-							// pool.averageDailyBurn = pool.poolDayData.length > 0 ? averageDailyBurn.div(pool.poolDayData.length).toString() : '0';
-							// pool.averageDailyRevenue = pool.poolDayData.length > 0 ? averageDailyRevenue.div(pool.poolDayData.length).toString() : '0';
 							pools[i] = pool;
 						}
 						
@@ -196,7 +183,6 @@ function AppDataProvider({ children }: any) {
 		return new Promise(async (resolve, reject) => {
 			const chainId = chain?.id ?? defaultChainId;
 			if(!isConnected) return;
-			console.log("Refreshing data", address);
 			const reqs: any[] = [];
 			if(_pools.length == 0) {
 				console.log("No pools found", _pools);
@@ -346,7 +332,6 @@ function AppDataProvider({ children }: any) {
 					}
 					setPools(_pools);
 					setRandom(Math.random());
-					console.log("Refreshed pools");
 					resolve("Refreshed pools");
 				} else {
 					console.log("No return data");
@@ -415,7 +400,8 @@ function AppDataProvider({ children }: any) {
 	const _setPools = (
 		_pools: any[],
 		_account: any,
-		_address: string
+		_address: string,
+		nTries: number = 0
 	): Promise<number> => {
 		const chainId = chain?.id ?? defaultChainId;
 		const provider = new ethers.providers.Web3Provider(
@@ -539,12 +525,22 @@ function AppDataProvider({ children }: any) {
 				resolve(0);
 			})
 			.catch(err => {
-				console.log("Failed to get balances and allowances", err);
+				console.log("Failed to get balances and allowances", err, calls);
 				setStatus("error");
 				setMessage(
 					"Failed to fetch data. Please refresh the page or try again later."
 				);
-				reject(err)
+				// reject(err)
+				if(nTries > 5) {
+					reject(err);
+					return;
+				}
+				else {
+					// try again in 5 seconds
+					setTimeout(() => {
+						_setPools(_pools, _account, _address, nTries + 1)
+					}, 1000)
+				}	
 			})
 		});
 	};
