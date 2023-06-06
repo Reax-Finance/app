@@ -31,7 +31,6 @@ import { base58 } from "ethers/lib/utils.js";
 import { useToast } from '@chakra-ui/react';
 const Big = require("big.js");
 import { ExternalLinkIcon, InfoIcon } from "@chakra-ui/icons";
-import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import useUpdateData from "../utils/useUpdateData";
 import SelectBody from "./SelectBody";
 
@@ -88,7 +87,7 @@ function Swap() {
 		}
 		setInputAssetIndex(e);
 		// calculate output amount
-		let _outputAmount = outputToken()?.priceUSD > 0 ? Big(inputAmount).times(inputToken(e).priceUSD).div(outputToken().priceUSD) : 0;
+		let _outputAmount = outputToken()?.priceUSD > 0 ? Big(inputAmount || 0).times(inputToken(e).priceUSD).div(outputToken().priceUSD) : 0;
 		setOutputAmount(
 			Number(
 				Big(1)
@@ -168,8 +167,6 @@ function Swap() {
 			pools[tradingPool].synths[outputAssetIndex].token.symbol;
 		const _outputAmount = outputAmount;
 
-		let _referral = useReferral ? BigNumber.from(base58.decode(referral!)).toHexString() : ethers.constants.AddressZero;
-
 		const priceFeedUpdateData = await getUpdateData();
 		let args = [
 			pools[tradingPool].synths[inputAssetIndex].token.id,
@@ -183,9 +180,6 @@ function Swap() {
 
 		send(pool, "swap", args)
 			.then(async (res: any) => {
-				// setMessage("Confirming...");
-				// setResponse("Transaction sent! Waiting for confirmation");
-				// setHash(res.hash);
 				const response = await res.wait(1);
 				// decode response.logs
 				const decodedLogs = response.logs.map((log: any) =>
@@ -208,18 +202,8 @@ function Swap() {
 					decodedLogs[decodedLogs.length - 1].args.value.toString(),
 					decodedLogs[decodedLogs.length - 3].args.value.toString(),
 				);
-				// setMessage(
-				// 	"Transaction Successful!"
-				// );
 				setInputAmount(0);
 				setOutputAmount(0);
-
-				// setTimeout(() => {
-				// 	setMessage("");
-				// 	setResponse("");
-				// 	setHash(null);
-				// }, 10000)
-				// setResponse(`Swapped ${_inputAmount} ${_inputAsset} for ${_outputAmount} ${_outputAsset}`);
 
 				setLoading(false);
 				toast({
@@ -252,11 +236,17 @@ function Swap() {
 						isClosable: true,
 						position: "top-right"
 					})
+				} else {
+					toast({
+						title: "Transaction Failed",
+						description: err?.data?.message || err?.reason || err?.message || JSON.stringify(err).slice(0,100),
+						status: "error",
+						duration: 5000,
+						isClosable: true,
+						position: "top-right"
+					})
 				}
 				setLoading(false);
-				// setMessage(JSON.stringify(err));
-				// setConfirmed(true);
-				// setResponse("Transaction failed. Please try again!");
 			});
 	};
 
