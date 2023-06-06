@@ -297,7 +297,7 @@ export const query_leaderboard = `
 	{
 		accounts{
 			id
-			accountDayData(orderBy: dayId, orderDirection: desc){
+			accountDayData(orderBy: dayId, orderDirection: desc, first: 200){
 				dayId
 				dailySynthsMinted{
 					synth{

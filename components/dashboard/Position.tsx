@@ -277,11 +277,7 @@ export default function Position() {
                         >
                             <Box
                                 h={1}
-                                bg={
-                                    availableToIssue() > 1
-                                            ? "primary.400"
-                                            : "yellow.400"
-                                }
+                                bg={"primary.400"}
                                 width={
                                     (pools[tradingPool]?.userCollateral > 0
                                         ? debtLimit()

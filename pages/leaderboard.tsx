@@ -125,17 +125,17 @@ export default function Leaderboard() {
         The more you trade, the higher you climb
       </Text>
 
-        <Divider my={5}/>
+        {/* <Divider my={5}/> */}
 
         <Flex gap={10}>
         
       <Box py={5} pt={5}>
-      <Heading size={'md'}>Total Volume</Heading>
+      <Heading size={'sm'} color={'whiteAlpha.700'}>Total Volume</Heading>
 
-      <Text fontSize={'3xl'} my={5}>{totalPoints().total}</Text>
+      <Text fontSize={'3xl'} my={3}>{totalPoints().total}</Text>
       </Box>
 
-      <Divider orientation='vertical' h='120px'/>
+      <Divider orientation='vertical' mt={5} h='80px'/>
 
       <Box >
         {/* <Flex>
@@ -152,20 +152,20 @@ export default function Leaderboard() {
           </Box>
         </Flex> */}
 
-<Box py={5} pt={5}>
+<Box py={5}>
   <Flex>
-      <Heading size={'md'}>24hr Volume</Heading>
+      <Heading size={'sm'} color={'whiteAlpha.700'}>24hr Volume</Heading>
       <IconButton icon={<MdRefresh />} onClick={refresh} aria-label={''} variant='unstyled' p={0} mt={-2} ml={2} isLoading={refreshing}/>
   </Flex>
 
-      <Text fontSize={'3xl'} my={3}>{totalPoints().daily}</Text>
+      <Text fontSize={'3xl'} my={0}>{totalPoints().daily}</Text>
       </Box>
 
       </Flex>
       </Box>
       </Flex>
     </Box>
-    <Box bg={'bg2'} mb={20} rounded={16} border={'2px'} pt={1} borderColor='whiteAlpha.50'>
+    <Box my={8} pt={1} borderColor='whiteAlpha.50' className='cutoutcornersbox'>
 
       <TableContainer >
   <Table variant='simple'>
