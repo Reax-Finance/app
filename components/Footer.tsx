@@ -44,15 +44,15 @@ export default function Footer() {
 
             </Flex>
           <Stack direction={'row'} spacing={6}>
-            <Link zIndex={1000} target={'_blank'} href={'https://twitter.com/synthe_x'}>
+            <Link zIndex={1000} target={'_blank'} href={'https://twitter.com/ReaxFinance'}>
               <FaTwitter />
             </Link>
-            <Link zIndex={1000} target={'_blank'} href={'https://discord.gg/SN5wJEBGvb'}>
+            <Link zIndex={1000} target={'_blank'} href={'https://discord.gg/PbZytGeMhV'}>
               <FaDiscord />
             </Link>
-            <Link zIndex={1000} target={'_blank'} href={'https://github.com/synthe-x'}>
+            {/* <Link zIndex={1000} target={'_blank'} href={'https://github.com/synthe-x'}>
               <FaGithub />
-            </Link>
+            </Link> */}
           </Stack>
         </Container>
       </Box>
