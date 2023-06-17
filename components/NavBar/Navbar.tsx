@@ -22,6 +22,7 @@ import NavLocalLink from "./NavLocalLink";
 import DAOMenu from "./DAOMenu";
 import NavExternalLink from "./NavExternalLink";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Status } from "../utils/status";
 
 function NavBar() {
 	const router = useRouter();
@@ -90,7 +91,7 @@ function NavBar() {
 		}
 		if (
 			(!(isConnected && !isConnecting) || chain?.unsupported) &&
-			status !== "fetching" &&
+			status !== Status.FETCHING &&
 			!init
 		) {
 			setInit(true);
