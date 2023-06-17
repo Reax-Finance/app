@@ -1,17 +1,14 @@
 import * as React from "react";
 import axios from "axios";
 import { getAddress, getABI, getContract } from "../../src/contract";
-import { ADDRESS_ZERO, dollarFormatter, Endpoints, WETH_ADDRESS, query, tokenFormatter, query_leaderboard, query_referrals, PYTH_ENDPOINT, defaultChain } from '../../src/const';
-import { ChainID, chainMapping } from "../../src/chains";
-import { BigNumber, ethers } from "ethers";
+import { ADDRESS_ZERO, defaultChain } from '../../src/const';
+import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
-import { Interface } from "ethers/lib/utils.js";
 const { Big } = require("big.js");
-import chains from 'wagmi'
 import { __chains } from "../../pages/_app";
 import { Status } from "../utils/status";
-import { usePriceData } from "./PriceContext";
+import { Endpoints, query, query_leaderboard, query_referrals } from "../../src/queries/synthetic";
 
 interface AppDataValue {
 	status: Status;
@@ -39,13 +36,9 @@ function AppDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<AppDataValue['status']>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<AppDataValue['message']>("");
 	const { chain } = useNetwork();
-	const { isConnected, address } = useAccount();
-
+	const { address } = useAccount();
 	const [account, setAccount] = React.useState<any|null>(null);
-
 	const [pools, setPools] = React.useState<any[]>([]);
-	// Synthetics {time, balances, price, name, symbol} in desc time order
-	const [portfolio, setPortfolio] = React.useState<any[]>([]);
 	const [tradingPool, setTradingPool] = React.useState(0);
 	const [leaderboard, setLeaderboard] = React.useState([]);
 
@@ -110,7 +103,6 @@ function AppDataProvider({ children }: any) {
 						const _account = userPoolData.accounts[0];
 
 						if(_account){
-							console.log("account", _account);
 							for(let i = 0; i < _account.positions.length; i++){
 								let pos = _account.positions[i];
 								let poolId = pos.pool.id;
@@ -219,33 +211,6 @@ function AppDataProvider({ children }: any) {
 			})
 		});
 	}
-
-	// const updateUserParams = (_pool: any) => {
-	// 	let _totalCollateral = Big(0);
-	// 	let _adjustedCollateral = Big(0);
-	// 	let _totalDebt = Big(0);
-
-	// 	for (let i = 0; i < _pool.collaterals.length; i++) {
-	// 		_totalCollateral = _totalCollateral.plus(
-	// 			Big(_pool.collaterals[i].balance ?? 0)
-	// 				.div(10 ** _pool.collaterals[i].token.decimals)
-	// 				.mul(_pool.collaterals[i].priceUSD)
-	// 		);
-	// 		_adjustedCollateral = _adjustedCollateral.plus(
-	// 			Big(_pool.collaterals[i].balance ?? 0)
-	// 				.div(10 ** _pool.collaterals[i].token.decimals)
-	// 				.mul(_pool.collaterals[i].priceUSD)
-	// 				.mul(_pool.collaterals[i].baseLTV)
-	// 				.div(10000)
-	// 		);
-	// 	}
-
-	// 	if(Big(_pool.totalSupply).gt(0)) _totalDebt = Big(_pool.balance ?? 0).div(_pool.totalSupply).mul(_pool.totalDebtUSD);
-
-	// 	_pool.adjustedCollateral = (_adjustedCollateral.toNumber());
-	// 	_pool.userCollateral = (_totalCollateral.toNumber());
-	// 	_pool.userDebt = (_totalDebt.toNumber());
-	// }
 
 	const refreshData = async (_pools = pools) => {
 		console.log("refreshing synthetic data");

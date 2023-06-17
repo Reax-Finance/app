@@ -14,7 +14,7 @@ import {
 	useToast,
 	CircularProgress,
 } from "@chakra-ui/react";
-import { ADDRESS_ZERO, PARTNER_ASSETS, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 
 import { useNetwork, useAccount, useSignTypedData } from 'wagmi';

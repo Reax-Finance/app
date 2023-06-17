@@ -10,7 +10,7 @@ import {
 	Tooltip,
 	Switch,
 } from "@chakra-ui/react";
-import { ADDRESS_ZERO, PARTNER_ASSETS, PARTNER_WARNINGS, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
+import { ADDRESS_ZERO, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
@@ -28,6 +28,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { useLendingData } from "../../context/LendingDataContext";
 import { formatLendingError } from "../../../src/errors";
+import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 
 export default function Supply({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);

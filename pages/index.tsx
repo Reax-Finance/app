@@ -1,27 +1,17 @@
 import {
 	Box,
 	Flex,
-	Text,
-	Heading,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { AppDataContext } from "../components/context/AppDataProvider";
 import CollateralTable from "../components/dashboard/CollateralTable";
-import PoolSelector from "../components/dashboard/PoolSelector";
-import { dollarFormatter, isMarketOpen } from "../src/const";
 import IssuanceTable from "../components/dashboard/IssuanceTable";
 import { motion } from "framer-motion";
 import Head from "next/head";
-import { InfoOutlineIcon } from "@chakra-ui/icons";
-import Big from "big.js";
-import { TbReportMoney } from "react-icons/tb";
-import { IoMdCash, IoMdAnalytics } from "react-icons/io";
-import Info from "../components/infos/Info";
-import ForexPaused from "../components/dashboard/ForexPaused";
 import Paused from "../components/dashboard/Paused";
-import IconBox from "../components/dashboard/IconBox";
 import Position from "../components/dashboard/Position";
 import Market from "../components/dashboard/Market";
+import { isMarketOpen } from "../src/timings";
 
 export default function TempPage() {
 	const { pools, tradingPool, account } = useContext(AppDataContext);

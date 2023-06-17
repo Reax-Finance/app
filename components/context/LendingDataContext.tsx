@@ -1,11 +1,12 @@
 import * as React from "react";
 import axios from "axios";
 import { getAddress, getABI, getContract } from "../../src/contract";
-import { ADDRESS_ZERO, defaultChain, query_lending, LendingEndpoint } from '../../src/const';
+import { ADDRESS_ZERO, defaultChain } from '../../src/const';
 import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
+import { LendingEndpoint, query_lending } from "../../src/queries/lending";
 
 interface LendingDataValue {
 	status: Status;

@@ -20,7 +20,7 @@ import Image from "next/image";
 import { BigNumber, ethers } from "ethers";
 import TokenSelector from "./TokenSelector";
 import { RiArrowDropDownLine, RiArrowDropUpLine, RiArrowUpFill } from "react-icons/ri";
-import { PYTH_ENDPOINT, dollarFormatter, isMarketOpen, tokenFormatter } from "../../src/const";
+import { PYTH_ENDPOINT, dollarFormatter, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import Response from "../modals/_utils/Response";
@@ -35,6 +35,7 @@ import useUpdateData from "../utils/useUpdateData";
 import SelectBody from "./SelectBody";
 import { useBalanceData } from "../context/BalanceContext";
 import { usePriceData } from "../context/PriceContext";
+import { isMarketOpen } from "../../src/timings";
 
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(1);

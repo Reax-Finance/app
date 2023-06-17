@@ -21,7 +21,7 @@ import {
 	NumberInputField,
 	Divider,
 } from "@chakra-ui/react";
-import { ADDRESS_ZERO, PARTNER_ASSETS, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -95,8 +95,6 @@ export default function CollateralModal({ collateral, index }: any) {
 	}
 
 	const { walletBalances, allowances, nonces } = useBalanceData();
-
-	const partner = Object.keys(PARTNER_ASSETS).map((key: string) => PARTNER_ASSETS[key].includes(collateral.token.symbol) ? key : null).filter((key: string | null) => key != null)[0];
 
 	return (
 		<>
