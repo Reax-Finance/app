@@ -44,7 +44,7 @@ body {
 }
 
 .positionTable {
-  background: linear-gradient(45deg, #FF8A00 10px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff10 0) top right;
+  background: linear-gradient(45deg, transparent 10px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff10 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
 }

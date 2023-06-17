@@ -26,6 +26,9 @@ import { base58 } from "ethers/lib/utils.js";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import useUpdateData from "../../utils/useUpdateData";
+import { useBalanceData } from "../../context/BalanceContext";
+import { usePriceData } from "../../context/PriceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
 
 const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const router = useRouter();
@@ -41,9 +44,12 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const { isConnected, address } = useAccount();
 	const { chain } = useNetwork();
 	const {getUpdateData} = useUpdateData();
-
+	const { walletBalances, updateBalance } = useBalanceData();
+	const { prices } = usePriceData();
+	const { position } = useSyntheticsData();
+	const pos = position();
+	
 	const {
-		updateSynthWalletBalance,
 		pools,
 		tradingPool,
 		updatePoolBalance,
@@ -64,14 +70,15 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 
 	const max = () => {
 		if(!address) return '0';
+		if(!prices[asset.token.id] || prices[asset.token.id] == 0) return '0';
 		return (
-			Big(pools[tradingPool].adjustedCollateral)
-				.sub(pools[tradingPool].userDebt)
-				.div(asset.priceUSD)
+			Big(pos.adjustedCollateral)
+				.sub(pos.debt)
+				.div(prices[asset.token.id] ?? 0)
 				.gt(0)
-				? Big(pools[tradingPool].adjustedCollateral)
-						.sub(pools[tradingPool].userDebt)
-						.div(asset.priceUSD)
+				? Big(pos.adjustedCollateral)
+						.sub(pos.debt)
+						.div(prices[asset.token.id] ?? 0)
 				: 0
 		).toString();
 	};
@@ -121,7 +128,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				console.log(decodedLogs[decodedLogs.length - 3].args.value.toString(), decodedLogs[decodedLogs.length - 2].args.value.toString(), decodedLogs[decodedLogs.length - 1].args.value.toString());
 
 				let amountUSD = Big(decodedLogs[decodedLogs.length - 2].args.value.toString())
-					.mul(asset.priceUSD)
+					.mul(prices[asset.token.id] ?? 0)
 					.div(10 ** 18)
 					.mul(1 + asset.mintFee / 10000);
 				// add fee
@@ -133,9 +140,8 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 					amountUSD.toString(),
 					false
 				);
-				updateSynthWalletBalance(
+				updateBalance(
 					asset.token.id,
-					pools[tradingPool].id,
 					decodedLogs[decodedLogs.length - 2].args.value.toString(),
 					false
 				);
@@ -243,18 +249,13 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 							Health Factor
 						</Text>
 						<Text fontSize={"md"}>
-							{numOrZero(pools[tradingPool].userCollateral > 0
-								? (100 * pools[tradingPool].userDebt) /
-								  pools[tradingPool].userCollateral
-								: 0
-							).toFixed(1)}{" "}
+							{(Big(pos.collateral).gt(0) ? 
+								Big(100).mul(pos.debt ?? 0).div(pos.collateral ?? 0).toNumber() : 0).toFixed(1)}{" "}
 							% {"->"}{" "}
 							{numOrZero(
-								(pools[tradingPool].userCollateral > 0
-									? (pools[tradingPool].userDebt +
-											amount * asset.priceUSD) /
-									  pools[tradingPool].userCollateral
-									: 0) * 100
+								(Big(pos.collateral ?? 0).gt(0) ? Big(pos.debt ?? 0).add(
+										Big(amount || 0).mul(prices[asset.token.id] ?? 0)).div(pos.collateral)
+									.toNumber() : 0) * 100
 							).toFixed(1)}
 							%
 						</Text>
@@ -266,14 +267,11 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 						</Text>
 						<Text fontSize={"md"}>
 							{dollarFormatter.format(
-								numOrZero(pools[tradingPool].adjustedCollateral -
-									pools[tradingPool].userDebt)
+								Big(pos.adjustedCollateral ?? 0).sub(pos.debt ?? 0).toNumber()
 							)}{" "}
 							{"->"}{" "}
 							{dollarFormatter.format(
-								numOrZero(pools[tradingPool].adjustedCollateral -
-									amount * asset.priceUSD -
-									pools[tradingPool].userDebt)
+								Big(pos.adjustedCollateral ?? 0).sub(Big(amount || 0).mul(prices[asset.token.id] ?? 0)).sub(pos.debt ?? 0).toNumber()
 							)}
 						</Text>
 					</Flex>

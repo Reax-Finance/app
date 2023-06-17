@@ -49,6 +49,7 @@ function TokenContextProvider({ children }: any) {
 	const { chain } = useNetwork();
 
 	const fetchData = async (address: string) => {
+		return;
 		// token unlocks
 		const essyx = await getContract(
 			"VestedREAX",

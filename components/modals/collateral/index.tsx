@@ -21,7 +21,7 @@ import {
 	NumberInputField,
 	Divider,
 } from "@chakra-ui/react";
-import { PARTNER_ASSETS, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, PARTNER_ASSETS, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -34,6 +34,9 @@ import { WETH_ADDRESS } from "../../../src/const";
 import { useNetwork, useAccount, useSignTypedData } from 'wagmi';
 import { isValidAndPositiveNS } from '../../utils/number';
 import TdBox from "../../dashboard/TdBox";
+import { useBalanceData } from "../../context/BalanceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
+import { usePriceData } from "../../context/PriceContext";
 
 export default function CollateralModal({ collateral, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -46,6 +49,9 @@ export default function CollateralModal({ collateral, index }: any) {
 	const { address } = useAccount();
 
 	const { pools, tradingPool } = useContext(AppDataContext);
+	const { prices } = usePriceData();
+	const { position } = useSyntheticsData();
+	const pos = position();
 
 	const _onClose = () => {
 		setAmount("0");
@@ -66,19 +72,16 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	const max = () => {
 		if (tabSelected == 0) {
-			return Big((isNative ?  collateral.nativeBalance : collateral.walletBalance) ?? 0)
+			return Big((isNative ?  walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]) ?? 0)
 				.div(10 ** collateral.token.decimals)
 				.toString();
 		} else {
-			const v1 =
-				collateral.priceUSD > 0
-					? Big(pools[tradingPool].adjustedCollateral)
-							.sub(pools[tradingPool].userDebt)
-							.div(collateral.priceUSD)
-							.mul(1e4)
+			const v1 = prices[collateral.token.id] > 0
+					? Big(pos.adjustedCollateral)
+							.sub(pos.debt)
+							.div(prices[collateral.token.id])
 							.div(collateral.baseLTV)
-							.mul(1e18)
-							.div(10**collateral.token.decimals)
+							.mul(1e4)
 					: Big(0);
 			const v2 = Big(collateral.balance ?? 0).div(10 ** collateral.token.decimals);
 			// min(v1, v2)
@@ -91,7 +94,8 @@ export default function CollateralModal({ collateral, index }: any) {
 		onOpen();
 	}
 
-	// 
+	const { walletBalances, allowances, nonces } = useBalanceData();
+
 	const partner = Object.keys(PARTNER_ASSETS).map((key: string) => PARTNER_ASSETS[key].includes(collateral.token.symbol) ? key : null).filter((key: string | null) => key != null)[0];
 
 	return (
@@ -117,8 +121,7 @@ export default function CollateralModal({ collateral, index }: any) {
 							<Text>{collateral.token.symbol} - </Text>
 								<Text>
 									{tokenFormatter.format(
-										Big(collateral.walletBalance ?? 0)
-										.add(collateral.nativeBalance ?? 0)
+										(collateral.token.id == WETH_ADDRESS(chain?.id!)?.toLowerCase() ? Big(walletBalances[collateral.token.id] ?? 0).add(walletBalances[ADDRESS_ZERO] ?? 0) : Big(walletBalances[collateral.token.id] ?? 0))
 											.div(
 												10 **
 													(collateral.token
@@ -145,7 +148,7 @@ export default function CollateralModal({ collateral, index }: any) {
 							: "whiteAlpha.500"
 					}>
 
-					<Text fontSize={'md'}  >
+					<Text fontSize={'md'}>
 
 					{tokenFormatter.format(
 						Big(collateral.balance ?? 0)
@@ -159,7 +162,7 @@ export default function CollateralModal({ collateral, index }: any) {
 						{dollarFormatter.format(
 							Big(collateral.balance ?? 0)
 								.div(10 ** (collateral.token.decimals ?? 18))
-								.mul(collateral.priceUSD)
+								.mul(prices[collateral.token.id] ?? 0)
 								.toNumber()
 						)}
 					</Text>}
@@ -191,7 +194,7 @@ export default function CollateralModal({ collateral, index }: any) {
 							/>
 							<Text>{collateral.token.name}</Text>
 							{chain?.testnet && <Link href="/faucet">
-								<Button size={"xs"} rounded="full">
+								<Button size={"xs"} rounded="full" mb={1}>
 									Use Faucet
 								</Button>
 							</Link>}
@@ -257,7 +260,7 @@ export default function CollateralModal({ collateral, index }: any) {
 													color={"whiteAlpha.600"}
 												>
 													{dollarFormatter.format(
-														collateral.priceUSD *
+														prices[collateral.token.id] *
 															amountNumber
 													)}
 												</Text>

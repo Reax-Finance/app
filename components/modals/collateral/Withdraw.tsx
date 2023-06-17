@@ -24,6 +24,9 @@ import Link from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import useUpdateData from "../../utils/useUpdateData";
+import { useBalanceData } from "../../context/BalanceContext";
+import { usePriceData } from "../../context/PriceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
 
 export default function Withdraw({ collateral, amount, setAmount, amountNumber, isNative }: any) {
 	const [loading, setLoading] = useState(false);
@@ -33,19 +36,29 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 	const [message, setMessage] = useState("");
 	const toast = useToast();
 
+	const { prices } = usePriceData();
+	const { position } = useSyntheticsData();
+	const pos = position();
+
 	const {
 		pools,
 		tradingPool,
-		updateCollateralWalletBalance,
 		updateCollateralAmount,
 	} = useContext(AppDataContext);
+
+	const {updateBalance} = useBalanceData();
 
 	const {getUpdateData} = useUpdateData();
 
 	// adjustedDebt - pools[tradingPool]?.userDebt = assetAmount*assetPrice*ltv
 	const max = () => {
-		const v1 = collateral.priceUSD > 0 ? Big(pools[tradingPool]?.adjustedCollateral).sub(pools[tradingPool]?.userDebt).div(collateral.priceUSD).mul(1e4).div(collateral.baseLTV) : Big(0);
-        const v2 = Big(collateral.balance ?? 0).div(10**collateral.token.decimals);
+		const v1 = prices[collateral.token.id] > 0 ? Big(pos.adjustedCollateral)
+							.sub(pos.debt)
+							.div(prices[collateral.token.id])
+							.div(collateral.baseLTV)
+							.mul(1e4)
+					: Big(0);
+		const v2 = Big(collateral.balance ?? 0).div(10 ** collateral.token.decimals);
 		// min(v1, v2)
 		return (v1.gt(v2) ? v2 : v1).toString();
 	};
@@ -100,7 +113,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 			const collateralId = log.args[1].toLowerCase();
 			const withdrawnAmount = log.args[2].toString();
 			setConfirmed(true);
-			updateCollateralWalletBalance(collateralId, poolId, withdrawnAmount, false);
+			updateBalance(collateralId, withdrawnAmount, false);
 			updateCollateralAmount(collateralId, poolId, withdrawnAmount, true);
 			setAmount('0');
 
@@ -129,6 +142,16 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 				toast({
 					title: "Transaction Rejected",
 					description: "You have rejected the transaction",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+					position: "top-right"
+				})
+			} else if(JSON.stringify(err).includes("execution reverted: 6")){
+				setAmount(max());
+				toast({
+					title: "Please try again",
+					description: "You are trying to withdraw more than your capacity",
 					status: "error",
 					duration: 5000,
 					isClosable: true,

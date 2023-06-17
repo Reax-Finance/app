@@ -41,8 +41,6 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
-			console.log("onConnect");
-			console.log(chain);
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
 			fetchData(address!)
@@ -143,6 +141,10 @@ function NavBar() {
 						<NavLocalLink
 							path={"/swap"}
 							title="Swap"
+						></NavLocalLink>
+						<NavLocalLink
+							path={"/lend"}
+							title="Lend"
 						></NavLocalLink>
 						{/* <NavLocalLink
 							path={"/claim"}

@@ -1,39 +1,27 @@
 import React from 'react'
-import Info from '../infos/Info'
+import Info from '../../infos/Info'
 import { Flex, Text, Box, Heading } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { IoMdAnalytics, IoMdCash } from 'react-icons/io'
-import IconBox from './IconBox'
+import IconBox from './../IconBox'
 import { TbReportMoney } from 'react-icons/tb'
 import Big from 'big.js'
-import { useAppData } from '../context/AppDataProvider'
+import { useAppData } from '../../context/AppDataProvider'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
-import { dollarFormatter } from '../../src/const'
-import { useBalanceData } from '../context/BalanceContext'
-import { usePriceData } from '../context/PriceContext'
-import { useSyntheticsData } from '../context/SyntheticsPosition'
+import { dollarFormatter } from '../../../src/const'
+import { useBalanceData } from '../../context/BalanceContext'
+import { usePriceData } from '../../context/PriceContext'
+import { useSyntheticsData } from '../../context/SyntheticsPosition'
+import { FaPercentage } from 'react-icons/fa'
 
-export default function Position() {
+export default function LendingPosition() {
     const { pools, tradingPool, account } = useAppData();
     const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
-    const { position } = useSyntheticsData();
+    const { lendingPosition, netAPY } = useSyntheticsData();
 
-    const pos = position();
+    const pos = lendingPosition();
 
-	const totalPortfolioValue = () => {
-		if (!pools[tradingPool]) return "0";
-		let total = Big(0);
-		for (let i = 0; i < pools[tradingPool]?.synths.length; i++) {
-			const synth = pools[tradingPool]?.synths[i];
-			total = total.add(
-				Big(walletBalances[synth.token.id] ?? 0)
-					.div(1e18)
-					.mul(prices[synth.token.id] ?? 0)
-			);
-		}
-		return total.toFixed(2);
-	}
   return (
     <>
         {Big(pos?.collateral).gt(0) ? <Box
@@ -48,7 +36,7 @@ export default function Position() {
                     </span>
                 </Heading>
 
-                <Info
+                {/* <Info
                     message={`You can issue debt till you reach Collateral's Base LTV`}
                     title={"Borrow Capacity"}
                 >
@@ -60,7 +48,7 @@ export default function Position() {
                         fontSize={"sm"} 
                     >
                         <Text color="whiteAlpha.700">
-                            Available to Mint: {" "}
+                            Available to Borrow: {" "}
                         </Text>
                         <Text
                             mr={0.5}
@@ -71,7 +59,7 @@ export default function Position() {
                             )}
                         </Text>
                     </Flex>
-                </Info>
+                </Info> */}
             </Flex>
             <Flex p={5} justifyContent={"space-between"} alignContent={"center"}>
                 <Flex flexDir={"column"} justify="center">
@@ -94,7 +82,7 @@ export default function Position() {
 
                                 <Info
                                     message={`
-                                        Sum of all your collateral deposited in USD
+                                        Sum of all your collateral enabled in USD
                                     `}
                                     title={"Total Collateral"}
                                 >
@@ -132,8 +120,10 @@ export default function Position() {
                                 </IconBox>
 
                                 <Info
-                                    message={`When you issue synths, you are allocated a share of pool's total debt. As the pool's total value changes, your debt changes as well`}
-                                    title={"Debt is variable"}
+                                    message={`
+                                        Sum of all your debt in USD
+                                    `}
+                                    title={"Total debt"}
                                 >
                                     <Box cursor={"help"}>
                                         <Heading
@@ -164,14 +154,13 @@ export default function Position() {
 
                             {Big(pos.debt).gt(0) && <Flex gap={3} align="start">
                                 <IconBox>
-                                    <IoMdAnalytics size={'20px'} />
+                                    <FaPercentage size={'20px'} />
                                 </IconBox>
 
                                 <Info
                                     message={`
-                                    In order to make profit, you'd mint synthetics that move up relative to pool's total liquidity. So your debt will be lower to your synthetic holdings.
-                                    `}
-                                    title={"Profit and Loss"}
+                                        Net APY is the difference between the interest you pay and the interest you earn`}
+                                    title={"Net APY"}
                                 >
                                     <Box cursor={"help"}>
                                         <Heading
@@ -179,23 +168,17 @@ export default function Position() {
                                             size={"xs"}
                                             color="whiteAlpha.700"
                                         >
-                                            PnL
+                                            Net APY
                                         </Heading>
                                         <Flex gap={2} align="center">
                                             <Flex
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={Big(totalPortfolioValue()).gt(pos.debt) ? 'green.400' : 'red.400'}
+                                                color={Big(netAPY()).gt(0) ? 'green.400' : 'red.400'}
                                             >
-                                                <Text
-                                                    // color={"whiteAlpha.800"}
-                                                    fontWeight={"normal"}
-                                                >
-                                                    $
-                                                </Text>
                                                 <Text>
-                                                    {Big(totalPortfolioValue()).sub(pos.debt).toFixed(2)} ({Big(totalPortfolioValue()).sub(pos.debt).mul(100).div(pos.debt).toFixed(2)}%)
+                                                    {(netAPY()).toFixed(2)}%
                                                 </Text>
                                             </Flex>
                                         </Flex>
@@ -254,8 +237,7 @@ export default function Position() {
                             %
                         </Text>
                     </Box>
-                </motion.div>
-                
+                </motion.div>       
             </Flex>
             <Box
                 // mt={2}
@@ -263,15 +245,22 @@ export default function Position() {
                 bg="whiteAlpha.200"
             >
                 <Box
-                    h={1}
-                    bg={"primary.400"}
+                    h={'1'}
+                    bg={
+                        Big(pos.availableToIssue).gt(0)
+                                    ? "green.400"
+                                    : "yellow.400"
+                    }
+                    // shadow to only top of this line
+                    // boxShadow={`0px -3px 30px 0.5px ${Big(pos.availableToIssue).gt(0)
+                    //     ? 'rgba(0,255,0,0.4)' : 'rgba(255,255,0,0.5)'}`}
                     width={
                         pos.debtLimit + "%"
                     }
                 ></Box>
             </Box>
         </Box>
-    : <Box h={'20px'}></Box>    
+    : <Box h={'0px'}></Box>    
     }
     </>
   )

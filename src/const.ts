@@ -48,6 +48,10 @@ const _Endpoints: any = {
 	[mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_5001,
 }
 
+const _LendingEndpoints: any = {
+	[mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_LENDING_URL_5001,
+}
+
 export const PARTNER_ASSETS: any = {
 	"Lodestar": ["lUSDC"]
 }
@@ -65,6 +69,8 @@ export const PARTNER_ASSET_COLOR: any = {
 }
 
 export const Endpoints = (chainId: number) => _Endpoints[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _Endpoints[mantleTestnet.id] : _Endpoints[ChainID.ARB]); 
+export const LendingEndpoint = (chainId: number) => _LendingEndpoints[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _LendingEndpoints[mantleTestnet.id] : _LendingEndpoints[ChainID.ARB]); 
+
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[ChainID.ARB]);
 
 export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://xc-testnet.pyth.network' : 'https://xc-mainnet.pyth.network';
@@ -225,6 +231,7 @@ export const query = (address: string) => (
 			  name
 			  symbol
 			  decimals
+			  isPermit
 			}
 			cumulativeMinted
 			cumulativeBurned
@@ -246,6 +253,7 @@ export const query = (address: string) => (
 			  name
 			  symbol
 			  decimals
+			  isPermit
 			}
 			priceUSD
 			cap
@@ -309,6 +317,81 @@ export const query_leaderboard = `
 		}
 	}
 `;
+
+export const query_lending = (address: string) => (
+	`{
+		lendingProtocols {
+		  id
+		  _priceOracle
+		  _lendingPoolAddress
+		  totalDepositBalanceUSD
+		  totalBorrowBalanceUSD
+		}
+		markets (orderBy: totalValueLockedUSD, orderDirection: desc) {
+		  protocol {
+			_lendingPoolAddress
+			_priceOracle
+		  }
+		  id
+		  name
+		  isActive
+		  canUseAsCollateral
+		  canBorrowFrom
+		  _vToken {
+			id
+			decimals
+		  }
+		  _sToken {
+			id
+			decimals
+		  }
+		  inputTokenPriceUSD
+		  inputToken {
+			id
+			name
+			symbol
+			decimals
+			isPermit
+		  }
+		  outputToken {
+			id
+			name
+			symbol
+			decimals
+			isPermit
+		  }
+		  totalValueLockedUSD
+		  totalDepositBalanceUSD
+		  totalBorrowBalanceUSD
+		  maximumLTV
+		  liquidationThreshold
+		  rates {
+			side
+			rate
+			type
+		  }
+		  inputTokenPriceUSD
+		  rewardTokenEmissionsAmount
+		  rewardTokenEmissionsUSD
+		  rewardTokens {
+			id
+		  }
+		  createdTimestamp
+		}
+		account(id: "${address}") {
+			_enabledCollaterals {
+				id
+			}
+		}
+		_meta {
+		  hasIndexingErrors
+		  deployment
+		  block {
+			number
+		  }
+		}
+	  }`
+)
 
 export const query_referrals = (address: string) => (`
 	{

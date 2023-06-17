@@ -7,7 +7,7 @@ export default function swap() {
 	return (
 		<Flex >
 			<Box w='100%' h={'100%'}>
-			<Flex justify={"center"} align="center" h={"88vh"}>
+			<Flex justify={"center"} align="center" h={"84vh"}>
 				<Box w={"43%"} minW="400px" >
 					<motion.div
 						initial={{ opacity: 0, y: 15 }}

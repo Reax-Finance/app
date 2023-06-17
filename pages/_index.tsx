@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 import Particles from '../components/utils/particles';
+import { Status } from '../components/utils/status';
 
 export default function _index({ children }: any) {
 	const router = useRouter();
@@ -74,10 +75,10 @@ export default function _index({ children }: any) {
 					This is a testnet. Please do not send real assets to these addresses
 				</Text>
 			</Flex>} */}
-			{(status == 'fetching' || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
+			{(status == Status.FETCHING || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
 
 			<Box bgColor="gray.800" color={'gray.400'}>
-			{status == 'error' && (
+			{status == Status.ERROR && (
 				<Text
 					textAlign={'center'}
 					width="100%"

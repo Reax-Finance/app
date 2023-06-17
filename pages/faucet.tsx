@@ -17,13 +17,13 @@ import {
 import { AppDataContext } from "../components/context/AppDataProvider";
 import { useEffect } from "react";
 
-const nonMintable = ["BIT"];
+const nonMintable = ["MNT"];
 
 const mintAmounts: any = {
-	"USDC": "100",
-	"USDT": "100",
-	"DAI": "100",
-	"EUROC": "100",
+	"USDC": "1000",
+	"USDT": "1000",
+	"DAI": "1000",
+	"EUROC": "1000",
 	"WETH": "1",
     "AAVE": "10",
     "WBTC": "0.1",
@@ -31,7 +31,7 @@ const mintAmounts: any = {
     "Link": "10",
     "wstETH": "10",
     "ARB": '10', 
-    "ETH": "0.1"
+    "ETH": "1"
 };
 
 import Head from "next/head";
@@ -48,16 +48,21 @@ import {
 import { getContract, send } from "../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { ethers } from "ethers";
+import { useBalanceData } from "../components/context/BalanceContext";
+import Big from "big.js";
 
 export default function Faucet() {
 	const [collaterals, setCollaterals] = React.useState<any>([]);
-	const { pools, updateCollateralWalletBalance } = useContext(AppDataContext);
+	const { pools } = useContext(AppDataContext);
+    const { updateBalance } = useBalanceData();
     const [loading, setLoading] = React.useState<any>(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [openedCollateral, setOpenedCollateral] = React.useState<any>(null);
 
     const {address, isConnected}  = useAccount();
     const {chain} = useNetwork();
+
+    const {walletBalances} = useBalanceData();
 
 	useEffect(() => {
 		if (collaterals.length == 0) {
@@ -94,8 +99,7 @@ export default function Faucet() {
             .then(async(res: any) => {
                 await res.wait(1);
                 setLoading(false);
-                updateCollateralWalletBalance(openedCollateral.token.id, pools[0].id, amount.toString(), false);
-                updateCollateralWalletBalance(openedCollateral.token.id, pools[1].id, amount.toString(), false);
+                updateBalance(openedCollateral.token.id, amount.toString(), false);
                 toast({
                     title: `Minted ${openedCollateral.token.symbol}`,
                     description: `${mintAmounts[openedCollateral.token.symbol]} ${openedCollateral.token.symbol} minted to your wallet.`,
@@ -140,11 +144,10 @@ export default function Faucet() {
                                 <Image src={`/icons/${collateral.token.symbol}.svg`} w='34px'/>
                                     <Box>
                             <Text >
-                                {collateral.token.name} 
-                                
+                            {collateral.token.symbol} 
                             </Text>
-                            <Text fontSize={'sm'} color='gray.400'>
-                            {collateral.token.symbol}
+                            <Text fontSize={'sm'} color='gray.500'>
+                            {Big(walletBalances[collateral.token.id]).div(10**collateral.token.decimals).toNumber()} in wallet
                             </Text>
                                     </Box>
                                 </Flex>

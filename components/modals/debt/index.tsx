@@ -37,6 +37,9 @@ import Burn from "./burn";
 import Big from "big.js";
 import { useAccount } from "wagmi";
 import TdBox from "../../dashboard/TdBox";
+import { useBalanceData } from "../../context/BalanceContext";
+import { usePriceData } from "../../context/PriceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
 
 export default function Debt({ synth, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -48,6 +51,12 @@ export default function Debt({ synth, index }: any) {
 	const [tabSelected, setTabSelected] = useState(0);
 
 	const { address } = useAccount();
+
+	const { walletBalances } = useBalanceData();
+
+	const { prices } = usePriceData();
+	const { position } = useSyntheticsData();
+	const pos = position();
 
 	const _onClose = () => {
 		setAmount("");
@@ -67,10 +76,22 @@ export default function Debt({ synth, index }: any) {
 
 	const max = () => {
 		if(!address) return '0';
+		if(!prices[synth.token.id] || prices[synth.token.id] == 0) return '0';
 		if (tabSelected == 0) {
-			return (Big(pools[tradingPool].adjustedCollateral).sub(pools[tradingPool].userDebt).div(synth.priceUSD).gt(0) ? Big(pools[tradingPool].adjustedCollateral).sub(pools[tradingPool].userDebt).div(synth.priceUSD) : 0).toString();
+			return (
+				Big(pos.adjustedCollateral)
+					.sub(pos.debt)
+					.div(prices[synth.token.id] ?? 0)
+					.gt(0)
+					? Big(pos.adjustedCollateral)
+							.sub(pos.debt)
+							.div(prices[synth.token.id] ?? 0)
+					: 0
+			).toString();
 		} else {
-			return (Big(pools[tradingPool].userDebt).div(synth.priceUSD).gt(Big(synth.walletBalance ?? 0).div(10 ** 18)) ? Big(synth.walletBalance ?? 0).div(10 ** 18) : Big(pools[tradingPool].userDebt).div(synth.priceUSD)).toString()
+			const v1 = Big(pos.debt ?? 0).div(prices[synth.token.id] ?? 0);
+			const v2 = Big(walletBalances[synth.token.id] ?? 0).div(10 ** 18);
+			return (v1.gt(v2) ? v2 : v1).toString();
 		}
 	};
 
@@ -114,7 +135,7 @@ export default function Debt({ synth, index }: any) {
 								<Text>
 									{synth.token.symbol} -{" "}
 									{tokenFormatter.format(
-										Big(synth.walletBalance ?? 0)
+										Big(walletBalances[synth.token.id] ?? 0)
 											.div(10 ** synth.token.decimals)
 											.toNumber()
 									)}{" "}
@@ -125,12 +146,12 @@ export default function Debt({ synth, index }: any) {
 					</Flex>
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
-					$ {tokenFormatter.format(synth.priceUSD)}
+					$ {tokenFormatter.format(prices[synth.token.id] ?? 0)}
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					{dollarFormatter.format(
 						Big(synth.synthDayData[0]?.dailyMinted ?? 0).add(synth.synthDayData[0]?.dailyBurned ?? 0)
-							.mul(synth.priceUSD)
+							.mul(prices[synth.token.id] ?? 0)
                             .div(10**18)
 							.toNumber()
 					)}
@@ -139,7 +160,7 @@ export default function Debt({ synth, index }: any) {
 					<Text>
 					{dollarFormatter.format(
 						Big(synth.totalSupply)
-						.mul(synth.priceUSD)
+						.mul(prices[synth.token.id] ?? 0)
 						.div(10**18)
 						.toNumber()
 						)}
@@ -224,7 +245,7 @@ export default function Debt({ synth, index }: any) {
                                             color={"whiteAlpha.600"}
                                         >
                                             {dollarFormatter.format(
-                                                (synth.priceUSD *
+                                                ((prices[synth.token.id] ?? 0) *
                                                     amountNumber)
                                             )}
                                         </Text>

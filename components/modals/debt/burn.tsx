@@ -9,7 +9,6 @@ import {
 	Link,
 	Tooltip
 } from "@chakra-ui/react";
-
 import { getContract, send } from "../../../src/contract";
 import { useContext } from "react";
 import { AppDataContext } from "../../context/AppDataProvider";
@@ -17,17 +16,14 @@ import { useAccount, useNetwork } from "wagmi";
 import { PYTH_ENDPOINT, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import Response from "../_utils/Response";
-import InfoFooter from "../_utils/InfoFooter";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
-import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
-import { ethers } from "ethers";
 import useUpdateData from "../../utils/useUpdateData";
-
-
+import { useBalanceData } from "../../context/BalanceContext";
+import { usePriceData } from "../../context/PriceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
 
 const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
-
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
 	const [hash, setHash] = useState(null);
@@ -36,17 +32,21 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const { address } = useAccount();
 	const { chain } = useNetwork();
 	const toast = useToast();
-
+	const {walletBalances, updateBalance} = useBalanceData();
+	const { prices } = usePriceData();
+	const { position } = useSyntheticsData();
+	const pos = position();
+	
 	const max = () => {
 		if(!address) return '0';
+		if(!prices[asset.token.id] || prices[asset.token.id] == 0) return '0';
 		// minimum of both
-		const v1 = Big(pools[tradingPool].userDebt).div(asset.priceUSD);
-		const v2 = Big(asset.walletBalance ?? 0).div(10 ** 18);
+		const v1 = Big(pos.debt ?? 0).div(prices[asset.token.id] ?? 0);
+		const v2 = Big(walletBalances[asset.token.id] ?? 0).div(10 ** 18);
 		return (v1.gt(v2) ? v2 : v1).toString();
 	}
 
 	const {
-		updateSynthWalletBalance,
 		pools,
 		tradingPool,
 		updatePoolBalance
@@ -98,7 +98,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 				console.log(decodedLogs[decodedLogs.length - 1].args.value.toString(), decodedLogs[decodedLogs.length - 2].args.value.toString(), decodedLogs[decodedLogs.length - 3].args.value.toString());
 				const amountUSD = Big(decodedLogs[decodedLogs.length - 2].args.value.toString()).mul(asset.priceUSD).div(10 ** 18).mul(1 - asset.burnFee/10000).toFixed(4);
 				updatePoolBalance(pools[tradingPool].id, decodedLogs[decodedLogs.length - 1].args.value.toString(), amountUSD, true);
-				updateSynthWalletBalance(asset.token.id, pools[tradingPool].id, decodedLogs[decodedLogs.length - 2].args.value.toString(), true);
+				updateBalance(asset.token.id, decodedLogs[decodedLogs.length - 2].args.value.toString(), true);
 				setAmount('0');
 				setConfirmed(true);
 
@@ -188,14 +188,15 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 								<Text fontSize={"md"} color="whiteAlpha.600">
 									Health Factor
 								</Text>
-								<Text fontSize={"md"}>{(pools[tradingPool].userDebt/pools[tradingPool].userCollateral * 100).toFixed(1)} % {"->"} {((pools[tradingPool].userDebt - (amount*asset.priceUSD)) /(pools[tradingPool].userCollateral) * 100).toFixed(1)}%</Text>
+								{Number(pos.collateral) > 0 ? <Text fontSize={"md"}>{(Big(pos.debt).div(pos.collateral).mul(100)).toFixed(1)} % {"->"} {Big(pos.debt).sub(amount*prices[asset.token.id]).div(pos.collateral).mul(100).toFixed(1)}%</Text> : <Text fontSize={"md"}>-</Text>}
 							</Flex>
 							<Divider my={2} />
 							<Flex justify="space-between">
 								<Text fontSize={"md"} color="whiteAlpha.600">
 									Available to issue
 								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format(pools[tradingPool].adjustedCollateral - pools[tradingPool].userDebt)} {"->"} {dollarFormatter.format(pools[tradingPool].adjustedCollateral + amount*asset.priceUSD - pools[tradingPool].userDebt)}</Text>
+								{/* <Text fontSize={"md"}>{dollarFormatter.format(pools[tradingPool].adjustedCollateral - pools[tradingPool].userDebt)} {"->"} {dollarFormatter.format(pools[tradingPool].adjustedCollateral + amount*asset.priceUSD - pools[tradingPool].userDebt)}</Text> */}
+								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.adjustedCollateral) - Number(pos.debt))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + amount*prices[asset.token.id] - Number(pos.debt))}</Text>
 							</Flex>
 						</Box>
 					</Box>

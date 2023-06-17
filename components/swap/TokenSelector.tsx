@@ -24,6 +24,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from "@chakra-ui/react";
+import { useBalanceData } from "../context/BalanceContext";
 
 function TokenSelector({
 	onTokenSelected,
@@ -35,6 +36,7 @@ function TokenSelector({
 	const { tradingPool, setTradingPool, pools } = useContext(AppDataContext);
 
 	const [searchPools, setSearchPools] = useState<any[]>([]);
+	const { walletBalances } = useBalanceData();
 
 	const selectToken = (tokenIndex: number) => {
 		onTokenSelected(tokenIndex);
@@ -168,15 +170,8 @@ function TokenSelector({
 										textAlign="right"
 									>
 										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
-										<Text
-											fontSize={"md"}
-										>
-											{_synth.walletBalance
-												? tokenFormatter.format(
-														_synth.walletBalance /
-															10 ** 18
-													)
-												: "-"}{" "}
+										<Text fontSize={"md"}>
+											{tokenFormatter.format((walletBalances[_synth.token.id] ?? 0) / 10 ** 18)}
 										</Text>
 									</Box>
 								</Flex>

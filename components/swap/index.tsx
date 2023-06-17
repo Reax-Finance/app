@@ -33,6 +33,8 @@ const Big = require("big.js");
 import { ExternalLinkIcon, InfoIcon } from "@chakra-ui/icons";
 import useUpdateData from "../utils/useUpdateData";
 import SelectBody from "./SelectBody";
+import { useBalanceData } from "../context/BalanceContext";
+import { usePriceData } from "../context/PriceContext";
 
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(1);
@@ -69,8 +71,8 @@ function Swap() {
 		setInputAmount(e.target.value);
 		if (isNaN(Number(e.target.value))) return;
 		let outputAmount =
-			(Number(e.target.value) * inputToken()?.priceUSD) /
-			outputToken()?.priceUSD;
+			(Number(e.target.value) * prices[inputToken()?.token.id]) /
+			prices[outputToken()?.token.id];
 		setOutputAmount(
 			Number(
 				Big(1)
@@ -87,7 +89,7 @@ function Swap() {
 		}
 		setInputAssetIndex(e);
 		// calculate output amount
-		let _outputAmount = outputToken()?.priceUSD > 0 ? Big(inputAmount || 0).times(inputToken(e).priceUSD).div(outputToken().priceUSD) : 0;
+		let _outputAmount = prices[outputToken()?.token.id] > 0 ? Big(inputAmount || 0).times(prices[inputToken(e).token.id]).div(prices[outputToken().token.id]) : 0;
 		setOutputAmount(
 			Number(
 				Big(1)
@@ -98,16 +100,18 @@ function Swap() {
 		);
 		onInputClose();
 	};
+	
+	const { walletBalances, updateBalance } = useBalanceData();
 
 	const updateOutputAmount = (e: any) => {
 		setOutputAmount(e.target.value);
 		if (isNaN(Number(e.target.value))) return;
 		let inputAmount = Big(Number(e.target.value))
 			.times(
-				pools[tradingPool].synths[outputAssetIndex].priceUSD
+				prices[pools[tradingPool].synths[outputAssetIndex].token.id]
 			)
 			.div(
-				pools[tradingPool].synths[inputAssetIndex].priceUSD
+				prices[pools[tradingPool].synths[inputAssetIndex].token.id]
 			);
 		setInputAmount(
 			Number(
@@ -125,9 +129,9 @@ function Swap() {
 		}
 		setOutputAssetIndex(e);
 		// calculate input amount
-		let _inputAmount = inputToken()?.priceUSD > 0 ? Big(outputAmount)
-			.times(outputToken(e).priceUSD)
-			.div(inputToken().priceUSD) : 0;
+		let _inputAmount = prices[inputToken()?.token.id] > 0 ? Big(outputAmount)
+			.times(prices[outputToken(e).token.id])
+			.div(prices[inputToken().token.id]) : 0;
 		setInputAmount(
 			Number(
 				Big(1)
@@ -282,8 +286,7 @@ function Swap() {
 
 	const { isConnected, address } = useAccount();
 
-	const { pools, tradingPool, updateSynthWalletBalance } =
-		useContext(AppDataContext);
+	const { pools, tradingPool } = useContext(AppDataContext);
 
 	const handleExchange = (
 		src: string,
@@ -291,8 +294,8 @@ function Swap() {
 		srcValue: string,
 		dstValue: string
 	) => {
-		updateSynthWalletBalance(dst, pools[tradingPool].id, dstValue, false);
-		updateSynthWalletBalance(src, pools[tradingPool].id, srcValue, true);
+		updateBalance(dst, dstValue, false);
+		updateBalance(src, srcValue, true);
 		setNullValue(!nullValue);
 	};
 
@@ -329,11 +332,11 @@ function Swap() {
 	}, [inputAssetIndex, outputAssetIndex, pools, tradingPool]);
 
 	const handleMax = () => {
-		let _inputAmount = Big(inputToken().walletBalance ?? 0).div(1e18);
+		let _inputAmount = Big(walletBalances[inputToken().token.id] ?? 0).div(1e18);
 		setInputAmount(_inputAmount);
-		let _outputAmount = outputToken().priceUSD > 0 ? Big(_inputAmount)
-			.times(inputToken().priceUSD)
-			.div(outputToken().priceUSD) : 0;
+		let _outputAmount = prices[outputToken().token.id] > 0 ? Big(_inputAmount)
+			.times(prices[inputToken().token.id])
+			.div(prices[outputToken().token.id]) : 0;
 		setOutputAmount(
 			Number(
 				Big(1)
@@ -356,7 +359,7 @@ function Swap() {
 
 	const swapInputExceedsBalance = () => {
 		if (inputAmount) {
-			return Big(inputAmount).gt(Big(inputToken().walletBalance ?? 0).div(1e18));
+			return Big(inputAmount).gt(Big(walletBalances[inputToken().token.id] ?? 0).div(1e18));
 		}
 		return false;
 	};
@@ -394,13 +397,15 @@ function Swap() {
 		}
 	};
 
+	const { prices } = usePriceData();
+
 	return (
 		<>
 			<Head>
 				<title>
 					{" "}
 					{tokenFormatter.format(
-						inputToken()?.priceUSD / outputToken()?.priceUSD
+						prices[inputToken()?.token.id] / prices[outputToken()?.token.id]
 					)}{" "}
 					{outputToken()?.token.symbol}/{inputToken()?.token.symbol} | REAX
 				</title>
@@ -441,7 +446,7 @@ function Swap() {
 						>
 							<Text>
 								{dollarFormatter.format(
-									inputAmount * inputToken()?.priceUSD 
+									inputAmount * prices[inputToken()?.token.id] 
 								)}
 							</Text>
 							<Flex gap={1}>
@@ -455,7 +460,7 @@ function Swap() {
 									{" "}
 									{tokenFormatter.format(
 										inputToken()
-											? Big(inputToken().walletBalance ?? 0)
+											? Big(walletBalances[inputToken().token.id] ?? 0)
 													.div(1e18)
 													.toNumber()
 											: 0
@@ -517,7 +522,7 @@ function Swap() {
 						>
 							<Text>
 								{dollarFormatter.format(
-									outputAmount * outputToken()?.priceUSD
+									outputAmount * prices[outputToken()?.token.id]
 								)}
 							</Text>
 							<Flex gap={1}>
@@ -526,7 +531,7 @@ function Swap() {
 									{" "}
 									{tokenFormatter.format(
 										outputToken()
-											? Big(outputToken().walletBalance ?? 0)
+											? Big(walletBalances[outputToken().token.id] ?? 0)
 													.div(1e18)
 													.toNumber()
 											: 0
@@ -558,15 +563,15 @@ function Swap() {
 								<Text>
 									1 {inputToken().token.symbol} ={" "}
 									{tokenFormatter.format(
-										inputToken()?.priceUSD /
-											outputToken()?.priceUSD
+										prices[inputToken()?.token.id] /
+											prices[outputToken()?.token.id]
 									)}{" "}
 									{outputToken().token.symbol}
 								</Text>
 								<Text fontSize={'sm'} color={"gray.400"}>
 									(
 									{dollarFormatter.format(
-										inputToken()?.priceUSD
+										prices[inputToken()?.token.id]
 									)}
 									)
 								</Text>

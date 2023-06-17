@@ -15,11 +15,13 @@ import { dollarFormatter } from "../../src/const";
 import Big from "big.js";
 import { useAccount } from "wagmi";
 import { MdRefresh } from "react-icons/md";
+import { usePriceData } from "../context/PriceContext";
 
 export default function Portfolio() {
 	const { account, pools, fetchData } = useContext(AppDataContext);
 	const [refreshing, setRefreshing] = React.useState(false);
-	const { address } = useAccount()
+	const { address } = useAccount();
+	const { prices } = usePriceData();
 
 	const refresh = async () => {
 		setRefreshing(true);
@@ -48,7 +50,7 @@ export default function Portfolio() {
 				if(!synth) continue;
 				dailyPoint = dailyPoint.plus(
 					Big(__account.accountDayData[i].dailySynthsMinted[j].amount)
-					.mul(synth.priceUSD)
+					.mul(prices[synth.token.id] ?? 0)
 				);
 			}
 			total = total.plus(dailyPoint);

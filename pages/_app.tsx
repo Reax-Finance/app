@@ -25,6 +25,10 @@ import rainbowTheme from "../styles/rainbowTheme";
 import { TokenContextProvider } from "../components/context/TokenContext";
 import { rabbyWallet } from "@rainbow-me/rainbowkit/wallets";
 import { PROJECT_ID, APP_NAME, mantleTestnet } from "../src/const";
+import { LendingDataProvider } from "../components/context/LendingDataContext";
+import { BalanceContext, BalanceContextProvider } from "../components/context/BalanceContext";
+import { PriceContextProvider } from "../components/context/PriceContext";
+import { SyntheticsPositionProvider } from "../components/context/SyntheticsPosition";
 
 const _chains = []
 
@@ -76,11 +80,19 @@ function MyApp({ Component, pageProps }: AppProps) {
 			<WagmiConfig client={wagmiClient}>
 				<RainbowKitProvider chains={chains} theme={rainbowTheme}>
 					<AppDataProvider>
-						<TokenContextProvider>
-							<Index>
-								<Component {...pageProps} />
-							</Index>
-						</TokenContextProvider>
+						<LendingDataProvider>
+							<BalanceContextProvider>
+								<PriceContextProvider>
+									<TokenContextProvider>
+									<SyntheticsPositionProvider>
+										<Index>
+											<Component {...pageProps} />
+										</Index>
+									</SyntheticsPositionProvider>
+									</TokenContextProvider>
+								</PriceContextProvider>
+							</BalanceContextProvider>
+						</LendingDataProvider>
 					</AppDataProvider>
 				</RainbowKitProvider>
 			</WagmiConfig>
