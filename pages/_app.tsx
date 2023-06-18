@@ -13,7 +13,7 @@ import {
 	trustWallet,
 	walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { configureChains, createClient, WagmiConfig, Chain } from "wagmi";
+import { configureChains, createClient, WagmiConfig, Chain, mainnet } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { Box, ChakraProvider, Flex } from "@chakra-ui/react";
@@ -24,7 +24,7 @@ import { theme } from "../styles/theme";
 import rainbowTheme from "../styles/rainbowTheme";
 import { TokenContextProvider } from "../components/context/TokenContext";
 import { rabbyWallet } from "@rainbow-me/rainbowkit/wallets";
-import { PROJECT_ID, APP_NAME, mantleTestnet } from "../src/const";
+import { PROJECT_ID, APP_NAME, mantleTestnet } from '../src/const';
 import { LendingDataProvider } from "../components/context/LendingDataProvider";
 import { BalanceContext, BalanceContextProvider } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
@@ -36,7 +36,7 @@ const _chains = []
 if(!process.env.NEXT_PUBLIC_NETWORK || process.env.NEXT_PUBLIC_NETWORK == 'testnet'){
 	_chains.push({...mantleTestnet, iconUrl: '/icons/mantle-logo.png'});
 } else {
-	// _chains.push(arbitrum);
+	_chains.push(mainnet);
 }
 
 export const __chains: Chain[] = _chains;
@@ -53,7 +53,7 @@ const connectors = connectorsForWallets([
 	{
 		groupName: "Recommended",
 		wallets: [
-			metaMaskWallet({ chains }),
+			metaMaskWallet({ chains, projectId: PROJECT_ID }),
 			walletConnectWallet({ projectId: PROJECT_ID, chains }),
 		],
 	},
