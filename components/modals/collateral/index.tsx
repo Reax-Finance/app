@@ -34,7 +34,7 @@ import { WETH_ADDRESS } from "../../../src/const";
 import { useNetwork, useAccount, useSignTypedData } from 'wagmi';
 import { isValidAndPositiveNS } from '../../utils/number';
 import TdBox from "../../dashboard/TdBox";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
 

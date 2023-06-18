@@ -28,7 +28,7 @@ import Link from "next/link";
 import { WETH_ADDRESS } from "../../../src/const";
 import { useNetwork, useAccount, useSignTypedData } from "wagmi";
 import { isValidAndPositiveNS } from "../../utils/number";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import Redeem from "./Redeem";
 import Supply from "./Supply";
@@ -41,7 +41,7 @@ export default function SupplyModal({
 	amount,
 	setAmount,
 }: any) {
-	const [isNative, setIsNative] = useState(true);
+	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
 	const { walletBalances } = useBalanceData();
 	const [tabSelected, setTabSelected] = useState(0);
@@ -51,7 +51,6 @@ export default function SupplyModal({
 	const pos = lendingPosition();
 
 	const _setAmount = (e: string) => {
-		if (Number(e) !== 0 && Number(e) < 0.000001) e = "0";
 		setAmount(e);
 		setAmountNumber(isValidAndPositiveNS(e) ? Number(e) : 0);
 	};

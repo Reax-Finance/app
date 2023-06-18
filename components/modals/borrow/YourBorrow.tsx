@@ -17,26 +17,20 @@ import {
 	tokenFormatter
 } from "../../../src/const";
 import Big from "big.js";
-import { useAccount, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 import TdBox from "../../dashboard/TdBox";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
-import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { getContract } from "../../../src/contract";
 import { formatLendingError } from "../../../src/errors";
 import BorrowModal from "./BorrowModal";
 
 export default function YourBorrow({ market, index, type }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
-
 	const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
-	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
-
 	const [loading, setLoading] = useState(false);
 
 	const _onClose = () => {
@@ -60,8 +54,7 @@ export default function YourBorrow({ market, index, type }: any) {
 		const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
 		pool.swapBorrowRateMode(market.inputToken.id, type == 'VARIABLE' ? '2' : '1')
 		.then(async (res: any) => {
-			await res.wait(2);
-			// toggleIsCollateral(market.id);
+			await res.wait();
 			toast({
 				title: `Switched ${type} to ${
 					type == "VARIABLE" ? "STABLE" : "VARIABLE"
@@ -107,7 +100,6 @@ export default function YourBorrow({ market, index, type }: any) {
 			}
 		})
 	}
-
 
 	return (
 		<>

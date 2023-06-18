@@ -9,7 +9,7 @@ import Big from 'big.js'
 import { useAppData } from '../../context/AppDataProvider'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
 import { dollarFormatter } from '../../../src/const'
-import { useBalanceData } from '../../context/BalanceContext'
+import { useBalanceData } from '../../context/BalanceProvider'
 import { usePriceData } from '../../context/PriceContext'
 import { useSyntheticsData } from '../../context/SyntheticsPosition'
 import { FaPercentage } from 'react-icons/fa'
@@ -260,7 +260,7 @@ export default function LendingPosition() {
                 ></Box>
             </Box>
         </Box>
-    : <Box h={'0px'}></Box>    
+    : <></>    
     }
     </>
   )

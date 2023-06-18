@@ -18,7 +18,7 @@ import {
 } from "../../../src/const";
 import Big from "big.js";
 import TdBox from "../../dashboard/TdBox";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import BorrowModal from "./BorrowModal";

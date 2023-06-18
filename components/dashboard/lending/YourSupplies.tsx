@@ -18,8 +18,8 @@ import {
 } from "@chakra-ui/react";
 
 import ThBox from "./../ThBox";
-import { useLendingData } from "../../context/LendingDataContext";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useLendingData } from "../../context/LendingDataProvider";
+import { useBalanceData } from "../../context/BalanceProvider";
 import YourSupply from "../../modals/supply/YourSupply";
 import { dollarFormatter, tokenFormatter } from '../../../src/const';
 import { usePriceData } from "../../context/PriceContext";

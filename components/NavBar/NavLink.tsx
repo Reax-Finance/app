@@ -21,7 +21,7 @@ export default function NavLink({
 	}, [setIsPath, router.pathname, path]);
 
 	return ( <Flex flexDir={'column'} align='center'>
-		<Flex align={"center"}>
+		<Flex h={'70px'}  align={"center"}>
 			<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 				<Flex
 					align={"center"}

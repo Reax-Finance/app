@@ -2,8 +2,8 @@ import React from "react";
 import { useAppData } from "./AppDataProvider";
 import { usePriceData } from "./PriceContext";
 import Big from "big.js";
-import { useBalanceData } from "./BalanceContext";
-import { useLendingData } from "./LendingDataContext";
+import { useBalanceData } from "./BalanceProvider";
+import { useLendingData } from "./LendingDataProvider";
 
 interface Position {
     collateral: string;

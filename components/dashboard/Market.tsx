@@ -205,7 +205,7 @@ export default function Market() {
 					</Flex>
 				</Box>
 
-				{
+				{/* {
 					(pools[tradingPool]
 					?.userDebt > 0 || synAccrued > 0) &&
 					<Box textAlign={"right"}>
@@ -235,7 +235,7 @@ export default function Market() {
 						</Button>
 						</Box>
 					</Box>
-				</Box>}
+				</Box>} */}
 			</Box>
 		</>
 	);

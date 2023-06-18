@@ -33,7 +33,7 @@ const Big = require("big.js");
 import { ExternalLinkIcon, InfoIcon } from "@chakra-ui/icons";
 import useUpdateData from "../utils/useUpdateData";
 import SelectBody from "./SelectBody";
-import { useBalanceData } from "../context/BalanceContext";
+import { useBalanceData } from "../context/BalanceProvider";
 import { usePriceData } from "../context/PriceContext";
 import { isMarketOpen } from "../../src/timings";
 
@@ -78,7 +78,7 @@ function Swap() {
 			Number(
 				Big(1)
 					.minus(Big(pools[tradingPool]._fee ?? 0).div(1e22))
-					.times(outputAmount)
+					.times(outputAmount ?? 0)
 					.toFixed(10)
 			)
 		);

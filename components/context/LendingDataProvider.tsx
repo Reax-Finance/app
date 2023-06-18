@@ -14,6 +14,7 @@ interface LendingDataValue {
 	markets: any[];
 	protocol: any;
 	toggleIsCollateral: (marketId: string) => void;
+	fetchData: (address?: string) => Promise<number>;
 }
 
 const LendingDataContext = React.createContext<LendingDataValue>({} as LendingDataValue);
@@ -33,16 +34,7 @@ function LendingDataProvider({ children }: any) {
         }
     }, [status, address, markets])
 
-	React.useEffect(() => {
-        if(subStatus == SubStatus.NOT_SUBSCRIBED && markets.length > 0 && address) {
-            if(markets[0].feed){
-				setSubStatus(SubStatus.SUBSCRIBED);
-				setInterval(refreshData, 10000);
-			}
-        }
-    }, [markets, address, status])
-
-	const fetchData = (_address: string | null): Promise<number> => {
+	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
 		console.log("fetching lending data for chain", chainId);
@@ -50,9 +42,10 @@ function LendingDataProvider({ children }: any) {
 			setStatus(Status.FETCHING);
 			const endpoint = LendingEndpoint(chainId)
 			console.log("lending endpoint", endpoint);
+			if(!_address) _address = ADDRESS_ZERO;
 			Promise.all([
 				axios.post(endpoint, {
-					query: query_lending(_address?.toLowerCase() ?? ADDRESS_ZERO),
+					query: query_lending(_address.toLowerCase()),
 					variables: {},
 				})
 			])
@@ -73,7 +66,6 @@ function LendingDataProvider({ children }: any) {
 					}
 					_setMarketsPriceFeeds(_markets, poolsData._priceOracle)
 					.then((_marketsWithFeeds) => {
-						refreshData(_marketsWithFeeds);
 						setStatus(Status.SUCCESS);
 						resolve(0);
 					})
@@ -160,59 +152,13 @@ function LendingDataProvider({ children }: any) {
 		setMarkets(_markets);
 	}
 
-	// update atoken, vtoken, stoken balance
-	const refreshData = async (_markets = markets) => {
-		console.log("refreshing lending data", _markets);
-		return new Promise(async (resolve, reject) => {
-			const chainId = chain?.id ?? defaultChain.id;
-			const reqs: any[] = [];
-			if(_markets.length == 0) {
-				console.log("No _markets found", _markets);
-				return;
-			}
-			let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-			
-			const helper = new ethers.Contract(
-				getAddress("Multicall2", chainId),
-				getABI("Multicall2", chainId),
-				provider
-			);
-			for(let i in _markets) {
-				const mockToken = new ethers.Contract(_markets[i].outputToken.id, getABI("MockToken", chainId), helper.provider);
-				reqs.push([_markets[i].outputToken.id, mockToken.interface.encodeFunctionData("balanceOf", [address])]);
-				reqs.push([_markets[i]._vToken.id, mockToken.interface.encodeFunctionData("balanceOf", [address])]);
-				reqs.push([_markets[i]._sToken.id, mockToken.interface.encodeFunctionData("balanceOf", [address])]);
-			}
-
-			helper.callStatic.aggregate(reqs).then(async (res: any) => {
-				if(res.returnData.length > 0){
-					let reqCount = 0;
-					for(let i = 0; i < _markets.length; i++) {
-						_markets[i].aTokenBalance = res.returnData[reqCount] / (10 ** _markets[i].outputToken.decimals);
-						_markets[i].vTokenBalance = res.returnData[reqCount + 1] / (10 ** _markets[i]._vToken.decimals);
-						_markets[i].sTokenBalance = res.returnData[reqCount + 2] / (10 ** _markets[i]._sToken.decimals);
-						reqCount += 3;
-					}
-					setMarkets(_markets);
-					resolve("Refreshed lending market balances");
-				} else {
-					console.log("No return data");
-					reject("No return data")
-				}
-			})
-			.catch(err => {
-				console.log("Failed multicall", err);
-				reject(err);
-			})
-		})
-	}
-
 	const value: LendingDataValue = {
 		status,
 		message,
 		markets,
 		protocol,
-		toggleIsCollateral
+		toggleIsCollateral,
+		fetchData
 	};
 
 	return (

@@ -12,7 +12,7 @@ import {
 import { getAddress, getContract, send } from "../../../src/contract";
 import { useContext, useEffect } from "react";
 import { useAccount, useNetwork } from "wagmi";
-import { defaultChain, dollarFormatter, numOrZero, tokenFormatter } from "../../../src/const";
+import { WETH_ADDRESS, defaultChain, dollarFormatter, numOrZero, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { BigNumber, ethers } from "ethers";
@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import { base58 } from "ethers/lib/utils.js";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
 import { formatLendingError } from "../../../src/errors";
@@ -146,18 +146,6 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		});
 	};
 
-	// const isValid = () => {
-	// 	if (referral == "" || referral == null) return true;
-	// 	try {
-	// 		const decodedString = BigNumber.from(
-	// 			base58.decode(referral!)
-	// 		).toHexString();
-	// 		return ethers.utils.isAddress(decodedString);
-	// 	} catch (err) {
-	// 		return false;
-	// 	}
-	// };
-
 	const shouldApprove = () => {
 		if(!isNative) return false;
 		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
@@ -183,28 +171,8 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 			]
 		)
 		.then(async (res: any) => {
-			await res.wait(1);
+			await res.wait();
 			setLoading(false);
-			// const decodedLogs = response.logs.map((log: any) =>
-			// 	{
-			// 		try {
-			// 			return collateralContract.interface.parseLog(log)
-			// 		} catch (e) {
-			// 			console.log(e)
-			// 		}
-			// 	}
-			// );
-			// console.log("decodedLogs", decodedLogs);
-			// let log: any = {};
-			// for(let i in decodedLogs){
-			// 	if(decodedLogs[i]){
-			// 		if(decodedLogs[i].name == "Approval"){
-			// 			log = decodedLogs[i];
-			// 		}
-			// 	}
-			// }
-			// addAllowance(market.inputToken.id, market.protocol._lendingPoolAddress, log.args[2].toString());
-			// setApproveLoading(false);
 			toast({
 				title: "Approval Successful",
 				description: <Box>
@@ -362,7 +330,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 					opacity: "0.5",
 				}}
 			>
-				{isConnected && !chain?.unsupported ? (
+				{isConnected ? (
 					Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
 						<>Insufficient Collateral</>
 					) : !amount || amountNumber == 0 ? (
@@ -370,9 +338,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 					) : (
 						<>Borrow</>
 					)
-				) : (
-					<>Invalid Referral Code</>
-				)}
+				) : <>Connect Wallet</>}
 			</Button>}
 
 			<Response

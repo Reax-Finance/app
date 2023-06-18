@@ -15,7 +15,7 @@ interface AppDataValue {
 	message: string;
 	pools: any[];
 	fetchData: (
-		_address: string | null
+		_address?: string
 	) => Promise<number>;
 	tradingPool: number;
 	setTradingPool: (_: number, pools?: any[]) => void;
@@ -66,7 +66,7 @@ function AppDataProvider({ children }: any) {
 		}
 	}, [refresh, pools, random]); 
 
-	const fetchData = (_address: string | null): Promise<number> => {
+	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
 		console.log("fetching for chain", chainId);
@@ -74,9 +74,10 @@ function AppDataProvider({ children }: any) {
 			setStatus(Status.FETCHING);
 			const endpoint = Endpoints(chainId)
 			console.log("endpoint", endpoint);
+			if(!_address) _address = ADDRESS_ZERO;
 			Promise.all([
 				axios.post(endpoint, {
-					query: query(_address?.toLowerCase() ?? ADDRESS_ZERO),
+					query: query(_address?.toLowerCase()),
 					variables: {},
 				}), 
 				axios.post(endpoint, {
@@ -84,7 +85,7 @@ function AppDataProvider({ children }: any) {
 					variables: {},
 				}),
 				axios.post(endpoint, {
-					query: query_referrals(_address?.toLowerCase() ?? ADDRESS_ZERO),
+					query: query_referrals(_address?.toLowerCase()),
 					variables: {},
 				})
 			])

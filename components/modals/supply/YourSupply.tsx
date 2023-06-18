@@ -20,11 +20,11 @@ import Big from "big.js";
 import { useNetwork, useAccount, useSignTypedData } from 'wagmi';
 import { isValidAndPositiveNS } from '../../utils/number';
 import TdBox from "../../dashboard/TdBox";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { getContract } from "../../../src/contract";
-import { useLendingData } from "../../context/LendingDataContext";
+import { useLendingData } from "../../context/LendingDataProvider";
 import { formatLendingError } from "../../../src/errors";
 import SupplyModal from "./SupplyModal";
 

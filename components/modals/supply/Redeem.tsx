@@ -21,7 +21,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatLendingError } from "../../../src/errors";
 import { BigNumber, ethers } from "ethers";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 
 export default function Redeem({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [loading, setLoading] = useState(false);

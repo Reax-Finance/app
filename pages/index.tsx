@@ -32,7 +32,7 @@ export default function TempPage() {
 			</Head>
 				<Box w={'100%'}>
 				
-				<Box mt={20} mb={7}>
+				<Box pt={10} mb={10}>
 					<Market/>
 				</Box>
 

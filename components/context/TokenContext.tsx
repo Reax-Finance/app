@@ -48,7 +48,7 @@ function TokenContextProvider({ children }: any) {
 	const [refresh, setRefresh] = React.useState(0);
 	const { chain } = useNetwork();
 
-	const fetchData = async (address: string) => {
+	const fetchData = async (address?: string) => {
 		return;
 		// token unlocks
 		const essyx = await getContract(
@@ -262,7 +262,7 @@ function TokenContextProvider({ children }: any) {
 }
 
 interface TokenValue {
-	fetchData: (address: string) => void;
+	fetchData: (address?: string) => void;
 	tokenUnlocks: UnlockPosition;
 	syn: SYN;
 	staking: StakingPosition;

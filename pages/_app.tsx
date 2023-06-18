@@ -25,10 +25,11 @@ import rainbowTheme from "../styles/rainbowTheme";
 import { TokenContextProvider } from "../components/context/TokenContext";
 import { rabbyWallet } from "@rainbow-me/rainbowkit/wallets";
 import { PROJECT_ID, APP_NAME, mantleTestnet } from "../src/const";
-import { LendingDataProvider } from "../components/context/LendingDataContext";
-import { BalanceContext, BalanceContextProvider } from "../components/context/BalanceContext";
+import { LendingDataProvider } from "../components/context/LendingDataProvider";
+import { BalanceContext, BalanceContextProvider } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
 import { SyntheticsPositionProvider } from "../components/context/SyntheticsPosition";
+import { DEXDataProvider } from "../components/context/DexDataProvider";
 
 const _chains = []
 
@@ -81,6 +82,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 				<RainbowKitProvider chains={chains} theme={rainbowTheme}>
 					<AppDataProvider>
 						<LendingDataProvider>
+							<DEXDataProvider>
 							<BalanceContextProvider>
 								<PriceContextProvider>
 									<TokenContextProvider>
@@ -92,6 +94,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 									</TokenContextProvider>
 								</PriceContextProvider>
 							</BalanceContextProvider>
+							</DEXDataProvider>
 						</LendingDataProvider>
 					</AppDataProvider>
 				</RainbowKitProvider>

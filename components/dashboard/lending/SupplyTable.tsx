@@ -21,7 +21,7 @@ import { AppDataContext } from "../../context/AppDataProvider";
 
 import SupplyModal from "../../modals/supply";
 import ThBox from "./../ThBox";
-import { useLendingData } from "../../context/LendingDataContext";
+import { useLendingData } from "../../context/LendingDataProvider";
 
 import {
 	Pagination,

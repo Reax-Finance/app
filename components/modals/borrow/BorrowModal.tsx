@@ -3,41 +3,28 @@ import React from "react";
 import { useContext, useState } from "react";
 
 import {
-	Modal,
-	ModalOverlay,
 	ModalContent,
 	ModalHeader,
-	ModalFooter,
 	ModalBody,
 	ModalCloseButton,
-	Tr,
-	Th,
-	Td,
 	Flex,
 	Image,
 	Text,
 	Box,
-	IconButton,
-	useDisclosure,
 	InputGroup,
 	NumberInput,
 	NumberInputField,
 	Button,
-	Link,
 	Divider,
-	Tooltip,
 } from "@chakra-ui/react";
-import { AppDataContext } from "../../context/AppDataProvider";
 import {
 	WETH_ADDRESS,
 	dollarFormatter,
-	tokenFormatter,
 } from "../../../src/const";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import Big from "big.js";
 import { useAccount, useNetwork } from "wagmi";
-import TdBox from "../../dashboard/TdBox";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import Repay from "./Repay";
@@ -53,7 +40,7 @@ export default function BorrowModal({
 	const { chain } = useNetwork();
 	const [tabSelected, setTabSelected] = useState(0);
 	let [debtType, setDebtType] = useState("2");
-	const [isNative, setIsNative] = useState(true);
+	const [isNative, setIsNative] = useState(false);
 
 	const { address } = useAccount();
 	const { walletBalances } = useBalanceData();
@@ -62,7 +49,6 @@ export default function BorrowModal({
 	const pos = lendingPosition();
 
 	const _setAmount = (e: string) => {
-		if (Number(e) > 0 && Number(e) < 0.000001) e = "0";
 		setAmount(e);
 		setAmountNumber(isNaN(Number(e)) ? 0 : Number(e));
 	};
@@ -97,7 +83,7 @@ export default function BorrowModal({
 			const v2 = Big(walletBalances[market.inputToken.id] ?? 0).div(
 				10 ** market.inputToken.decimals
 			);
-			return (v1.gt(v2) ? v2 : v1).toString();
+			return (v1.gt(v2) ? v2 : v1).toFixed(market.inputToken.decimals);
 		}
 	};
 
@@ -221,7 +207,7 @@ export default function BorrowModal({
 													.mul(
 														tabSelected == 0
 															? 0.99
-															: 0
+															: 1
 													)
 													.toString()
 											)

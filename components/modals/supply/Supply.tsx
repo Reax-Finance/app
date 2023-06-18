@@ -23,10 +23,10 @@ import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import Link from "next/link";
 import InfoFooter from "../_utils/InfoFooter";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import { useLendingData } from "../../context/LendingDataContext";
+import { useLendingData } from "../../context/LendingDataProvider";
 import { formatLendingError } from "../../../src/errors";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 

@@ -37,7 +37,7 @@ import Burn from "./burn";
 import Big from "big.js";
 import { useAccount } from "wagmi";
 import TdBox from "../../dashboard/TdBox";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 

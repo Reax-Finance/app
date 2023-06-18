@@ -14,7 +14,7 @@ import { dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import TdBox from "../../dashboard/TdBox";
 import { MdCheck, MdWarning } from "react-icons/md";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import SupplyModal from "./SupplyModal";

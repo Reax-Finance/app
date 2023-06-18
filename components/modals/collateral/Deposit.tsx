@@ -23,7 +23,7 @@ import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import Link from "next/link";
 import InfoFooter from "../_utils/InfoFooter";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 
 export default function Deposit({ collateral, amount, setAmount, amountNumber, isNative }: any) {

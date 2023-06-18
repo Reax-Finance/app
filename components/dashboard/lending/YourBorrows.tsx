@@ -19,10 +19,10 @@ import {
 } from "@chakra-ui/react";
 
 import ThBox from "../ThBox";
-import { useLendingData } from "../../context/LendingDataContext";
+import { useLendingData } from "../../context/LendingDataProvider";
 
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import YourSupply from "../../modals/supply/YourSupply";
 import YourBorrow from "../../modals/borrow/YourBorrow";
 import Big from "big.js";

@@ -23,7 +23,7 @@ body {
 
 
 .swapButton {
-  background: linear-gradient(45deg, transparent 6px, #F64E00 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
+  background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
 }
@@ -31,6 +31,13 @@ body {
 
 .cutoutcornersbox {
   background: linear-gradient(45deg, transparent 10px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff20 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+  padding: 1px;
+}
+
+.smallcutoutcornersbox {
+  background: linear-gradient(45deg, transparent 4px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 4px, #ffffff20 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
   padding: 1px;

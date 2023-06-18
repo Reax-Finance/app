@@ -106,7 +106,9 @@ export default function _index({ children }: any) {
 							exit={{opacity: 0, y: 15}}
 							transition={{duration: 0.25}}
 						>
+							<Box zIndex={1}>
 							{children}
+							</Box>
 						</motion.div>
 						</Box>
 

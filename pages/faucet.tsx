@@ -48,7 +48,7 @@ import {
 import { getContract, send } from "../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { ethers } from "ethers";
-import { useBalanceData } from "../components/context/BalanceContext";
+import { useBalanceData } from "../components/context/BalanceProvider";
 import Big from "big.js";
 
 export default function Faucet() {

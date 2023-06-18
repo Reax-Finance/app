@@ -24,7 +24,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from "@chakra-ui/react";
-import { useBalanceData } from "../context/BalanceContext";
+import { useBalanceData } from "../context/BalanceProvider";
 
 function TokenSelector({
 	onTokenSelected,

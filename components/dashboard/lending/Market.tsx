@@ -1,6 +1,6 @@
 import { Box, Flex, Heading } from '@chakra-ui/react'
 import React from 'react'
-import { useLendingData } from '../../context/LendingDataContext'
+import { useLendingData } from '../../context/LendingDataProvider'
 import { dollarFormatter } from '../../../src/const';
 
 export default function LendingMarket() {

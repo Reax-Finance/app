@@ -26,7 +26,7 @@ import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Skeleton } from "@chakra-ui/react";
 import Borrow from "../../modals/borrow";
 import ThBox from "../ThBox";
-import { useLendingData } from "../../context/LendingDataContext";
+import { useLendingData } from "../../context/LendingDataProvider";
 
 const pageSize = 9;
 

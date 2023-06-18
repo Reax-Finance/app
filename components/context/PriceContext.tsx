@@ -4,7 +4,7 @@ import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { ADDRESS_ZERO, PYTH_ENDPOINT, WETH_ADDRESS, defaultChain } from "../../src/const";
-import { useLendingData } from "./LendingDataContext";
+import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status, SubStatus } from "../utils/status";
 import axios from 'axios';
@@ -27,7 +27,7 @@ function PriceContextProvider({ children }: any) {
     const { address } = useAccount();
 
     React.useEffect(() => {
-        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && markets.length > 0 && address) {
+        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && markets.length > 0) {
             if(markets[0].feed && pools[0].synths[0].feed){
                 setSubStatus(SubStatus.SUBSCRIBED);
                 updatePrices();
@@ -39,7 +39,6 @@ function PriceContextProvider({ children }: any) {
 	const updatePrices = async () => {
         console.log("updating prices");
         const chainId = chain?.id ?? defaultChain.id;
-		if(chain?.unsupported) return Promise.resolve(1);
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),

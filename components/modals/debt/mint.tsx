@@ -26,7 +26,7 @@ import { base58 } from "ethers/lib/utils.js";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import useUpdateData from "../../utils/useUpdateData";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 

@@ -24,7 +24,7 @@ import { useToast } from '@chakra-ui/react';
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import { BigNumber, ethers } from "ethers";
 import useUpdateData from "../../utils/useUpdateData";
-import { useBalanceData } from "../../context/BalanceContext";
+import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatLendingError } from "../../../src/errors";
@@ -71,7 +71,7 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 		} else if (amountNumber > Number(max)) {
 			return {
 				stage: 0,
-				message: "Amount Exceeds Debt"
+				message: "Amount Exceeds Balance"
 			}
 		}
 		else if (!market || !allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]) {

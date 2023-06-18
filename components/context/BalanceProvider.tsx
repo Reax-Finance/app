@@ -4,7 +4,7 @@ import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../src/const";
-import { useLendingData } from "./LendingDataContext";
+import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
 
