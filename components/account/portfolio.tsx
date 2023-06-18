@@ -2,12 +2,6 @@ import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
 import React from "react";
 import { useContext } from "react";
 import {
-	Stat,
-	StatLabel,
-	StatNumber,
-	StatHelpText,
-	StatArrow,
-	StatGroup,
 	Text,
 } from "@chakra-ui/react";
 import { AppDataContext } from "../context/AppDataProvider";
@@ -25,7 +19,7 @@ export default function Portfolio() {
 
 	const refresh = async () => {
 		setRefreshing(true);
-		fetchData(address || null)
+		fetchData(address)
 		.then(res => {
 			setRefreshing(false);
 		})
