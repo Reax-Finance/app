@@ -76,10 +76,11 @@ const wagmiClient = createClient({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
+
 	return (
 		<ChakraProvider theme={theme}>
 			<WagmiConfig client={wagmiClient}>
-				<RainbowKitProvider chains={chains} theme={rainbowTheme}>
+				<RainbowKitProvider chains={chains} modalSize="compact" theme={rainbowTheme}>
 					<AppDataProvider>
 						<LendingDataProvider>
 							<DEXDataProvider>

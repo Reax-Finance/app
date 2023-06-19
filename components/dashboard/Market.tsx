@@ -173,14 +173,14 @@ export default function Market() {
 							<Heading size={"sm"} color={"primary.400"}>
 								Total Supply
 							</Heading>
-							<Heading size={"sm"}>$ {totalCollateral}</Heading>
+							<Heading size={"sm"}>{dollarFormatter.format(totalCollateral ?? 0)}</Heading>
 						</Flex>
 
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"secondary.400"}>
 								Total Debt
 							</Heading>
-							<Heading size={"sm"}>$ {totalDebt}</Heading>
+							<Heading size={"sm"}>{dollarFormatter.format(totalDebt ?? 0)}</Heading>
 						</Flex>
 
 						<Flex gap={2}>

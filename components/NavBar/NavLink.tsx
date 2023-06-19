@@ -21,20 +21,20 @@ export default function NavLink({
 	}, [setIsPath, router.pathname, path]);
 
 	return ( <Flex flexDir={'column'} align='center'>
-		<Flex h={'70px'}  align={"center"}>
+		<Flex h={'60px'}  align={"center"}>
 			<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+				<Flex flexDir={'column'} align={'center'} w={'100%'}>
 				<Flex
 					align={"center"}
 					h={"32px"}
 					px={2}
+					mx={1}
 					cursor="pointer"
-					rounded={100}
 					flex='stretch'
 					color={isPath ? "white" : "whitelpha.600"}
 				>
 					<Box
 						fontWeight={"bold"}
-						fontSize="sm"
 					>
 						<Flex align={"center"} gap={2}>
 							{children}
@@ -42,9 +42,10 @@ export default function NavLink({
 						</Flex>
 					</Box>
 				</Flex>
+			{isPath && <Box w='70%' h={'2px'} rounded='0' bg='secondary.400'></Box>}
+		</Flex>
 			</motion.div>
 		</Flex>
-		{isPath && <Box w='80%' h={'2px'} rounded='0' bg='primary.400'></Box>}
 		</Flex>
 	);
 };

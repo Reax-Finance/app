@@ -72,7 +72,7 @@ export default function PoolSelector() {
 									<Flex>
 										<Box textAlign={'left'}>
 										<Flex gap={4}>
-										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '35px'}} fontWeight='bold'>
+										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '32px'}} fontWeight='bold'>
 											{pools[tradingPool].name}
 										</Heading>
 										</Flex>

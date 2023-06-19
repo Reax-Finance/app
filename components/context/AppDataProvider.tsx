@@ -43,8 +43,10 @@ function AppDataProvider({ children }: any) {
 	const [leaderboard, setLeaderboard] = React.useState([]);
 
 	useEffect(() => {
-		if(localStorage){
+		if(localStorage && window.ethereum){
+			console.log(localStorage);
 			const _tradingPool = localStorage.getItem("tradingPool");
+			console.log("tradingPool", _tradingPool);
 			if(_tradingPool && pools.length > parseInt(_tradingPool)){
 				setTradingPool(parseInt(_tradingPool));
 			}
@@ -64,7 +66,7 @@ function AppDataProvider({ children }: any) {
 			setRefresh([Number(timer.toString())]);
 			setRandom(Math.random());
 		}
-	}, [refresh, pools, random]); 
+	}, [refresh, pools, random]);
 
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;

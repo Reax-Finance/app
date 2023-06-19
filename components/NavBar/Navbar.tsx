@@ -25,6 +25,7 @@ import NavExternalLink from "./NavExternalLink";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Status } from "../utils/status";
 import { useLendingData } from "../context/LendingDataProvider";
+import { CustomConnectButton } from "./ConnectButton";
 
 function NavBar() {
 	const router = useRouter();
@@ -111,54 +112,46 @@ function NavBar() {
 	return (
 		<>
 		<Flex justify={'center'} zIndex={0} mt={2} align='center' >
-			<Box  minW='0' w={'100%'} maxW='1250px'>
-			<Flex alignItems={"center"} justify="space-between" >
-				<Flex justify="space-between" align={"center"} gap={10} w='100%'>
-					<Flex gap={10} align='center' mt={1}>
+			<Box mt={5} minW='0' w={'100%'} maxW='1250px'>
+			<Flex align={"center"} justify="space-between" >
+				<Flex justify="space-between" align={"center"} w='100%'>
+					<Flex gap={10} align='center'>
 						<Image
-							// onClick={() => {
-							// 	router.push(
-							// 		{
-							// 			pathname: '/',
-							// 			query: router.query
-							// 		}
-							// 	);
-							// }}
-							src={"/logo-square.svg"}
+							src={"/logo.svg"}
 							alt=""
-							width="24px"
+							// width="26px"
+							width={'76px'}
+							mb={0.5}
 						/>
 						<Flex
-						
-						gap={2}
-						align="center"
-						display={{ sm: "none", md: "flex" }}
-					>
-						<NavLocalLink
-							path={"/"}
-							title={"Dashboard"}
-						></NavLocalLink>
-						<NavLocalLink
-							path={"/swap"}
-							title="Swap"
-						></NavLocalLink>
-						<NavLocalLink
-							path={"/lend"}
-							title="Lend"
-						></NavLocalLink>
-						{/* <NavLocalLink
-							path={"/pools"}
-							title="Pools"
-						></NavLocalLink> */}
-						{/* <NavLocalLink
-							path={"/claim"}
-							title="Claim"
-						></NavLocalLink> */}
-						{/* <NavLocalLink
-							path={"/earn"}
-							title="Earn"
-						></NavLocalLink> */}
-					</Flex>
+							align="center"
+							display={{ sm: "none", md: "flex" }}
+						>
+							<NavLocalLink
+								path={"/"}
+								title={"Dashboard"}
+							></NavLocalLink>
+							<NavLocalLink
+								path={"/swap"}
+								title="Swap"
+							></NavLocalLink>
+							<NavLocalLink
+								path={"/lend"}
+								title="Lend"
+							></NavLocalLink>
+							{/* <NavLocalLink
+								path={"/pools"}
+								title="Pools"
+							></NavLocalLink> */}
+							{/* <NavLocalLink
+								path={"/claim"}
+								title="Claim"
+							></NavLocalLink> */}
+							{/* <NavLocalLink
+								path={"/earn"}
+								title="Earn"
+							></NavLocalLink> */}
+						</Flex>
 					</Flex>
 					
 					<Flex display={{sm: 'flex', md: 'none'}}>
@@ -215,12 +208,14 @@ function NavBar() {
 					<Box>
 						<AccountButton />
 					</Box>
-					{(isConnected && !chain?.unsupported) && <Box>
-						<ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} />
+					{<Box>
+						{/* <CustomConnectButton accountStatus="address" chainStatus="icon" showBalance={false} /> */}
+						<CustomConnectButton />
+
 					</Box>}
 				</Flex>
 			</Flex>
-			<Divider/>
+			{/* <Divider/> */}
 			</Box>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
