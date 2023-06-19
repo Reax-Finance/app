@@ -42,10 +42,8 @@ export default function Position() {
             className='cutoutcornersboxright'
         >
             <Flex align={'center'} justify={'space-between'} px={5} py={4} className='cutoutcornersboxright'>
-                <Heading fontSize={'xl'}>
-                    <span className='gradienttext'>
+                <Heading fontSize={'18px'}>
                     Your Position
-                    </span>
                 </Heading>
 
                 <Info

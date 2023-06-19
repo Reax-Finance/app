@@ -27,7 +27,7 @@ export default function TempPage() {
 	return (
 		<>
 			<Head>
-				<title>REAX | Dashboard</title>
+				<title>REAX | Lending</title>
 				<link rel="icon" type="image/x-icon" href="/REAX.svg"></link>
 			</Head>
 				<Box w={'100%'}>

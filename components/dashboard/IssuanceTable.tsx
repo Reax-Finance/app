@@ -48,8 +48,8 @@ export default function CollateralTable() {
 
 	return (
 		<Box>
-			<Box className="cutoutcornersboxright" px={5} pt={6} pb={6}>
-				<Heading size={'md'} color={'secondary.300'}>Synthetic Assets</Heading>			
+			<Box className="cutoutcornersboxright" px={5} py={5}>
+				<Heading fontSize={'18px'} color={'secondary.300'}>Synthetic Assets</Heading>			
 			</Box>
 			{pools[tradingPool]?.synths.length > 0 ? (
 				<TableContainer>

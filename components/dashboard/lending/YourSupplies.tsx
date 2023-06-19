@@ -37,7 +37,7 @@ export default function YourSupplies() {
 	if(suppliedMarkets.length > 0) return (
 		<Box>
 			<Box className="cutoutcornersboxright" px={5} py={5}>
-				<Heading size={'md'} color={'primary.400'}>Your Supplies</Heading>
+				<Heading fontSize={'18px'} color={'primary.400'}>Your Supplies</Heading>
 			</Box>
 
 			{markets.length > 0 ? ( <>

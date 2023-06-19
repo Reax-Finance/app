@@ -44,7 +44,7 @@ export default function YourBorrows() {
 	if(borrowedMarkets.length > 0) return (
 		<Box h={'100%'}>
 			<Box className="cutoutcornersboxright" px={5} py={5}>
-				<Heading size={'md'} color={'primary.400'}>Your Borrows</Heading>
+				<Heading fontSize={'18px'} color={'primary.400'}>Your Borrows</Heading>
 			</Box>
 
 			{markets.length > 0 ? ( <>
