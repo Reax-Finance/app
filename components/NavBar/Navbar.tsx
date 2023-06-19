@@ -112,20 +112,22 @@ function NavBar() {
 	return (
 		<>
 		<Flex justify={'center'} zIndex={0} mt={2} align='center' >
-			<Box mt={5} minW='0' w={'100%'} maxW='1250px'>
+			<Box minW='0' w={'100%'} maxW='1250px'>
 			<Flex align={"center"} justify="space-between" >
 				<Flex justify="space-between" align={"center"} w='100%'>
 					<Flex gap={10} align='center'>
 						<Image
-							src={"/logo.svg"}
+							// src={"/logo.svg"}
+							src={"/logo-square.svg"}
 							alt=""
-							// width="26px"
-							width={'76px'}
+							width="26px"
+							// width={'76px'}
 							mb={0.5}
 						/>
 						<Flex
 							align="center"
 							display={{ sm: "none", md: "flex" }}
+							gap={2}
 						>
 							<NavLocalLink
 								path={"/"}
@@ -215,7 +217,7 @@ function NavBar() {
 					</Box>}
 				</Flex>
 			</Flex>
-			{/* <Divider/> */}
+			<Divider/>
 			</Box>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
