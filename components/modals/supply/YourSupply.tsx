@@ -23,7 +23,7 @@ import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import { getContract } from "../../../src/contract";
+import { getContract, send } from "../../../src/contract";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { formatLendingError } from "../../../src/errors";
 import SupplyModal from "./SupplyModal";
@@ -52,29 +52,6 @@ export default function YourSupply({ market, index }: any) {
 	const { toggleIsCollateral } = useLendingData();
 	const pos = lendingPosition();
 
-	const _setAmount = (e: string) => {
-		if (Number(e) !== 0 && Number(e) < 0.000001) e = "0";
-		setAmount(e);
-		setAmountNumber(isValidAndPositiveNS(e) ? Number(e) : 0);
-	};
-
-	const selectTab = (index: number) => {
-		setTabSelected(index);
-	};
-
-	const max = () => {
-		if (tabSelected == 0) {
-			return Big(
-				(isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[market.inputToken.id]) ?? 0
-			).div(10**market.inputToken.decimals).toString();
-		} else {
-			const v1 = prices[market.inputToken.id] > 0 ? Big(pos.adjustedCollateral).sub(pos.debt).sub(pos.stableDebt).div(prices[market.inputToken.id]).mul(1e4).div(market.maximumLTV) : Big(0);
-			const v2 = Big(walletBalances[market.inputToken.id] ?? 0).div(10**market.inputToken.decimals);
-			// min(v1, v2)
-			return (v1.gt(v2) ? v2 : v1).toString();
-		}
-	};
-
 	const _onOpen = (e: any) => {
 		// we have a switch (with classname isCollateralSwitch) in this row, so we need to prevent the modal from opening
 		if (e.target.className.includes("chakra-switch")) return;
@@ -87,7 +64,7 @@ export default function YourSupply({ market, index }: any) {
 		setLoading(true);
 		// call setUserUseReserveAsCollateral
 		const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
-		pool.setUserUseReserveAsCollateral(market.inputToken.id, !market.isCollateral)
+		send(pool, "setUserUseReserveAsCollateral", [market.inputToken.id, !market.isCollateral])
 		.then(async (res: any) => {
 			await res.wait();
 			toggleIsCollateral(market.id);

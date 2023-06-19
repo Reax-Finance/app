@@ -21,7 +21,7 @@ import { useNetwork } from "wagmi";
 import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
-import { getContract } from "../../../src/contract";
+import { getContract, send } from "../../../src/contract";
 import { formatLendingError } from "../../../src/errors";
 import BorrowModal from "./BorrowModal";
 
@@ -52,7 +52,7 @@ export default function YourBorrow({ market, index, type }: any) {
 		if(e.target.value == typeNow) return;
 		setLoading(true);
 		const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
-		pool.swapBorrowRateMode(market.inputToken.id, type == 'VARIABLE' ? '2' : '1')
+		send(pool, "swapBorrowRateMode", [market.inputToken.id, type == 'VARIABLE' ? '2' : '1'])
 		.then(async (res: any) => {
 			await res.wait();
 			toast({
