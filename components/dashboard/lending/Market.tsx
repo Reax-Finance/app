@@ -16,7 +16,7 @@ export default function LendingMarket() {
             mb={6}
         >
             <Box>
-					<Heading fontSize={{sm: '3xl', md: "3xl", lg: '3xl'}} fontWeight='bold'>Lending Market</Heading>
+					<Heading fontSize={{sm: '3xl', md: "3xl", lg: '35px'}} fontWeight='bold'>Lending Market</Heading>
 					<Flex mt={7} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>

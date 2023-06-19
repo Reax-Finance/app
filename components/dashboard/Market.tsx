@@ -168,7 +168,7 @@ export default function Market() {
 			>
 				<Box>
 					<PoolSelector />
-					<Flex mt={7} mb={4} gap={10}>
+					<Flex mt={8} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>
 								Total Supply
