@@ -1,24 +1,19 @@
 import React, { useState } from "react";
-
 import {
 	Modal,
 	ModalOverlay,
 	Tr,
 	Td,
 	Flex,
-	Image,
 	Text,
 	Box,
 	useDisclosure,
 	Switch,
 	useToast,
-	CircularProgress,
 } from "@chakra-ui/react";
-import { ADDRESS_ZERO, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
-
-import { useNetwork, useAccount, useSignTypedData } from 'wagmi';
-import { isValidAndPositiveNS } from '../../utils/number';
+import { useNetwork } from 'wagmi';
 import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
@@ -27,16 +22,15 @@ import { getContract, send } from "../../../src/contract";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { formatLendingError } from "../../../src/errors";
 import SupplyModal from "./SupplyModal";
+import MarketInfo from "../_utils/TokenInfo";
+import useHandleError from "../../utils/useHandleError";
 
 export default function YourSupply({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [tabSelected, setTabSelected] = useState(0);
-
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
-	const { address } = useAccount();
 	const { walletBalances } = useBalanceData();
 	const [loading, setLoading] = useState(false);
 
@@ -59,6 +53,7 @@ export default function YourSupply({ market, index }: any) {
 	}
 
 	const toast = useToast();
+	const handleError = useHandleError();
 
 	const _switchIsCollateral = async () => {
 		setLoading(true);
@@ -77,38 +72,10 @@ export default function YourSupply({ market, index }: any) {
 				position: "top-right"
 			});
 			setLoading(false);
-
 		})
 		.catch((err: any) => {
 			setLoading(false);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else if(formatLendingError(err)){
-				toast({
-					title: "Transaction Failed",
-					description: formatLendingError(err),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
 		})
 	}
 
@@ -123,32 +90,7 @@ export default function YourSupply({ market, index }: any) {
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<Flex gap={3} textAlign='left'>
-						<Image
-							src={`/icons/${market.inputToken.symbol}.svg`}
-							width="38px"
-							alt=""
-						/>
-						<Box>
-							<Text color="whiteAlpha.800">{market.inputToken.symbol}</Text>
-							<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-								<Text>
-									{tokenFormatter.format(
-										Big(walletBalances[market.inputToken.id] ?? 0)
-										// .add(collateral.nativeBalance ?? 0)
-											.div(
-												10 **
-													(market.inputToken.decimals ?? 18)
-											)
-											.toNumber()
-									)}{" "}
-								</Text>
-								<Text>
-								in wallet
-								</Text>
-							</Flex>
-						</Box>
-					</Flex>
+					<MarketInfo token={market.inputToken} />
 				</TdBox>
 				<TdBox
 					isFirst={index == 0}
@@ -178,8 +120,7 @@ export default function YourSupply({ market, index }: any) {
 					isNumeric
 				>
 					<Flex gap={2}>
-					<Switch size="md" isDisabled={loading} className="isCollateralSwitch" colorScheme="secondary" isChecked={market.isCollateral} onChange={_switchIsCollateral} />
-					{loading && <CircularProgress size={'20px'} ringColor={'red'} color="red" isIndeterminate={true} />}
+						<Switch variant={'boxy'} rounded={0} size="sm" isDisabled={loading} className="isCollateralSwitch" colorScheme="secondary" isChecked={market.isCollateral} onChange={_switchIsCollateral} />
 					</Flex>
 				</TdBox>
 			</Tr>

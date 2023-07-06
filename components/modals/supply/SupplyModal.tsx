@@ -27,7 +27,7 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import Link from "next/link";
 import { WETH_ADDRESS } from "../../../src/const";
 import { useNetwork, useAccount, useSignTypedData } from "wagmi";
-import { isValidAndPositiveNS } from "../../utils/number";
+import { formatInput, isValidAndPositiveNS, parseInput } from "../../utils/number";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import Redeem from "./Redeem";
@@ -51,6 +51,7 @@ export default function SupplyModal({
 	const pos = lendingPosition();
 
 	const _setAmount = (e: string) => {
+		e = parseInput(e);
 		setAmount(e);
 		setAmountNumber(isValidAndPositiveNS(e) ? Number(e) : 0);
 	};
@@ -88,7 +89,7 @@ export default function SupplyModal({
 						<Image
 							src={`/icons/${market.inputToken.symbol}.svg`}
 							alt=""
-							width={"38px"}
+							width={"32px"}
 						/>
 						<Text>{market.inputToken.symbol}</Text>
 						{chain?.testnet && (
@@ -107,42 +108,29 @@ export default function SupplyModal({
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 							<>
 								<Flex justify={"center"} mb={5}>
-									<Flex
-										justify={"center"}
-										align="center"
-										gap={0.5}
-										bg="whiteAlpha.400"
-										rounded="0"
+									<Tabs
+										variant="unstyled"
+										onChange={(index) =>
+											index == 1
+												? setIsNative(false)
+												: setIsNative(true)
+										}
+										index={isNative ? 0 : 1}
+										size="sm"
 									>
-										<Tabs
-											variant="soft-rounded"
-											colorScheme="primary"
-											onChange={(index) =>
-												index == 1
-													? setIsNative(false)
-													: setIsNative(true)
-											}
-											index={isNative ? 0 : 1}
-											size="sm"
-										>
-											<TabList>
-												<Tab
-													rounded={0}
-													color={"black"}
-													_selected={{ bg: "white" }}
-												>
-													MNT
-												</Tab>
-												<Tab
-													rounded={0}
-													color={"black"}
-													_selected={{ bg: "white" }}
-												>
-													WMNT
-												</Tab>
-											</TabList>
-										</Tabs>
-									</Flex>
+										<TabList>
+											<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
+											<Tab>
+												MNT
+											</Tab>
+											</Box>
+											<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
+											<Tab>
+												WMNT
+											</Tab>
+											</Box>
+										</TabList>
+									</Tabs>
 								</Flex>
 							</>
 						)}
@@ -154,7 +142,7 @@ export default function SupplyModal({
 						>
 							<NumberInput
 								w={"100%"}
-								value={amount}
+								value={formatInput(amount)}
 								onChange={_setAmount}
 								min={0}
 								step={0.01}

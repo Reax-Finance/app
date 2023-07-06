@@ -7,17 +7,17 @@ export const mantleTestnet = {
     name: "Mantle Testnet",
     network: "mantle-testnet",
     nativeCurrency: {
-        name: "BitDAO",
-        symbol: "BIT",
+        name: "Mantle",
+        symbol: "MNT",
         decimals: 18
     },
     rpcUrls: {
         default: {
-            http: ["https://mantle-testnet.rpc.thirdweb.com"],
+            http: ["https://rpc.testnet.mantle.xyz"],
             // webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
         },
         public: {
-            http: ["https://mantle-testnet.rpc.thirdweb.com"],
+            http: ["https://rpc.testnet.mantle.xyz"],
             // readonly webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
         }
     },
@@ -32,9 +32,17 @@ export const mantleTestnet = {
 
 export const defaultChain = mantleTestnet;
 
+export const NATIVE = "MNT";
+export const W_NATIVE = "WMNT";
+
 const _WETH_ADDRESS: any = {
-	[mantleTestnet.id]: "0x55f317247632d42584848064A0cC0190fE1f6c58"
+	[mantleTestnet.id]: "0x55f317247632d42584848064A0cC0190fE1f6c58".toLowerCase()
 };
+
+export const PERP_CATEGORIES: any = {
+    3: 'C',
+    4: 'S'
+}
 
 export const ESYX_PRICE = 0.005;
 
@@ -44,6 +52,7 @@ export const APP_NAME = 'Reax';
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[ChainID.ARB]);
 
 export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://xc-testnet.pyth.network' : 'https://xc-mainnet.pyth.network';
+export const ROUTER_ENDPOINT = 'https://routes-api.reax.one';
 export const dollarFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
 	currency: "USD",

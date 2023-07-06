@@ -17,7 +17,7 @@ import {
 import { AppDataContext } from "../components/context/AppDataProvider";
 import { useEffect } from "react";
 
-const nonMintable = ["MNT"];
+const nonMintable = ["MNT", "WETH", "cUSD", "sUSD", "cBTC", 'cETH', 'cBNB', 'sAAPL', 'sMSFT', 'sCOIN', 'sGOOGL', 'cXRP'];
 
 const mintAmounts: any = {
 	"USDC": "1000",
@@ -50,9 +50,9 @@ import { useAccount, useNetwork } from "wagmi";
 import { ethers } from "ethers";
 import { useBalanceData } from "../components/context/BalanceProvider";
 import Big from "big.js";
+import { useDexData } from "../components/context/DexDataProvider";
 
 export default function Faucet() {
-	const [collaterals, setCollaterals] = React.useState<any>([]);
 	const { pools } = useContext(AppDataContext);
     const { updateBalance } = useBalanceData();
     const [loading, setLoading] = React.useState<any>(false);
@@ -62,27 +62,7 @@ export default function Faucet() {
     const {address, isConnected}  = useAccount();
     const {chain} = useNetwork();
 
-    const {walletBalances} = useBalanceData();
-
-	useEffect(() => {
-		if (collaterals.length == 0) {
-			// filter out non-mintable assets from pool[].collaterals
-			let _collaterals: string[] = [];
-			for (let i = 0; i < pools.length; i++) {
-				for (let j = 0; j < pools[i].collaterals.length; j++) {
-					if (!nonMintable.includes(pools[i].collaterals[j].token.symbol)) {
-						_collaterals.push(pools[i].collaterals[j]);
-					}
-				}
-			}
-			// delete duplicates
-			_collaterals = _collaterals.filter(
-				(item, index) => _collaterals.indexOf(item) === index
-			);
-
-			setCollaterals(_collaterals);
-		}
-	});
+    const { tokens, walletBalances } = useBalanceData();
 
     const _onOpen = (collateral: any) => {
         setOpenedCollateral(collateral);
@@ -137,29 +117,27 @@ export default function Faucet() {
 						</Tr>
 					</Thead>
 					<Tbody>
-                        {collaterals.map((collateral: any, index: number) => (
-                            <Tr  key={index}>
-							<Td style={index == collaterals.length - 1 ? {border: 0} : {}}>
-                                <Flex gap={2}>
-                                <Image src={`/icons/${collateral.token.symbol}.svg`} w='34px'/>
-                                    <Box>
-                            <Text >
-                            {collateral.token.symbol} 
-                            </Text>
-                            <Text fontSize={'sm'} color='gray.500'>
-                            {Big(walletBalances[collateral.token.id]).div(10**collateral.token.decimals).toNumber()} in wallet
-                            </Text>
-                                    </Box>
-                                </Flex>
-                                
-                            </Td>
-							<Td style={index == collaterals.length - 1 ? {border: 0} : {}}>{mintAmounts[collateral.token.symbol]}</Td>
-							<Td style={index == collaterals.length - 1 ? {border: 0} : {}} isNumeric>
-                                <Button size='sm' rounded='0' colorScheme={'primary'} bg={'primary.400'} onClick={() => _onOpen(collateral)}>Mint</Button>
-                            </Td>
-						</Tr>
-                        ))}
-						
+                        {tokens.map((token: any, index: number) => {
+                            if(nonMintable.includes(token.symbol)) return;
+                            return <Tr  key={index}>
+                                <Td style={index == token.length - 1 ? {border: 0} : {}}>
+                                    <Flex gap={2}>
+                                    <Image src={`/icons/${token.symbol}.svg`} w='34px'/>
+                                        <Box>
+                                            <Text>{token.symbol}</Text>
+                                            <Text fontSize={'sm'} color='gray.500'>
+                                            {Big(walletBalances[token.id] ?? 0).div(10**token.decimals).toNumber()} in wallet
+                                            </Text>
+                                        </Box>
+                                    </Flex>
+                                    
+                                </Td>
+                                <Td style={index == tokens.length - 1 ? {border: 0} : {}}>{mintAmounts[token.symbol]}</Td>
+                                <Td style={index == tokens.length - 1 ? {border: 0} : {}} isNumeric>
+                                    <Button size='sm' rounded='0' colorScheme={'secondary'} bg={'secondary.400'} color={'white'} onClick={() => _onOpen(token)}>Mint</Button>
+                                </Td>
+                            </Tr>
+                        })}
 					</Tbody>
 				</Table>
 			</TableContainer>
@@ -167,16 +145,16 @@ export default function Faucet() {
             {openedCollateral && <Modal isOpen={isOpen} onClose={onClose} isCentered>
             <ModalOverlay />
             <ModalContent rounded={0} width={'400px'}>
-            <ModalHeader>{openedCollateral.token.name}</ModalHeader>
+            <ModalHeader>{openedCollateral.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody >
                 <Flex gap={4}>
 
-                <Image alt={openedCollateral.token.symbol} src={`/icons/${openedCollateral.token.symbol}.svg`} w='44px' mb={2}/>
+                <Image alt={openedCollateral.symbol} src={`/icons/${openedCollateral.symbol}.svg`} w='44px' mb={2}/>
                 <Box  mb={2}>
 
                 <Text color={'gray.400'}>
-                    You are about to mint {mintAmounts[openedCollateral.token.symbol]} {openedCollateral.token.symbol} tokens.
+                    You are about to mint {mintAmounts[openedCollateral.symbol]} {openedCollateral.symbol} tokens.
                 </Text>
                 </Box>
                 </Flex>
@@ -184,7 +162,7 @@ export default function Faucet() {
             </ModalBody>
 
             <ModalFooter justifyContent={'center'}>
-                <Button isDisabled={!isConnected} size={'md'} loadingText="Minting" isLoading={loading} colorScheme='primary' bg={'primary.400'} mb={0} rounded={0} onClick={mint} width='100%'>
+                <Button isDisabled={!isConnected} color={'white'} size={'md'} loadingText="Minting" isLoading={loading} colorScheme='secondary' bg={'secondary.400'} mb={0} rounded={0} onClick={mint} width='100%'>
                 {isConnected ? 'Mint' : 'Please Connect Your Wallet'}
                 </Button>
             </ModalFooter>

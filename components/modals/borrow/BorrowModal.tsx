@@ -1,7 +1,5 @@
 import React from "react";
-
 import { useContext, useState } from "react";
-
 import {
 	ModalContent,
 	ModalHeader,
@@ -29,6 +27,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import Repay from "./Repay";
 import Borrow from "./Borrow";
+import { formatInput, parseInput } from "../../utils/number";
 
 export default function BorrowModal({
 	market,
@@ -49,6 +48,7 @@ export default function BorrowModal({
 	const pos = lendingPosition();
 
 	const _setAmount = (e: string) => {
+		e = parseInput(e);
 		setAmount(e);
 		setAmountNumber(isNaN(Number(e)) ? 0 : Number(e));
 	};
@@ -96,9 +96,8 @@ export default function BorrowModal({
 						<Image
 							src={`/icons/${market.inputToken.symbol}.svg`}
 							alt=""
-							width={"38px"}
+							width={"32px"}
 						/>
-
 						<Text>{market.inputToken.symbol}</Text>
 					</Flex>
 				</ModalHeader>
@@ -109,16 +108,8 @@ export default function BorrowModal({
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 							<>
 								<Flex justify={"center"} mb={5}>
-									<Flex
-										justify={"center"}
-										align="center"
-										gap={0.5}
-										bg="whiteAlpha.400"
-										rounded="0"
-									>
 										<Tabs
-											variant="soft-rounded"
-											colorScheme="primary"
+											variant="unstyled"
 											onChange={(index) =>
 												index == 1
 													? setIsNative(false)
@@ -128,23 +119,18 @@ export default function BorrowModal({
 											size="sm"
 										>
 											<TabList>
-												<Tab
-													rounded={0}
-													color={"black"}
-													_selected={{ bg: "white" }}
-												>
+												<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
+												<Tab>
 													MNT
 												</Tab>
-												<Tab
-													rounded={0}
-													color={"black"}
-													_selected={{ bg: "white" }}
-												>
+												</Box>
+												<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
+												<Tab>
 													WMNT
 												</Tab>
+												</Box>
 											</TabList>
 										</Tabs>
-									</Flex>
 								</Flex>
 							</>
 						)}
@@ -156,7 +142,7 @@ export default function BorrowModal({
 						>
 							<NumberInput
 								w={"100%"}
-								value={amount}
+								value={formatInput(amount)}
 								onChange={_setAmount}
 								min={0}
 								step={0.01}

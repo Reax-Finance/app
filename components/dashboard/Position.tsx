@@ -8,7 +8,7 @@ import { TbReportMoney } from 'react-icons/tb'
 import Big from 'big.js'
 import { useAppData } from '../context/AppDataProvider'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
-import { dollarFormatter } from '../../src/const'
+import { dollarFormatter, tokenFormatter } from '../../src/const'
 import { useBalanceData } from '../context/BalanceProvider'
 import { usePriceData } from '../context/PriceContext'
 import { useSyntheticsData } from '../context/SyntheticsPosition'
@@ -37,6 +37,7 @@ export default function Position() {
   return (
     <>
         {Big(pos?.collateral).gt(0) ? <Box
+            mb={-5}
             w='100%'
             display={{ sm: "block", md: "block" }}
             className='cutoutcornersboxright'
@@ -87,7 +88,7 @@ export default function Position() {
                         >
                             <Flex gap={3} align="start">
                                 <IconBox>
-                                    <IoMdCash size={'22px'} />
+                                    <IoMdCash size={'18px'} />
                                 </IconBox>
 
                                 <Info
@@ -117,7 +118,7 @@ export default function Position() {
                                             $
                                         </Text>
                                         <Text>
-                                            {Number(pos.collateral).toFixed(2)}
+                                            {tokenFormatter.format(Number(pos.collateral))}
                                         </Text>
                                     </Flex>
                                 </Box>
@@ -126,7 +127,7 @@ export default function Position() {
 
                             <Flex gap={3} align="start">
                                 <IconBox>
-                                    <TbReportMoney size={'22px'}  />
+                                    <TbReportMoney size={'18px'}  />
                                 </IconBox>
 
                                 <Info
@@ -152,7 +153,7 @@ export default function Position() {
                                                     $
                                                 </Text>
                                                 <Text>
-                                                    {Number(pos.debt).toFixed(2)}
+                                                    {tokenFormatter.format(Number(pos.debt))}
                                                 </Text>
                                             </Flex>
                                         </Flex>
@@ -160,7 +161,7 @@ export default function Position() {
                                 </Info>
                             </Flex>
 
-                            {Big(pos.debt).gt(0) && <Flex gap={3} align="start">
+                            {/* {Big(pos.debt).gt(0) && <Flex gap={3} align="start">
                                 <IconBox>
                                     <IoMdAnalytics size={'20px'} />
                                 </IconBox>
@@ -199,7 +200,7 @@ export default function Position() {
                                         </Flex>
                                     </Box>
                                 </Info>
-                            </Flex>}
+                            </Flex>} */}
                         </Flex>
                     </motion.div>
                 </Flex>
@@ -212,7 +213,7 @@ export default function Position() {
                 >
                     <Box
                         textAlign={{ sm: "left", md: "right" }}
-                        mt={{ sm: 16, md: 1.5 }}
+                        mt={{ sm: 16, md: 0 }}
                     >
                         <Info
                             message={`Your Debt Limit depends on your LTV %. Account would be liquidated if LTV is greater than your Collateral's Liquidation Threshold`}
@@ -262,7 +263,11 @@ export default function Position() {
             >
                 <Box
                     h={1}
-                    bg={"primary.400"}
+                    bg={
+                        Big(pos.availableToIssue).gt(0)
+                                    ? "green.400"
+                                    : "primary.400"
+                    }
                     width={
                         pos.debtLimit + "%"
                     }

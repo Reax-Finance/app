@@ -20,18 +20,18 @@ import { TokenContext } from "../context/TokenContext";
 import { motion } from "framer-motion";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
-import DAOMenu from "./DAOMenu";
-import NavExternalLink from "./NavExternalLink";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Status } from "../utils/status";
 import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
+import { useDexData } from "../context/DexDataProvider";
 
 function NavBar() {
 	const router = useRouter();
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
 	const { fetchData: fetchLendingData } = useLendingData()
+	const { fetchData: fetchDexData } = useDexData();
 
 
 	const { chain, chains } = useNetwork();
@@ -49,16 +49,15 @@ function NavBar() {
 		onConnect({ address, connector, isReconnected }) {
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
-			fetchData(address!)
-			fetchLendingData(address!)
+			fetchData(address!);
+			fetchLendingData(address!);
+			fetchDexData(address!);
 			fetchTokenData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
 			console.log("onDisconnect");
-			fetchData()
-			fetchLendingData()
-			fetchTokenData()
+			window.location.reload();
 		},
 	});
 
@@ -92,7 +91,8 @@ function NavBar() {
 		) {
 			setInit(true);
 			fetchData();
-			fetchLendingData()
+			fetchLendingData();
+			fetchDexData();
 			fetchTokenData();
 		}
 	}, [activeConnector, address, chain?.unsupported, chains, fetchData, init, isConnected, isConnecting, isSubscribed, status]);
@@ -131,15 +131,24 @@ function NavBar() {
 						>
 							<NavLocalLink
 								path={"/"}
-								title={"Dashboard"}
+								title="Trade"
 							></NavLocalLink>
 							<NavLocalLink
-								path={"/swap"}
-								title="Swap"
+								path={"/perps"}
+								title="Perpetuals"
+							></NavLocalLink>
+							
+							<NavLocalLink
+								path={"/synthetics"}
+								title={"Synths"}
 							></NavLocalLink>
 							<NavLocalLink
 								path={"/lend"}
 								title="Lend"
+							></NavLocalLink>
+							<NavLocalLink
+								path={"/pools"}
+								title="Pools"
 							></NavLocalLink>
 							{/* <NavLocalLink
 								path={"/pools"}
@@ -207,6 +216,9 @@ function NavBar() {
 				{/* <NavExternalLink path={'https://synthex.finance/intro/quick-start'} title={'Docs'}></NavExternalLink> */}
 
 				{/* <DAOMenu /> */}
+					{isConnected && <NavLocalLink
+								path={"/faucet"}
+								title="Faucet"></NavLocalLink>}
 					<Box>
 						<AccountButton />
 					</Box>

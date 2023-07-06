@@ -21,9 +21,60 @@ body {
   background-color: rgb(0, 0, 0);
 }
 
+.tradingview-widget-container{
+  height: 600px !important;
+}
 
 .swapButton {
   background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.swapButton:hover {
+  background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.mainButton {
+  background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.comingSoonText{
+  background: linear-gradient(80deg, transparent 20px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 22px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.mainButton:hover {
+  background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.7) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.7) 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.tabButtonLeft {
+  background: linear-gradient(45deg, transparent 6px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 0px, #ffffff20 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.tabButtonLeftSelected {
+  background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 0px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.tabButtonRight {
+  background: linear-gradient(45deg, transparent 0px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 6px, #ffffff20 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.tabButtonRightSelected {
+  background: linear-gradient(45deg, transparent 0px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
 }
@@ -40,9 +91,15 @@ body {
   background-size: 100% 50%;
 }
 
-
 .cutoutcornersbox {
   background: linear-gradient(45deg, transparent 10px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff20 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+  padding: 1px;
+}
+
+.tokenBox {
+  background: linear-gradient(45deg, transparent 6px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 6px, #ffffff10 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
   padding: 1px;

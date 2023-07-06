@@ -8,7 +8,7 @@ import { TbReportMoney } from 'react-icons/tb'
 import Big from 'big.js'
 import { useAppData } from '../../context/AppDataProvider'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
-import { dollarFormatter } from '../../../src/const'
+import { dollarFormatter, tokenFormatter } from '../../../src/const'
 import { useBalanceData } from '../../context/BalanceProvider'
 import { usePriceData } from '../../context/PriceContext'
 import { useSyntheticsData } from '../../context/SyntheticsPosition'
@@ -34,8 +34,8 @@ export default function LendingPosition() {
                     Your Position
                 </Heading>
 
-                {/* <Info
-                    message={`You can issue debt till you reach Collateral's Base LTV`}
+                <Info
+                    message={`You can issue borrow till you reach Collateral's Base LTV`}
                     title={"Borrow Capacity"}
                 >
                     <Flex
@@ -57,7 +57,7 @@ export default function LendingPosition() {
                             )}
                         </Text>
                     </Flex>
-                </Info> */}
+                </Info>
             </Flex>
             <Flex p={5} justifyContent={"space-between"} alignContent={"center"}>
                 <Flex flexDir={"column"} justify="center">
@@ -75,7 +75,7 @@ export default function LendingPosition() {
                         >
                             <Flex gap={3} align="start">
                                 <IconBox>
-                                    <IoMdCash size={'22px'} />
+                                    <IoMdCash size={'18px'} />
                                 </IconBox>
 
                                 <Info
@@ -105,7 +105,7 @@ export default function LendingPosition() {
                                             $
                                         </Text>
                                         <Text>
-                                            {Number(pos.collateral).toFixed(2)}
+                                            {tokenFormatter.format(Number(pos.collateral))}
                                         </Text>
                                     </Flex>
                                 </Box>
@@ -114,7 +114,7 @@ export default function LendingPosition() {
 
                             <Flex gap={3} align="start">
                                 <IconBox>
-                                    <TbReportMoney size={'22px'}  />
+                                    <TbReportMoney size={'18px'}  />
                                 </IconBox>
 
                                 <Info
@@ -142,7 +142,7 @@ export default function LendingPosition() {
                                                     $
                                                 </Text>
                                                 <Text>
-                                                    {Number(pos.debt).toFixed(2)}
+                                                    {tokenFormatter.format(Number(pos.debt))}
                                                 </Text>
                                             </Flex>
                                         </Flex>
@@ -152,7 +152,7 @@ export default function LendingPosition() {
 
                             {Big(pos.debt).gt(0) && <Flex gap={3} align="start">
                                 <IconBox>
-                                    <FaPercentage size={'20px'} />
+                                    <FaPercentage size={'16px'} />
                                 </IconBox>
 
                                 <Info
@@ -195,7 +195,7 @@ export default function LendingPosition() {
                 >
                     <Box
                         textAlign={{ sm: "left", md: "right" }}
-                        mt={{ sm: 16, md: 1.5 }}
+                        mt={{ sm: 16, md: 0 }}
                     >
                         <Info
                             message={`Your Debt Limit depends on your LTV %. Account would be liquidated if LTV is greater than your Collateral's Liquidation Threshold`}
@@ -247,11 +247,8 @@ export default function LendingPosition() {
                     bg={
                         Big(pos.availableToIssue).gt(0)
                                     ? "green.400"
-                                    : "yellow.400"
+                                    : "primary.400"
                     }
-                    // shadow to only top of this line
-                    // boxShadow={`0px -3px 30px 0.5px ${Big(pos.availableToIssue).gt(0)
-                    //     ? 'rgba(0,255,0,0.4)' : 'rgba(255,255,0,0.5)'}`}
                     width={
                         pos.debtLimit + "%"
                     }

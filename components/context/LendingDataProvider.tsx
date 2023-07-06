@@ -28,12 +28,6 @@ function LendingDataProvider({ children }: any) {
 	const [markets, setMarkets] = React.useState<any[]>([]);
 	const [protocol, setProtocol] = React.useState<any>({});
 
-    useEffect(() => {
-        if(address && status == Status.NOT_FETCHING && markets.length == 0){
-            fetchData(address);
-        }
-    }, [status, address, markets])
-
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
@@ -93,7 +87,6 @@ function LendingDataProvider({ children }: any) {
 		nTries: number = 0
 	): Promise<any> => {
 		const chainId = chain?.id ?? defaultChain.id;
-		if(chain?.unsupported) return Promise.resolve(1);
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),

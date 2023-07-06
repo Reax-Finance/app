@@ -96,7 +96,7 @@ export const MARKET_TIMINGS: any = {
 export const isMarketOpen = (marketName: string) => {
 	const now = new Date();
 	const day = now.toLocaleString("en-US", { timeZone: 'America/New_York', weekday: "long" });
-	const time = now.toLocaleString("en-US", { timeZone: 'America/New_York', hour: "2-digit", minute: "2-digit", hour12: false });
+	const time = now.toLocaleString("en-US", { timeZone: 'America/New_York', hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 	const open = MARKET_TIMINGS[marketName][day]["open"];
 	const close = MARKET_TIMINGS[marketName][day]["close"];
 	return time >= open && time <= close;

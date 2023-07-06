@@ -7,29 +7,42 @@ const DEX_ENDPOINTS: any = {
 export const DEX_ENDPOINT = (chainId: number) => DEX_ENDPOINTS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? DEX_ENDPOINTS[mantleTestnet.id] : DEX_ENDPOINTS[mantleTestnet.id]);
 export const query_dex = (address: string) => (`
 {
-    pools {
-    id
-    address
-    poolType
-    factory
-    name
-    symbol
-    swapFee
-    swapEnabled
-    isPaused
-    totalWeight
-    totalLiquidity
-    tokens {
-        token {
-        name
-        symbol
-        id
+    balancers{
+        address
+        pools {
+            id
+            address
+            poolType
+            factory
+            name
+            symbol
+            swapFee
+            swapEnabled
+            isPaused
+            totalWeight
+            totalLiquidity
+            totalSwapVolume
+            totalSwapFee
+            tokens(orderBy: index) {
+                token {
+                    name
+                    symbol
+                    id
+                    decimals
+                    isPermit
+                }
+                balance
+                weight
+                index
+            }
+            tokensList
+            totalShares
+            snapshots(first:7){
+              swapVolume
+              swapFees
+              timestamp
+            }
         }
-        balance
-        weight
-    }
-    tokensList
-    totalLiquidity
     }
   }
 `);

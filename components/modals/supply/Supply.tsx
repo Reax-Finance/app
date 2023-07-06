@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-
 import {
 	Flex,
 	Text,
 	Box,
-	useDisclosure,
 	Button,
 	Divider,
 	Tooltip,
-	Switch,
 } from "@chakra-ui/react";
 import { ADDRESS_ZERO, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
@@ -16,9 +13,6 @@ import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
 import { ethers, BigNumber } from 'ethers';
 import { getContract, send } from "../../../src/contract";
-import { useContext } from "react";
-import { AppDataContext } from "../../context/AppDataProvider";
-import { compactTokenFormatter } from "../../../src/const";
 import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import Link from "next/link";
@@ -27,8 +21,8 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { useLendingData } from "../../context/LendingDataProvider";
-import { formatLendingError } from "../../../src/errors";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
+import useHandleError from "../../utils/useHandleError";
 
 export default function Supply({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
@@ -50,7 +44,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 	const { toggleIsCollateral } = useLendingData();
 
-	const { walletBalances, nonces, allowances, addAllowance, updateBalance, addNonce } = useBalanceData();
+	const { walletBalances, nonces, allowances, updateFromTx, addNonce } = useBalanceData();
 
 	// stage: 0: before approval, 1: approval pending, 2: after approval, 3: approval not needed
 	const validate = () => {
@@ -135,6 +129,8 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 	const toast = useToast();
 
+	const handleError = useHandleError();
+
 	const deposit = async () => {
 		setLoading(true);
 		setMessage("")
@@ -150,11 +146,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 			tx = send(
 				wrapper,
 				"depositETH",
-				[
-					market.inputToken.id,
-					address,
-					0
-				],
+				[market.inputToken.id, address, 0],
 				_amount.toString()
 			);
 		} else {
@@ -163,34 +155,21 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				tx = send(
 					pool,
 					"supplyWithPermit",
-					[
-						market.inputToken.id,
-						_amount,
-						address,
-						0,
-						deadline,
-						v,
-						r,
-						s
-					]
+					[market.inputToken.id, _amount, address, 0, deadline, v, r, s]
 				);
 			} else {
 				tx = send(
 					pool,
 					"supply",
-					[
-						market.inputToken.id,
-						_amount,
-						address
-					]
+					[market.inputToken.id, _amount, address]
 				);
 			}
 		}
 		tx.then(async (res: any) => {
 			const response = await res.wait(1);
+			updateFromTx(response);
 			setConfirmed(true);
-			updateBalance(market.inputToken.id, _amount.toString(), true);
-			setAmount('0');
+			setAmount('');
 			setApprovedAmount('0');
 
 			// supplying for first time
@@ -201,14 +180,14 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				title: "Deposit Successful",
 				description: <Box>
 					<Text>
-				{`You have deposited ${Big(_amount.toString()).div(10**market.inputToken.decimals).toString()} ${market.inputToken.symbol}`}
+						{`You have deposited ${Big(_amount.toString()).div(10**market.inputToken.decimals).toString()} ${market.inputToken.symbol}`}
 					</Text>
-				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
-					<Flex align={'center'} gap={2}>
-					<ExternalLinkIcon />
-					<Text>View Transaction</Text>
-					</Flex>
-				</Link>
+					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
+						<Flex align={'center'} gap={2}>
+						<ExternalLinkIcon />
+						<Text>View Transaction</Text>
+						</Flex>
+					</Link>
 				</Box>,
 				status: "success",
 				duration: 10000,
@@ -216,34 +195,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				position: "top-right"
 			});
 		}).catch((err: any) => {
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else if(formatLendingError(err)){
-				toast({
-					title: "Transaction Failed",
-					description: formatLendingError(err),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
 			setLoading(false);
 		});
 	};
@@ -261,31 +213,13 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 		)
 		.then(async (res: any) => {
 			const response = await res.wait(1);
-			const decodedLogs = response.logs.map((log: any) =>
-				{
-					try {
-						return collateralContract.interface.parseLog(log)
-					} catch (e) {
-						console.log(e)
-					}
-				}
-			);
-			console.log("decodedLogs", decodedLogs);
-			let log: any = {};
-			for(let i in decodedLogs){
-				if(decodedLogs[i]){
-					if(decodedLogs[i].name == "Approval"){
-						log = decodedLogs[i];
-					}
-				}
-			}
-			addAllowance(market.inputToken.id, market.protocol._lendingPoolAddress, log.args[2].toString());
+			updateFromTx(response);
 			setApproveLoading(false);
 			toast({
 				title: "Approval Successful",
 				description: <Box>
 					<Text>
-				{`You have approved ${Big(log.args[2].toString()).div(10**market.inputToken.decimals).toString()} ${market.inputToken.symbol}`}
+				{`You have approved ${market.inputToken.symbol}`}
 					</Text>
 				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 					<Flex align={'center'} gap={2}>
@@ -300,26 +234,8 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				position: "top-right"
 			})
 		}).catch((err: any) => {
-			console.log(err);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
+			setApproveLoading(false);
 		})
 	}
 
@@ -374,26 +290,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				})
 			})
 			.catch((err: any) => {
-				console.log("err", JSON.stringify(err));
-				if(err?.cause?.reason == "user rejected signing"){
-					toast({
-						title: "Signature Rejected",
-						description: "You have rejected the signature",
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				} else {
-					toast({
-						title: "Transaction Failed",
-						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				}
+				handleError(err);
 				setApproveLoading(false);
 			});
 	};
@@ -438,28 +335,23 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 					<Divider my={2} /> */}
 
 					<Flex justify="space-between">
-						{/* <Text fontSize={"xs"} color="gray.400">
-								1 {asset._mintedTokens[selectedAssetIndex].symbol} = {asset._mintedTokens[selectedAssetIndex].lastPriceUSD}{" "}
-								USD
-							</Text> */}
+						<Flex gap={1}>
+							<Tooltip label='Minimum Loan to Value Ratio'>
 
-							<Flex gap={1}>
-						<Tooltip label='Minimum Loan to Value Ratio'>
+							<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+								Base LTV
+							</Text>
+							</Tooltip>
+							<Text fontSize={"md"} color="whiteAlpha.600">
+							/ 
+							</Text>
+							<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-							Base LTV
-						</Text>
-						</Tooltip>
-						<Text fontSize={"md"} color="whiteAlpha.600">
-						/ 
-						</Text>
-						<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
-
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-							Liq Threshold
-						</Text>
-						</Tooltip>
-							</Flex>
+							<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+								Liq Threshold
+							</Text>
+							</Tooltip>
+						</Flex>
 
 						<Text fontSize={"md"}>
 							{parseFloat(market.maximumLTV)} % /{" "}
@@ -468,46 +360,43 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 					</Flex>
 				</Box>
 
-					<Box>
-						<Text mt={8} fontSize={"sm"} color="whiteAlpha.600" fontWeight={'bold'}>
-							Transaction Overview
-						</Text>
-						<Box
-							// border="1px"
-							// borderColor={"gray.700"}
-							my={4}
-							rounded={8}
-							// p={2}
-						>
-							<Flex justify="space-between">
-								<Text fontSize={"md"} color="whiteAlpha.600">
-									Health Factor
-								</Text>
-								<Text fontSize={"md"}>
-									{Big(pos.debtLimit).toFixed(2)} % 
-									{" -> "} 
-									{Big(pos.collateral).add(amount*prices[market.inputToken.id]).gt(0) ? 
-										Big(pos.debt).add(pos.stableDebt).div(Big(pos.collateral).add(amount*prices[market.inputToken.id])).mul(100).toFixed(1) 
-									: '0'} %
-									</Text>
-							</Flex>
-							<Divider my={2} />
-							<Flex justify="space-between">
-								<Text fontSize={"md"} color="whiteAlpha.600">
-									Available to issue
-								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + amount*prices[market.inputToken.id]*market.maximumLTV/100 - (Number(pos.debt) + Number(pos.stableDebt)))}</Text>
-							</Flex>
-						</Box>
+				<Box mt={6} mb={6}>
+					<Text fontSize={"sm"} color="whiteAlpha.600" fontWeight={'bold'}>
+						Transaction Overview
+					</Text>
+					<Box
+						my={4}
+						rounded={8}
+					>
+						<Flex justify="space-between">
+							<Text fontSize={"md"} color="whiteAlpha.600">
+								Health Factor
+							</Text>
+							<Text fontSize={"md"}>
+								{Big(pos.debtLimit).toFixed(2)} % 
+								{" -> "} 
+								{Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id]).gt(0) ? 
+									Big(pos.debt).add(pos.stableDebt).div(Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id])).mul(100).toFixed(1) 
+								: '0'} %
+							</Text>
+						</Flex>
+						<Divider my={2} />
+						<Flex justify="space-between">
+							<Text fontSize={"md"} color="whiteAlpha.600">
+								Available to issue
+							</Text>
+							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount)*prices[market.inputToken.id]*market.maximumLTV/100 - (Number(pos.debt) + Number(pos.stableDebt)))}</Text>
+						</Flex>
 					</Box>
+				</Box>
 				
-					{(validate().stage == 1|| validate().stage == 0) ? <Button
+					{validate().stage <= 2 && <Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
 						colorScheme={'primary'}
 						bg={"primary.400"}
-						color='gray.800'
+						color='white'
 						mt={2}
 						width="100%"
 						onClick={market.inputToken.isPermit ? approve : approveTx}
@@ -520,13 +409,13 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 							<InfoOutlineIcon/>
 							</Tooltip> : <></>
 						}
-					>
-						{validate().message}
-					</Button> : <Button
-						isDisabled={validate().stage == 1}
+					>{validate().message}</Button>}
+					{validate().stage > 0 && <Button
+						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
-						bgColor={validate().stage == 1 ? "primary.400" : "primary.400"}
+						bgColor={"primary.500"}
+						_hover={{ bg: "primary.700" }}
 						width="100%"
 						color="white"
 						rounded={0}
@@ -537,8 +426,6 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 						{isConnected && !activeChain?.unsupported ? (
 							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
 								<>Insufficient Wallet Balance</>
-							) : !amount || amountNumber == 0 ? (
-								<>Enter Amount</>
 							) : (
 								<>Deposit</>
 							)

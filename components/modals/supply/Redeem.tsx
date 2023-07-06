@@ -22,6 +22,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatLendingError } from "../../../src/errors";
 import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
+import useHandleError from "../../utils/useHandleError";
 
 export default function Redeem({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [loading, setLoading] = useState(false);
@@ -36,6 +37,16 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 	const pos = lendingPosition();
 
 	const {getUpdateData} = useUpdateData();
+	const handleError = useHandleError();
+
+	const { address, isConnected } = useAccount();
+	const { chain } = useNetwork();
+	const [deadline, setDeadline] = useState('0');
+	const { signTypedDataAsync } = useSignTypedData();
+	const [data, setData] = useState(null);
+	const [approvedAmount, setApprovedAmount] = useState('0');
+	const [approveLoading, setApproveLoading] = useState(false);
+	const { nonces, allowances, updateFromTx } = useBalanceData();
 
 	const withdraw = async () => {
 		setLoading(true);
@@ -68,7 +79,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 			)
 		}
 		tx.then(async (res: any) => {
-			await res.wait();
+			updateFromTx(await res.wait());
 			setAmount('0');
 			setApprovedAmount('0')
 			setLoading(false);
@@ -91,47 +102,10 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 				position: 'top-right'
 			})
 		}).catch((err: any) => {
-			console.log(err);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else if(formatLendingError(err)){
-				toast({
-					title: "Transaction Failed",
-					description: formatLendingError(err),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
 			setLoading(false);
 		});
 	};
-
-	const { address, isConnected } = useAccount();
-	const { chain } = useNetwork();
-	const [deadline, setDeadline] = useState('0');
-	const { signTypedDataAsync } = useSignTypedData();
-	const [data, setData] = useState(null);
-	const [approvedAmount, setApprovedAmount] = useState('0');
-	const [approveLoading, setApproveLoading] = useState(false);
-	const { nonces, allowances } = useBalanceData();
 
 	const approve = async () => {
 		setApproveLoading(true);
@@ -186,26 +160,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 				})
 			})
 			.catch((err: any) => {
-				console.log("err", JSON.stringify(err));
-				if(err?.cause?.reason == "user rejected signing"){
-					toast({
-						title: "Signature Rejected",
-						description: "You have rejected the signature",
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				} else {
-					toast({
-						title: "Transaction Failed",
-						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				}
+				handleError(err);
 				setApproveLoading(false);
 			});
 	};
@@ -254,8 +209,8 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 					</Flex>
 				</Box>
 				
-                <Box>
-					<Text mt={8} fontSize={"sm"} color='whiteAlpha.600' fontWeight={'bold'}>
+                <Box mt={6} mb={6}>
+					<Text fontSize={"sm"} color='whiteAlpha.600' fontWeight={'bold'}>
 						Transaction Overview
 					</Text>
 					<Box
@@ -267,7 +222,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 								Health Factor
 							</Text>
 							<Text fontSize={"md"}>
-								{Number(pos.debtLimit).toFixed(1)} % {"->"} {Number(pos.collateral) - amount*prices[market.inputToken.id] > 0 ? (Number(pos.debt)/(Number(pos.collateral) - (amount*prices[market.inputToken.id])) * 100).toFixed(1) : '0'} %
+								{Number(pos.debtLimit).toFixed(2)} % {"->"} {Number(pos.collateral) - amount*prices[market.inputToken.id] > 0 ? (Number(pos.debt)/(Number(pos.collateral) - (amount*prices[market.inputToken.id])) * 100).toFixed(1) : '0'} %
 							</Text>
 						</Flex>
 						<Divider my={2} />

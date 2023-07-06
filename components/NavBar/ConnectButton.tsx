@@ -1,5 +1,6 @@
 import { Box, Button } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { RiArrowDropDownLine } from 'react-icons/ri';
 
 
 export const CustomConnectButton = () => {
@@ -24,19 +25,9 @@ export const CustomConnectButton = () => {
           (!authenticationStatus ||
             authenticationStatus === 'authenticated');
         return (
-          <div
-            // {...(!ready && {
-            //   'aria-hidden': true,
-            //   'style': {
-            //     opacity: 0,
-            //     pointerEvents: 'none',
-            //     userSelect: 'none',
-            //   },
-            // })}
-          >
+          <div>
             {(() => {
               if (!connected) {
-                console.log('not connected');
                 return (
                     <Box className='swapButton' >
                   <Button size={'md'} onClick={openConnectModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
@@ -47,15 +38,15 @@ export const CustomConnectButton = () => {
               }
               if (chain.unsupported) {
                 return (
-                  <button onClick={openChainModal} type="button">
+                  <Button bg={'red.500'} _hover={{bg: 'red.700'}} rounded={0} onClick={openChainModal}>
                     Wrong network
-                  </button>
+                  </Button>
                 );
               }
               return (
                 <Box >
                   <Button rounded={0} size={'sm'} py={'18px'} onClick={openAccountModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
-                    {account.displayName}
+                    {account.displayName} <RiArrowDropDownLine size={24}/>
                   </Button>
                 </Box>
               );

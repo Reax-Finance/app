@@ -24,6 +24,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { getContract, send } from "../../../src/contract";
 import { formatLendingError } from "../../../src/errors";
 import BorrowModal from "./BorrowModal";
+import MarketInfo from "../_utils/TokenInfo";
 
 export default function YourBorrow({ market, index, type }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -109,28 +110,7 @@ export default function YourBorrow({ market, index, type }: any) {
 				_hover={{ bg: 'whiteAlpha.100' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<Flex gap={3} ml={'-2px'} textAlign='left'>
-						<Image
-							src={`/icons/${market.inputToken.symbol}.svg`}
-							width="38px"
-							alt=""
-						/>
-						<Box>
-							<Text color={'white'}>
-								{market.inputToken.symbol}
-							</Text>
-							<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-								<Text>
-									{tokenFormatter.format(
-										Big(walletBalances[market.inputToken.id] ?? 0)
-											.div(10 ** market.inputToken.decimals)
-											.toNumber()
-									)}{" "}
-									in wallet
-								</Text>
-							</Flex>
-						</Box>
-					</Flex>
+					<MarketInfo token={market.inputToken} />
 				</TdBox>
 				
 				<TdBox isFirst={index == 0} alignBox='center'>
@@ -141,12 +121,12 @@ export default function YourBorrow({ market, index, type }: any) {
 
 				<TdBox isFirst={index == 0} alignBox='center'>
 					<Flex w={'100%'} justify={'center'}>
-					<Select size={'xs'} maxW={'100px'} rounded={0} value={type == 'VARIABLE' ? '2' : '1'} onChange={_onSwapModeChange}>
+					<Select disabled={loading} size={'xs'} maxW={'100px'} rounded={0} value={type == 'VARIABLE' ? '2' : '1'} onChange={_onSwapModeChange}>
 						<option value="2">VARIABLE</option>
 						<option value="1">STABLE</option>
 					</Select>
 
-					{loading && <CircularProgress color={'red'} isIndeterminate={loading} size="20px" ml={2} />}
+					{/* {loading && <CircularProgress color={'red'} isIndeterminate={loading} size="20px" ml={2} />} */}
 					</Flex>
 				</TdBox>
 

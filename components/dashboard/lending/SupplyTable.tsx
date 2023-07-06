@@ -43,7 +43,7 @@ export default function CollateralTable() {
 			pagesCount: Math.ceil((markets?.length ?? 1) / pageSize) ?? 1,
 			initialState: { currentPage: 1 }
 		}
-	);	
+	);
 
 	return (
 		<Box >

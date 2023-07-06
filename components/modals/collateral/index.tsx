@@ -27,16 +27,15 @@ import Big from "big.js";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import Deposit from "./Deposit";
 import Link from "next/link";
-import { useContext, useEffect } from "react";
-import { AppDataContext } from "../../context/AppDataProvider";
 import Withdraw from "./Withdraw";
 import { WETH_ADDRESS } from "../../../src/const";
 import { useNetwork, useAccount, useSignTypedData } from 'wagmi';
-import { isValidAndPositiveNS } from '../../utils/number';
+import { formatInput, isValidAndPositiveNS, parseInput } from '../../utils/number';
 import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
+import TokenInfo from "../_utils/TokenInfo";
 
 export default function CollateralModal({ collateral, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -46,9 +45,6 @@ export default function CollateralModal({ collateral, index }: any) {
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
-	const { address } = useAccount();
-
-	const { pools, tradingPool } = useContext(AppDataContext);
 	const { prices } = usePriceData();
 	const { position } = useSyntheticsData();
 	const pos = position();
@@ -61,7 +57,7 @@ export default function CollateralModal({ collateral, index }: any) {
 	};
 
 	const _setAmount = (e: string) => {
-		if (Number(e) !== 0 && Number(e) < 0.000001) e = "0";
+		e = parseInput(e);
 		setAmount(e);
 		setAmountNumber(isValidAndPositiveNS(e) ? Number(e) : 0);
 	};
@@ -72,7 +68,7 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	const max = () => {
 		if (tabSelected == 0) {
-			return Big((isNative ?  walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]) ?? 0)
+			return Big((isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]) ?? 0)
 				.div(10 ** collateral.token.decimals)
 				.toString();
 		} else {
@@ -107,33 +103,7 @@ export default function CollateralModal({ collateral, index }: any) {
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<Flex gap={3} textAlign='left'>
-						<Image
-							src={`/icons/${collateral.token.symbol}.svg`}
-							width="38px"
-							alt=""
-						/>
-						<Box>
-							<Text color="whiteAlpha.800">{collateral.token.name}</Text>
-							<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-							<Text>{collateral.token.symbol} - </Text>
-								<Text>
-									{tokenFormatter.format(
-										(collateral.token.id == WETH_ADDRESS(chain?.id!)?.toLowerCase() ? Big(walletBalances[collateral.token.id] ?? 0).add(walletBalances[ADDRESS_ZERO] ?? 0) : Big(walletBalances[collateral.token.id] ?? 0))
-											.div(
-												10 **
-													(collateral.token
-														.decimals ?? 18)
-											)
-											.toNumber()
-									)}{" "}
-								</Text>
-								<Text>
-								in wallet
-								</Text>
-							</Flex>
-						</Box>
-					</Flex>
+					<TokenInfo token={collateral.token} />
 				</TdBox>
 				<TdBox
 					isFirst={index == 0}
@@ -188,7 +158,7 @@ export default function CollateralModal({ collateral, index }: any) {
 							<Image
 								src={`/icons/${collateral.token.symbol}.svg`}
 								alt=""
-								width={"38px"}
+								width={"32px"}
 							/>
 							<Text>{collateral.token.name}</Text>
 							{chain?.testnet && <Link href="/faucet">
@@ -205,26 +175,29 @@ export default function CollateralModal({ collateral, index }: any) {
 								WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 								<>
 									<Flex justify={"center"} mb={5}>
-										<Flex
-											justify={"center"}
-											align="center"
-											gap={0.5}
-											bg="whiteAlpha.600"
-											rounded="full"
-										>
-											<Tabs
-												variant="soft-rounded"
-												colorScheme="primary"
-												onChange={(index) => index == 1 ? setIsNative(false) : setIsNative(true)}
-												index={isNative ? 0 : 1}
-												size='sm'
-											>
-												<TabList>
-													<Tab _selected={{bg: 'white'}}>BIT</Tab>
-													<Tab _selected={{bg: 'white'}}>WBIT</Tab>
-												</TabList>
-											</Tabs>
-										</Flex>
+									<Tabs
+										variant="unstyled"
+										onChange={(index) =>
+											index == 1
+												? setIsNative(false)
+												: setIsNative(true)
+										}
+										index={isNative ? 0 : 1}
+										size="sm"
+									>
+										<TabList>
+											<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
+											<Tab>
+												MNT
+											</Tab>
+											</Box>
+											<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
+											<Tab>
+												WMNT
+											</Tab>
+											</Box>
+										</TabList>
+									</Tabs>
 									</Flex>
 								</>
 							)}
@@ -236,7 +209,7 @@ export default function CollateralModal({ collateral, index }: any) {
 									>
 										<NumberInput
 											w={"100%"}
-											value={amount}
+											value={formatInput(amount)}
 											onChange={_setAmount}
 											min={0}
 											step={0.01}

@@ -40,11 +40,11 @@ import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
+import { formatInput, parseInput } from "../../utils/number";
+import TokenInfo from "../_utils/TokenInfo";
 
 export default function Debt({ synth, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
-	const { pools, tradingPool, account } = useContext(AppDataContext);
 
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
@@ -65,7 +65,7 @@ export default function Debt({ synth, index }: any) {
 	};
 
 	const _setAmount = (e: string) => {
-		if(Number(e) > 0 && Number(e) < 0.000001) e = '0';
+		e = parseInput(e);
 		setAmount(e);
 		setAmountNumber(isNaN(Number(e)) ? 0 : Number(e));
 	};
@@ -104,7 +104,7 @@ export default function Debt({ synth, index }: any) {
                 address: synth.token.id, // The address that the token is at.
                 symbol: synth.token.symbol, // A ticker symbol or shorthand, up to 5 chars.
                 decimals: synth.token.decimals, // The number of decimals in the token
-                image: 'https://app.synthex.finance/icons/'+synth.token.symbol+'.svg', // A string url of the token logo
+                image: process.env.NEXT_PUBLIC_VERCEL_URL + '/icons/'+synth.token.symbol+'.svg', // A string url of the token logo
               },
             }
         });
@@ -118,32 +118,7 @@ export default function Debt({ synth, index }: any) {
 				_hover={{ bg: 'whiteAlpha.100' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<Flex gap={3} ml={'-2px'} textAlign='left'>
-						<Image
-							src={`/icons/${synth.token.symbol}.svg`}
-							width="38px"
-							alt=""
-						/>
-						<Box>
-							<Text color={'white'}>
-								{synth.token.name
-									.split(" ")
-									.slice(1, -2)
-									.join(" ")}
-							</Text>
-							<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-								<Text>
-									{synth.token.symbol} -{" "}
-									{tokenFormatter.format(
-										Big(walletBalances[synth.token.id] ?? 0)
-											.div(10 ** synth.token.decimals)
-											.toNumber()
-									)}{" "}
-									in wallet
-								</Text>
-							</Flex>
-						</Box>
-					</Flex>
+					<TokenInfo token={synth.token} />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					$ {tokenFormatter.format(prices[synth.token.id] ?? 0)}
@@ -182,7 +157,7 @@ export default function Debt({ synth, index }: any) {
 							<Image
 								src={`/icons/${synth.token.symbol}.svg`}
 								alt=""
-								width={"38px"}
+								width={"32px"}
 							/>
 
 							<Text>{synth.token.name.split(" ").slice(1, -2).join(" ")}</Text>
@@ -223,7 +198,7 @@ export default function Debt({ synth, index }: any) {
                             >
                                 <NumberInput
                                     w={"100%"}
-                                    value={amount}
+                                    value={formatInput(amount)}
                                     onChange={_setAmount}
                                     min={0}
                                     step={0.01}
@@ -264,7 +239,7 @@ export default function Debt({ synth, index }: any) {
                                         variant={"unstyled"}
                                         fontSize="sm"
                                         fontWeight={"bold"}
-                                        onClick={() => _setAmount(max())}
+                                        onClick={() => _setAmount(Big(max()).mul(0.99).toString())}
                                     >
                                         MAX
                                     </Button>

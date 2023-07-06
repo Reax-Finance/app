@@ -18,6 +18,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import SupplyModal from "./SupplyModal";
+import TokenInfo from "../_utils/TokenInfo";
 
 export default function Supply({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -47,32 +48,7 @@ export default function Supply({ market, index }: any) {
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<Flex gap={3} textAlign='left'>
-						<Image
-							src={`/icons/${market.inputToken.symbol}.svg`}
-							width="38px"
-							alt=""
-						/>
-						<Box>
-							<Text color="whiteAlpha.800">{market.inputToken.symbol}</Text>
-							<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-								<Text>
-									{tokenFormatter.format(
-										Big(walletBalances[market.inputToken.id] ?? 0)
-										// .add(collateral.nativeBalance ?? 0)
-											.div(
-												10 **
-													(market.inputToken.decimals ?? 18)
-											)
-											.toNumber()
-									)}{" "}
-								</Text>
-								<Text>
-								in wallet
-								</Text>
-							</Flex>
-						</Box>
-					</Flex>
+					<TokenInfo token={market.inputToken} />
 				</TdBox>
 				
 				<TdBox

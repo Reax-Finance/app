@@ -21,13 +21,12 @@ interface AppDataValue {
 	setTradingPool: (_: number, pools?: any[]) => void;
 	updateCollateralAmount: (collateralAddress: string, poolAddress: string, amount: string, minus: boolean) => void;
 	block: number;
-	updatePoolBalance: (poolAddress: string, value: string, amountUSD: string, minus: boolean) => void;
-	refreshData: () => void;
 	leaderboard: any[];
 	account: any,
 	setRefresh: (_: number[]) => void; 
 	refresh: number[];
 	referrals: any[];
+	updateFromTx: (tx: any) => void;
 }
 
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
@@ -43,10 +42,8 @@ function AppDataProvider({ children }: any) {
 	const [leaderboard, setLeaderboard] = React.useState([]);
 
 	useEffect(() => {
-		if(localStorage && window.ethereum){
-			console.log(localStorage);
+		if(localStorage){
 			const _tradingPool = localStorage.getItem("tradingPool");
-			console.log("tradingPool", _tradingPool);
 			if(_tradingPool && pools.length > parseInt(_tradingPool)){
 				setTradingPool(parseInt(_tradingPool));
 			}
@@ -58,15 +55,6 @@ function AppDataProvider({ children }: any) {
 	const [random, setRandom] = React.useState(0);
 
 	const [referrals, setReferrals] = React.useState<any[]>([]);
-
-	useEffect(() => {
-		if (refresh.length == 0 && pools.length > 0) {
-			// set new interval
-			const timer = setInterval(refreshData, 10000);
-			setRefresh([Number(timer.toString())]);
-			setRandom(Math.random());
-		}
-	}, [refresh, pools, random]);
 
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
@@ -129,7 +117,6 @@ function AppDataProvider({ children }: any) {
 						setPools(_pools);
 						setPoolFeeds(_pools)
 							.then((_poolsWithFeeds) => {
-								refreshData(_poolsWithFeeds);
 								setStatus(Status.SUCCESS);
 								resolve(0);
 							})
@@ -215,100 +202,54 @@ function AppDataProvider({ children }: any) {
 		});
 	}
 
-	const refreshData = async (_pools = pools) => {
-		console.log("refreshing synthetic data");
-		return new Promise(async (resolve, reject) => {
-			const chainId = chain?.id ?? defaultChain.id;
-			const reqs: any[] = [];
-			if(_pools.length == 0) {
-				console.log("No pools found", _pools);
-				return;
-			}
-			let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-			
-			const helper = new ethers.Contract(
-				getAddress("Multicall2", chainId),
-				getABI("Multicall2", chainId),
-				provider
-			);
-			const pool = new ethers.Contract(_pools[0].id, getABI("Pool", chainId), helper.provider);
-			for(let i in _pools) {
-				for(let j in _pools[i].synths) {
-					const synth = _pools[i].synths[j];
-					reqs.push([
-						synth.token.id,
-						pool.interface.encodeFunctionData("totalSupply", [])
-					]);
+	const updateFromTx = async (tx: any) => {
+		let poolItf = new ethers.utils.Interface(getABI("Pool", chain?.id ?? defaultChain.id));
+		// Get Deposit Events
+		let depositEvents = tx.logs.filter((log: any) => {
+			return log.topics[0] == poolItf.getEventTopic("Deposit");
+		});
+		let decodedDepositEvents = depositEvents.map((log: any) => {
+			return {address: log.address.toLowerCase(), args: poolItf.decodeEventLog("Deposit", log.data, log.topics)};
+		});
+		// Get Withdraw Events
+		let withdrawEvents = tx.logs.filter((log: any) => {
+			return log.topics[0] == poolItf.getEventTopic("Withdraw");
+		});
+		let decodedWithdrawEvents = withdrawEvents.map((log: any) => {
+			return {address: log.address.toLowerCase(), args: poolItf.decodeEventLog("Withdraw", log.data, log.topics)};
+		});
+		// Get Transfer Events
+		let transferEvents = tx.logs.filter((log: any) => {
+			return log.topics[0] == poolItf.getEventTopic("Transfer");
+		});
+		let decodedTransferEvents = transferEvents.map((log: any) => {
+			return {address: log.address.toLowerCase(), args: poolItf.decodeEventLog("Transfer", log.data, log.topics)};
+		});
+
+		for(let i in decodedDepositEvents) {
+			updateCollateralAmount(decodedDepositEvents[i].args[1].toLowerCase(), pools[tradingPool].id, decodedDepositEvents[i].args[2].toString(), false);
+		}
+		for(let i in decodedWithdrawEvents) {
+			updateCollateralAmount(decodedWithdrawEvents[i].args[1].toLowerCase(), pools[tradingPool].id, decodedWithdrawEvents[i].args[2].toString(), true);
+		}
+		let _pools = [...pools];
+		for(let i in decodedTransferEvents) {
+			if(decodedTransferEvents[i].address == pools[tradingPool].id){
+				let amount = decodedTransferEvents[i].args[2].toString();
+				let value = amount * _pools[tradingPool].totalDebtUSD / _pools[tradingPool].totalSupply;
+				let isMinus = true;
+				// if minting debt tokens
+				if(decodedTransferEvents[i].args[0] == ADDRESS_ZERO){
+					isMinus = false;
 				}
-				reqs.push([
-					_pools[i].id,
-					pool.interface.encodeFunctionData("totalSupply", [])
-				]);
-				if(address) reqs.push([
-					_pools[i].id,
-					pool.interface.encodeFunctionData("balanceOf", [address])
-				])
-			}
-
-			helper.callStatic.aggregate(reqs).then(async (res: any) => {
-				if(res.returnData.length > 0){
-					let reqCount = 0;
-					for(let i = 0; i < _pools.length; i++) {
-						for(let j in _pools[i].synths) {
-							_pools[i].synths[j].totalSupply = pool.interface.decodeFunctionResult("totalSupply", res.returnData[reqCount])[0].toString();
-							reqCount += 1;
-						}
-						
-						_pools[i].totalSupply = pool.interface.decodeFunctionResult("totalSupply", res.returnData[reqCount])[0].toString();
-						reqCount += 1;
-						if(address) {
-							_pools[i].balance = pool.interface.decodeFunctionResult("balanceOf", res.returnData[reqCount])[0].toString();
-							reqCount += 1;
-						}
-
-						// TODO: sort pool.synths. Has conflict with balance data updates
-						// _pools[i].synths.sort((a: any, b: any) => {
-						// 	return (
-						// 		parseFloat(b.totalSupply) *
-						// 		parseFloat(b.priceUSD)
-						// 	) -
-								
-						// 		(parseFloat(a.totalSupply) *
-						// 			parseFloat(a.priceUSD));
-						// });
-						// updateUserParams(_pools[i]);
-					}
-					setPools(_pools);
-					setRandom(Math.random());
-					resolve("Refreshed pools");
-				} else {
-					console.log("No return data");
-					reject("No return data")
-				}
-			})
-			.catch(err => {
-				console.log("Failed multicall", err);
-				reject(err);
-			})
-		})
-	}
-
-	const updatePoolBalance = (poolAddress: string, value: string, amountUSD: string, isMinus: boolean = false) => {
-		let _pools = pools;
-		for (let i in _pools) {
-			if (_pools[i].id == poolAddress) {
-				// update pool params
-				_pools[i].balance = Big(_pools[i].balance ?? 0)[isMinus?'minus' : 'add'](value).toString();
-				_pools[i].totalSupply = Big(_pools[i].totalSupply ?? 0)[isMinus?'minus' : 'add'](value).toString();
-				_pools[i].totalDebtUSD = Big(_pools[i].totalDebtUSD ?? 0)[isMinus?'minus' : 'add'](amountUSD).toString();
-				// update total debt
-				_pools[i].totalDebt = Big(_pools[i].totalDebt ?? 0)[isMinus?'minus' : 'add'](amountUSD).toNumber();
-				setPools(_pools);
-				setRandom(Math.random());
-				return;
+				_pools[tradingPool].totalSupply = Big(_pools[tradingPool].totalSupply ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
+				_pools[tradingPool].balance = Big(_pools[tradingPool].balance ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
+				_pools[tradingPool].totalDebtUSD = Big(_pools[tradingPool].totalDebtUSD ?? 0)[isMinus? 'minus' : 'add'](value).toString();
+				_pools[tradingPool].totalDebt = Big(_pools[tradingPool].totalDebt ?? 0)[isMinus? 'minus' : 'add'](value).toNumber();
 			}
 		}
-	};
+		setPools(_pools);
+	}
 
 	const updateCollateralAmount = (
 		collateralAddress: string,
@@ -320,12 +261,10 @@ function AppDataProvider({ children }: any) {
 		for (let i in _pools) {
 			if (_pools[i].id == poolAddress) {
 				for (let j in _pools[i].collaterals) {
-					console.log(_pools[i].collaterals[j].token.id, collateralAddress);
 					if (_pools[i].collaterals[j].token.id == collateralAddress) {
 						_pools[i].collaterals[j].balance = Big(_pools[i].collaterals[j].balance ?? 0)[isMinus?'minus':'add'](value).toString();
 						_pools[i].userAdjustedCollateral = Big(_pools[i].userAdjustedCollateral ?? 0)[isMinus?'minus':'add'](Big(value).div(10**_pools[i].collaterals[j].token.decimals).mul(_pools[i].collaterals[j].priceUSD).mul(_pools[i].collaterals[j].baseLTV).div(10000)).toNumber();
 						_pools[i].userCollateral = Big(_pools[i].userCollateral ?? 0)[isMinus?'minus':'add'](Big(value).div(10**_pools[i].collaterals[j].token.decimals).mul(_pools[i].collaterals[j].priceUSD)).toNumber();
-						// updateUserParams(_pools[i]);
 					}
 				}
 			}
@@ -342,14 +281,13 @@ function AppDataProvider({ children }: any) {
 		pools,
 		tradingPool,
 		setTradingPool,
-		updatePoolBalance,
 		fetchData,
 		updateCollateralAmount,
 		block,
-		refreshData,
 		setRefresh,
 		refresh,
-		referrals
+		referrals,
+		updateFromTx
 	};
 
 	return (

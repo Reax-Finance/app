@@ -1,17 +1,20 @@
 import * as React from "react";
 import axios from "axios";
-import { getAddress, getABI, getContract } from "../../src/contract";
+import { getAddress, getABI, getArtifact } from "../../src/contract";
 import { ADDRESS_ZERO, defaultChain } from '../../src/const';
 import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
 import { DEX_ENDPOINT, query_dex } from "../../src/queries/dex";
+import Big from "big.js";
 
 interface DEXDataValue {
 	status: Status;
 	message: string;
 	pools: any[];
+	vault: any;
+	fetchData: (address?: string) => Promise<number>;
 }
 
 const DEXDataContext = React.createContext<DEXDataValue>({} as DEXDataValue);
@@ -23,23 +26,17 @@ function DEXDataProvider({ children }: any) {
 	const { chain } = useNetwork();
 	const { address } = useAccount();
 	const [pools, setPools] = React.useState<any[]>([]);
+	const [vault, setVault] = React.useState<any>({});
 
-    useEffect(() => {
-        if(address && status == Status.NOT_FETCHING && pools.length == 0){
-            fetchData(address);
+	React.useEffect(() => {
+        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && address) {
+			setSubStatus(SubStatus.SUBSCRIBED);
+			console.log("subscribing to dex data");
+			setInterval(refreshData, 10000);
         }
-    }, [status, address, pools])
+    }, [pools, address, status])
 
-	// React.useEffect(() => {
-    //     if(subStatus == SubStatus.NOT_SUBSCRIBED && markets.length > 0 && address) {
-    //         if(markets[0].feed){
-	// 			setSubStatus(SubStatus.SUBSCRIBED);
-	// 			setInterval(refreshData, 10000);
-	// 		}
-    //     }
-    // }, [markets, address, status])
-
-	const fetchData = (_address: string | null): Promise<number> => {
+	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
 		console.log("fetching dex data for chain", chainId);
@@ -59,22 +56,11 @@ function DEXDataProvider({ children }: any) {
 					setMessage("Network Error. Please refresh the page or try again later.");
 					reject(res[0].data.errors);
 				} else {
-                    setPools(res[0].data.data.pools);
-					// const poolsData = res[0].data.data.lendingProtocols[0];
-					// setProtocol(poolsData);
-					// const _markets = res[0].data.data.markets;
-					// if(_address && res[0].data.data.account){
-					// 	const _enabledCollaterals = res[0].data.data.account._enabledCollaterals.map((c: any) => c.id);
-					// 	_markets.forEach((market: any) => {
-					// 		market.isCollateral = _enabledCollaterals.includes(market.id);
-					// 	})
-					// }
-					// _setMarketsPriceFeeds(_markets, poolsData._priceOracle)
-					// .then((_marketsWithFeeds) => {
-					// 	refreshData(_marketsWithFeeds);
-					// 	setStatus(Status.SUCCESS);
-					// 	resolve(0);
-					// })
+					const _pools = res[0].data.data.balancers[0].pools;
+                    setPools(_pools);
+					setVault({address: res[0].data.data.balancers[0].address})
+					setStatus(Status.SUCCESS);
+					resolve(0);
 				}
 			})
 			.catch((err) => {
@@ -86,10 +72,60 @@ function DEXDataProvider({ children }: any) {
 		});
 	};
 
+	const refreshData = () => {
+		const chainId = chain?.id ?? defaultChain.id;
+		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+		const helper = new ethers.Contract(
+			getAddress("Multicall2", chainId),
+			getABI("Multicall2", chainId),
+			provider
+		);
+		return new Promise(async (resolve, reject) => {
+            let calls: any[] = [];
+			const itf = new ethers.utils.Interface(getABI("MockToken", chainId));
+			const stablePoolItf = new ethers.utils.Interface(getArtifact("ComposableStablePool"));
+			const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"), provider);
+			pools.forEach((pool: any) => {
+				if(pool.totalShares > 0){
+					calls.push([pool.address, stablePoolItf.encodeFunctionData("getActualSupply", [])]);
+					calls.push([vault.address, vaultContract.interface.encodeFunctionData("getPoolTokens", [pool.id])]);
+				}
+			});
+			helper.callStatic.aggregate(calls)
+			.then((res: any) => {
+				// update pool.totalShares
+				let index = 0;
+				const _pools = pools.map((pool: any, i: number) => {
+					if(pool.totalShares > 0){
+						pool.totalShares = ethers.utils.formatEther(ethers.BigNumber.from(res.returnData[index]).toString());
+						index++;
+						const poolTokens = vaultContract.interface.decodeFunctionResult("getPoolTokens", res.returnData[index]);
+						index++;
+						for(let i in poolTokens.tokens){
+							for(let j in pool.tokens){
+								if(poolTokens.tokens[i].toLowerCase() == pool.tokens[j].token.id){
+									pool.tokens[j].balance = Big(poolTokens.balances[i].toString()).div(10**pool.tokens[j].token.decimals).toFixed(pool.tokens[j].token.decimals);
+								}
+							}
+						}
+					}
+					return pool;
+				});
+				setPools(_pools);
+				resolve(0);
+			})
+			.catch((err: any) => {
+				console.log("Failed to refresh dex data", err);
+			})
+		})
+	}
+
 	const value: DEXDataValue = {
 		status,
 		message,
-		pools
+		pools,
+		vault,
+		fetchData,
 	};
 
 	return (

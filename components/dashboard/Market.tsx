@@ -194,8 +194,8 @@ export default function Market() {
 								<Box cursor={"help"}>
 									<Heading size={"sm"}>
 										{(
-											Number(debtBurnApr()) +
-											Number(esSyxApr())
+											Number(debtBurnApr())
+											// + Number(esSyxApr())
 										).toFixed(2)}
 										%
 									</Heading>

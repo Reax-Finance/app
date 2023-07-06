@@ -40,26 +40,28 @@ function APRInfoBox({ debtBurnApr, esSyxApr }: any) {
 				<Box px={3} py={2} className="cutoutcornersboxright">
 					<Text color={"whiteAlpha.700"}>Total APY</Text>
 					<Text fontSize={"lg"}>
-						{(Number(debtBurnApr) + Number(esSyxApr)).toFixed(2)} %
+						{(Number(debtBurnApr)
+						 // + Number(esSyxApr)
+						 ).toFixed(2)} %
 					</Text>
 				</Box>
 
 				<Divider />
 				<Box px={3} py={1} roundedBottom={8}>
 					<Flex align={"center"} gap={2} mb={2} mt={2}>
-						<TbMoneybag size={"20px"} />
+						{/* <TbMoneybag size={"20px"} /> */}
 						<Flex gap={2}>
 							<Text>{debtBurnApr} %</Text>
 							<Text color={"whiteAlpha.700"}>Debt Burn</Text>
 						</Flex>
 					</Flex>
-					<Flex align={"center"} gap={2} mb={2}>
+					{/* <Flex align={"center"} gap={2} mb={2}>
 						<Image src="/veREAX.svg" w={5} alt={"veREAX"} />
 						<Flex gap={2}>
 							<Text>{esSyxApr} %</Text>
 							<Text color={"whiteAlpha.700"}>veREAX</Text>
 						</Flex>
-					</Flex>
+					</Flex> */}
 				</Box>
 			</Box>
 		</>

@@ -24,6 +24,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
 import { formatLendingError } from "../../../src/errors";
+import useHandleError from "../../utils/useHandleError";
 
 const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
 	const router = useRouter();
@@ -39,7 +40,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	const { isConnected, address } = useAccount();
 	const { chain } = useNetwork();
 	const {getUpdateData} = useUpdateData();
-	const {updateBalance, walletBalances, allowances} = useBalanceData();
+	const {updateFromTx, walletBalances, allowances} = useBalanceData();
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
@@ -57,6 +58,8 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	});
 
 	const toast = useToast();
+
+	const handleError = useHandleError();
 
 	const borrow = async () => {
 		if (!amount) return;
@@ -91,6 +94,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		}
 
 		tx.then(async (res: any) => {
+			updateFromTx(await res.wait());
 			setAmount("0");
 			setLoading(false);
 			toast({
@@ -114,34 +118,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		})
 		.catch((err: any) => {
 			console.log(err);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else if(formatLendingError(err)){
-				toast({
-					title: "Transaction Failed",
-					description: formatLendingError(err),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err)
 			setLoading(false);
 		});
 	};
@@ -193,26 +170,8 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 			})
 		}).catch((err: any) => {
 			console.log(err);
+			handleError(err);
 			setLoading(false);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
 		})
 	}
 

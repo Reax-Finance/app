@@ -30,11 +30,12 @@ function PriceContextProvider({ children }: any) {
         if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && markets.length > 0) {
             if(markets[0].feed && pools[0].synths[0].feed){
                 setSubStatus(SubStatus.SUBSCRIBED);
+                console.log("subscribing to price data");
                 updatePrices();
-                setInterval(updatePrices, 2500);
+                setInterval(updatePrices, 30000);
             }
         }
-    }, [markets, pools, address, subStatus])
+    }, [markets, pools, address, subStatus]);
 
 	const updatePrices = async () => {
         console.log("updating prices");
@@ -133,6 +134,7 @@ function PriceContextProvider({ children }: any) {
                     pythIndex += 1;
                 }
             }
+            _prices[ADDRESS_ZERO] = _prices[WETH_ADDRESS(chainId)]
             setPrices(_prices);
         })
         .catch((err: any) => {

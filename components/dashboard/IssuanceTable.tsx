@@ -29,10 +29,6 @@ import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Skeleton } from "@chakra-ui/react";
 import Debt from "../modals/debt";
 import ThBox from "./ThBox";
-import Big from "big.js";
-import { ESYX_PRICE } from "../../src/const";
-import APRInfo from "../infos/APRInfo";
-import TdBox from "./TdBox";
 
 const pageSize = 5;
 

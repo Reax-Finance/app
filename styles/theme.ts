@@ -1,4 +1,5 @@
 import { extendTheme, ThemeConfig } from "@chakra-ui/react";
+import { switchTheme } from './switchTheme';
 
 const config: ThemeConfig = {
 	initialColorMode: 'dark',
@@ -19,7 +20,8 @@ export const theme = extendTheme({
 			baseStyle: {
 				fontWeight: 'semibold'
 			}
-		}
+		},
+		Switch: switchTheme
 	},
 	fonts: {
 		heading: `Chakra Petch, sans-serif`,
@@ -32,28 +34,28 @@ export const theme = extendTheme({
 		warning: "#FF8A00",
 		danger: "#FF0000",
 		primary: {
-			50:  '#FFF3E6',
-			100: '#FFDAB0',
-			200: '#FFC88A',
-			300: '#FEAF54',
-			400: '#FF8A00',
-			500: '#FE8700',
-			600: '#E77B00',
-			700: '#B46000',
-			800: '#8C4A00',
-			900: '#6B3900',
+			50:  '#FFE5BC',
+			100: '#FFD89B',
+			200: '#FFC871',
+			300: '#FFBD54',
+			400: '#FFAE2D',
+			500: '#E49C28',
+			600: '#CF8D23',
+			700: '#BB7F20',
+			800: '#9B6A1C',
+			900: '#7D5617',
 		},
 		secondary: {
-			50:  '#F64E00',
-			100: '#F64E00',
-			200: '#F64E00',
-			300: '#F64E00',
-			400: '#F64E00',
-			500: '#F64E00',
-			600: '#F64E00',
-			700: '#F64E00',
-			800: '#F64E00',
-			900: '#F64E00',
+			50:  '#FFB593',
+			100: '#FF9B6D',
+			200: '#FF8B55',
+			300: '#FF7333',
+			400: '#ff631b',
+			500: '#DF581A',
+			600: '#CE5117',
+			700: '#AE4616',
+			800: '#933D15',
+			900: '#783212',
 		},
 		bg1: "#2B2E32",
 		bg2: "#1D1F24",

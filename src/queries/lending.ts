@@ -25,6 +25,12 @@ export const query_lending = (address: string) => (
 		  isActive
 		  canUseAsCollateral
 		  canBorrowFrom
+		  eModeCategory {
+			id
+			label
+			ltv
+			liquidationThreshold
+		  }
 		  _vToken {
 			id
 			decimals

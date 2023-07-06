@@ -8,12 +8,10 @@ export default function SelectBody({ asset, onOpen }: any) {
 			<Flex
 				justify={"space-between"}
 				align={"center"}
-				// bg="whiteAlpha.200"
-				// rounded={"full"}
                 bgGradient={'linear(45deg, transparent 10px, #ffffff10 0) bottom left'}
-				// shadow={"2xl"}
-				// border={"2px"}
-				// borderColor="whiteAlpha.200"
+				_hover={{
+					bgGradient: 'linear(45deg, transparent 10px, #ffffff15 0) bottom left',
+				}}
 				px={2}
 				py={2}
 				pr={2}
@@ -21,7 +19,7 @@ export default function SelectBody({ asset, onOpen }: any) {
 				mr={-1}
 			>
 				<Image
-					src={"/icons/" + asset?.token.symbol + ".svg"}
+					src={"/icons/" + asset?.symbol + ".svg"}
 					height={26}
 					style={{margin: "4px"}}
 					width={26}
@@ -29,7 +27,7 @@ export default function SelectBody({ asset, onOpen }: any) {
 				/>
 
 				<Text fontSize="lg" color="whiteAlpha.800">
-					{asset.token.symbol}
+					{asset?.symbol}
 				</Text>
 				<Box>
 					<RiArrowDropDownLine size={20} />

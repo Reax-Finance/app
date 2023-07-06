@@ -23,6 +23,11 @@ export function getABI(contractName: string, chain: number) {
   return contractBuild;
 }
 
+export function getArtifact(contractName: string) {
+  const artifact = require(`../artifacts/${contractName}.json`);
+  return artifact.abi;
+}
+
 export function getAddress(contractName: string, chain: number) {
   const supportedChains = process.env.NEXT_PUBLIC_SUPPORTED_CHAINS?.split(',');
   if(!supportedChains?.includes(chain.toString())) chain = defaultChain.id;
