@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, IconButton, useDisclosure, useToast } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
 import {
@@ -73,16 +73,16 @@ export default function Faucet() {
 
     const mint = async () => {
         setLoading(true);
-        const token = await getContract("MockToken", chain?.id!, openedCollateral.token.id);
-        const amount = ethers.utils.parseUnits(mintAmounts[openedCollateral.token.symbol], openedCollateral.token.decimals);
+        const token = await getContract("MockToken", chain?.id!, openedCollateral.id);
+        const amount = ethers.utils.parseUnits(mintAmounts[openedCollateral.symbol], openedCollateral.decimals);
         send(token, "mint", [address, amount])
             .then(async(res: any) => {
                 await res.wait(1);
                 setLoading(false);
-                updateBalance(openedCollateral.token.id, amount.toString(), false);
+                updateBalance(openedCollateral.id, amount.toString(), false);
                 toast({
-                    title: `Minted ${openedCollateral.token.symbol}`,
-                    description: `${mintAmounts[openedCollateral.token.symbol]} ${openedCollateral.token.symbol} minted to your wallet.`,
+                    title: `Minted ${openedCollateral.symbol}`,
+                    description: `${mintAmounts[openedCollateral.symbol]} ${openedCollateral.symbol} minted to your wallet.`,
                     status: "success",
                     duration: 5000,
                     isClosable: true,
@@ -95,6 +95,21 @@ export default function Faucet() {
                 setLoading(false);
             });
     };
+
+    const addToMetamask = async (token: any) => {
+        (window as any).ethereum.request({
+            method: 'wallet_watchAsset',
+            params: {
+              type: 'ERC20', // Initially only supports ERC20, but eventually more!
+              options: {
+                address: token.id, // The address that the token is at.
+                symbol: token.symbol, // A ticker symbol or shorthand, up to 5 chars.
+                decimals: token.decimals, // The number of decimals in the token
+                image: process.env.NEXT_PUBLIC_VERCEL_URL + '/icons/'+token.symbol+'.svg', // A string url of the token logo
+              },
+            }
+        });
+    }
 
 	return (
 		<>
@@ -124,11 +139,27 @@ export default function Faucet() {
                                     <Flex gap={2}>
                                     <Image src={`/icons/${token.symbol}.svg`} w='34px'/>
                                         <Box>
-                                            <Text>{token.symbol}</Text>
+                                            <Flex align={'center'} gap={2}>
+                                                <Text>{token.symbol}</Text>
+                                                <IconButton
+                                                    icon={
+                                                        <Image
+                                                            src="https://cdn.consensys.net/uploads/metamask-1.svg"
+                                                            w={"20px"}
+                                                            alt=""
+                                                        />
+                                                    }
+                                                    onClick={() => addToMetamask(token)}
+                                                    size={"xs"}
+                                                    rounded="full"
+                                                    aria-label={""}
+                                                />
+                                            </Flex>
                                             <Text fontSize={'sm'} color='gray.500'>
                                             {Big(walletBalances[token.id] ?? 0).div(10**token.decimals).toNumber()} in wallet
                                             </Text>
                                         </Box>
+                                        
                                     </Flex>
                                     
                                 </Td>

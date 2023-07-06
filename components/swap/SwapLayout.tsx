@@ -77,6 +77,7 @@ export default function SwapLayout({
     const outputValue = (Number(outputAmount) || 0) * prices[tokens[outputAssetIndex]?.id];
 
     const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
+    const valid = inputAmount > 0 && outputAmount > 0;
 
   return (
     <>
@@ -239,7 +240,7 @@ export default function SwapLayout({
             <Box px="5">
 
 
-            { gas > 0 && <Box pb={10} mt={5}>
+            {valid && <Box pb={10} mt={5}>
                 {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} bg={'whiteAlpha.50'} color={'orange'}>
                     <WarningTwoIcon/>
                     <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
@@ -292,7 +293,7 @@ export default function SwapLayout({
                             width: '100%'
                         }}
                     >
-                        {isOpen && 	<>
+                    {isOpen && 	<>
                         <Divider />
                         <Flex bg={'whiteAlpha.50'} flexDir={'column'} gap={1} mt={0} px={3} py={2} fontSize='sm' color={'whiteAlpha.800'}>
                             <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'red.400' : 'orange.400'} justify={'space-between'}>
@@ -318,7 +319,7 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={!gas ? 6 : 0.5} mb={5} className="swapButton">
+                <Box mt={!valid ? 6 : 0.5} mb={5} className="swapButton">
                 <Button
                     size="lg"
                     fontSize={"xl"}
