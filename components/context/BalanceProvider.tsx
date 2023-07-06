@@ -42,7 +42,6 @@ function BalanceContextProvider({ children }: any) {
     React.useEffect(() => {
         if(status == Status.NOT_FETCHING && pools.length > 0 && markets.length > 0 && dexPools.length > 0 ) {
             fetchBalances(address);
-            // setInterval(() => fetchBalances(address), 5000);
         }
     }, [markets.length, pools.length, dexPools.length, address, status])
 
@@ -50,7 +49,6 @@ function BalanceContextProvider({ children }: any) {
         console.log("fetching balances", _address);
         setStatus(Status.FETCHING);
         const chainId = chain?.id ?? defaultChain.id;
-		if(chain?.unsupported) return Promise.resolve(1);
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),
@@ -187,20 +185,6 @@ function BalanceContextProvider({ children }: any) {
                 market._sToken.id,
                 itf.encodeFunctionData("balanceOf", [_address]),
             ]);
-
-            // TODO: update total supplies in lending provider
-            // calls.push([
-            //     market.outputToken.id,
-            //     itf.encodeFunctionData("totalSupply", []),
-            // ]);
-            // calls.push([
-            //     market._vToken.id,
-            //     itf.encodeFunctionData("totalSupply", []),
-            // ]);
-            // calls.push([
-            //     market._sToken.id,
-            //     itf.encodeFunctionData("totalSupply", []),
-            // ]);
         };
 
         // check balance for lp tokens and allowance to vault
@@ -223,86 +207,78 @@ function BalanceContextProvider({ children }: any) {
             }
         }
 
-        return new Promise(async (resolve, reject) => {
-            helper.callStatic.aggregate(calls).then(async (res: any) => {
-                const newBalances: any = {};
-                const newAllowances: any = {};
-                const newNonces: any = {};
-                // const newTotalSupplies: any = {};
-                res = res.returnData;
-                let index = 0;
-                // update eth balance
-                newBalances[ADDRESS_ZERO] = BigNumber.from(res[index]).toString();
+        helper.callStatic.aggregate(calls).then(async (res: any) => {
+            const newBalances: any = {};
+            const newAllowances: any = {};
+            const newNonces: any = {};
+            // const newTotalSupplies: any = {};
+            res = res.returnData;
+            let index = 0;
+            // update eth balance
+            newBalances[ADDRESS_ZERO] = BigNumber.from(res[index]).toString();
+            index++;
+            // update tokens
+            for(let i = 0; i < _tokens.length; i++) {
+                const token = _tokens[i];
+                newBalances[token.id] = BigNumber.from(res[index]).toString();
                 index++;
-                // update tokens
-                for(let i = 0; i < tokens.length; i++) {
-                    const token = tokens[i];
-                    newBalances[token.id] = BigNumber.from(res[index]).toString();
+                if(!newAllowances[token.id]) newAllowances[token.id] = {};
+                newAllowances[token.id][routerAddress] = BigNumber.from(res[index]).toString();
+                index++;
+                if(token.isPermit){
+                    newNonces[token.id] = BigNumber.from(res[index]).toString();
                     index++;
+                }
+            }
+            for (let i = 0; i < pools.length; i++) {
+                for(let j = 0; j < pools[i].collaterals.length; j++) {
+                    const collateral = pools[i].collaterals[j];
+                    if(!newAllowances[collateral.token.id]) newAllowances[collateral.token.id] = {};
+                    newAllowances[collateral.token.id][pools[i].id] = BigNumber.from(res[index]).toString();
+                    index++;
+                }
+            }
+            for(let i = 0; i < markets.length; i++) {
+                const market = markets[i];
+                if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
+                newAllowances[market.inputToken.id][market.protocol._lendingPoolAddress] = BigNumber.from(res[index]).toString();
+                index++;
+                newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
+                index++;
+                if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                    newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                    index++;
+                    if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
+                    newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                    index++;
+                }
+                newBalances[market.outputToken.id] = BigNumber.from(res[index]).toString();
+                index++;
+                newBalances[market._vToken.id] = BigNumber.from(res[index]).toString();
+                index++;
+                newBalances[market._sToken.id] = BigNumber.from(res[index]).toString();
+                index++;
+            }
+            for(let i = 0; i < dexPools.length; i++) {
+                const dexPool = dexPools[i];
+                newBalances[dexPool.address] = BigNumber.from(res[index]).toString();
+                index++;
+                for(let j = 0; j < dexPool.tokens.length; j++) {
+                    const token = dexPool.tokens[j].token;
                     if(!newAllowances[token.id]) newAllowances[token.id] = {};
-                    newAllowances[token.id][routerAddress] = BigNumber.from(res[index]).toString();
-                    index++;
-                    if(token.isPermit){
-                        newNonces[token.id] = BigNumber.from(res[index]).toString();
-                        index++;
-                    }
-                }
-                for (let i = 0; i < pools.length; i++) {
-                    for(let j = 0; j < pools[i].collaterals.length; j++) {
-                        const collateral = pools[i].collaterals[j];
-                        if(!newAllowances[collateral.token.id]) newAllowances[collateral.token.id] = {};
-                        newAllowances[collateral.token.id][pools[i].id] = BigNumber.from(res[index]).toString();
-                        index++;
-                    }
-                }
-                for(let i = 0; i < markets.length; i++) {
-                    const market = markets[i];
-                    if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
-                    newAllowances[market.inputToken.id][market.protocol._lendingPoolAddress] = BigNumber.from(res[index]).toString();
-                    index++;
-                    newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
-                    index++;
-                    if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
-                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
-                        index++;
-                        if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
-                        newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
-                        index++;
-                    }
-                    newBalances[market.outputToken.id] = BigNumber.from(res[index]).toString();
-                    index++;
-                    newBalances[market._vToken.id] = BigNumber.from(res[index]).toString();
-                    index++;
-                    newBalances[market._sToken.id] = BigNumber.from(res[index]).toString();
-                    index++;
-                    // newTotalSupplies[market.outputToken.id] = BigNumber.from(res[index]).toString();
-                    // index++;
-                    // newTotalSupplies[market._vToken.id] = BigNumber.from(res[index]).toString();
-                    // index++;
-                    // newTotalSupplies[market._sToken.id] = BigNumber.from(res[index]).toString();
-                    // index++;
-                }
-                for(let i = 0; i < dexPools.length; i++) {
-                    const dexPool = dexPools[i];
-                    newBalances[dexPool.address] = BigNumber.from(res[index]).toString();
-                    index++;
-                    for(let j = 0; j < dexPool.tokens.length; j++) {
-                        const token = dexPool.tokens[j].token;
-                        if(!newAllowances[token.id]) newAllowances[token.id] = {};
                     newAllowances[token.id][vault.address] = BigNumber.from(res[index]).toString();
-                        index++;
-                    }
+                    index++;
                 }
-                setStatus(Status.SUCCESS);
-                setWalletBalances(newBalances);
-                setAllowances(newAllowances);
-                setNonces(newNonces);
-            })
-            .catch((err: any) => {
-                setStatus(Status.ERROR);
-                reject(err);
-            })
-        });
+            }
+            console.log(index, calls.length);
+            setStatus(Status.SUCCESS);
+            setWalletBalances(newBalances);
+            setAllowances(newAllowances);
+            setNonces(newNonces);
+        })
+        .catch((err: any) => {
+            setStatus(Status.ERROR);
+        })
 	};
 
     /**
