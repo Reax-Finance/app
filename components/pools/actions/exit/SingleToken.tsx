@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { usePriceData } from "../../../context/PriceContext";
 import {
-	Box,
-	Button,
-	Divider,
-	Flex,
-	Image,
-	InputGroup,
-	NumberInput,
-	NumberInputField,
-	Select,
-	Text,
     useToast,
 } from "@chakra-ui/react";
 import { NATIVE, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../../../src/const";
-import { PlusSquareIcon } from "@chakra-ui/icons";
 import { ethers } from "ethers";
 import { getAddress, getArtifact, getContract, send } from "../../../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
@@ -22,19 +11,17 @@ import { useDexData } from "../../../context/DexDataProvider";
 import { useBalanceData } from "../../../context/BalanceProvider";
 import Big from "big.js";
 import { formatBalError } from "../../../../src/errors";
-import { BsArrowDownSquareFill } from "react-icons/bs";
-import useHandleBalError from "../../../utils/useHandleError";
 import StableWithdrawLayout from "./layouts/StableWithdrawLayout";
 import { parseInput } from "../../../utils/number";
+import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
 export default function SingleTokenWithdraw({ pool }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
 	const [amount, setAmount] = React.useState('');
-    const [maxAmountIn, setMaxAmountIn] = React.useState('0');
 	const { prices } = usePriceData();
-	const { address } = useAccount();
+	const { address, isConnected } = useAccount();
 	const { vault } = useDexData();
-	const { walletBalances, allowances } = useBalanceData();
+	const { walletBalances, updateFromTx } = useBalanceData();
 	const { chain } = useNetwork();
 	const [loading, setLoading] = React.useState(false);
 	const [isNative, setIsNative] = React.useState(false);
@@ -43,9 +30,7 @@ export default function SingleTokenWithdraw({ pool }: any) {
     const [error, setError] = React.useState('');
     const [bptIn, setBptIn] = React.useState('0');
 
-    const toast = useToast();
-
-    const handleBalError = useHandleBalError();
+    const handleBalError = useHandleError(PlatformType.DEX);
 
 	const withdrawWithExit = async () => {
 		setLoading(true);
@@ -70,7 +55,8 @@ export default function SingleTokenWithdraw({ pool }: any) {
 		];
 		send(vaultContract, "exitPool", args)
 		.then(async (res: any) => {
-			await res.wait();
+			let response = await res.wait();
+            updateFromTx(response);
 			setLoading(false);
 			setAmount('');
             setIsNative(false);
@@ -108,7 +94,8 @@ export default function SingleTokenWithdraw({ pool }: any) {
 
 		send(vaultContract, "batchSwap", args)
 		.then(async (res: any) => {
-			await res.wait();
+			let response = await res.wait();
+            updateFromTx(response);
 			setLoading(false);
 			setAmount('');
 		})
@@ -194,6 +181,8 @@ export default function SingleTokenWithdraw({ pool }: any) {
     const queryBptIn = pool.poolType == 'ComposableStable' ? queryBptInWithSwap : queryBptInWithExit;
 
 	const validate = () => {
+        if(!isConnected) return {valid: false, message: "Connect wallet"};
+		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
 		// check balances
         if(isNaN(Number(amount)) || Number(amount) == 0) {
             return {

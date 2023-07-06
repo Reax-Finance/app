@@ -17,14 +17,12 @@ import Big from "big.js";
 import Response from "../_utils/Response";
 import { BigNumber, ethers } from "ethers";
 import { useRouter } from "next/router";
-import { base58 } from "ethers/lib/utils.js";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
-import { formatLendingError } from "../../../src/errors";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
 	const router = useRouter();
@@ -34,7 +32,6 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	const [confirmed, setConfirmed] = useState(false);
 	const [message, setMessage] = useState("");
 
-	const [useReferral, setUseReferral] = useState(false);
 	const [referral, setReferral] = useState<string | null>(null);
 
 	const { isConnected, address } = useAccount();
@@ -45,21 +42,9 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
-	useEffect(() => {
-		if (referral == null) {
-			const { ref: refCode } = router.query;
-			if (refCode) {
-				setReferral(refCode as string);
-				setUseReferral(true);
-			} else {
-				setUseReferral(false);
-			}
-		}
-	});
-
 	const toast = useToast();
 
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.LENDING);
 
 	const borrow = async () => {
 		if (!amount) return;
@@ -117,7 +102,6 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 			})
 		})
 		.catch((err: any) => {
-			console.log(err);
 			handleError(err)
 			setLoading(false);
 		});
@@ -169,7 +153,6 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 				position: "top-right"
 			})
 		}).catch((err: any) => {
-			console.log(err);
 			handleError(err);
 			setLoading(false);
 		})

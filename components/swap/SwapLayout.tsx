@@ -28,6 +28,7 @@ import { AiOutlineWallet } from "react-icons/ai";
 import { useAccount, useFeeData, useNetwork } from "wagmi";
 import Settings from "./Settings";
 import { ethers } from "ethers";
+import RouteDetails from "./RouteDetails";
 
 const inputStyle = {
 	variant: "unstyled",
@@ -61,6 +62,7 @@ export default function SwapLayout({
     setMaxSlippage,
     deadline,
     setDeadline,
+    swapData
 }: any) {
     const { walletBalances, tokens: _tokens } = useBalanceData();
     const { prices } = usePriceData();
@@ -315,6 +317,7 @@ export default function SwapLayout({
                             <Text>Network Fee</Text>
                             <Text>{dollarFormatter.format((gas * (Number(data?.formatted.gasPrice) + 40000))/1e10)}</Text>
                             </Flex>
+                            <RouteDetails swapData={swapData} />
                         </Flex></>}
                     </motion.div>
                 </Box>

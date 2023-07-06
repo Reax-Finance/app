@@ -11,9 +11,9 @@ import { useDexData } from "../../../context/DexDataProvider";
 import { useBalanceData } from "../../../context/BalanceProvider";
 import Big from "big.js";
 import { formatBalError } from "../../../../src/errors";
-import useHandleBalError from "../../../utils/useHandleError";
 import ProportionalWithdrawLayout from "./layouts/ProportionalWithdrawLayout";
 import { parseInput } from "../../../utils/number";
+import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
 export default function ProportionalWithdraw({ pool }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
@@ -21,9 +21,9 @@ export default function ProportionalWithdraw({ pool }: any) {
 		poolTokens.map((token: any) => "")
 	);
 	const { prices } = usePriceData();
-	const { address } = useAccount();
+	const { address, isConnected } = useAccount();
 	const { vault } = useDexData();
-	const { walletBalances, allowances } = useBalanceData();
+	const { walletBalances, allowances, updateFromTx } = useBalanceData();
 	const { chain } = useNetwork();
 	const [loading, setLoading] = React.useState(false);
 	const [isNative, setIsNative] = React.useState(false);
@@ -31,7 +31,7 @@ export default function ProportionalWithdraw({ pool }: any) {
     const [maxSlippage, setMaxSlippage] = React.useState('0.5');
 	const [error, setError] = React.useState("");
 
-	const handleBalError = useHandleBalError();
+	const handleBalError = useHandleError(PlatformType.DEX);
 
 	const withdrawWithExit = async () => {
 		setLoading(true);
@@ -55,7 +55,8 @@ export default function ProportionalWithdraw({ pool }: any) {
 
 		send(vaultContract, "exitPool", args)
 		.then(async (res: any) => {
-			await res.wait();
+			let response = await res.wait();
+            updateFromTx(response);
 			setLoading(false);
 			setAmounts(poolTokens.map((token: any) => ""));
 		})
@@ -94,7 +95,8 @@ export default function ProportionalWithdraw({ pool }: any) {
 
 		send(vaultContract, "batchSwap", args)
 		.then(async (res: any) => {
-			await res.wait();
+			let response = await res.wait();
+            updateFromTx(response);
 			setLoading(false);
 			setAmounts(poolTokens.map((token: any) => ""));
 		})
@@ -232,6 +234,8 @@ export default function ProportionalWithdraw({ pool }: any) {
 	}
 
 	const validate = () => {
+		if(!isConnected) return {valid: false, message: "Connect wallet"};
+		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
 		// check balances
 		for(let i = 0; i < poolTokens.length; i++) {
 			if(isNaN(Number(amounts[i])) || Number(amounts[i]) == 0) {

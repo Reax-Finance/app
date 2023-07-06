@@ -30,7 +30,7 @@ function PriceContextProvider({ children }: any) {
         if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && markets.length > 0) {
             if(markets[0].feed && pools[0].synths[0].feed){
                 setSubStatus(SubStatus.SUBSCRIBED);
-                console.log("subscribing to price data");
+                console.log("Subscribed to price data");
                 updatePrices();
                 setInterval(updatePrices, 30000);
             }
@@ -38,7 +38,6 @@ function PriceContextProvider({ children }: any) {
     }, [markets, pools, address, subStatus]);
 
 	const updatePrices = async () => {
-        console.log("updating prices");
         const chainId = chain?.id ?? defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(

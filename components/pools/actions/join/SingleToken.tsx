@@ -9,9 +9,9 @@ import { useDexData } from "../../../context/DexDataProvider";
 import { useBalanceData } from "../../../context/BalanceProvider";
 import Big from "big.js";
 import { formatBalError } from "../../../../src/errors";
-import useHandleBalError from "../../../utils/useHandleError";
 import StableDepositLayout from "./layouts/StableDepositLayout";
 import { parseInput } from "../../../utils/number";
+import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
 export default function SingleTokenDeposit({ pool }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
@@ -19,7 +19,7 @@ export default function SingleTokenDeposit({ pool }: any) {
 
 	const [amount, setAmount] = React.useState('');
 	const { prices } = usePriceData();
-	const { address } = useAccount();
+	const { address, isConnected } = useAccount();
 	const { vault } = useDexData();
 	const { walletBalances, allowances, updateFromTx } = useBalanceData();
 	const { chain } = useNetwork();
@@ -30,7 +30,7 @@ export default function SingleTokenDeposit({ pool }: any) {
     const [maxSlippage, setMaxSlippage] = React.useState('0.5');
     const [error, setError] = React.useState('');
 
-    const handleBalError = useHandleBalError();
+    const handleBalError = useHandleError(PlatformType.DEX);
 
 	const deposit = async () => {
 		setLoading(true);
@@ -114,6 +114,8 @@ export default function SingleTokenDeposit({ pool }: any) {
 	}
 
 	const validate = () => {
+        if(!isConnected) return {valid: false, message: "Connect wallet"};
+		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
 		// check balances
         if(isNaN(Number(amount)) || Number(amount) == 0) {
             return {
@@ -151,8 +153,9 @@ export default function SingleTokenDeposit({ pool }: any) {
 			vault.address,
 			ethers.constants.MaxUint256
 		])
-		.then((res: any) => {
-			console.log(res);
+		.then(async(res: any) => {
+            let response = await res.wait();
+            updateFromTx(response);
 		})
 		.catch((err: any) => {
 			console.log(err);

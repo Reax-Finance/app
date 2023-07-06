@@ -12,8 +12,8 @@ import { useBalanceData } from "../../../context/BalanceProvider";
 import Big from "big.js";
 import { formatBalError } from "../../../../src/errors";
 import ProportionalDepositLayout from "./layouts/ProportionalDepositLayout";
-import useHandleBalError from "../../../utils/useHandleError";
 import { parseInput } from "../../../utils/number";
+import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
 export default function ProportionalDeposit({ pool }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
@@ -21,7 +21,7 @@ export default function ProportionalDeposit({ pool }: any) {
 		poolTokens.map((token: any) => "")
 	);
 	const { prices } = usePriceData();
-	const { address } = useAccount();
+	const { address, isConnected } = useAccount();
 	const { vault } = useDexData();
 	const { walletBalances, allowances, updateFromTx } = useBalanceData();
 	const { chain } = useNetwork();
@@ -31,7 +31,7 @@ export default function ProportionalDeposit({ pool }: any) {
     const [maxSlippage, setMaxSlippage] = React.useState('0.5');
 	const [error, setError] = React.useState<any>(null);
 
-	const handleBalError = useHandleBalError();
+	const handleBalError = useHandleError(PlatformType.DEX);
 
 	const deposit = async () => {
 		setLoading(true);
@@ -127,6 +127,8 @@ export default function ProportionalDeposit({ pool }: any) {
 	}
 
 	const validate = () => {
+		if(!isConnected) return {valid: false, message: "Connect wallet"};
+		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
 		// check balances
 		for(let i = 0; i < poolTokens.length; i++) {
 			if(isNaN(Number(amounts[i])) || Number(amounts[i]) == 0) {
@@ -160,8 +162,9 @@ export default function ProportionalDeposit({ pool }: any) {
 			vault.address,
 			ethers.constants.MaxUint256
 		])
-		.then((res: any) => {
-			console.log(res);
+		.then(async (res: any) => {
+			let response = await res.wait();
+            updateFromTx(response);
 		})
 		.catch((err: any) => {
 			console.log(err);
@@ -230,50 +233,32 @@ export default function ProportionalDeposit({ pool }: any) {
 
 	const setMax = (multiplier: number) => {
 		let _amountsMin: any[] = [];
-		console.log(pool);
-		// if(pool.poolType == 'ComposableStable'){
-		// 	for(let i = 0; i < poolTokens.length; i++){
-		// 		_amountsMin.push(Big(walletBalances[poolTokens[i].token.id] ?? 0).div(10 ** poolTokens[i].token.decimals).toFixed(poolTokens[i].token.decimals));
-		// 	}
-		// 	// find lowest _amounts[i]
-		// 	let min = _amountsMin[0];
-		// 	for(let i = 1; i < _amountsMin.length; i++){
-		// 		if(Big(_amountsMin[i]).lt(min)){
-		// 			min = _amountsMin[i];
-		// 		}
-		// 	}
-		// 	_amountsMin = _amountsMin.map((amount: any) => {
-		// 		// return min 
-		// 		return Big(min).mul(multiplier).toFixed(poolTokens[0].token.decimals);
-		// 	})
-		// } else {
-			let _amounts: string[][] = [];
-			for(let i = 0; i < poolTokens.length; i++){
-				_amounts.push([])
-				let amount = Big(walletBalances[poolTokens[i].token.id] ?? 0).div(10 ** poolTokens[i].token.decimals).toFixed(poolTokens[i].token.decimals);
-				for(let j = 0; j < amounts.length; j++){
-					if(i == j){
-						_amounts[i].push(amount);
-					} else {
-						_amounts[i].push(Big(amount).mul(poolTokens[j].balance).div(poolTokens[i].balance).toFixed(poolTokens[j].token.decimals));
-					}
+		let _amounts: string[][] = [];
+		for(let i = 0; i < poolTokens.length; i++){
+			_amounts.push([])
+			let amount = Big(walletBalances[poolTokens[i].token.id] ?? 0).div(10 ** poolTokens[i].token.decimals).toFixed(poolTokens[i].token.decimals);
+			for(let j = 0; j < amounts.length; j++){
+				if(i == j){
+					_amounts[i].push(amount);
+				} else {
+					_amounts[i].push(Big(amount).mul(poolTokens[j].balance).div(poolTokens[i].balance).toFixed(poolTokens[j].token.decimals));
 				}
 			}
-			// find array with lowest _amounts[i][0]
-			let min = _amounts[0][0];
-			let minIndex = 0;
-			for(let i = 1; i < _amounts.length; i++){
-				if(Big(_amounts[i][0]).lt(min)){
-					min = _amounts[i][0];
-					minIndex = i;
-				}
+		}
+		// find array with lowest _amounts[i][0]
+		let min = _amounts[0][0];
+		let minIndex = 0;
+		for(let i = 1; i < _amounts.length; i++){
+			if(Big(_amounts[i][0]).lt(min)){
+				min = _amounts[i][0];
+				minIndex = i;
 			}
-			_amountsMin = _amounts[minIndex]
-			// multiply by multiplier
-			for(let i = 0; i < _amountsMin.length; i++){
-				_amountsMin[i] = Big(_amountsMin[i]).mul(multiplier).toFixed(poolTokens[i].token.decimals);
-			}
-		// }
+		}
+		_amountsMin = _amounts[minIndex]
+		// multiply by multiplier
+		for(let i = 0; i < _amountsMin.length; i++){
+			_amountsMin[i] = Big(_amountsMin[i]).mul(multiplier).toFixed(poolTokens[i].token.decimals);
+		}
 		
 		setAmounts(_amountsMin);
 		setLoading(true);

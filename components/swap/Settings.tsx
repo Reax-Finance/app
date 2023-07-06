@@ -59,7 +59,7 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
     <>
         <Menu flip={false}>
             <Flex align={'center'} gap={0}>
-            {<Flex h={'100%'} px={3} align={'center'} color={'whiteAlpha.700'} bg={'whiteAlpha.50'} fontSize={'sm'}>
+            {maxSlippage >= 1 && <Flex h={'100%'} px={3} align={'center'} color={'whiteAlpha.700'} bg={'whiteAlpha.50'} fontSize={'sm'}>
                 <Text >Max Slippage: {maxSlippage}%</Text>
             </Flex>}
             <MenuButton as={IconButton} rounded={0} aria-label={""} icon={<SettingsIcon />} bg={'whiteAlpha.200'}></MenuButton>

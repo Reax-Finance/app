@@ -111,6 +111,12 @@ export default function Faucet() {
         });
     }
 
+    const validate = () => {
+        if(!isConnected) return {valid: false, message: "Please connect your wallet."}
+        else if(chain?.unsupported) return {valid: false, message: "Unsupported network"}
+        else return {valid: true, message: "Mint"}
+    }
+
 	return (
 		<>
         <Head>
@@ -193,8 +199,8 @@ export default function Faucet() {
             </ModalBody>
 
             <ModalFooter justifyContent={'center'}>
-                <Button isDisabled={!isConnected} color={'white'} size={'md'} loadingText="Minting" isLoading={loading} colorScheme='secondary' bg={'secondary.400'} mb={0} rounded={0} onClick={mint} width='100%'>
-                {isConnected ? 'Mint' : 'Please Connect Your Wallet'}
+                <Button isDisabled={!validate().valid} color={'white'} size={'md'} loadingText="Minting" isLoading={loading} colorScheme='secondary' bg={'secondary.400'} mb={0} rounded={0} onClick={mint} width='100%'>
+                    {validate().message}
                 </Button>
             </ModalFooter>
             </ModalContent>

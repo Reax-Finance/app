@@ -8,7 +8,6 @@ import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
 import { useDexData } from "./DexDataProvider";
-import tokenlist from '../../deployments/tokenlist.json';
 
 const BalanceContext = React.createContext<BalanceValue>({} as BalanceValue);
 
@@ -29,8 +28,6 @@ function BalanceContextProvider({ children }: any) {
 	const [walletBalances, setWalletBalances] = React.useState<any>({});
     const [allowances, setAllowances] = React.useState<any>({});
     const [nonces, setNonces] = React.useState<any>({});
-    // const [totalSupplies, setTotalSupplies] = React.useState<any>({});
-    // const [lendingBalances, setLendingBalances] = React.useState<any>({});
     const [tokens, setTokens] = React.useState<any>([]);
 	const { chain } = useNetwork();
 
@@ -46,7 +43,7 @@ function BalanceContextProvider({ children }: any) {
     }, [markets.length, pools.length, dexPools.length, address, status])
 
 	const fetchBalances = async (_address?: string) => {
-        console.log("fetching balances", _address);
+        console.log("Fetching balances for:", _address);
         setStatus(Status.FETCHING);
         const chainId = chain?.id ?? defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
@@ -270,7 +267,6 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                 }
             }
-            console.log(index, calls.length);
             setStatus(Status.SUCCESS);
             setWalletBalances(newBalances);
             setAllowances(newAllowances);
@@ -314,13 +310,11 @@ function BalanceContextProvider({ children }: any) {
 
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {
         const newBalances = {...walletBalances};
-        console.log(newBalances[asset]);
         if (isMinus) {
             newBalances[asset] = Big(walletBalances[asset] ?? 0).minus(value).toString();
         } else {
             newBalances[asset] = Big(walletBalances[asset] ?? 0).plus(value).toString();
         }
-        console.log(newBalances[asset]);
         setWalletBalances(newBalances);
     }
 

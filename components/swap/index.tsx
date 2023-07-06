@@ -6,7 +6,6 @@ import Head from "next/head";
 import TokenSelector from "./TokenSelector";
 import { ADDRESS_ZERO, ROUTER_ENDPOINT, defaultChain, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
-import { useRouter } from "next/router";
 import { useToast } from '@chakra-ui/react';
 import useUpdateData from "../utils/useUpdateData";
 import { useBalanceData } from "../context/BalanceProvider";
@@ -17,7 +16,7 @@ import Big from "big.js";
 import { BigNumber, ethers } from "ethers";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { parseInput } from "../utils/number";
-import useHandleError from "../utils/useHandleError";
+import useHandleError, { PlatformType } from "../utils/useHandleError";
 
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(4);
@@ -55,7 +54,7 @@ function Swap() {
 	const { walletBalances, updateFromTx, tokens: _tokens, allowances, nonces, addNonce } = useBalanceData();
     const tokens: any[] = _tokens.concat({ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] });
 
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.DEX);
 
 	const calculateOutputAmount = (inputAmount: string) => {
 		return new Promise((resolve, reject) => {
@@ -258,7 +257,7 @@ function Swap() {
 			})
 			.catch((err: any) => {
 				setLoading(false);
-				console.log(err);
+				handleError(err)
 			})
 		}
 	};
@@ -463,6 +462,7 @@ function Swap() {
 					setMaxSlippage={setMaxSlippage}
 					deadline={deadline_m}
 					setDeadline={setDeadline_m}
+					swapData={swapData}
 				/>
 			) : (
 				<SwapSkeleton />

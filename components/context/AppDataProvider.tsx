@@ -35,7 +35,6 @@ function AppDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<AppDataValue['status']>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<AppDataValue['message']>("");
 	const { chain } = useNetwork();
-	const { address } = useAccount();
 	const [account, setAccount] = React.useState<any|null>(null);
 	const [pools, setPools] = React.useState<any[]>([]);
 	const [tradingPool, setTradingPool] = React.useState(0);

@@ -24,7 +24,7 @@ import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const router = useRouter();
@@ -65,7 +65,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 	};
 
 	const toast = useToast();
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.SYNTHETICS);
 
 	const mint = async () => {
 		if (!amount) return;

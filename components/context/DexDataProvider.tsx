@@ -31,8 +31,8 @@ function DEXDataProvider({ children }: any) {
 	React.useEffect(() => {
         if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && address) {
 			setSubStatus(SubStatus.SUBSCRIBED);
-			console.log("subscribing to dex data");
-			setInterval(refreshData, 10000);
+			console.log("Subscribed to DEX data");
+			setInterval(refreshData, 30000);
         }
     }, [pools, address, status])
 

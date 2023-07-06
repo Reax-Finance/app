@@ -27,7 +27,7 @@ import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function Withdraw({ collateral, amount, setAmount, amountNumber, isNative }: any) {
 	const [loading, setLoading] = useState(false);
@@ -59,7 +59,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 		return (v1.gt(v2) ? v2 : v1).toString();
 	};
 
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.SYNTHETICS);
 
 	const withdraw = async () => {
 		setLoading(true);

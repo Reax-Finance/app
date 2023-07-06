@@ -22,7 +22,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function Supply({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
@@ -129,7 +129,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 	const toast = useToast();
 
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.LENDING);
 
 	const deposit = async () => {
 		setLoading(true);

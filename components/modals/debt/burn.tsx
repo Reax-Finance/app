@@ -23,7 +23,7 @@ import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const { pools, tradingPool, updateFromTx: updateFromSynthTx } = useAppData();
 
 	const { getUpdateData } = useUpdateData();
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.SYNTHETICS);
 
 	const burn = async () => {
 		if (!amount) return;

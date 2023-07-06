@@ -26,7 +26,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function Deposit({ collateral, amount, setAmount, amountNumber, isNative }: any) {
 
@@ -67,13 +67,6 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			return {
 				stage: 0,
 				message: "Connect Wallet"
-			}
-		} else if (Big(walletBalances[ADDRESS_ZERO] ?? 0).lt(
-			ethers.utils.parseEther("0.000001").toString()
-		)) {
-			return {
-				stage: 0,
-				message: "Insufficient ETH for Gas Fee"
 			}
 		} else if (chain?.unsupported){
 			return {
@@ -143,7 +136,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 	}
 
 	const toast = useToast();
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.SYNTHETICS);
 
 	const deposit = async () => {
 		setLoading(true);

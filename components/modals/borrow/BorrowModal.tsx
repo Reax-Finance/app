@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import {
 	WETH_ADDRESS,
+	W_NATIVE,
 	dollarFormatter,
 } from "../../../src/const";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -28,6 +29,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import Repay from "./Repay";
 import Borrow from "./Borrow";
 import { formatInput, parseInput } from "../../utils/number";
+import { NATIVE } from '../../../src/const';
 
 export default function BorrowModal({
 	market,
@@ -121,12 +123,12 @@ export default function BorrowModal({
 											<TabList>
 												<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
 												<Tab>
-													MNT
+													{NATIVE}
 												</Tab>
 												</Box>
 												<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
 												<Tab>
-													WMNT
+													{W_NATIVE}
 												</Tab>
 												</Box>
 											</TabList>

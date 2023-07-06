@@ -22,7 +22,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatLendingError } from "../../../src/errors";
 import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function Redeem({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 	const pos = lendingPosition();
 
 	const {getUpdateData} = useUpdateData();
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.LENDING);
 
 	const { address, isConnected } = useAccount();
 	const { chain } = useNetwork();

@@ -4,13 +4,11 @@ import {
 	ModalOverlay,
 	Tr,
 	Flex,
-	Image,
 	Text,
 	Box,
 	useDisclosure,
 	Select,
 	useToast,
-	CircularProgress,
 } from "@chakra-ui/react";
 import {
 	dollarFormatter,
@@ -22,9 +20,9 @@ import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { getContract, send } from "../../../src/contract";
-import { formatLendingError } from "../../../src/errors";
 import BorrowModal from "./BorrowModal";
 import MarketInfo from "../_utils/TokenInfo";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function YourBorrow({ market, index, type }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -47,6 +45,8 @@ export default function YourBorrow({ market, index, type }: any) {
 
 	const { chain } = useNetwork();
 	const toast = useToast();
+
+	const handleError = useHandleError(PlatformType.LENDING);
 
 	const _onSwapModeChange = async (e: any) => {
 		const typeNow = type == 'VARIABLE' ? '2' : '1';
@@ -71,34 +71,7 @@ export default function YourBorrow({ market, index, type }: any) {
 		})
 		.catch((err: any) => {
 			setLoading(false);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else if(formatLendingError(err)){
-				toast({
-					title: "Transaction Failed",
-					description: formatLendingError(err),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
 		})
 	}
 
@@ -125,8 +98,6 @@ export default function YourBorrow({ market, index, type }: any) {
 						<option value="2">VARIABLE</option>
 						<option value="1">STABLE</option>
 					</Select>
-
-					{/* {loading && <CircularProgress color={'red'} isIndeterminate={loading} size="20px" ml={2} />} */}
 					</Flex>
 				</TdBox>
 

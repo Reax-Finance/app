@@ -23,7 +23,7 @@ import { useLendingData } from "../../context/LendingDataProvider";
 import { formatLendingError } from "../../../src/errors";
 import SupplyModal from "./SupplyModal";
 import MarketInfo from "../_utils/TokenInfo";
-import useHandleError from "../../utils/useHandleError";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function YourSupply({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -53,7 +53,7 @@ export default function YourSupply({ market, index }: any) {
 	}
 
 	const toast = useToast();
-	const handleError = useHandleError();
+	const handleError = useHandleError(PlatformType.LENDING);
 
 	const _switchIsCollateral = async () => {
 		setLoading(true);

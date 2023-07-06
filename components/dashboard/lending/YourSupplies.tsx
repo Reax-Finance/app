@@ -28,7 +28,6 @@ import Big from "big.js";
 export default function YourSupplies() {
 	const { markets } = useLendingData();
 	const { walletBalances } = useBalanceData();
-	const { prices } = usePriceData();
 
 	const suppliedMarkets = markets.filter((market: any) => {
 		return walletBalances[market.outputToken.id] > 0;
