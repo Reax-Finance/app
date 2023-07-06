@@ -52,16 +52,16 @@ export default function Join({ pool, isOpen, onClose }: any) {
 					<Divider />
 					<Tabs size={"sm"} isFitted colorScheme="secondary">
 						<TabList>
-							<Tab>Pool Tokens</Tab>
 							<Tab py={2}>Single Token</Tab>
+							<Tab>Pool Tokens</Tab>
 						</TabList>
 
 						<TabPanels>
 							<TabPanel p={0}>
-								<ProportionalJoin pool={pool} />
+								<SingleTokenJoin pool={pool} />
 							</TabPanel>
 							<TabPanel p={0}>
-								<SingleTokenJoin pool={pool} />
+								<ProportionalJoin pool={pool} />
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

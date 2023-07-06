@@ -235,7 +235,7 @@ function AppDataProvider({ children }: any) {
 		for(let i in decodedTransferEvents) {
 			if(decodedTransferEvents[i].address == pools[tradingPool].id){
 				let amount = decodedTransferEvents[i].args[2].toString();
-				let value = amount * _pools[tradingPool].totalDebtUSD / _pools[tradingPool].totalSupply;
+				let value = amount * ((_pools[tradingPool].totalDebtUSD / _pools[tradingPool].totalSupply) || 1);
 				let isMinus = true;
 				// if minting debt tokens
 				if(decodedTransferEvents[i].args[0] == ADDRESS_ZERO){

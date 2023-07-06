@@ -5,33 +5,29 @@ import {
 	Table,
 	Thead,
 	Tbody,
-	Tfoot,
 	Tr,
-	Th,
-	Td,
-	TableCaption,
 	TableContainer,
     Text,
     Image
 } from "@chakra-ui/react";
 import { AppDataContext } from "../components/context/AppDataProvider";
-import { useEffect } from "react";
 
-const nonMintable = ["MNT", "WETH", "cUSD", "sUSD", "cBTC", 'cETH', 'cBNB', 'sAAPL', 'sMSFT', 'sCOIN', 'sGOOGL', 'cXRP'];
+const nonMintable = ["MNT", "WETH", "cUSD", "sUSD", "cBTC", 'cETH', 'cBNB', 'sAAPL', 'sMSFT', 'sCOIN', 'sGOOGL', 'cXRP', 'cDOGE', 'cSOL', 'cDOT', 'cADA', 'cLTC', 'WMNT'];
 
 const mintAmounts: any = {
-	"USDC": "1000",
-	"USDT": "1000",
+    "USDT": "1000",
 	"DAI": "1000",
 	"EUROC": "1000",
 	"WETH": "1",
     "AAVE": "10",
-    "WBTC": "0.1",
     "LINK": "10",
     "Link": "10",
     "wstETH": "10",
     "ARB": '10', 
-    "ETH": "1"
+    // in use
+	"USDC": "10000000",
+    "WBTC": "100",
+    "ETH": "1000",
 };
 
 import Head from "next/head";
@@ -51,6 +47,8 @@ import { ethers } from "ethers";
 import { useBalanceData } from "../components/context/BalanceProvider";
 import Big from "big.js";
 import { useDexData } from "../components/context/DexDataProvider";
+import ThBox from "../components/dashboard/ThBox";
+import TdBox from "../components/dashboard/TdBox";
 
 export default function Faucet() {
 	const { pools } = useContext(AppDataContext);
@@ -128,20 +126,20 @@ export default function Faucet() {
                 Note: This is a testnet faucet. These tokens are not real and have no value.
             </Text>
 
-			<TableContainer className="tableStyle" rounded={0}>
+			<TableContainer px={4} pb={4} className="tableStyle" rounded={0}>
 				<Table variant="simple">
 					<Thead>
 						<Tr>
-							<Th>Asset</Th>
-							<Th>Mint Amount</Th>
-							<Th isNumeric></Th>
+							<ThBox>Asset</ThBox>
+							<ThBox>Mint Amount</ThBox>
+							<ThBox isNumeric>.</ThBox>
 						</Tr>
 					</Thead>
 					<Tbody>
                         {tokens.map((token: any, index: number) => {
                             if(nonMintable.includes(token.symbol)) return;
-                            return <Tr  key={index}>
-                                <Td style={index == token.length - 1 ? {border: 0} : {}}>
+                            return <Tr key={index}>
+                                <TdBox style={index == token.length - 1 ? {border: 0} : {}}>
                                     <Flex gap={2}>
                                     <Image src={`/icons/${token.symbol}.svg`} w='34px'/>
                                         <Box>
@@ -161,18 +159,28 @@ export default function Faucet() {
                                                     aria-label={""}
                                                 />
                                             </Flex>
-                                            <Text fontSize={'sm'} color='gray.500'>
+                                            <Text textAlign={'left'} fontSize={'sm'} color='gray.500'>
                                             {Big(walletBalances[token.id] ?? 0).div(10**token.decimals).toNumber()} in wallet
                                             </Text>
                                         </Box>
-                                        
                                     </Flex>
-                                    
-                                </Td>
-                                <Td style={index == tokens.length - 1 ? {border: 0} : {}}>{mintAmounts[token.symbol]}</Td>
-                                <Td style={index == tokens.length - 1 ? {border: 0} : {}} isNumeric>
-                                    <Button size='sm' rounded='0' colorScheme={'secondary'} bg={'secondary.400'} color={'white'} onClick={() => _onOpen(token)}>Mint</Button>
-                                </Td>
+                                </TdBox>
+                                <TdBox style={index == tokens.length - 1 ? {border: 0} : {}}>{mintAmounts[token.symbol]}</TdBox>
+                                <TdBox style={index == tokens.length - 1 ? {border: 0} : {}} isNumeric>
+                                <Flex justify={'end'}>
+                                    <Box className="mainButton">
+                                        <Button
+                                            onClick={() => _onOpen(token)}
+                                            color={"white"}
+                                            size={"md"} 
+                                            bg={'transparent'} 
+                                            _hover={{bg: 'transparent'}}
+                                        >
+                                            Mint
+                                        </Button>
+                                    </Box>
+                                </Flex>
+                            </TdBox>
                             </Tr>
                         })}
 					</Tbody>
@@ -181,7 +189,7 @@ export default function Faucet() {
 
             {openedCollateral && <Modal isOpen={isOpen} onClose={onClose} isCentered>
             <ModalOverlay />
-            <ModalContent rounded={0} width={'400px'}>
+            <ModalContent rounded={0} bg={'bg1'} width={'400px'}>
             <ModalHeader>{openedCollateral.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody >
@@ -199,9 +207,15 @@ export default function Faucet() {
             </ModalBody>
 
             <ModalFooter justifyContent={'center'}>
-                <Button isDisabled={!validate().valid} color={'white'} size={'md'} loadingText="Minting" isLoading={loading} colorScheme='secondary' bg={'secondary.400'} mb={0} rounded={0} onClick={mint} width='100%'>
+            <Box w={'100%'} className="swapButton">
+
+                <Button w={'100%'} isDisabled={!validate().valid} color={"white"}
+								size={"md"} 
+								bg={'transparent'} 
+								_hover={{bg: 'transparent'}} loadingText="Minting" isLoading={loading} mb={0} rounded={0} onClick={mint}>
                     {validate().message}
                 </Button>
+                </Box>
             </ModalFooter>
             </ModalContent>
         </Modal>}

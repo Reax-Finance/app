@@ -18,7 +18,7 @@ import SingleTokenWithdraw from "./SingleToken";
 export default function Withdraw({ pool, isOpen, onClose }: any) {
 	return (
 		<Modal isCentered isOpen={isOpen} onClose={onClose}>
-			<ModalOverlay />
+			<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
 			<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
 				<ModalCloseButton rounded={"0"} mt={1} />
 				<ModalHeader>
@@ -51,16 +51,16 @@ export default function Withdraw({ pool, isOpen, onClose }: any) {
 					<Divider />
 					<Tabs size={"sm"} isFitted colorScheme="secondary">
 						<TabList>
-							<Tab>In Proportion</Tab>
 							<Tab py={2}>Single Token</Tab>
+							<Tab>In Proportion</Tab>
 						</TabList>
 
 						<TabPanels>
 							<TabPanel p={0}>
-								<ProportionalWithdraw pool={pool} />
+								<SingleTokenWithdraw pool={pool} />
 							</TabPanel>
 							<TabPanel p={0}>
-								<SingleTokenWithdraw pool={pool} />
+								<ProportionalWithdraw pool={pool} />
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

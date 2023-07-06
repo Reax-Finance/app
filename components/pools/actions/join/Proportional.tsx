@@ -20,6 +20,7 @@ export default function ProportionalDeposit({ pool }: any) {
 	const [amounts, setAmounts] = React.useState(
 		poolTokens.map((token: any) => "")
 	);
+	
 	const { prices } = usePriceData();
 	const { address, isConnected } = useAccount();
 	const { vault } = useDexData();
@@ -29,7 +30,6 @@ export default function ProportionalDeposit({ pool }: any) {
 	const [isNative, setIsNative] = React.useState(false);
 	const [bptOut, setBptOut] = React.useState<any>(null);
     const [maxSlippage, setMaxSlippage] = React.useState('0.5');
-	const [error, setError] = React.useState<any>(null);
 
 	const handleBalError = useHandleError(PlatformType.DEX);
 
@@ -41,15 +41,31 @@ export default function ProportionalDeposit({ pool }: any) {
             ['uint256', 'uint256[]', 'uint256'], 
             [1, amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0)), bptOut ?? 0]
         );
-        let maxAmountsIn = poolTokens.map((token: any, i: number) => Big(Number(amounts[i])).mul(10**token.token.decimals).mul(100+maxSlippage).div(100).toFixed(0));
-        if(Big(pool.totalShares ?? 0).eq(0)) userData = ethers.utils.defaultAbiCoder.encode(
-            ['uint256', 'uint256[]'], 
-            [0, amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0))]
-        );
-		
+        let maxAmountsIn = poolTokens.map((token: any, i: number) => Big(Number(amounts[i])).mul(10**token.token.decimals).mul(100+Number(maxSlippage)).div(100).toFixed(0));
+
 		let poolTokenIndex = pool.tokens.findIndex((token: any) => token.token.id == pool.address);
+
+		// Handle first deposit
+        if(Big(pool.totalShares ?? 0).eq(0)){
+			userData = ethers.utils.defaultAbiCoder.encode(
+				['uint256', 'uint256[]'], 
+				[0, amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0))]
+			);
+			if(poolTokenIndex !== -1) {
+				let _amounts = amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0));
+				// insert 0 in index of pool token
+				_amounts.splice(poolTokenIndex, 0, 0);
+				console.log(_amounts);
+				userData = ethers.utils.defaultAbiCoder.encode(
+					['uint256', 'uint256[]'], 
+					[0, _amounts]
+				);
+			}
+		} 
+		
 		// insert into maxAmountsIn
-		if(poolTokenIndex !== -1) maxAmountsIn.splice(poolTokenIndex, 0, '0');
+		if(poolTokenIndex !== -1) maxAmountsIn.splice(poolTokenIndex, 0, ethers.constants.MaxUint256);
+		console.log(maxAmountsIn);
         
 		let args = [
 			pool.id,
@@ -157,6 +173,7 @@ export default function ProportionalDeposit({ pool }: any) {
 	}
 
 	const approve = async () => {
+		setLoading(true);
 		let token = await getContract("MockToken", chain?.id!, poolTokens[tokenToApprove()].token.id);
 		send(token, "approve", [
 			vault.address,
@@ -165,9 +182,11 @@ export default function ProportionalDeposit({ pool }: any) {
 		.then(async (res: any) => {
 			let response = await res.wait();
             updateFromTx(response);
+			setLoading(false);
 		})
 		.catch((err: any) => {
-			console.log(err);
+			handleBalError(err);
+			setLoading(false);
 		})
 	}
 
@@ -240,8 +259,10 @@ export default function ProportionalDeposit({ pool }: any) {
 			for(let j = 0; j < amounts.length; j++){
 				if(i == j){
 					_amounts[i].push(amount);
-				} else {
+				} else if (Big(poolTokens[i].balance).gt(0)) {
 					_amounts[i].push(Big(amount).mul(poolTokens[j].balance).div(poolTokens[i].balance).toFixed(poolTokens[j].token.decimals));
+				} else {
+					_amounts[i].push("0");
 				}
 			}
 		}

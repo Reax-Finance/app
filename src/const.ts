@@ -36,7 +36,7 @@ export const NATIVE = "MNT";
 export const W_NATIVE = "WMNT";
 
 const _WETH_ADDRESS: any = {
-	[mantleTestnet.id]: "0x55f317247632d42584848064A0cC0190fE1f6c58".toLowerCase()
+	[mantleTestnet.id]: "0x5b156dca04f775046064032e1f5e45fd1fcca1e0".toLowerCase()
 };
 
 export const PERP_CATEGORIES: any = {

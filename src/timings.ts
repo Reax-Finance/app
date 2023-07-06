@@ -30,7 +30,7 @@ export const MARKET_TIMINGS: any = {
 			"close": "00:01"
 		}
 	}, 
-	"Crypto Market": {
+	"Crypto Pool": {
 		"Monday": {
 			"open": "00:00",
 			"close": "23:59"
@@ -97,6 +97,7 @@ export const isMarketOpen = (marketName: string) => {
 	const now = new Date();
 	const day = now.toLocaleString("en-US", { timeZone: 'America/New_York', weekday: "long" });
 	const time = now.toLocaleString("en-US", { timeZone: 'America/New_York', hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+	if(!MARKET_TIMINGS[marketName]) return true;
 	const open = MARKET_TIMINGS[marketName][day]["open"];
 	const close = MARKET_TIMINGS[marketName][day]["close"];
 	return time >= open && time <= close;
