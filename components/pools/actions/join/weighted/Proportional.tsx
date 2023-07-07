@@ -12,7 +12,7 @@ import { useBalanceData } from "../../../../context/BalanceProvider";
 import Big from "big.js";
 import { formatBalError } from "../../../../../src/errors";
 import ProportionalDepositLayout from "../layouts/ProportionalDepositLayout";
-import useHandleBalError from "../../../../utils/useHandleError";
+import useHandleBalError, { PlatformType } from "../../../../utils/useHandleError";
 
 export default function ProportionalDeposit({ pool }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
@@ -31,7 +31,7 @@ export default function ProportionalDeposit({ pool }: any) {
 
     const toast = useToast();
 
-	const handleBalError = useHandleBalError();
+	const handleBalError = useHandleBalError(PlatformType.DEX);
 
 	const deposit = async () => {
 		setLoading(true);

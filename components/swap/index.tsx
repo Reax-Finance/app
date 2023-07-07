@@ -56,7 +56,8 @@ function Swap() {
 
 	const handleError = useHandleError(PlatformType.DEX);
 
-	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
+	const isUnwrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO);
+	const isWrap = (tokens[inputAssetIndex]?.id == ADDRESS_ZERO && tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id));
 
 	const calculateOutputAmount = (inputAmount: string) => {
 		return new Promise((resolve, reject) => {
@@ -111,7 +112,7 @@ function Swap() {
 			setOutputAmount('0');
 			return;
 		}
-		if(isWrap){
+		if(isWrap || isUnwrap){
 			setOutputAmount(value);
 		} else {
 			setLoading(true);
@@ -132,7 +133,7 @@ function Swap() {
 		value = parseInput(value);
 		setOutputAmount(value);
 		if (isNaN(Number(value)) || Number(value) == 0) return;
-		if(isWrap){
+		if(isWrap || isUnwrap){
 			setInputAmount(value);
 		} else {
 			setLoading(true);
@@ -212,9 +213,9 @@ function Swap() {
 			// calculateInputAmount()
 			const router = await getContract("Router", chain?.id!);
 			let tx;
-			if(isWrap){
+			if(isWrap || isUnwrap){
 				let weth = await getContract("WETH9", chain?.id!, WETH_ADDRESS(chain?.id!));
-				if(tokens[inputAssetIndex].id == ADDRESS_ZERO) tx = send(weth, "deposit", [], Big(inputAmount).mul(10**token.decimals).toFixed(0));
+				if(isWrap) tx = send(weth, "deposit", [], Big(inputAmount).mul(10**token.decimals).toFixed(0));
 				else tx = send(weth, "withdraw", [Big(outputAmount).mul(10**token.decimals).toFixed(0)]);
 			} else {
 				const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
@@ -390,6 +391,7 @@ function Swap() {
 		const routerAddress = getAddress("Router", chain?.id! ?? defaultChain.id);
 		const token = tokens[inputAssetIndex];
 		if(token.id == ADDRESS_ZERO) return false;
+		if(isUnwrap) return false;
 		if (Big(allowances[token.id]?.[routerAddress] ?? 0).add(Big(approvedAmount).mul(10**token.decimals)).lt(Big(inputAmount).mul(10**token.decimals))){
 			return true;
 		}
@@ -406,6 +408,7 @@ function Swap() {
 		else if (Number(deadline_m) == 0) return {valid: false, message: "Please set deadline"}
 		else if (maxSlippage == 0) return {valid: false, message: "Please set slippage"}
 		else if (isWrap) return {valid: true, message: "Wrap"}
+		else if (isUnwrap) return {valid: true, message: "Unwrap"}
 		else return {valid: true, message: "Swap"}
 	}
 
