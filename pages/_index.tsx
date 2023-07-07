@@ -8,10 +8,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
-import Particles from '../components/utils/particles';
 import { Status } from '../components/utils/status';
 
-export default function _index({ children }: any) {
+export default function Index({ children }: any) {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [refresh, setRefresh] = useState(0);
