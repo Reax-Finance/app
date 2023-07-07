@@ -287,13 +287,15 @@ function BalanceContextProvider({ children }: any) {
         let events = tx.events.filter((event: any) => event.topics[0] == tokenItf.getEventTopic("Transfer"));
         // Decode events
         let decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Transfer", event.data, event.topics)}});
+        const newBalances = {...walletBalances};
         for(let i in decodedEvents){
             let isOut = decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase();
             let isIn = decodedEvents[i].args[1].toLowerCase() == address?.toLowerCase();
             if(isIn || isOut){
-                updateBalance(decodedEvents[i].token, decodedEvents[i].args[2].toString(), isOut ? true : false);
+                newBalances[decodedEvents[i].token] = Big(walletBalances[decodedEvents[i].token] ?? 0)[isOut ? 'minus' : 'add'](decodedEvents[i].args[2].toString()).toFixed(0);
             }
         }
+        setWalletBalances(newBalances);
         // Approve events
         events = tx.events.filter((event: any) => event.topics[0] == tokenItf.getEventTopic("Approval"));
         // Decode events
@@ -311,9 +313,9 @@ function BalanceContextProvider({ children }: any) {
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {
         const newBalances = {...walletBalances};
         if (isMinus) {
-            newBalances[asset] = Big(walletBalances[asset] ?? 0).minus(value).toString();
+            newBalances[asset] = Big(walletBalances[asset] ?? 0).minus(value).toFixed(0);
         } else {
-            newBalances[asset] = Big(walletBalances[asset] ?? 0).plus(value).toString();
+            newBalances[asset] = Big(walletBalances[asset] ?? 0).plus(value).toFixed(0);
         }
         setWalletBalances(newBalances);
     }
