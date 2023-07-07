@@ -16,7 +16,7 @@ import { useState } from "react";
 import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
 import { RiArrowDropDownLine, RiArrowDropUpLine, RiArrowUpFill } from "react-icons/ri";
-import { NATIVE, dollarFormatter, tokenFormatter } from "../../src/const";
+import { ADDRESS_ZERO, NATIVE, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
 import { InfoOutlineIcon, SettingsIcon, WarningIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 import SelectBody from "./SelectBody";
@@ -79,7 +79,8 @@ export default function SwapLayout({
     const outputValue = (Number(outputAmount) || 0) * prices[tokens[outputAssetIndex]?.id];
 
     const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
-    const valid = inputAmount > 0 && outputAmount > 0;
+	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
+    const valid = inputAmount > 0 && outputAmount > 0 && !isWrap;
 
   return (
     <>

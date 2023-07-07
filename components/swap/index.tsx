@@ -4,7 +4,7 @@ import { getContract, send, estimateGas, getAddress } from "../../src/contract";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import TokenSelector from "./TokenSelector";
-import { ADDRESS_ZERO, ROUTER_ENDPOINT, defaultChain, tokenFormatter } from "../../src/const";
+import { ADDRESS_ZERO, ROUTER_ENDPOINT, WETH_ADDRESS, defaultChain, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from '@chakra-ui/react';
 import useUpdateData from "../utils/useUpdateData";
@@ -55,6 +55,8 @@ function Swap() {
     const tokens: any[] = _tokens.concat({ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] });
 
 	const handleError = useHandleError(PlatformType.DEX);
+
+	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
 
 	const calculateOutputAmount = (inputAmount: string) => {
 		return new Promise((resolve, reject) => {
@@ -109,38 +111,46 @@ function Swap() {
 			setOutputAmount('0');
 			return;
 		}
-		setLoading(true);
-		calculateOutputAmount(value)
-		.then((res: any) => {
-			setOutputAmount(Big(res.fData.estimatedOut).div(10**tokens[outputAssetIndex]?.decimals).toString());
-			setSwapData(res);
-			setLoading(false);
-		})
-		.catch((err) => {
-			setLoading(false);
-			console.log(err);
-		})
+		if(isWrap){
+			setOutputAmount(value);
+		} else {
+			setLoading(true);
+			calculateOutputAmount(value)
+			.then((res: any) => {
+				setOutputAmount(Big(res.fData.estimatedOut).div(10**tokens[outputAssetIndex]?.decimals).toString());
+				setSwapData(res);
+				setLoading(false);
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+			})
+		}
 	};
 
 	const updateOutputAmount = (value: any) => {
 		value = parseInput(value);
 		setOutputAmount(value);
 		if (isNaN(Number(value)) || Number(value) == 0) return;
-		setLoading(true);
-		calculateInputAmount(value)
-		.then((res: any) => {
-			setLoading(false);
-			let inputValue = Big(res.fData.estimatedIn).div(10**tokens[inputAssetIndex]?.decimals).toString();
-			setInputAmount(inputValue);
-			calculateOutputAmount(inputValue)
+		if(isWrap){
+			setInputAmount(value);
+		} else {
+			setLoading(true);
+			calculateInputAmount(value)
 			.then((res: any) => {
-				setSwapData(res);
+				setLoading(false);
+				let inputValue = Big(res.fData.estimatedIn).div(10**tokens[inputAssetIndex]?.decimals).toString();
+				setInputAmount(inputValue);
+				calculateOutputAmount(inputValue)
+				.then((res: any) => {
+					setSwapData(res);
+				})
 			})
-		})
-		.catch((err) => {
-			setLoading(false);
-			console.log(err);
-		})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+			})
+		}
 	};
 
 	const onInputTokenSelected = (e: number) => {
@@ -202,29 +212,39 @@ function Swap() {
 			// calculateInputAmount()
 			const router = await getContract("Router", chain?.id!);
 			let tx;
-			const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
-			const pythData = await getUpdateData(tokenPricesToUpdate);
-			// concat swap assets[]
-			let _swapData = {...swapData};
-			if(token.id == ADDRESS_ZERO){
-				let ethAmount = Big(inputAmount).mul(10**token.decimals).toFixed(0);
-				tx = send(router, "swap", [_swapData, pythData], ethAmount)
+			if(isWrap){
+				let weth = await getContract("WETH9", chain?.id!, WETH_ADDRESS(chain?.id!));
+				if(tokens[inputAssetIndex].id == ADDRESS_ZERO) tx = send(weth, "deposit", [], Big(inputAmount).mul(10**token.decimals).toFixed(0));
+				else tx = send(weth, "withdraw", [Big(outputAmount).mul(10**token.decimals).toFixed(0)]);
 			} else {
-				let calls = [];
-				if(Number(approvedAmount) > 0){
-					const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
-					const {v, r, s} = ethers.utils.splitSignature(data!);
+				const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
+				const pythData = await getUpdateData(tokenPricesToUpdate);
+				// concat swap assets[]
+				let _swapData = {...swapData};
+				if(token.id == ADDRESS_ZERO){
+					let ethAmount = Big(inputAmount).mul(10**token.decimals).toFixed(0);
+					tx = send(router, "swap", [_swapData, pythData], ethAmount)
+				} else {
+					let calls = [];
+					if(Number(approvedAmount) > 0){
+						const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
+						const {v, r, s} = ethers.utils.splitSignature(data!);
+						calls.push(
+							router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
+						)
+					}
+					console.log(_swapData);
 					calls.push(
-						router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
-					)
+						router.interface.encodeFunctionData("swap", [_swapData, pythData])
+					);
+					tx = send(router, "multicall", [calls])
 				}
-				calls.push(
-					router.interface.encodeFunctionData("swap", [_swapData, pythData])
-				);
-				tx = send(router, "multicall", [calls])
 			}
+
 			tx.then(async (res: any) => {
 				let response = await res.wait();
+				updateFromTx(response);
+				setLoading(false);
 				toast({
 					title: 'Transaction submitted',
 					description: <Box>
@@ -243,8 +263,6 @@ function Swap() {
 					isClosable: true,
 					position: 'top-right'
 				})
-				updateFromTx(response);
-				setLoading(false);
 				setInputAmount('');
 				setOutputAmount('0');
 				setSwapData(null);
@@ -387,6 +405,7 @@ function Swap() {
 		else if (shouldApprove()) return { valid: true, message: `Approve ${tokens[inputAssetIndex].symbol} for use`}
 		else if (Number(deadline_m) == 0) return {valid: false, message: "Please set deadline"}
 		else if (maxSlippage == 0) return {valid: false, message: "Please set slippage"}
+		else if (isWrap) return {valid: true, message: "Wrap"}
 		else return {valid: true, message: "Swap"}
 	}
 

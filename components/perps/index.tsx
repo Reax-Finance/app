@@ -9,8 +9,6 @@ export default function Perps({category}: any) {
     const router = useRouter();
     const { asset } = router.query;
     const { markets } = useLendingData();
-
-    console.log(PERP_CATEGORIES[category]);
     
     if(!PERP_CATEGORIES[category]) router.push(`/perps/${Object.keys(PERP_CATEGORIES)[0]}`)
 
@@ -23,8 +21,6 @@ export default function Perps({category}: any) {
 
     // remove lowercase chars from asset
     let parsedAsset = (asset as string).replace(/[^A-Z]/g, '');
-
-    console.log(parsedAsset);
 
     return (
         <>

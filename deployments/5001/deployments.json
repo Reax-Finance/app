@@ -315,7 +315,7 @@
           "abi": "Multicall2"
       },
       "Router": {
-          "address": "0x06ED8dE1487E5eB872828Ac986ec9f559ef002A4",
+          "address": "0xC2703D2eecc20eF79C74d2b8e53d92E4590408d2",
           "abi": "Router",
           "constructorArguments": [
               "0x55f317247632d42584848064A0cC0190fE1f6c58",

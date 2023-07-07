@@ -5,7 +5,9 @@ import {
 	Input,
 	Divider,
 	Image,
-	Button
+	Button,
+	Tooltip,
+	Heading
 } from "@chakra-ui/react";
 
 import { useContext, useState, useEffect } from "react";
@@ -24,8 +26,10 @@ import {
 import { useBalanceData } from "../context/BalanceProvider";
 import { ethers } from "ethers";
 import { useNetwork } from "wagmi";
+import { MdTrendingUp, MdVerified } from "react-icons/md";
+import whitelistedTokens from "../../src/whitelistedTokens";
 
-const POPULAR_TOKENS = ['ETH', 'MNT', 'USDC', 'USDT']
+const POPULAR_TOKENS = ['ETH', 'MNT', 'USDC', 'cUSD']
 
 function TokenSelector({
 	onTokenSelected,
@@ -71,35 +75,39 @@ function TokenSelector({
 		setSearchedTokens(_searchedTokens);
 	};
 
+	const _onClose = () => {
+		searchToken("");
+		onClose();
+	}
+
 	if(tokens.length <= 1) return <></>
 
 	return (
 		<>
 			<Modal
 				isOpen={isOpen}
-				onClose={onClose}
+				onClose={_onClose}
 				scrollBehavior={"inside"}
 				isCentered
 			>
 				<ModalOverlay bg="blackAlpha.800" backdropFilter="blur(30px)" />
 				<ModalContent bg={'transparent'} bgGradient={'linear-gradient(-135deg, transparent 10px, bg1 0) '} shadow={'none'} rounded={0} maxH={"800px"} mx={2}>
-					<ModalHeader>Select a token</ModalHeader>
-					<Box mx={5} mb={2}>
-						<Input rounded={0} placeholder="Search token" onChange={(e) => searchToken(e.target.value)} />
+					<ModalHeader>Select a Token </ModalHeader>
+					<Box mx={5} mb={0}>
+						<Input bg={'blackAlpha.200'} size={'lg'} _focus={{border: 0, outline: 0}} focusBorderColor='secondary.100' rounded={0} placeholder="Search by Token Name or Address" onChange={(e) => searchToken(e.target.value)} />
 					</Box>
-					<Box mx={5} mt={1}>
+					<Box mx={5} mt={2} mb={4}>
 
-						<Flex align={'center'} mb={4} mt={2}>
-						<Text mr={2} fontSize={'sm'} color={'whiteAlpha.700'}>Trending </Text>
+						<Flex align={'center'} >
+						{/* <Text mr={2} fontSize={'sm'} color={'whiteAlpha.700'}>Trending </Text> */}
+						<Box p={'3'} border={'1px'} borderColor={'whiteAlpha.300'} bg={'blackAlpha.200'}>
+						<MdTrendingUp/>
+						</Box>
 							{POPULAR_TOKENS.map((token, index) => (
 								tokens.map((t: any, i: number) => (
 									t.symbol === token && (
-										<Box className="smallcutoutcornersbox" pl={2} py={0.5} pr={4} mr={2} key={i}>
-											<Button size={'sm'} fontWeight={'normal'} variant={'unstyled'} onClick={() =>
-										selectToken(
-											i
-										)
-									}>
+										<Box border={'1px'} borderColor={'whiteAlpha.300'} bg={'blackAlpha.400'} py={1} px={3} pr={4} _hover={{bg: 'blackAlpha.50'}} key={i}>
+											<Button size={'sm'} fontWeight={'normal'} variant={'unstyled'} onClick={() => selectToken(i)}>
 												<Flex align={'center'}>
 												<Image src={`/icons/${t.symbol}.svg`} w={'22px'} alt="" />
 												<Text fontSize={'sm'} ml={2} color={'white'}>{t.symbol}</Text>
@@ -133,7 +141,7 @@ function TokenSelector({
 									}}
 									onClick={() =>
 										selectToken(
-											tokenIndex
+											token.tokenIndex
 										)
 									}
 								>
@@ -156,9 +164,18 @@ function TokenSelector({
 											/>
 
 											<Box>
+												<Flex gap={1} align={'center'}>
 												<Text>
 													{token.symbol}
 												</Text>
+												{whitelistedTokens.includes(token.id) && (
+													<Tooltip label={'Verified'}>
+														<Box color="green.400">
+														<MdVerified />
+														</Box>
+													</Tooltip>
+												)}
+												</Flex>
 
 												<Text
 													color={
@@ -190,7 +207,7 @@ function TokenSelector({
 					</ModalBody>
 					<Flex roundedBottom={16} py={1} justify='space-between' px={4} fontSize='sm' >
 						<Text>{tokens.length} Tokens</Text>
-						<Text>Reax</Text>
+						<Text>Reax Token List</Text>
 					</Flex>
 				</ModalContent>
 			</Modal>
