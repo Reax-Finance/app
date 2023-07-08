@@ -44,6 +44,8 @@ export default function ProportionalWithdrawLayout({
 	const { prices } = usePriceData();
 	return (
 		<>
+		<Divider />
+		<Box bg={'bg.600'} mb={4} pt={'1px'}>
 			{amounts.map((amount: any, i: number) => {
 				const _isNativeToken =
 					poolTokens[i].token.id == WETH_ADDRESS(chain?.id!) &&
@@ -97,6 +99,8 @@ export default function ProportionalWithdrawLayout({
 											gap={2}
 											mt={2}
 										>
+                  <Flex className="outlinedBox" p={2} py={1.5} pl={8} justify={'end'} align={'center'} gap={2} mt={i==0? 4:0}>
+
 											<Image
 												rounded={"full"}
 												src={`/icons/${
@@ -146,12 +150,15 @@ export default function ProportionalWithdrawLayout({
 													{poolTokens[i].token.symbol}
 												</Text>
 											)}
+											</Flex>
 										</Flex>
-										<Flex justify={"end"} mt={2}>
+										{ i == 0 && <Flex justify={"end"} mt={2}>
 											<Button
 												variant={"unstyled"}
 												fontSize="sm"
-												fontWeight={"bold"}
+												fontWeight={"normal"}
+												textDecor={'underline'}
+												textDecorationStyle="dashed"
 												onClick={() => setMax(0.5)}
 											>
 												50%
@@ -159,12 +166,14 @@ export default function ProportionalWithdrawLayout({
 											<Button
 												variant={"unstyled"}
 												fontSize="sm"
-												fontWeight={"bold"}
+												fontWeight={"normal"}
+												textDecor={'underline'}
+												textDecorationStyle="dashed"
 												onClick={() => setMax(0.9999 - pool.swapFee)}
 											>
 												MAX
 											</Button>
-										</Flex>
+										</Flex>}
 									</Box>
 								</NumberInput>
 							</InputGroup>
@@ -181,7 +190,9 @@ export default function ProportionalWithdrawLayout({
 				);
 			})}
 
-			<Divider mt={8} mb={4} />
+			<Divider mt={8} />
+		</Box>
+
 			<ValuesTable bptIn={bptIn} values={values} pool={pool} />
 			<Box className="swapButton" m={4}>
 				<Button

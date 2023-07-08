@@ -62,10 +62,12 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
             {maxSlippage >= 1 && <Flex h={'100%'} px={3} align={'center'} color={'whiteAlpha.700'} bg={'whiteAlpha.50'} fontSize={'sm'}>
                 <Text >Max Slippage: {maxSlippage}%</Text>
             </Flex>}
-            <MenuButton as={IconButton} rounded={0} aria-label={""} icon={<SettingsIcon />} bg={'whiteAlpha.200'}></MenuButton>
+            <Box className='iconButton'>
+            <MenuButton  as={IconButton} rounded={0} aria-label={""} icon={<SettingsIcon />} bg={'transparent'} _hover={{bg: 'transparent'}}></MenuButton>
+            </Box>
             </Flex>
-            <MenuList border={0} rounded={0} bg={'bg1'}>
-
+            <MenuList p={0} m={0} border={0} rounded={0} bg={'transparent'} shadow={'none'}>
+                <Box className='containerBody' pt={1.5} pb={4}>
                 <MenuGroup title="Slippage Tolerance">
                         <Flex mx={4} align={'center'} justify={'space-between'}>
                         {options.map((value) => {
@@ -100,6 +102,7 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
                         </Flex>
                     </>
                 </MenuGroup>
+                </Box>
             </MenuList>
         </Menu>
     </>

@@ -1,5 +1,6 @@
 import React from "react";
 import {
+	Box,
 	Divider,
 	Flex,
 	Heading,
@@ -20,10 +21,11 @@ export default function Join({ pool, isOpen, onClose }: any) {
 	return (
 		<Modal isCentered isOpen={isOpen} onClose={onClose}>
 			<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
-			<ModalContent w={"30rem"} bgColor="bg1" rounded={0} mx={2}>
+			<ModalContent w={"30rem"} bgColor="transparent" shadow={0} rounded={0} mx={2}>
+				<Box className='containerBody2'>
 				<ModalCloseButton rounded={"0"} mt={1} />
 				<ModalHeader>
-					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
+					<Flex justify={"start"} px={3} gap={2} pt={1} align={"center"}>
 						<Flex ml={-2}>
 							{pool.tokens.map((token: any, index: number) => {
 								return (
@@ -45,15 +47,16 @@ export default function Join({ pool, isOpen, onClose }: any) {
 								);
 							})}
 						</Flex>
-						<Heading size={'md'}>{pool.symbol}</Heading>
+						<Heading fontSize={'22px'} fontWeight={'bold'}>{pool.symbol}</Heading>
 					</Flex>
 				</ModalHeader>
 				<ModalBody p={0} m={0}>
 					<Divider />
-					<Tabs size={"sm"} isFitted colorScheme="secondary">
+					<Tabs variant={'enclosed'} size={"sm"} isFitted colorScheme="secondary">
 						<TabList>
-							<Tab py={2}>Single Token</Tab>
-							<Tab>Pool Tokens</Tab>
+							<Tab border={0} py={2}>Single Token</Tab>
+							<Divider orientation="vertical" h={'40px'} />
+							<Tab border={0} py={2}>Pool Tokens</Tab>
 						</TabList>
 
 						<TabPanels>
@@ -66,6 +69,7 @@ export default function Join({ pool, isOpen, onClose }: any) {
 						</TabPanels>
 					</Tabs>
 				</ModalBody>
+				</Box>
 			</ModalContent>
 		</Modal>
 	);

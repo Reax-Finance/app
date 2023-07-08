@@ -28,100 +28,228 @@ body {
 .swapButton {
   background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .swapButton:hover {
   background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .mainButton {
   background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .comingSoonText{
   background: linear-gradient(80deg, transparent 20px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 22px, #F64E00 0) top right;
   background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+
+/* Starts Here */
+.containerBody {
+  background: linear-gradient(45deg, transparent 10px, #191D25 0) bottom left, linear-gradient(-135deg, transparent 10px, #191D25 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.containerBody2 {
+  background: linear-gradient(45deg, transparent 10px, #252B36 0) bottom left, linear-gradient(-135deg, transparent 10px, #252B36 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.containerHeader {
+  background: linear-gradient(45deg, transparent 0px, #252B36 0) bottom left, linear-gradient(-135deg, transparent 10px, #252B36 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.containerFooter {
+  background: linear-gradient(45deg, transparent 10px, #252B36 0) bottom left, linear-gradient(-135deg, transparent 0px, #252B36 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.containerFooter2 {
+  background: linear-gradient(45deg, transparent 10px, #191D25 0) bottom left, linear-gradient(-135deg, transparent 0px, #191D25 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.primaryButton {
+  background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.primaryButton:hover {
+  background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) top right;
+  background-repeat: no-repeat;
   background-size: 100% 50%;
 }
+
+.disabledPrimaryButton {
+  background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.40) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.40) 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.secondaryButton {
+  background: linear-gradient(45deg, transparent 6px, #FF9400 0) bottom left, linear-gradient(-135deg, transparent 6px, #FF9400 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.secondaryButton:hover {
+  background: linear-gradient(45deg, transparent 6px, #d97f00 0) bottom left, linear-gradient(-135deg, transparent 6px, #d97f00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.disabledSecondaryButton {
+  background: linear-gradient(45deg, transparent 6px, #d97f007b 0) bottom left, linear-gradient(-135deg, transparent 6px, #d97f007b 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 50%;
+}
+
+.primaryTabLeft {
+  background: linear-gradient(45deg, transparent 6px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 0px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.primaryTabLeftSelected {
+  background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 0px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.primaryTabRight {
+  background: linear-gradient(45deg, transparent 0px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 6px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.primaryTabRightSelected {
+  background: linear-gradient(45deg, transparent 0px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.secondaryTabLeft {
+  background: linear-gradient(45deg, transparent 6px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 0px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.secondaryTabLeftSelected {
+  background: linear-gradient(45deg, transparent 6px, #d97f00 0) bottom left, linear-gradient(-135deg, transparent 0px, #d97f00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.secondaryTabRight {
+  background: linear-gradient(45deg, transparent 0px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 6px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.secondaryTabRightSelected {
+  background: linear-gradient(45deg, transparent 0px, #d97f00 0) bottom left, linear-gradient(-135deg, transparent 6px, #d97f00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.outlinedButton {
+  background: linear-gradient(45deg, transparent 5px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 5px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.outlinedBox {
+  background: linear-gradient(45deg, transparent 5px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 5px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+/* hover for outlined button */
+.outlinedButton:hover {
+  background: linear-gradient(45deg, transparent 5px, #2B2E32 0) bottom left, linear-gradient(-135deg, transparent 5px, #2B2E32 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+/* End */
+
+
+.iconButton {
+  background: linear-gradient(45deg, transparent 6px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 6px, #343B48 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.iconButton:hover {
+  background: linear-gradient(45deg, transparent 6px, #343b48bf 0) bottom left, linear-gradient(-135deg, transparent 6px, #343b48bf 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
 
 .mainButton:hover {
   background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.7) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.7) 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
-.tabButtonLeft {
-  background: linear-gradient(45deg, transparent 6px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 0px, #ffffff20 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-}
-
-.tabButtonLeftSelected {
-  background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 0px, #F64E00 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-}
-
-.tabButtonRight {
-  background: linear-gradient(45deg, transparent 0px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 6px, #ffffff20 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-}
-
-.tabButtonRightSelected {
-  background: linear-gradient(45deg, transparent 0px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-}
 
 .connectButton {
   background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .errorButton {
   background: linear-gradient(45deg, transparent 6px, rgb(246, 45, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgb(246, 45, 0) 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .cutoutcornersbox {
   background: linear-gradient(45deg, transparent 10px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff20 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
   padding: 1px;
 }
 
 .tokenBox {
   background: linear-gradient(45deg, transparent 6px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 6px, #ffffff10 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
   padding: 1px;
 }
 
 .navbox {
   background: linear-gradient(45deg, transparent 10px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff10 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
   padding: 1px;
 }
 
 .navbutton {
   background: linear-gradient(45deg, transparent 4px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 4px, #ffffff10 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .smallcutoutcornersbox {
   background: linear-gradient(45deg, transparent 4px, #ffffff20 0) bottom left, linear-gradient(-135deg, transparent 4px, #ffffff20 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
   padding: 1px;
 }
 
@@ -135,30 +263,18 @@ body {
 .positionTable {
   background: linear-gradient(45deg, transparent 10px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff10 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .tableStyle {
   background: linear-gradient(45deg, transparent 10px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 10px, #ffffff10 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .corneredBox2 {
   background: linear-gradient(45deg, transparent 10px, #2B2E32 0) bottom left, linear-gradient(-135deg, transparent 10px, #2B2E32 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
-.outlinedButton {
-  background: linear-gradient(45deg, transparent 5px, #ffffff10 0) bottom left, linear-gradient(-135deg, transparent 5px, #ffffff10 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-}
-
-/* hover for outlined button */
-.outlinedButton:hover {
-  background: linear-gradient(45deg, transparent 5px, #2B2E32 0) bottom left, linear-gradient(-135deg, transparent 5px, #2B2E32 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-}

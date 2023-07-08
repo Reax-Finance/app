@@ -108,8 +108,8 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 
 	return (
 		<>
-			<Box bg={"bg2"} px={5} py={5}>
-				<Box mt={4}>
+			<Box px={5} py={5}>
+				<Box>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
 						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
@@ -190,7 +190,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 						</Box>
 					</Box>
             
-				
+				<Box mt={6} className="primaryButton">
                 <Button
                     isDisabled={
                         loading ||
@@ -202,16 +202,14 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
                     }
                     isLoading={loading}
                     loadingText="Please sign the transaction"
-                    bgColor="secondary.400"
-					colorScheme="secondary"
+                    bgColor="transparent"
                     width="100%"
                     color="white"
-                    mt={2}
                     onClick={withdraw}
                     size="lg"
                     rounded={0}
                     _hover={{
-                        opacity: "0.5",
+                        bg: "transparent",
                     }}
                 >
                     {isConnected && !chain?.unsupported ? (
@@ -226,6 +224,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
                         <>Please connect your wallet</>
                     )}
                 </Button>
+				</Box>
 
 				<Response
 					response={response}

@@ -19,7 +19,6 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import { formatLendingError } from "../../../src/errors";
 import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
@@ -179,10 +178,45 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 		return false;
 	}
 
+	const validate = () => {
+		if(!isConnected){
+			return {
+				stage: 0,
+				message: "Connect Wallet"
+			}
+		} else if (chain?.unsupported){
+			return {
+				stage: 0,
+				message: "Unsupported Network"
+			}
+		}
+		else if(amountNumber == 0){
+			return {
+				stage: 0,
+				message: "Enter Amount"
+			}
+		} else if (amountNumber > Number(max)) {
+			return {
+				stage: 0,
+				message: "Amount Exceeds Balance"
+			}
+		} else if (shouldApprove()) {
+			return {
+				stage: 1,
+				message: "Approve Use Of aW"+market.outputToken.symbol
+			}
+		} else {
+			return {
+				stage: 3,
+				message: "Withdraw"
+			}
+		}
+	}
+
 	return (
 		<>
-			<Box bg={"bg2"} px={5} py={5}>
-				<Box mt={4}>
+			<Box px={5} py={5}>
+				<Box mt={2}>
 					<Flex justify="space-between">
 							<Flex gap={1}>
 						<Tooltip label='Minimum Loan to Value Ratio'>
@@ -237,7 +271,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 					</Box>
 				</Box>
 
-
+				{/* <Box mt={6}>
 				{shouldApprove() ? <Button
                     isDisabled={
                         loading ||
@@ -283,7 +317,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
                     }
                     isLoading={loading}
                     loadingText="Please sign the transaction"
-                    bgColor="secondary.400"
+                    bgColor="transparent"
                     width="100%"
                     color="white"
                     mt={2}
@@ -291,7 +325,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
                     size="lg"
                     rounded={0}
                     _hover={{
-                        opacity: "0.5",
+                        bg: "transparent",
                     }}
                 >
                     {isConnected && !chain?.unsupported ? (
@@ -306,13 +340,48 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
                         <>Please connect your wallet</>
                     )}
                 </Button>}
+				</Box> */}
 
-				<Response
-					response={response}
-					message={message}
-					hash={hash}
-					confirmed={confirmed}
-				/>
+				<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "primaryButton":'disabledPrimaryButton'}><Button
+						isDisabled={validate().stage != 1}
+						isLoading={approveLoading}
+						loadingText="Please sign the transaction"
+						color='white'
+						width="100%"
+						onClick={approve}
+						size="lg"
+						rounded={0}
+						bg={'transparent'}
+						_hover={{ bg: "transparent" }}
+					>
+						{validate().message}
+					</Button>
+					</Box>}
+						
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "primaryButton":'disabledPrimaryButton'} > <Button
+						isDisabled={validate().stage < 2}
+						isLoading={loading}
+						loadingText="Please sign the transaction"
+						width="100%"
+						color="white"
+						rounded={0}
+						bg={'transparent'}
+						onClick={withdraw}
+						size="lg"
+						_hover={{ bg: "transparent" }}
+					>
+						{isConnected && !chain?.unsupported ? (
+							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
+								<>Insufficient Wallet Balance</>
+							) : (
+								<>Withdraw</>
+							)
+						) : (
+							<>Please connect your wallet</>
+						)}
+					</Button></Box>}
+				</Box>
 			</Box>
 		</>
 	);

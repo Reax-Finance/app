@@ -49,6 +49,8 @@ export default function ProportionalDepositLayout({
   
   return (
     <>
+    <Divider />
+    <Box bg={'bg.600'} pt={'1px'}>
     {amounts.map((amount: any, i: number) => {
       const _isNativeToken = poolTokens[i].token.id == WETH_ADDRESS(chain?.id!) && isNative;
       return (
@@ -90,7 +92,7 @@ export default function ProportionalDepositLayout({
                   </Text>
                 </Box>
                 <Box>
-                  <Flex className="tokenBox" p={2} py={1.5} pl={8} justify={'end'} align={'center'} gap={2} mt={i==0? 4:0}>
+                  <Flex className="outlinedBox" p={2} py={1.5} pl={8} justify={'end'} align={'center'} gap={2} mt={i==0? 4:0}>
                     <Image rounded={'full'} src={`/icons/${_isNativeToken ? 'MNT' : poolTokens[i].token.symbol}.svg`} alt="" width={"30px"} />
                     {poolTokens[i].token.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) ? <><Select mr={-2} w={'110px'} value={isNative ? 'ETH' : 'WETH'} variant={'unstyled'} onChange={(e) => e.target.value == 'ETH' ? setIsNative(true) : setIsNative(false)}>
                       <option value="ETH">MNT</option>
@@ -136,12 +138,13 @@ export default function ProportionalDepositLayout({
         </Box>
       );
     })}
-
     <Divider mt={8}/>
-    <Box bg={'bg1'} pt={4} pb={'1px'}>
+    </Box>
+
+    <Box pt={4} pb={'1px'}>
 
     <ValuesTable values={values} pool={pool} bptOut={bptOut} />
-    <Box className="swapButton" m={4}>
+    <Box className="primaryButton" m={4}>
     <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} _disabled={{color: 'whiteAlpha.700'}} rounded={0} w={'100%'} onClick={tokenToApprove() >= 0 ? approve : deposit}>
       {validate().message}
     </Button>

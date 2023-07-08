@@ -16,7 +16,6 @@ import { useAccount, useNetwork } from "wagmi";
 import { PYTH_ENDPOINT, dollarFormatter, numOrZero, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import Response from "../_utils/Response";
-import { BigNumber, ethers } from "ethers";
 import { useRouter } from "next/router";
 import { base58 } from "ethers/lib/utils.js";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
@@ -140,7 +139,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 	}
 
 	return (
-		<Box px={5} pb={5} pt={0.5} bg="bg2">
+		<Box px={5} pb={5} pt={0.5} bg="transparent">
 			<Box
 				mt={6}
 				rounded={8}
@@ -213,29 +212,23 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				</Box>
 			</Box>
 
-			<Flex mt={2} justify="space-between"></Flex>
-			<Button
-				isDisabled={!validate().valid}
-				isLoading={loading}
-				loadingText="Please sign the transaction"
-				bg="primary.400"
-				colorScheme="primary"
-				width="100%"
-				color="white"
-				mt={4}
-				onClick={mint}
-				size="lg"
-				rounded={0}
-			>
-				{validate().message}
-			</Button>
-
-			<Response
-				response={response}
-				message={message}
-				hash={hash}
-				confirmed={confirmed}
-			/>
+			<Box mt={6} className="secondaryButton">
+				<Button
+					isDisabled={!validate().valid}
+					isLoading={loading}
+					loadingText="Please sign the transaction"
+					bg="transparent"
+					colorScheme="primary"
+					width="100%"
+					color="white"
+					_hover={{ bg: "transparent" }}
+					onClick={mint}
+					size="lg"
+					rounded={0}
+				>
+					{validate().message}
+				</Button>
+			</Box>
 		</Box>
 	);
 };

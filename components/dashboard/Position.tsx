@@ -40,9 +40,9 @@ export default function Position() {
             mb={-5}
             w='100%'
             display={{ sm: "block", md: "block" }}
-            className='cutoutcornersboxright'
+            className='containerBody'
         >
-            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='cutoutcornersboxright'>
+            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='containerHeader'>
                 <Heading fontSize={'18px'}>
                     Your Position
                 </Heading>

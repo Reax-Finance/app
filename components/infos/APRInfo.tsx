@@ -34,10 +34,11 @@ function APRInfoBox({ debtBurnApr, esSyxApr }: any) {
 		<>
 			<Box
 				rounded={0}
-				className="corneredBox2"
+				className="containerBody"
 				color={'white'}
+				shadow={'2xl'}
 			>
-				<Box px={3} py={2} className="cutoutcornersboxright">
+				<Box px={3} py={2} className="containerHeader">
 					<Text color={"whiteAlpha.700"}>Total APY</Text>
 					<Text fontSize={"lg"}>
 						{(Number(debtBurnApr)

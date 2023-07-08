@@ -32,8 +32,8 @@ export default function Positions() {
     
     return (
     <>
-    <Box className='positionTable'>
-      <Box className='cutoutcornersboxright'>
+    <Box className='containerBody'>
+      <Box className='containerHeader'>
         <Flex align={'center'} p={4} px={5} gap={4}>
           <Heading fontSize={'18px'} color={'primary.400'}>Your Balances</Heading>
         </Flex>

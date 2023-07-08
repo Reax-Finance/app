@@ -62,7 +62,7 @@ export default function TempPage() {
 										height: "100%",
 									}}
 								>
-									<Box className="tableStyle" h={'100%'}>
+									<Box className="containerBody" h={'100%'}>
 										<CollateralTable />
 									</Box>
 								</motion.div>
@@ -75,7 +75,7 @@ export default function TempPage() {
 									transition={{ duration: 0.25 }}
 									key={tradingPool + 2}
 								>
-									<Box className="tableStyle" h={'100%'}>
+									<Box className="containerBody" h={'100%'}>
 										<IssuanceTable />
 									</Box>
 								</motion.div>

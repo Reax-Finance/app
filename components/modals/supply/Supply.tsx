@@ -53,13 +53,6 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				stage: 0,
 				message: "Connect Wallet"
 			}
-		} else if (Big(walletBalances[ADDRESS_ZERO]).lt(
-			ethers.utils.parseEther("0.000001").toString()
-		)) {
-			return {
-				stage: 0,
-				message: "Insufficient ETH for Gas Fee"
-			}
 		} else if (chain?.unsupported){
 			return {
 				stage: 0,
@@ -302,8 +295,8 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 	return (
 		<>
-			<Box bg={"bg2"} px={5} pt={5} pb={5}>
-				<Box mt={4}>
+			<Box px={5} pt={5} pb={5}>
+				<Box mt={2}>
 					{/* <Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
 						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
@@ -390,38 +383,34 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 					</Box>
 				</Box>
 				
-					{validate().stage <= 2 && <Button
+				<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
-						colorScheme={'primary'}
-						bg={"primary.400"}
 						color='white'
-						mt={2}
 						width="100%"
 						onClick={market.inputToken.isPermit ? approve : approveTx}
 						size="lg"
 						rounded={0}
-						leftIcon={
-							validate().stage ==1 ? <Tooltip label='
-								Approve tokens to be used by the protocol.
-							'>
-							<InfoOutlineIcon/>
-							</Tooltip> : <></>
-						}
-					>{validate().message}</Button>}
-					{validate().stage > 0 && <Button
+						bg={'transparent'}
+						_hover={{ bg: "transparent" }}
+					>
+						{validate().message}
+					</Button>
+					</Box>}
+						
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "secondaryButton":'disabledSecondaryButton'} > <Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
-						bgColor={"primary.500"}
-						_hover={{ bg: "primary.700" }}
 						width="100%"
 						color="white"
 						rounded={0}
-						mt={2}
+						bg={'transparent'}
 						onClick={deposit}
 						size="lg"
+						_hover={{ bg: "transparent" }}
 					>
 						{isConnected && !activeChain?.unsupported ? (
 							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
@@ -432,9 +421,10 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 						) : (
 							<>Please connect your wallet</>
 						)}
-					</Button>}
+					</Button></Box>}
+				</Box>
 
-					{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
+				{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
 
 				<Response
 					response={response}

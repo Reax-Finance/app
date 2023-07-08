@@ -158,8 +158,43 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		})
 	}
 
+	const validate = () => {
+		if(!isConnected){
+			return {
+				stage: 0,
+				message: "Connect Wallet"
+			}
+		} else if (chain?.unsupported){
+			return {
+				stage: 0,
+				message: "Unsupported Network"
+			}
+		}
+		else if(amountNumber == 0){
+			return {
+				stage: 0,
+				message: "Enter Amount"
+			}
+		} else if (amountNumber > Number(max)) {
+			return {
+				stage: 0,
+				message: "Amount Exceeds Balance"
+			}
+		} else if (shouldApprove()) {
+			return {
+				stage: 1,
+				message: "Approve Use Of aW"+market.outputToken.symbol
+			}
+		} else {
+			return {
+				stage: 3,
+				message: "Borrow"
+			}
+		}
+	}
+
 	return (
-		<Box px={5} pb={5} pt={0.5} bg="bg2">
+		<Box px={5} pb={5} pt={0.5} >
 			<Box mt={6}>
 				<Flex align={'center'} justify={'space-between'} gap={'50'}>
 					<Text color="whiteAlpha.600">Interest Rate</Text>
@@ -216,79 +251,46 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 				</Box>
 			</Box>
 
-			<Flex mt={2} justify="space-between"></Flex>
-			{shouldApprove() ? <Button
-                    isDisabled={
-                        loading ||
-                        !isConnected ||
-                        chain?.unsupported ||
-                        !amount ||
-                        amountNumber == 0 ||
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) 
-                    }
-                    isLoading={loading}
-                    loadingText="Please sign the transaction"
-                    bgColor="primary.400"
-                    width="100%"
-                    color="white"
-                    mt={2}
-                    onClick={approveTx}
-                    size="lg"
-                    rounded={0}
-                    _hover={{
-                        opacity: "0.5",
-                    }}
-                >
-                    {isConnected && !chain?.unsupported ? (
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
-                            <>Insufficient Collateral</>
-                        ) : !amount || amountNumber == 0 ? (
-                            <>Enter Amount</>
-                        ) : (
-                            <>Approve</>
-                        )
-                    ) : (
-                        <>Please connect your wallet</>
-                    )}
-                </Button> : <Button
-				isDisabled={
-					loading ||
-					!isConnected ||
-					chain?.unsupported ||
-					!amount ||
-					amountNumber == 0 ||
-					Big(amountNumber > 0 ? amount : amountNumber).gt(max)
-				}
-				isLoading={loading}
-				loadingText="Please sign the transaction"
-				bgColor="primary.400"
-				width="100%"
-				color="white"
-				mt={4}
-				onClick={borrow}
-				size="lg"
-				rounded={0}
-				_hover={{
-					opacity: "0.5",
-				}}
-			>
-				{isConnected ? (
-					Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
-						<>Insufficient Collateral</>
-					) : !amount || amountNumber == 0 ? (
-						<>Enter Amount</>
-					) : (
-						<>Borrow</>
-					)
-				) : <>Connect Wallet</>}
-			</Button>}
-
-			<Response
-				response={response}
-				message={message}
-				hash={hash}
-				confirmed={confirmed}
-			/>
+			<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
+						isDisabled={validate().stage != 1}
+						isLoading={loading}
+						loadingText="Please sign the transaction"
+						color='white'
+						width="100%"
+						onClick={approveTx}
+						size="lg"
+						rounded={0}
+						bg={'transparent'}
+						_hover={{ bg: "transparent" }}
+					>
+						{validate().message}
+					</Button>
+					</Box>}
+						
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "secondaryButton":'disabledSecondaryButton'} > <Button
+						isDisabled={validate().stage < 2}
+						isLoading={loading}
+						loadingText="Please sign the transaction"
+						width="100%"
+						color="white"
+						rounded={0}
+						bg={'transparent'}
+						onClick={borrow}
+						size="lg"
+						_hover={{ bg: "transparent" }}
+					>
+						{isConnected && !chain?.unsupported ? (
+							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
+								<>Insufficient Wallet Balance</>
+							) : (
+								<>Borrow</>
+							)
+						) : (
+							<>Please connect your wallet</>
+						)}
+					</Button></Box>}
+				</Box>
 		</Box>
 	);
 };

@@ -60,7 +60,7 @@ export default function TempPage() {
 									height: "100%",
 								}}
 							>
-								<Box className="tableStyle" h={'100%'}>
+								<Box className="containerBody" h={'100%'}>
 									<YourSupplies />
 								</Box>
 							</motion.div>
@@ -75,7 +75,7 @@ export default function TempPage() {
 									height: "100%",
 								}}
 							>
-								<Box className="tableStyle" h={'100%'}>
+								<Box className="containerBody" h={'100%'}>
 									<YourBorrows />
 								</Box>
 							</motion.div>
@@ -105,7 +105,7 @@ export default function TempPage() {
 									height: "100%",
 								}}
 							>
-								<Box className="tableStyle" h={'100%'}>
+								<Box className="containerBody" h={'100%'}>
 									<SupplyTable />
 								</Box>
 							</motion.div>
@@ -118,7 +118,7 @@ export default function TempPage() {
 								transition={{ duration: 0.25 }}
 								key={tradingPool + 2}
 							>
-								<Box className="tableStyle" h={'100%'}>
+								<Box className="containerBody" h={'100%'}>
 									<BorrowTable />
 								</Box>
 							</motion.div>

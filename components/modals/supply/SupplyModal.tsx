@@ -82,7 +82,8 @@ export default function SupplyModal({
     
 	return (
 		<>
-			<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
+			<ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
+			<Box className="containerBody2">
 				<ModalCloseButton rounded={"full"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
@@ -103,7 +104,7 @@ export default function SupplyModal({
 				</ModalHeader>
 				<ModalBody m={0} p={0}>
 					<Divider />
-					<Box mb={6} mt={4} px={8}>
+					<Box bg={'bg.600'} pb={12} pt={4} px={8}>
 						{market.inputToken.id ==
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 							<>
@@ -119,12 +120,12 @@ export default function SupplyModal({
 										size="sm"
 									>
 										<TabList>
-											<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
+											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
 											<Tab>
 												MNT
 											</Tab>
 											</Box>
-											<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
+											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
 											<Tab>
 												WMNT
 											</Tab>
@@ -196,8 +197,9 @@ export default function SupplyModal({
 							</NumberInput>
 						</InputGroup>
 					</Box>
-
-					<Tabs onChange={selectTab}>
+					<Divider />
+					<Box className="containerFooter">
+					<Tabs variant={'enclosed'} onChange={selectTab}>
 						<TabList>
 							<Tab
 								w={"50%"}
@@ -205,15 +207,20 @@ export default function SupplyModal({
 									color: "primary.400",
 									borderColor: "primary.400",
 								}}
+								rounded={0}
+								border={0}
 							>
 								Supply
 							</Tab>
+							<Divider orientation="vertical" h={'40px'} />
 							<Tab
 								w={"50%"}
 								_selected={{
 									color: "secondary.400",
 									borderColor: "secondary.400",
 								}}
+								rounded={0}
+								border={0}
 							>
 								Withdraw
 							</Tab>
@@ -242,7 +249,9 @@ export default function SupplyModal({
 							</TabPanel>
 						</TabPanels>
 					</Tabs>
+					</Box>
 				</ModalBody>
+				</Box>
 			</ModalContent>
 		</>
 	);

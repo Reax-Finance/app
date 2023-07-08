@@ -115,7 +115,7 @@ export default function Debt({ synth, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				_hover={{ bg: 'whiteAlpha.100' }}
+				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
 					<TokenInfo token={synth.token} />
@@ -145,7 +145,8 @@ export default function Debt({ synth, index }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
+				<ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
+					<Box className="containerBody2">
 					<ModalCloseButton rounded={"full"} mt={1} />
 					<ModalHeader>
 						<Flex
@@ -180,7 +181,7 @@ export default function Debt({ synth, index }: any) {
 					</ModalHeader>
 					<ModalBody m={0} p={0}>
 						<Divider />
-						<Box mb={6} mt={4} px={8}>
+						<Box bg={'bg.600'} pb={12} pt={6} px={8}>
                             <Flex justify={"center"} mb={2}>
                                 <Flex
                                     justify={"center"}
@@ -248,8 +249,9 @@ export default function Debt({ synth, index }: any) {
                                 </NumberInput>
                             </InputGroup>
 						</Box>
-
-						<Tabs onChange={selectTab} index={tabSelected}>
+						<Divider />
+						<Box className="containerFooter">
+						<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 							<TabList>
 								<Tab
 									w={"50%"}
@@ -257,20 +259,24 @@ export default function Debt({ synth, index }: any) {
 										color: "primary.400",
 										borderColor: "primary.400",
 									}}
+									rounded={0}
+									border={0}
 								>
 									Mint
 								</Tab>
+								<Divider orientation="vertical" h={'40px'} />
 								<Tab
 									w={"50%"}
 									_selected={{
 										color: "secondary.400",
 										borderColor: "secondary.400",
 									}}
+									rounded={0}
+									border={0}
 								>
 									Burn
 								</Tab>
 							</TabList>
-
 							<TabPanels>
 								<TabPanel m={0} p={0}>
 									<Mint
@@ -290,7 +296,9 @@ export default function Debt({ synth, index }: any) {
 								</TabPanel>
 							</TabPanels>
 						</Tabs>
+							</Box>
 					</ModalBody>
+					</Box>
 				</ModalContent>
 			</Modal>
 		</>

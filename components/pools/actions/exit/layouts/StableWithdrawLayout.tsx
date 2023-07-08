@@ -43,8 +43,9 @@ export default function StableWithdrawLayout({
 
     return (
     <>
+    <Divider />
         <Box>
-            <Box py={4} px={4}>
+            <Box bg={'bg.600'} py={4} pb={6} px={4}>
                 <InputGroup
                     variant={"unstyled"}
                     display="flex"
@@ -79,6 +80,8 @@ export default function StableWithdrawLayout({
 
                         <Box>
                         <Flex justify={'end'} align={'center'} gap={2} mt={6}>
+                        <Flex cursor={'pointer'} className="outlinedBox" w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
+
                             <Image rounded={'full'} src={`/icons/${_isNativeToken ? NATIVE : pool.tokens[tokenSelectedIndex].token.symbol}.svg`} alt="" width={"30px"} />
                             <Select mr={-2} w={'110px'} value={tokenSelectedIndex + '-' + (isNative ? 'ETH' : pool.tokens[tokenSelectedIndex].token.symbol)} variant={'unstyled'} onChange={onSelectUpdate}>
                                 {pool.tokens.map((token: any, i: number) => {
@@ -91,12 +94,15 @@ export default function StableWithdrawLayout({
                                 }
                                 )}
                             </Select>
+                            </Flex>
                         </Flex>
                         <Flex justify={'end'} mt={0}>
                             <Button
                                 variant={"unstyled"}
                                 fontSize="sm"
-                                fontWeight={"bold"}
+                                fontWeight={"normal"}
+                                textDecor={'underline'}
+                                textDecorationStyle="dashed"
                                 onClick={() => setMax(0.5)}
                             >
                                 50%
@@ -104,7 +110,9 @@ export default function StableWithdrawLayout({
                             <Button
                                 variant={"unstyled"}
                                 fontSize="sm"
-                                fontWeight={"bold"}
+                                fontWeight={"normal"}
+                                textDecor={'underline'}
+                                textDecorationStyle="dashed"
                                 onClick={() => setMax(0.999)}
                             >
                                 MAX
@@ -116,7 +124,7 @@ export default function StableWithdrawLayout({
                 </InputGroup>
             </Box>
         </Box>
-        <Divider mt={2} mb={4}/>
+        <Divider mb={4}/>
         <ValuesTable2 values={values} pool={pool} bptIn={bptIn} />
         <Box className="swapButton" m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={withdraw}>

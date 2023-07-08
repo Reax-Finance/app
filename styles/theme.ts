@@ -60,6 +60,11 @@ export const theme = extendTheme({
 		bg1: "#2B2E32",
 		bg2: "#1D1F24",
 		bg3: '#001A31',
+		bg: {
+			200: '#343B48',
+			400: '#252B36',
+			600: '#191D25',
+		},
 		skyblue: "#92CAFF",
 	},
 });

@@ -91,7 +91,8 @@ export default function BorrowModal({
 
 	return (
 		<>
-			<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
+			<ModalContent width={"30rem"} bg={'transparent'} shadow={'none'} rounded={0} mx={2}>
+				<Box className="containerBody2">
 				<ModalCloseButton rounded={"full"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
@@ -105,7 +106,8 @@ export default function BorrowModal({
 				</ModalHeader>
 				<ModalBody m={0} p={0}>
 					<Divider />
-					<Box mb={6} mt={4} px={8}>
+					<Box bg={'bg.600'}>
+					<Box pb={12} pt={6} px={8}>
 						{market.inputToken.id ==
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 							<>
@@ -207,8 +209,9 @@ export default function BorrowModal({
 							</NumberInput>
 						</InputGroup>
 					</Box>
+					</Box>
 
-					<Tabs onChange={selectTab} index={tabSelected}>
+					<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 						<TabList>
 							<Tab
 								w={"50%"}
@@ -216,15 +219,20 @@ export default function BorrowModal({
 									color: "primary.400",
 									borderColor: "primary.400",
 								}}
+								border={0}
+								rounded={0}
 							>
 								Borrow
 							</Tab>
+							<Divider orientation="vertical" h={'40px'} />
 							<Tab
 								w={"50%"}
 								_selected={{
 									color: "secondary.400",
 									borderColor: "secondary.400",
 								}}
+								rounded={0}
+								border={0}
 							>
 								Repay
 							</Tab>
@@ -258,6 +266,7 @@ export default function BorrowModal({
 						</TabPanels>
 					</Tabs>
 				</ModalBody>
+				</Box>
 			</ModalContent>
 		</>
 	);

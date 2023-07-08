@@ -84,7 +84,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 							return (
 								pool.address !== token.token.id && (
 									<Flex
-										className="smallcutoutcornersbox"
+										className="outlinedBox"
 										p={2}
 										key={index}
 										align="center"
@@ -119,7 +119,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 
 				<TdBox isNumeric>
 					<Flex gap={2}>
-						<Box className="mainButton">
+						<Box className="primaryButton">
 							<Button
 								onClick={onWithdrawOpen}
 								color={"white"}

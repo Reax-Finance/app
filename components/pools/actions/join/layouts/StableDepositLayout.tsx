@@ -51,11 +51,12 @@ export default function StableDepositLayout({
   return (
     <>
 	
-        <Box>
-            <Box px={4}>
+        <>
+        <Divider />
+            <Box bg={'bg.600'} px={4}>
                 <InputGroup
-                    mt={7}
-                    mb={6}
+                    pt={7}
+                    pb={7}
                     variant={"unstyled"}
                     display="flex"
                     placeholder="Enter amount"
@@ -88,7 +89,7 @@ export default function StableDepositLayout({
                         </Box>
 
                         <Flex flexDir={'column'} align={'end'}>
-                        <Flex cursor={'pointer'} bgGradient={'linear(45deg, transparent 6px, #ffffff10 0) bottom left'} _hover={{ bgGradient: 'linear(45deg, transparent 6px, #ffffff15 0) bottom left' }} w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
+                        <Flex cursor={'pointer'} className="outlinedBox" w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
                             <Image rounded={'full'} src={`/icons/${_isNativeToken ? NATIVE : pool.tokens[tokenSelectedIndex].token.symbol}.svg`} alt="" width={"30px"} />
                             <Select mr={-2} w={'110px'} value={tokenSelectedIndex + '-' + (isNative ? 'ETH' : pool.tokens[tokenSelectedIndex].token.symbol)} variant={'unstyled'} onChange={onSelectUpdate}>
                                 {pool.tokens.map((token: any, i: number) => {
@@ -122,12 +123,12 @@ export default function StableDepositLayout({
                     </NumberInput>
                 </InputGroup>
             </Box>
-        </Box>
+        </>
 
-        <Divider mt={4} mb={4}/>
+        <Divider mb={4}/>
         
         <ValuesTable values={values} pool={pool} bptOut={bptOut} />
-        <Box className="swapButton" m={4}>
+        <Box className="primaryButton" m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={shouldApprove() ? approve : deposit}>
             {validate().message}
         </Button>

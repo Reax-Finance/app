@@ -19,6 +19,9 @@ export default function swap() {
 							animation={"fadeIn 0.5s ease-in-out"}
 							className="cutoutcornersbox"
 							boxShadow={'xl'}
+							p={0}
+							paddingBottom={'1px'}
+							border={'0'}
 						>
 							<Swap />
 						</Box>

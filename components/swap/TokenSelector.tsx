@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useBalanceData } from "../context/BalanceProvider";
 import { ethers } from "ethers";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
 
@@ -41,6 +41,7 @@ function TokenSelector({
 	const [searchedTokens, setSearchedTokens] = useState<any[]>([]);
 	const { walletBalances, tokens: _tokens } = useBalanceData();
 	const {chain} = useNetwork();
+	const {isConnected} = useAccount();
     const tokens: any[] = _tokens.concat({ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] });
 
 	const selectToken = (tokenIndex: number) => {
@@ -91,22 +92,24 @@ function TokenSelector({
 				isCentered
 			>
 				<ModalOverlay bg="blackAlpha.800" backdropFilter="blur(30px)" />
-				<ModalContent bg={'transparent'} bgGradient={'linear-gradient(-135deg, transparent 10px, bg1 0) '} shadow={'none'} rounded={0} maxH={"800px"} mx={2}>
+				<ModalContent bg={'transparent'} shadow={'none'} rounded={0} maxH={"800px"} mx={2}>
+					<Box className="containerBody">
+						<Box className="containerHeader">
 					<ModalHeader>Select a Token </ModalHeader>
 					<Box mx={5} mb={0}>
-						<Input bg={'blackAlpha.200'} size={'lg'} _focus={{border: 0, outline: 0}} focusBorderColor='secondary.100' rounded={0} placeholder="Search by Token Name or Address" onChange={(e) => searchToken(e.target.value)} />
+						<Input bg={'bg.600'} size={'lg'} _focus={{border: 0, outline: 0}} focusBorderColor='secondary.100' rounded={0} placeholder="Search by Token Name or Address" onChange={(e) => searchToken(e.target.value)} />
 					</Box>
 					<Box mx={5} mt={2} mb={4}>
 
 						<Flex align={'center'} >
 						{/* <Text mr={2} fontSize={'sm'} color={'whiteAlpha.700'}>Trending </Text> */}
-						<Box p={'3'} border={'1px'} borderColor={'whiteAlpha.300'} bg={'blackAlpha.200'}>
+						<Box p={'3'} border={'1px'} borderColor={'whiteAlpha.300'}>
 						<MdTrendingUp/>
 						</Box>
 							{POPULAR_TOKENS.map((token, index) => (
 								tokens.map((t: any, i: number) => (
 									t.symbol === token && (
-										<Box border={'1px'} borderColor={'whiteAlpha.300'} bg={'blackAlpha.400'} py={1} px={3} pr={4} _hover={{bg: 'blackAlpha.50'}} key={i}>
+										<Box border={'1px'} borderColor={'whiteAlpha.300'} bg={'bg.200'} py={1} px={3} pr={4} _hover={{bg: 'blackAlpha.50'}} key={i}>
 											<Button size={'sm'} fontWeight={'normal'} variant={'unstyled'} onClick={() => selectToken(i)}>
 												<Flex align={'center'}>
 												<Image src={`/icons/${t.symbol}.svg`} w={'22px'} alt="" />
@@ -122,7 +125,9 @@ function TokenSelector({
 					<Divider />
 
 					<ModalCloseButton rounded={'full'} mt={1} />
-					<ModalBody bg={'bg2'}>
+
+					</Box>
+					<ModalBody bg={'bg.600'} maxH={'55vh'}>
 
 						{/* Token List */}
 						<Box mx={-6} mt={-2}>
@@ -136,7 +141,7 @@ function TokenSelector({
 									py={3}
 									px={6}
 									_hover={{
-										bg: "whiteAlpha.50",
+										bg: "bg.400",
 										cursor: "pointer",
 									}}
 									onClick={() =>
@@ -189,26 +194,27 @@ function TokenSelector({
 										</Flex>
 									</Box>
 
-									<Box
+									{isConnected && <Box
 										borderColor={"gray.700"}
-										px={2}
+										pl={2}
 										textAlign="right"
 									>
 										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
 										<Text fontSize={"md"}>
 											{tokenFormatter.format((walletBalances[token.id] ?? 0) / 10 ** (token.decimals ?? 18))}
 										</Text>
-									</Box>
+									</Box>}
 								</Flex>
 								</Box>
 							)
 						)}
 						</Box>
 					</ModalBody>
-					<Flex roundedBottom={16} py={1} justify='space-between' px={4} fontSize='sm' >
+					<Flex className="containerFooter" roundedBottom={16} py={1} justify='space-between' px={4} fontSize='sm' >
 						<Text>{tokens.length} Tokens</Text>
 						<Text>Reax Token List</Text>
 					</Flex>
+					</Box>
 				</ModalContent>
 			</Modal>
 		</>

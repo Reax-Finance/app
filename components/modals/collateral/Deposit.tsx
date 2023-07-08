@@ -330,8 +330,8 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 
 	return (
 		<>
-			<Box bg={"bg2"} px={5} pt={5} pb={5}>
-				<Box mt={4}>
+			<Box px={5} pt={5} pb={5}>
+				<Box>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
 						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
@@ -420,34 +420,36 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 					</Tooltip>)
 					}
 
-				
-					{validate().stage <= 2 && <Button
+				<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
-						bg={"primary.400"}
-						colorScheme={'primary'}
 						color='white'
-						mt={2}
 						width="100%"
 						onClick={collateral.token.isPermit ? approve : approveTx}
 						size="lg"
 						rounded={0}
+						bg={'transparent'}
+						_hover={{ bg: "transparent" }}
 					>
 						{validate().message}
-					</Button>}
-					{validate().stage > 0 && <Button
+					</Button>
+					</Box>
+					}
+						
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "secondaryButton":'disabledSecondaryButton'}><Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
-						bg={"primary.400"}
-						colorScheme={'primary'}
 						width="100%"
 						color="white"
 						rounded={0}
-						mt={2}
+						bg={'transparent'}
 						onClick={deposit}
 						size="lg"
+						_hover={{ bg: "transparent" }}
+
 					>
 						{isConnected && !activeChain?.unsupported ? (
 							Big(amountNumber > 0 ? amount : amountNumber).gt(max()) ? (
@@ -458,7 +460,8 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 						) : (
 							<>Please connect your wallet</>
 						)}
-					</Button>}
+					</Button></Box>}
+					</Box>
 
 
 					{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}

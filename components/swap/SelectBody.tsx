@@ -8,9 +8,9 @@ export default function SelectBody({ asset, onOpen }: any) {
 			<Flex
 				justify={"space-between"}
 				align={"center"}
-                bgGradient={'linear(45deg, transparent 10px, #ffffff10 0) bottom left'}
+                bgGradient={'linear(45deg, transparent 10px, bg.200 0) bottom left'}
 				_hover={{
-					bgGradient: 'linear(45deg, transparent 10px, #ffffff15 0) bottom left',
+					bgGradient: 'linear(45deg, transparent 10px, bg.400 0) bottom left',
 				}}
 				px={2}
 				py={2}

@@ -134,13 +134,13 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 		} else {
 			return {
 				valid: true,
-				message: "Mint",
+				message: "Burn",
 			}
 		}
 	}
 
 	return (
-		<Box px={5} pb={5} pt={0.5} bg="bg2">
+		<Box px={5} pb={5} pt={0.5}>
 			<Box mt={6} rounded={8}>
 				<Tooltip
 					label={`Fee for Minting and Burning ${asset.token.symbol}`}
@@ -222,31 +222,24 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 					</Box>
 				</Box>
 
-				<Flex mt={2} justify="space-between"></Flex>
+				<Box mt={6} className="primaryButton">
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}
 					loadingText="Please sign the transaction"
-					bgColor="secondary.400"
+					bgColor="transparent"
 					width="100%"
 					color="white"
-					mt={4}
 					onClick={burn}
 					size="lg"
 					rounded={0}
 					_hover={{
-						opacity: "0.5",
+						bgColor: "transparent",
 					}}
 				>
 					{validate().message}
 				</Button>
-
-				<Response
-					response={response}
-					message={message}
-					hash={hash}
-					confirmed={confirmed}
-				/>
+				</Box>
 			</Box>
 		</Box>
 	);

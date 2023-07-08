@@ -42,7 +42,7 @@ export default function Supply({ market, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ borderColor: "primary.400", bg: "whiteAlpha.100" }}
+				_hover={{ borderColor: "primary.400", bg: "bg.400" }}
 			>
 				<TdBox
 					isFirst={index == 0}

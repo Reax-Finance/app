@@ -1,7 +1,9 @@
 import React from "react";
 import {
+	Box,
 	Divider,
 	Flex,
+	Heading,
 	Image,
 	Modal,
 	ModalBody,
@@ -19,7 +21,8 @@ export default function Withdraw({ pool, isOpen, onClose }: any) {
 	return (
 		<Modal isCentered isOpen={isOpen} onClose={onClose}>
 			<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
-			<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
+			<ModalContent width={"30rem"} bgColor="transparent" rounded={0} mx={2}>
+			<Box className='containerBody2'>
 				<ModalCloseButton rounded={"0"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
@@ -44,15 +47,16 @@ export default function Withdraw({ pool, isOpen, onClose }: any) {
 								);
 							})}
 						</Flex>
-						<Text>{pool.name}</Text>
+						<Heading fontSize={'22px'} fontWeight={'bold'}>{pool.symbol}</Heading>
 					</Flex>
 				</ModalHeader>
 				<ModalBody p={0}>
 					<Divider />
-					<Tabs size={"sm"} isFitted colorScheme="secondary">
+					<Tabs variant={'enclosed'} size={"sm"} isFitted colorScheme="secondary">
 						<TabList>
-							<Tab py={2}>Single Token</Tab>
-							<Tab>In Proportion</Tab>
+							<Tab border={0} py={2}>Single Token</Tab>
+							<Divider orientation="vertical" h={'40px'} />
+							<Tab border={0} py={2}>In Proportion</Tab>
 						</TabList>
 
 						<TabPanels>
@@ -65,6 +69,7 @@ export default function Withdraw({ pool, isOpen, onClose }: any) {
 						</TabPanels>
 					</Tabs>
 				</ModalBody>
+			</Box>
 			</ModalContent>
 		</Modal>
 	);

@@ -28,6 +28,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatLendingError } from "../../../src/errors";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
 
@@ -49,7 +50,9 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
-	const {walletBalances, addAllowance, nonces, allowances, updateBalance} = useBalanceData();
+	const {walletBalances, addAllowance, nonces, allowances, updateFromTx} = useBalanceData();
+
+	const handleError = useHandleError(PlatformType.LENDING);
 
 	// stage: 0: before approval, 1: approval pending, 2: after approval, 3: approval not needed
 	const validate = () => {
@@ -169,10 +172,10 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 		}
 		
 		tx.then(async (res: any) => {
-			await res.wait()
+			let response = await res.wait()
+			updateFromTx(response)
 			setAmount('0');
 			setConfirmed(true);
-
 			setLoading(false);
 			toast({
 				title: "Repayment Successful!",
@@ -194,35 +197,7 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 			});
 		})
 		.catch((err: any) => {
-			console.log(err);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else if(formatLendingError(err)){
-				toast({
-					title: "Transaction Failed",
-					description: formatLendingError(err),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
 			setLoading(false);
 		});
 	};
@@ -239,32 +214,14 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 			]
 		)
 		.then(async (res: any) => {
-			const response = await res.wait(1);
-			const decodedLogs = response.logs.map((log: any) =>
-				{
-					try {
-						return collateralContract.interface.parseLog(log)
-					} catch (e) {
-						console.log(e)
-					}
-				}
-			);
-			console.log("decodedLogs", decodedLogs);
-			let log: any = {};
-			for(let i in decodedLogs){
-				if(decodedLogs[i]){
-					if(decodedLogs[i].name == "Approval"){
-						log = decodedLogs[i];
-					}
-				}
-			}
-			addAllowance(market.inputToken.id, market.protocol._lendingPoolAddress, log.args[2].toString());
+			const response = await res.wait();
+			updateFromTx(response);
 			setApproveLoading(false);
 			toast({
 				title: "Approval Successful",
 				description: <Box>
 					<Text>
-				{`You have approved ${Big(log.args[2].toString()).div(10**market.inputToken.decimals).toString()} ${market.inputToken.symbol}`}
+				{`You have approved ${market.inputToken.symbol}`}
 					</Text>
 				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 					<Flex align={'center'} gap={2}>
@@ -279,26 +236,8 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 				position: "top-right"
 			})
 		}).catch((err: any) => {
-			console.log(err);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
+			setApproveLoading(false);
 		})
 	}
 
@@ -342,9 +281,6 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 						<Text>
 							{`for ${_amount} ${market.inputToken.symbol}`}
 						</Text>
-						<Text>
-							Please deposit to continue
-						</Text>
 					</Box>,
 					status: "info",
 					duration: 10000,
@@ -353,26 +289,7 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 				})
 			})
 			.catch((err: any) => {
-				console.log("err", JSON.stringify(err));
-				if(err?.cause?.reason == "user rejected signing"){
-					toast({
-						title: "Signature Rejected",
-						description: "You have rejected the signature",
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				} else {
-					toast({
-						title: "Transaction Failed",
-						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				}
+				handleError(err);
 				setApproveLoading(false);
 			});
 	};
@@ -380,9 +297,9 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 	const { isConnected } = useAccount();
 
 	return (
-		<Box px={5} pb={5} pt={0.5} bg='bg2'>
+		<Box px={5} pb={5} pt={0.5}>
 
-<Box mt={6}>
+			<Box mt={6}>
 				<Flex align={'center'} justify={'space-between'} gap={'50'}>
 					<Text color="whiteAlpha.600">Interest Rate</Text>
 					<Select borderColor={'whiteAlpha.200'} maxW={'50%'} rounded={0} value={debtType} onChange={(e) => setDebtType(e.target.value) }>
@@ -416,53 +333,46 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 						</Box>
 					</Box>
 
-					<Box pt={2}></Box>
-
-						{(validate().stage == 1|| validate().stage == 0) ? <Button
+					<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "primaryButton":'disabledPrimaryButton'}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
-						colorScheme={'primary'}
-						bg={"primary.400"}
 						color='white'
-						mt={2}
 						width="100%"
-						onClick={market.inputToken.isPermit ? approve : approveTx}
+						onClick={approve}
 						size="lg"
 						rounded={0}
-						leftIcon={
-							validate().stage ==1 ? <Tooltip label='
-								Approve tokens to be used by the protocol.
-							'>
-							<InfoOutlineIcon/>
-							</Tooltip> : <></>
-						}
+						bg={'transparent'}
+						_hover={{ bg: "transparent" }}
 					>
 						{validate().message}
-					</Button> : <Button
-						isDisabled={validate().stage == 1}
+					</Button>
+					</Box>}
+						
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "primaryButton":'disabledPrimaryButton'} > <Button
+						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
-						bgColor={validate().stage == 1 ? "primary.400" : "primary.400"}
 						width="100%"
 						color="white"
 						rounded={0}
-						mt={2}
+						bg={'transparent'}
 						onClick={repay}
 						size="lg"
+						_hover={{ bg: "transparent" }}
 					>
 						{isConnected && !chain?.unsupported ? (
 							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
 								<>Insufficient Wallet Balance</>
-							) : !amount || amountNumber == 0 ? (
-								<>Enter Amount</>
 							) : (
 								<>Repay</>
 							)
 						) : (
 							<>Please connect your wallet</>
 						)}
-					</Button>}
+					</Button></Box>}
+				</Box>
 
 						<Response
 							response={response}

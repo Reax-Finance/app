@@ -68,6 +68,7 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	const max = () => {
 		if (tabSelected == 0) {
+			console.log(isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]);
 			return Big((isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]) ?? 0)
 				.div(10 ** collateral.token.decimals)
 				.toString();
@@ -97,7 +98,7 @@ export default function CollateralModal({ collateral, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ borderColor: "primary.400", bg: "whiteAlpha.100" }}
+				_hover={{ borderColor: "primary.400", bg: "bg.400" }}
 			>
 				<TdBox
 					isFirst={index == 0}
@@ -143,10 +144,11 @@ export default function CollateralModal({ collateral, index }: any) {
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
 				<ModalContent
 					width={"30rem"}
-					bgColor="bg1"
+					bgColor="transparent" shadow={'none'}
 					rounded={0}
 					mx={2}
 				>
+					<Box className="containerBody2">
 					<ModalCloseButton rounded={"full"} mt={1} />
 					<ModalHeader>
 						<Flex
@@ -170,7 +172,7 @@ export default function CollateralModal({ collateral, index }: any) {
 					</ModalHeader>
 					<ModalBody m={0} p={0}>
 						<Divider />
-						<Box mb={6} mt={4} px={8}>
+						<Box bg={'bg.600'} pb={12} pt={4} px={8}>
 							{collateral.token.id ==
 								WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 								<>
@@ -186,12 +188,12 @@ export default function CollateralModal({ collateral, index }: any) {
 										size="sm"
 									>
 										<TabList>
-											<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
+											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
 											<Tab>
 												MNT
 											</Tab>
 											</Box>
-											<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
+											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
 											<Tab>
 												WMNT
 											</Tab>
@@ -268,8 +270,9 @@ export default function CollateralModal({ collateral, index }: any) {
 									</InputGroup>
 							
 						</Box>
-
-						<Tabs onChange={selectTab}>
+						<Divider />
+						<Box className="containerFooter">
+						<Tabs variant={'enclosed'} onChange={selectTab}>
 							<TabList>
 								<Tab
 									w={"50%"}
@@ -277,15 +280,20 @@ export default function CollateralModal({ collateral, index }: any) {
 										color: "primary.400",
 										borderColor: "primary.400",
 									}}
+									rounded={0}
+									border={0}
 								>
 									Deposit
 								</Tab>
+								<Divider orientation="vertical" h={'40px'} />
 								<Tab
 									w={"50%"}
 									_selected={{
 										color: "secondary.400",
 										borderColor: "secondary.400",
 									}}
+									rounded={0}
+									border={0}
 								>
 									Withdraw
 								</Tab>
@@ -311,7 +319,9 @@ export default function CollateralModal({ collateral, index }: any) {
 								</TabPanel>
 							</TabPanels>
 						</Tabs>
+						</Box>
 					</ModalBody>
+					</Box>
 				</ModalContent>
 			</Modal>
 		</>

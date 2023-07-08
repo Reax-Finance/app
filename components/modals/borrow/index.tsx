@@ -44,7 +44,7 @@ export default function Debt({ market, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				_hover={{ bg: 'whiteAlpha.100' }}
+				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
 					<MarketInfo token={market.inputToken} />

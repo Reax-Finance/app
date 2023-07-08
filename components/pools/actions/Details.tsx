@@ -1,8 +1,9 @@
-import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider } from '@chakra-ui/react'
+import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider, IconButton } from '@chakra-ui/react'
 import React from 'react'
 import { dollarFormatter, tokenFormatter } from '../../../src/const';
 import Big from 'big.js';
 import { usePriceData } from '../../context/PriceContext';
+import { CloseIcon } from '@chakra-ui/icons';
 
 export default function Details({pool, isOpen, onClose}: any) {
 	
@@ -15,49 +16,54 @@ export default function Details({pool, isOpen, onClose}: any) {
   	return (
     <>
     <Modal
-				isCentered
-				isOpen={isOpen}
-				onClose={onClose}
-			>
-				<ModalOverlay />
-				<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
-					<ModalCloseButton rounded={"0"} mt={1} />
-					<ModalHeader>
-						<Flex
-							justify={"center"}
-							gap={2}
-							pt={1}
-							align={"center"}
-						>
-							<Flex ml={-4}>
-								{pool.tokens.map(
-									(token: any, index: number) => {
-										return (
-											pool.address !== token.token.id && (
-												<Flex
-													ml={"-2"}
-													key={index}
-													align="center"
-													gap={2}
-												>
-													<Image
-														rounded={"full"}
-														src={`/icons/${token.token.symbol}.svg`}
-														alt=""
-														width={"30px"}
-													/>
-												</Flex>
-											)
-										);
-									}
-								)}
-							</Flex>
-							<Text>{pool.name}</Text>
-						</Flex>
-					</ModalHeader>
+		isCentered
+		isOpen={isOpen}
+		onClose={onClose}
+	>
+		<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
+		<ModalContent width={"30rem"} bgColor="transparent" shadow={0} rounded={0} mx={2}>
+			<ModalCloseButton variant={'ghost'} rounded={"0"} mt={1} />
+			<Box className='containerBody2'>
+			<ModalHeader>
+				<Flex justify={'space-between'}>
+				<Flex
+					justify={"start"}
+					gap={2}
+					pt={1}
+					px={4}
+					align={"center"}
+				>
+					<Flex ml={-4}>
+						{pool.tokens.map(
+							(token: any, index: number) => {
+								return (
+									pool.address !== token.token.id && (
+										<Flex
+											ml={"-2"}
+											key={index}
+											align="center"
+											gap={2}
+										>
+											<Image
+												rounded={"full"}
+												src={`/icons/${token.token.symbol}.svg`}
+												alt=""
+												width={"30px"}
+											/>
+										</Flex>
+									)
+								);
+							}
+						)}
+					</Flex>
+					<Text>{pool.name}</Text>
+				</Flex>
+				</Flex>
+			</ModalHeader>
     <ModalBody p={0}>
         {/* {JSON.stringify(pool)} */}
 		<Divider />
+		<Box bg={'bg.600'}>
 		<Flex>
 		<Box mx={4} my={4}>
 			<Text mt={2} mb={2}>Total Value Locked</Text>
@@ -125,7 +131,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 
 		<Divider />
 
-		<Box mx={4} my={4}>
+		<Box mx={4} my={0}>
 			<Heading size={'md'} mt={2} mb={4}>Pool Composition</Heading>
 			<Flex gap={2} flexDir={'column'}>
 			{pool.tokens.map((token: any, index: number) => {
@@ -146,7 +152,10 @@ export default function Details({pool, isOpen, onClose}: any) {
 			})}
 			</Flex>
 		</Box>
+		</Box>
+		<Box className='containerFooter2' h={6}></Box>
     </ModalBody>
+	</Box>
     </ModalContent>
     </Modal>
     </>

@@ -22,8 +22,8 @@ import ThBox from '../dashboard/ThBox';
 export default function Pools() {
     const { pools } = useDexData();
     return (
-      <Box className='positionTable'>
-        <Box className='cutoutcornersboxright'>
+      <Box className='containerBody'>
+        <Box className='containerHeader'>
           <Flex align={'center'} p={4} px={5} gap={4}>
             <Heading fontSize={'18px'} color={'secondary.400'}>All Pools</Heading>
           </Flex>

@@ -126,7 +126,7 @@ export default function Faucet() {
                 Note: This is a testnet faucet. These tokens are not real and have no value.
             </Text>
 
-			<TableContainer px={4} pb={4} className="tableStyle" rounded={0}>
+			<TableContainer px={4} pb={4} className="containerBody" rounded={0}>
 				<Table variant="simple">
 					<Thead>
 						<Tr>
@@ -168,7 +168,7 @@ export default function Faucet() {
                                 <TdBox style={index == tokens.length - 1 ? {border: 0} : {}}>{mintAmounts[token.symbol]}</TdBox>
                                 <TdBox style={index == tokens.length - 1 ? {border: 0} : {}} isNumeric>
                                 <Flex justify={'end'}>
-                                    <Box className="mainButton">
+                                    <Box className="primaryButton">
                                         <Button
                                             onClick={() => _onOpen(token)}
                                             color={"white"}
@@ -189,7 +189,8 @@ export default function Faucet() {
 
             {openedCollateral && <Modal isOpen={isOpen} onClose={onClose} isCentered>
             <ModalOverlay />
-            <ModalContent rounded={0} bg={'bg1'} width={'400px'}>
+            <ModalContent rounded={0} bg={'transparent'} shadow={0} width={'400px'}>
+                <Box className="containerBody2">
             <ModalHeader>{openedCollateral.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody >
@@ -207,16 +208,17 @@ export default function Faucet() {
             </ModalBody>
 
             <ModalFooter justifyContent={'center'}>
-            <Box w={'100%'} className="swapButton">
+            <Box w={'100%'} className="primaryButton">
 
                 <Button w={'100%'} isDisabled={!validate().valid} color={"white"}
-								size={"md"} 
+								size={"lg"} 
 								bg={'transparent'} 
 								_hover={{bg: 'transparent'}} loadingText="Minting" isLoading={loading} mb={0} rounded={0} onClick={mint}>
                     {validate().message}
                 </Button>
                 </Box>
             </ModalFooter>
+            </Box>
             </ModalContent>
         </Modal>}
 

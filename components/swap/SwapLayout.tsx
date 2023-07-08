@@ -85,7 +85,7 @@ export default function SwapLayout({
   return (
     <>
         <Box>
-            <Box p={5}>
+            <Box className="containerHeader" p={5}>
                 <Flex align={'center'} justify={'space-between'}>
                     <Box>
                         <Heading size={'md'}>Trade</Heading>
@@ -100,7 +100,7 @@ export default function SwapLayout({
             </Box>
 
             {/* Input */}
-            <Box px="5" bg={'blackAlpha.400'} pb={12} pt={10}>
+            <Box px="5" bg={'bg.600'} pb={12} pt={10}>
                 <Flex align="center" justify={"space-between"}>
                     <InputGroup width={"70%"}>
                         <NumberInput
@@ -162,7 +162,7 @@ export default function SwapLayout({
 
             {/* Switch */}
             <Flex px="5" my={-4} align='center'>
-                <Divider w={'10px'} border='1px' borderColor={'whiteAlpha.300'} />
+                <Divider w={'10px'} border='1px' borderColor={'bg.200'} />
                 <Button
                     _hover={{ bg: "whiteAlpha.50" }}
                     rounded={'0'}
@@ -172,7 +172,7 @@ export default function SwapLayout({
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    bg={'whiteAlpha.300'}
+                    bg={'bg.200'}
                     transform={"rotate(45deg)"}
                     mx={1.5}
                 >
@@ -180,11 +180,11 @@ export default function SwapLayout({
                     <MdOutlineSwapVert size={"20px"} />
                     </Box>
                 </Button>
-                <Divider border='1px' borderColor={'whiteAlpha.300'} />
+                <Divider border='1px' borderColor={'bg.200'} />
             </Flex>
 
             {/* Output */}
-            <Box px="5" pt={10} pb={14} bg={'blackAlpha.400'}>
+            <Box px="5" pt={10} pb={14} bg={'bg.600'}>
                 <Flex align="center" justify={"space-between"}>
                     <InputGroup width={"70%"}>
                         <NumberInput
@@ -240,7 +240,7 @@ export default function SwapLayout({
                 </Flex>
             </Box>
 
-            <Box px="5">
+            <Box px="5" pb={'1px'} pt={'1px'} className="containerFooter">
 
 
             {valid && <Box pb={10} mt={5}>

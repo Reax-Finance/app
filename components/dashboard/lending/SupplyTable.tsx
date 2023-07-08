@@ -47,7 +47,7 @@ export default function CollateralTable() {
 
 	return (
 		<Box >
-			<Box className="cutoutcornersboxright" px={5} py={5}>
+			<Box className="containerHeader" px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Assets to Supply</Heading>
 			</Box>
 
