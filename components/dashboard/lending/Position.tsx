@@ -27,7 +27,7 @@ export default function LendingPosition() {
         {Big(pos?.collateral).gt(0) ? <Box
             w='100%'
             display={{ sm: "block", md: "block" }}
-            className='containerBody'
+            className='halfContainerBody'
         >
             <Flex align={'center'} justify={'space-between'} px={5} py={4} className='containerHeader'>
                 <Heading fontSize={'18px'}>

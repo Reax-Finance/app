@@ -88,7 +88,9 @@ export default function Index({ children }: any) {
 				</Text>
 			)}
 			</Box>
-			<Box bgGradient={'linear(to-b, #090B0F, #090B0F)'} zIndex={0}>
+			{/* <Box bgGradient={'linear(to-b, #090B0F, #090B0F)'} zIndex={0}> */}
+			<Box bgGradient={'linear(to-b, blackAlpha.500, blackAlpha.800)'} zIndex={0}>
+
 				<Flex
 					justify={'center'}
 					flexDirection={{ sm: 'column', md: 'row' }}
