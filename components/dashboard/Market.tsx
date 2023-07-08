@@ -14,44 +14,75 @@ import APRInfo from "../infos/APRInfo";
 import { TokenContext } from "../context/TokenContext";
 import { useAccount, useNetwork } from "wagmi";
 import { getContract } from "../../src/contract";
+import { usePriceData } from "../context/PriceContext";
+import { useSyntheticsData } from "../context/SyntheticsPosition";
 
 export default function Market() {
 	const { pools, tradingPool, account } = useAppData();
+	const { poolDebt, position } = useSyntheticsData();
     const [totalDebt, setTotalDebt] = useState<any>('0.00');
     const [totalCollateral, setTotalCollateral] = useState<any>('0.00');
+	const { prices } = usePriceData();
 
     useEffect(() => {
         if(!pools?.[tradingPool]) return;
         let _totalDebt = Big(0);
         for(let i in pools[tradingPool].synths){
-            _totalDebt = _totalDebt.plus(Big(pools[tradingPool].synths[i].totalSupply).div(10**18).mul(pools[tradingPool].synths[i].priceUSD));
+            _totalDebt = _totalDebt.plus(Big(pools[tradingPool].synths[i].totalSupply).div(10**18).mul(prices[pools[tradingPool].synths[i].token.id] ?? 0));
         }
         setTotalDebt(_totalDebt.toFixed(2));
 
         let _totalCollateral = Big(0);
         for(let i in pools[tradingPool].collaterals){
-            _totalCollateral = _totalCollateral.plus(Big(pools[tradingPool].collaterals[i].totalDeposits).div(10**pools[tradingPool].collaterals[i].token.decimals).mul(pools[tradingPool].collaterals[i].priceUSD));
+            _totalCollateral = _totalCollateral.plus(Big(pools[tradingPool].collaterals[i].totalDeposits).div(10**pools[tradingPool].collaterals[i].token.decimals).mul(prices[pools[tradingPool].collaterals[i].token.id] ?? 0));
         }
         setTotalCollateral(_totalCollateral.toFixed(2));
-    }, [pools, tradingPool])
+    }, [pools, tradingPool, prices])
 
 	const esSyxApr = () => {
 		if (!pools[tradingPool]) return "0";
-		if (Big(pools[tradingPool]?.totalDebtUSD).eq(0)) return "0";
+		const totalDebt = poolDebt();
+		if (Big(totalDebt).eq(0)) return "0";
 		return Big(pools[tradingPool]?.rewardSpeeds[0])
 			.div(1e18)
 			.mul(365 * 24 * 60 * 60 * ESYX_PRICE)
-			.div(pools[tradingPool]?.totalDebtUSD)
+			.div(totalDebt)
 			.mul(100)
 			.toFixed(2);
 	};
 
+
 	const debtBurnApr = () => {
-		if (!pools[tradingPool]) return "0";
-		if (Big(pools[tradingPool]?.totalDebtUSD).eq(0)) return "0";
-		return Big(pools[tradingPool]?.averageDailyBurn ?? 0)
+		const pool = pools[tradingPool];
+		if (!pool) return "0";
+		const totalDebt = poolDebt();
+		if (Big(totalDebt).eq(0)) return "0";
+		// average burn and revenue
+		let averageDailyBurn = Big(0);
+		let averageDailyRevenue = Big(0);
+		for(let k = 0; k < pool.synths.length; k++) {
+			for(let l = 0; l <pool.synths[k].synthDayData.length; l++) {
+				let synthDayData = pool.synths[k].synthDayData[l];
+				// synthDayData.dailyMinted / 1e18 * pool.synths[k].mintFee / 10000 * pool.synths[k].priceUSD
+				let totalFee = Big(synthDayData.dailyMinted).div(1e18).mul(pool.synths[k].mintFee).div(10000).mul(prices[pool.synths[k].token.id]);
+				// add burn fee
+				totalFee = totalFee.plus(Big(synthDayData.dailyBurned).div(1e18).mul(pool.synths[k].burnFee).div(10000).mul(prices[pool.synths[k].token.id]));
+
+				// add to average
+				averageDailyBurn = averageDailyBurn.plus(
+					totalFee.mul(pool.issuerAlloc).div(10000)
+				);
+				averageDailyRevenue = averageDailyRevenue.plus(
+					totalFee.mul(10000 - pool.issuerAlloc).div(10000)
+				);
+			}
+		}
+		// pool.averageDailyBurn = averageDailyBurn.div(7).toString();
+		// pool.averageDailyRevenue = averageDailyRevenue.div(7).toString();
+		return averageDailyBurn
+			.div(7)
 			.mul(365)
-			.div(pools[tradingPool]?.totalDebtUSD)
+			.div(totalDebt)
 			.mul(100)
 			.toFixed(2);
 	};
@@ -137,20 +168,19 @@ export default function Market() {
 			>
 				<Box>
 					<PoolSelector />
-
-					<Flex mt={7} mb={4} gap={10}>
+					<Flex mt={8} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>
 								Total Supply
 							</Heading>
-							<Heading size={"sm"}>$ {totalCollateral}</Heading>
+							<Heading size={"sm"}>{dollarFormatter.format(totalCollateral ?? 0)}</Heading>
 						</Flex>
 
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"secondary.400"}>
 								Total Debt
 							</Heading>
-							<Heading size={"sm"}>$ {totalDebt}</Heading>
+							<Heading size={"sm"}>{dollarFormatter.format(totalDebt ?? 0)}</Heading>
 						</Flex>
 
 						<Flex gap={2}>
@@ -164,8 +194,8 @@ export default function Market() {
 								<Box cursor={"help"}>
 									<Heading size={"sm"}>
 										{(
-											Number(debtBurnApr()) +
-											Number(esSyxApr())
+											Number(debtBurnApr())
+											// + Number(esSyxApr())
 										).toFixed(2)}
 										%
 									</Heading>
@@ -175,7 +205,7 @@ export default function Market() {
 					</Flex>
 				</Box>
 
-				{
+				{/* {
 					(pools[tradingPool]
 					?.userDebt > 0 || synAccrued > 0) &&
 					<Box textAlign={"right"}>
@@ -205,7 +235,7 @@ export default function Market() {
 						</Button>
 						</Box>
 					</Box>
-				</Box>}
+				</Box>} */}
 			</Box>
 		</>
 	);

@@ -6,6 +6,7 @@ import {
 	Collapse,
 	IconButton,
 	Heading,
+	Divider,
 } from "@chakra-ui/react";
 import AccountButton from '../ConnectButton'; 
 import React, { useEffect, useState } from "react";
@@ -19,14 +20,19 @@ import { TokenContext } from "../context/TokenContext";
 import { motion } from "framer-motion";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
-import DAOMenu from "./DAOMenu";
-import NavExternalLink from "./NavExternalLink";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Status } from "../utils/status";
+import { useLendingData } from "../context/LendingDataProvider";
+import { CustomConnectButton } from "./ConnectButton";
+import { useDexData } from "../context/DexDataProvider";
 
 function NavBar() {
 	const router = useRouter();
-	const { status, account, fetchData, setRefresh, refresh } = useContext(AppDataContext);
+	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
+	const { fetchData: fetchLendingData } = useLendingData()
+	const { fetchData: fetchDexData } = useDexData();
+
 
 	const { chain, chains } = useNetwork();
 	const [init, setInit] = useState(false);
@@ -41,29 +47,17 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
-			console.log("onConnect");
-			console.log(chain);
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
-			fetchData(address!)
-			.then((_) => {
-				for(let i in refresh){
-					clearInterval(refresh[i]);
-				}
-				setRefresh([]);
-			})
+			fetchData(address!);
+			fetchLendingData(address!);
+			fetchDexData(address!);
 			fetchTokenData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
 			console.log("onDisconnect");
-			fetchData(null)
-			.then((_) => {
-				for(let i in refresh){
-					clearInterval(refresh[i]);
-				}
-				setRefresh([]);
-			})
+			window.location.reload();
 		},
 	});
 
@@ -92,13 +86,16 @@ function NavBar() {
 		}
 		if (
 			(!(isConnected && !isConnecting) || chain?.unsupported) &&
-			status !== "fetching" &&
+			status !== Status.FETCHING &&
 			!init
 		) {
 			setInit(true);
-			fetchData(null);
+			fetchData();
+			fetchLendingData();
+			fetchDexData();
+			fetchTokenData();
 		}
-	}, [activeConnector, address, chain?.unsupported, chains, fetchData, init, isConnected, isConnecting, isSubscribed, refresh, setRefresh, status]);
+	}, [activeConnector, address, chain?.unsupported, chains, fetchData, init, isConnected, isConnecting, isSubscribed, status]);
 
 
 	const [isOpen, setIsOpen] = React.useState(false);
@@ -113,46 +110,59 @@ function NavBar() {
 	});
 
 	return (
-		<Flex justify={'center'} align='center' >
-			<Flex alignItems={"center"} justify="space-between" h={"100px"} minW='0' w={'100%'} maxW='1250px'>
-				<Flex justify="space-between" align={"center"} gap={10} mt={2} w='100%'>
-					<Flex gap={10} align='center' cursor="pointer">
+		<>
+		<Flex justify={'center'} zIndex={0} mt={2} align='center' >
+			<Box minW='0' w={'100%'} maxW='1250px'>
+			<Flex align={"center"} justify="space-between" >
+				<Flex justify="space-between" align={"center"} w='100%'>
+					<Flex gap={10} align='center'>
 						<Image
-							onClick={() => {
-								router.push(
-									{
-										pathname: '/',
-										query: router.query
-									}
-								);
-							}}
-							src={"/logo.svg"}
+							// src={"/logo.svg"}
+							src={"/logo-square.svg"}
 							alt=""
-							width="75px"
+							width="26px"
+							// width={'76px'}
+							mb={0.5}
 						/>
 						<Flex
-						
-						gap={2}
-						align="center"
-						display={{ sm: "none", md: "flex" }}
-					>
-						<NavLocalLink
-							path={"/"}
-							title={"Dashboard"}
-						></NavLocalLink>
-						<NavLocalLink
-							path={"/swap"}
-							title="Swap"
-						></NavLocalLink>
-						{/* <NavLocalLink
-							path={"/claim"}
-							title="Claim"
-						></NavLocalLink> */}
-						{/* <NavLocalLink
-							path={"/earn"}
-							title="Earn"
-						></NavLocalLink> */}
-					</Flex>
+							align="center"
+							display={{ sm: "none", md: "flex" }}
+							gap={2}
+						>
+							<NavLocalLink
+								path={"/"}
+								title="Trade"
+							></NavLocalLink>
+							<NavLocalLink
+								path={"/perps"}
+								title="Perpetuals"
+							></NavLocalLink>
+							
+							<NavLocalLink
+								path={"/synthetics"}
+								title={"Synths"}
+							></NavLocalLink>
+							<NavLocalLink
+								path={"/lend"}
+								title="Lend"
+							></NavLocalLink>
+							<NavLocalLink
+								path={"/pools"}
+								title="Pools"
+							></NavLocalLink>
+							{/* <NavLocalLink
+								path={"/pools"}
+								title="Pools"
+							></NavLocalLink> */}
+							{/* <NavLocalLink
+								path={"/claim"}
+								title="Claim"
+							></NavLocalLink> */}
+							{/* <NavLocalLink
+								path={"/earn"}
+								title="Earn"
+							></NavLocalLink> */}
+						</Flex>
 					</Flex>
 					
 					<Flex display={{sm: 'flex', md: 'none'}}>
@@ -206,18 +216,27 @@ function NavBar() {
 				{/* <NavExternalLink path={'https://synthex.finance/intro/quick-start'} title={'Docs'}></NavExternalLink> */}
 
 				{/* <DAOMenu /> */}
+					{isConnected && <NavLocalLink
+								path={"/faucet"}
+								title="Faucet"></NavLocalLink>}
 					<Box>
 						<AccountButton />
 					</Box>
-					{(isConnected && !chain?.unsupported) && <Box>
-						<ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} />
+					{<Box>
+						{/* <CustomConnectButton accountStatus="address" chainStatus="icon" showBalance={false} /> */}
+						<CustomConnectButton />
+
 					</Box>}
 				</Flex>
 			</Flex>
+			<Divider/>
+			</Box>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
 			</Collapse>
+
 		</Flex>
+		</>
 	);
 }
 

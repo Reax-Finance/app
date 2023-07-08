@@ -8,9 +8,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
-import Particles from '../components/utils/particles';
+import { Status } from '../components/utils/status';
 
-export default function _index({ children }: any) {
+export default function Index({ children }: any) {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [refresh, setRefresh] = useState(0);
@@ -74,10 +74,10 @@ export default function _index({ children }: any) {
 					This is a testnet. Please do not send real assets to these addresses
 				</Text>
 			</Flex>} */}
-			{(status == 'fetching' || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
+			{(status == Status.FETCHING || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
 
 			<Box bgColor="gray.800" color={'gray.400'}>
-			{status == 'error' && (
+			{status == Status.ERROR && (
 				<Text
 					textAlign={'center'}
 					width="100%"
@@ -88,7 +88,9 @@ export default function _index({ children }: any) {
 				</Text>
 			)}
 			</Box>
+			{/* <Box bgGradient={'linear(to-b, #090B0F, #090B0F)'} zIndex={0}> */}
 			<Box bgGradient={'linear(to-b, blackAlpha.500, blackAlpha.800)'} zIndex={0}>
+
 				<Flex
 					justify={'center'}
 					flexDirection={{ sm: 'column', md: 'row' }}
@@ -105,7 +107,9 @@ export default function _index({ children }: any) {
 							exit={{opacity: 0, y: 15}}
 							transition={{duration: 0.25}}
 						>
+							<Box zIndex={1}>
 							{children}
+							</Box>
 						</motion.div>
 						</Box>
 

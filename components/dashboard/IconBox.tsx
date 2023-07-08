@@ -5,8 +5,8 @@ export default function IconBox({ children }: any) {
 		<Flex
 			align={"center"}
 			justify="center"
-			h={"40px"}
-			w={"40px"}
+			h={"30px"}
+			w={"30px"}
 			bg="whiteAlpha.200"
 			rounded={0}
 		>

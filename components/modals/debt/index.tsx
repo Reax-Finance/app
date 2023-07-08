@@ -37,17 +37,26 @@ import Burn from "./burn";
 import Big from "big.js";
 import { useAccount } from "wagmi";
 import TdBox from "../../dashboard/TdBox";
+import { useBalanceData } from "../../context/BalanceProvider";
+import { usePriceData } from "../../context/PriceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
+import { formatInput, parseInput } from "../../utils/number";
+import TokenInfo from "../_utils/TokenInfo";
 
 export default function Debt({ synth, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
-	const { pools, tradingPool, account } = useContext(AppDataContext);
 
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [tabSelected, setTabSelected] = useState(0);
 
 	const { address } = useAccount();
+
+	const { walletBalances } = useBalanceData();
+
+	const { prices } = usePriceData();
+	const { position } = useSyntheticsData();
+	const pos = position();
 
 	const _onClose = () => {
 		setAmount("");
@@ -56,7 +65,7 @@ export default function Debt({ synth, index }: any) {
 	};
 
 	const _setAmount = (e: string) => {
-		if(Number(e) > 0 && Number(e) < 0.000001) e = '0';
+		e = parseInput(e);
 		setAmount(e);
 		setAmountNumber(isNaN(Number(e)) ? 0 : Number(e));
 	};
@@ -67,10 +76,22 @@ export default function Debt({ synth, index }: any) {
 
 	const max = () => {
 		if(!address) return '0';
+		if(!prices[synth.token.id] || prices[synth.token.id] == 0) return '0';
 		if (tabSelected == 0) {
-			return (Big(pools[tradingPool].adjustedCollateral).sub(pools[tradingPool].userDebt).div(synth.priceUSD).gt(0) ? Big(pools[tradingPool].adjustedCollateral).sub(pools[tradingPool].userDebt).div(synth.priceUSD) : 0).toString();
+			return (
+				Big(pos.adjustedCollateral)
+					.sub(pos.debt)
+					.div(prices[synth.token.id] ?? 0)
+					.gt(0)
+					? Big(pos.adjustedCollateral)
+							.sub(pos.debt)
+							.div(prices[synth.token.id] ?? 0)
+					: 0
+			).toString();
 		} else {
-			return (Big(pools[tradingPool].userDebt).div(synth.priceUSD).gt(Big(synth.walletBalance ?? 0).div(10 ** 18)) ? Big(synth.walletBalance ?? 0).div(10 ** 18) : Big(pools[tradingPool].userDebt).div(synth.priceUSD)).toString()
+			const v1 = Big(pos.debt ?? 0).div(prices[synth.token.id] ?? 0);
+			const v2 = Big(walletBalances[synth.token.id] ?? 0).div(10 ** 18);
+			return (v1.gt(v2) ? v2 : v1).toString();
 		}
 	};
 
@@ -83,7 +104,7 @@ export default function Debt({ synth, index }: any) {
                 address: synth.token.id, // The address that the token is at.
                 symbol: synth.token.symbol, // A ticker symbol or shorthand, up to 5 chars.
                 decimals: synth.token.decimals, // The number of decimals in the token
-                image: 'https://app.synthex.finance/icons/'+synth.token.symbol+'.svg', // A string url of the token logo
+                image: process.env.NEXT_PUBLIC_VERCEL_URL + '/icons/'+synth.token.symbol+'.svg', // A string url of the token logo
               },
             }
         });
@@ -94,43 +115,18 @@ export default function Debt({ synth, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				_hover={{ bg: 'whiteAlpha.100' }}
+				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<Flex gap={3} ml={'-2px'} textAlign='left'>
-						<Image
-							src={`/icons/${synth.token.symbol}.svg`}
-							width="38px"
-							alt=""
-						/>
-						<Box>
-							<Text color={'white'}>
-								{synth.token.name
-									.split(" ")
-									.slice(1, -2)
-									.join(" ")}
-							</Text>
-							<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-								<Text>
-									{synth.token.symbol} -{" "}
-									{tokenFormatter.format(
-										Big(synth.walletBalance ?? 0)
-											.div(10 ** synth.token.decimals)
-											.toNumber()
-									)}{" "}
-									in wallet
-								</Text>
-							</Flex>
-						</Box>
-					</Flex>
+					<TokenInfo token={synth.token} />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
-					$ {tokenFormatter.format(synth.priceUSD)}
+					$ {tokenFormatter.format(prices[synth.token.id] ?? 0)}
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					{dollarFormatter.format(
 						Big(synth.synthDayData[0]?.dailyMinted ?? 0).add(synth.synthDayData[0]?.dailyBurned ?? 0)
-							.mul(synth.priceUSD)
+							.mul(prices[synth.token.id] ?? 0)
                             .div(10**18)
 							.toNumber()
 					)}
@@ -139,7 +135,7 @@ export default function Debt({ synth, index }: any) {
 					<Text>
 					{dollarFormatter.format(
 						Big(synth.totalSupply)
-						.mul(synth.priceUSD)
+						.mul(prices[synth.token.id] ?? 0)
 						.div(10**18)
 						.toNumber()
 						)}
@@ -149,7 +145,8 @@ export default function Debt({ synth, index }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<ModalContent width={"30rem"} bgColor="bg1" rounded={0} mx={2}>
+				<ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
+					<Box className="containerBody2">
 					<ModalCloseButton rounded={"full"} mt={1} />
 					<ModalHeader>
 						<Flex
@@ -161,7 +158,7 @@ export default function Debt({ synth, index }: any) {
 							<Image
 								src={`/icons/${synth.token.symbol}.svg`}
 								alt=""
-								width={"38px"}
+								width={"32px"}
 							/>
 
 							<Text>{synth.token.name.split(" ").slice(1, -2).join(" ")}</Text>
@@ -184,7 +181,7 @@ export default function Debt({ synth, index }: any) {
 					</ModalHeader>
 					<ModalBody m={0} p={0}>
 						<Divider />
-						<Box mb={6} mt={4} px={8}>
+						<Box bg={'bg.600'} pb={12} pt={6} px={8}>
                             <Flex justify={"center"} mb={2}>
                                 <Flex
                                     justify={"center"}
@@ -202,7 +199,7 @@ export default function Debt({ synth, index }: any) {
                             >
                                 <NumberInput
                                     w={"100%"}
-                                    value={amount}
+                                    value={formatInput(amount)}
                                     onChange={_setAmount}
                                     min={0}
                                     step={0.01}
@@ -224,7 +221,7 @@ export default function Debt({ synth, index }: any) {
                                             color={"whiteAlpha.600"}
                                         >
                                             {dollarFormatter.format(
-                                                (synth.priceUSD *
+                                                ((prices[synth.token.id] ?? 0) *
                                                     amountNumber)
                                             )}
                                         </Text>
@@ -243,7 +240,7 @@ export default function Debt({ synth, index }: any) {
                                         variant={"unstyled"}
                                         fontSize="sm"
                                         fontWeight={"bold"}
-                                        onClick={() => _setAmount(max())}
+                                        onClick={() => _setAmount(Big(max()).mul(0.99).toString())}
                                     >
                                         MAX
                                     </Button>
@@ -252,8 +249,9 @@ export default function Debt({ synth, index }: any) {
                                 </NumberInput>
                             </InputGroup>
 						</Box>
-
-						<Tabs onChange={selectTab} index={tabSelected}>
+						<Divider />
+						<Box className="containerFooter">
+						<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 							<TabList>
 								<Tab
 									w={"50%"}
@@ -261,20 +259,24 @@ export default function Debt({ synth, index }: any) {
 										color: "primary.400",
 										borderColor: "primary.400",
 									}}
+									rounded={0}
+									border={0}
 								>
 									Mint
 								</Tab>
+								<Divider orientation="vertical" h={'40px'} />
 								<Tab
 									w={"50%"}
 									_selected={{
 										color: "secondary.400",
 										borderColor: "secondary.400",
 									}}
+									rounded={0}
+									border={0}
 								>
 									Burn
 								</Tab>
 							</TabList>
-
 							<TabPanels>
 								<TabPanel m={0} p={0}>
 									<Mint
@@ -294,7 +296,9 @@ export default function Debt({ synth, index }: any) {
 								</TabPanel>
 							</TabPanels>
 						</Tabs>
+							</Box>
 					</ModalBody>
+					</Box>
 				</ModalContent>
 			</Modal>
 		</>

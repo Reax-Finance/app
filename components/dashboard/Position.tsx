@@ -8,20 +8,18 @@ import { TbReportMoney } from 'react-icons/tb'
 import Big from 'big.js'
 import { useAppData } from '../context/AppDataProvider'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
-import { dollarFormatter } from '../../src/const'
+import { dollarFormatter, tokenFormatter } from '../../src/const'
+import { useBalanceData } from '../context/BalanceProvider'
+import { usePriceData } from '../context/PriceContext'
+import { useSyntheticsData } from '../context/SyntheticsPosition'
 
 export default function Position() {
     const { pools, tradingPool, account } = useAppData();
+    const { walletBalances } = useBalanceData();
+	const { prices } = usePriceData();
+    const { position } = useSyntheticsData();
 
-	const debtLimit = () =>
-		(100 * pools[tradingPool]?.userDebt) /
-		pools[tradingPool]?.userCollateral;
-
-	const availableToIssue = () => {
-		if(!pools[tradingPool]?.adjustedCollateral) return 0;
-		if(pools[tradingPool].adjustedCollateral - pools[tradingPool]?.userDebt < 0) return 0;
-		return pools[tradingPool].adjustedCollateral - pools[tradingPool].userDebt
-	}
+    const pos = position();
 
 	const totalPortfolioValue = () => {
 		if (!pools[tradingPool]) return "0";
@@ -29,51 +27,50 @@ export default function Position() {
 		for (let i = 0; i < pools[tradingPool]?.synths.length; i++) {
 			const synth = pools[tradingPool]?.synths[i];
 			total = total.add(
-				Big(synth.walletBalance ?? 0)
+				Big(walletBalances[synth.token.id] ?? 0)
 					.div(1e18)
-					.mul(synth.priceUSD ?? 0)
+					.mul(prices[synth.token.id] ?? 0)
 			);
 		}
 		return total.toFixed(2);
 	}
   return (
     <>
-        {pools[tradingPool]?.userCollateral > 0 ? <Box
+        {Big(pos?.collateral).gt(0) ? <Box
+            mb={-5}
             w='100%'
             display={{ sm: "block", md: "block" }}
-            className='positionTable'
+            className='halfContainerBody'
         >
-            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='cutoutcornersboxright'>
-                <Heading fontSize={'xl'}>
-                    <span className='gradienttext'>
+            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='containerHeader'>
+                <Heading fontSize={'18px'}>
                     Your Position
-                    </span>
                 </Heading>
 
                 <Info
-								message={`You can issue debt till you reach Collateral's Base LTV`}
-								title={"Borrow Capacity"}
-							>
-								<Flex
-									justify={{ sm: "start", md: "end" }}
-									align="center"
-									gap={1}
-									cursor={"help"}
-                                    fontSize={"sm"} 
-								>
-									<Text color="whiteAlpha.700">
-										Available to Mint: {" "}
-									</Text>
-									<Text
-										mr={0.5}
-										fontWeight="medium"
-									>
-										{dollarFormatter.format(
-											availableToIssue()
-										)}
-									</Text>
-								</Flex>
-							</Info>
+                    message={`You can issue debt till you reach Collateral's Base LTV`}
+                    title={"Borrow Capacity"}
+                >
+                    <Flex
+                        justify={{ sm: "start", md: "end" }}
+                        align="center"
+                        gap={1}
+                        cursor={"help"}
+                        fontSize={"sm"} 
+                    >
+                        <Text color="whiteAlpha.700">
+                            Available to Mint: {" "}
+                        </Text>
+                        <Text
+                            mr={0.5}
+                            fontWeight="medium"
+                        >
+                            {dollarFormatter.format(
+                                Number(pos.availableToIssue)
+                            )}
+                        </Text>
+                    </Flex>
+                </Info>
             </Flex>
             <Flex p={5} justifyContent={"space-between"} alignContent={"center"}>
                 <Flex flexDir={"column"} justify="center">
@@ -91,7 +88,7 @@ export default function Position() {
                         >
                             <Flex gap={3} align="start">
                                 <IconBox>
-                                    <IoMdCash size={'22px'} />
+                                    <IoMdCash size={'18px'} />
                                 </IconBox>
 
                                 <Info
@@ -121,10 +118,7 @@ export default function Position() {
                                             $
                                         </Text>
                                         <Text>
-                                            {(
-                                                pools[tradingPool]
-                                                    ?.userCollateral ?? 0
-                                            ).toFixed(2)}
+                                            {tokenFormatter.format(Number(pos.collateral))}
                                         </Text>
                                     </Flex>
                                 </Box>
@@ -133,7 +127,7 @@ export default function Position() {
 
                             <Flex gap={3} align="start">
                                 <IconBox>
-                                    <TbReportMoney size={'22px'}  />
+                                    <TbReportMoney size={'18px'}  />
                                 </IconBox>
 
                                 <Info
@@ -159,10 +153,7 @@ export default function Position() {
                                                     $
                                                 </Text>
                                                 <Text>
-                                                    {(
-                                                        pools[tradingPool]
-                                                            ?.userDebt ?? 0
-                                                    ).toFixed(2)}
+                                                    {tokenFormatter.format(Number(pos.debt))}
                                                 </Text>
                                             </Flex>
                                         </Flex>
@@ -170,7 +161,7 @@ export default function Position() {
                                 </Info>
                             </Flex>
 
-                            {Big(pools[tradingPool]?.userDebt ?? 0).gt(0) && <Flex gap={3} align="start">
+                            {/* {Big(pos.debt).gt(0) && <Flex gap={3} align="start">
                                 <IconBox>
                                     <IoMdAnalytics size={'20px'} />
                                 </IconBox>
@@ -194,7 +185,7 @@ export default function Position() {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={Big(totalPortfolioValue()).gt(pools[tradingPool]?.userDebt ?? 0) ? 'green.400' : 'red.400'}
+                                                color={Big(totalPortfolioValue()).gt(pos.debt) ? 'green.400' : 'red.400'}
                                             >
                                                 <Text
                                                     // color={"whiteAlpha.800"}
@@ -203,13 +194,13 @@ export default function Position() {
                                                     $
                                                 </Text>
                                                 <Text>
-                                                    {Big(totalPortfolioValue()).sub(pools[tradingPool]?.userDebt).toFixed(2)} ({Big(totalPortfolioValue()).sub(pools[tradingPool]?.userDebt).mul(100).div(pools[tradingPool]?.userDebt).toFixed(2)}%)
+                                                    {Big(totalPortfolioValue()).sub(pos.debt).toFixed(2)} ({Big(totalPortfolioValue()).sub(pos.debt).mul(100).div(pos.debt).toFixed(2)}%)
                                                 </Text>
                                             </Flex>
                                         </Flex>
                                     </Box>
                                 </Info>
-                            </Flex>}
+                            </Flex>} */}
                         </Flex>
                     </motion.div>
                 </Flex>
@@ -222,7 +213,7 @@ export default function Position() {
                 >
                     <Box
                         textAlign={{ sm: "left", md: "right" }}
-                        mt={{ sm: 16, md: 1.5 }}
+                        mt={{ sm: 16, md: 0 }}
                     >
                         <Info
                             message={`Your Debt Limit depends on your LTV %. Account would be liquidated if LTV is greater than your Collateral's Liquidation Threshold`}
@@ -253,17 +244,12 @@ export default function Position() {
                             fontWeight={"semibold"}
                             fontSize={"3xl"}
                             color={
-                                pools[tradingPool]?.userCollateral > 0
-                                    ? availableToIssue() > 1
+                                Big(pos.availableToIssue).gt(0)
                                     ? "green.400"
                                     : "yellow.400"
-                                    : "red.400"
                             }
                         >
-                            {(pools[tradingPool]?.userCollateral > 0
-                                ? debtLimit()
-                                : pools[tradingPool]?.userCollateral ?? 0
-                            ).toFixed(1)}{" "}
+                            {Number(pos.debtLimit).toFixed(1)}{" "}
                             %
                         </Text>
                     </Box>
@@ -271,22 +257,24 @@ export default function Position() {
                 
             </Flex>
             <Box
-                            // mt={2}
-                            width={"100%"}
-                            bg="whiteAlpha.200"
-                        >
-                            <Box
-                                h={1}
-                                bg={"primary.400"}
-                                width={
-                                    (pools[tradingPool]?.userCollateral > 0
-                                        ? debtLimit()
-                                        : "0") + "%"
-                                }
-                            ></Box>
-                        </Box>
+                // mt={2}
+                width={"100%"}
+                bg="whiteAlpha.200"
+            >
+                <Box
+                    h={1}
+                    bg={
+                        Big(pos.availableToIssue).gt(0)
+                                    ? "green.400"
+                                    : "primary.400"
+                    }
+                    width={
+                        pos.debtLimit + "%"
+                    }
+                ></Box>
+            </Box>
         </Box>
-    : <Box h={'20px'}></Box>    
+    : <></>    
     }
     </>
   )

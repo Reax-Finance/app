@@ -25,9 +25,9 @@ export default function CollateralTable() {
 	const { pools, tradingPool } = useContext(AppDataContext);
 
 	return (
-		<Box >
-			<Box className="cutoutcornersboxright" px={5} pt={6} pb={6}>
-				<Heading size={'md'} color={'primary.400'}>Collaterals</Heading>
+		<>
+			<Box className="containerHeader" px={5} py={5}>
+				<Heading fontSize={'18px'} color={'primary.400'}>Collaterals</Heading>
 			</Box>
 
 			{pools[tradingPool]?.collaterals.length > 0 ? (
@@ -67,6 +67,6 @@ export default function CollateralTable() {
 					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
-		</Box>
+		</>
 	);
 }

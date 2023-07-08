@@ -4,25 +4,29 @@ import {
 	Flex,
 	Text,
 	Box,
-	useDisclosure,
 	Button,
 	Divider,
 	Tooltip,
 	Switch,
 } from "@chakra-ui/react";
-import { PARTNER_ASSETS, PARTNER_WARNINGS, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
+import { ADDRESS_ZERO, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
 import { ethers, BigNumber } from 'ethers';
 import { getContract, send } from "../../../src/contract";
 import { useContext } from "react";
-import { AppDataContext } from "../../context/AppDataProvider";
+import { AppDataContext, useAppData } from "../../context/AppDataProvider";
 import { compactTokenFormatter } from "../../../src/const";
 import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import Link from "next/link";
 import InfoFooter from "../_utils/InfoFooter";
+import { useBalanceData } from "../../context/BalanceProvider";
+import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
+import { usePriceData } from "../../context/PriceContext";
+import { useSyntheticsData } from "../../context/SyntheticsPosition";
+import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
 export default function Deposit({ collateral, amount, setAmount, amountNumber, isNative }: any) {
 
@@ -40,18 +44,20 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveMax, setApproveMax] = useState(false);
 
+	const {position} = useSyntheticsData();
+	const pos = position();
+
 	const {
 		pools,
 		tradingPool,
-		updateCollateralWalletBalance,
-		updateCollateralAmount,
-		addCollateralAllowance,
-		incrementNonce
-	} = useContext(AppDataContext);
+		updateFromTx: updateFromSynthTx
+	} = useAppData();
+
+	const { walletBalances, nonces, allowances, addAllowance, updateFromTx, addNonce } = useBalanceData();
 
 	const max = () => {
 		return Big(
-			(isNative ?  collateral.nativeBalance : collateral.walletBalance) ?? 0
+			(isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]) ?? 0
 		).div(10**collateral.token.decimals).toString();
 	};
 
@@ -61,13 +67,6 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			return {
 				stage: 0,
 				message: "Connect Wallet"
-			}
-		} else if (ethBalance?.value.lt(
-			ethers.utils.parseEther("0.00001")
-		)) {
-			return {
-				stage: 0,
-				message: "Insufficient ETH for Gas Fee"
 			}
 		} else if (chain?.unsupported){
 			return {
@@ -92,7 +91,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				message: "Amount Exceeds Cap"
 			}
 		}
-		else if (!collateral || !collateral?.allowance) {
+		else if (!collateral || !allowances[collateral.token.id]?.[pools[tradingPool].id]) {
 			return {
 				stage: 0,
 				message: "Loading..."
@@ -101,12 +100,12 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		
 		// check allowance if not native
 		if (!isNative) {
-			if (Big(collateral.allowance).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).eq(0)){
+			if (Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).eq(0)){
 				return {
 					stage: 1,
 					message: "Approve Use Of" + " " + collateral.token.symbol
 				}
-			} else if(Big(collateral.allowance).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).lt(
+			} else if (Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).lt(
 				parseFloat(amount) * 10 ** (collateral.token.decimals ?? 18) || 1
 			)) {
 				return {
@@ -114,8 +113,6 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 					message: "Approve Use Of" + " " + collateral.token.symbol
 				}
 			}
-
-
 		} else {
 			return {
 				stage: 3,
@@ -123,7 +120,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			}
 		}
 
-		if(Big(collateral.allowance).gt(
+		if(Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).gt(
 			parseFloat(amount) * 10 ** (collateral.token.decimals ?? 18) || 1
 		)) {
 			return {
@@ -139,6 +136,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 	}
 
 	const toast = useToast();
+	const handleError = useHandleError(PlatformType.SYNTHETICS);
 
 	const deposit = async () => {
 		setLoading(true);
@@ -161,7 +159,6 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				_amount.toString()
 			);
 		} else {
-			console.log("data", data);
 			if(Number(approvedAmount) > 0){
 				const {v, r, s} = ethers.utils.splitSignature(data!);
 				tx = send(
@@ -191,46 +188,14 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			}
 		}
 		tx.then(async (res: any) => {
-			// setMessage("Confirming...");
-			// setResponse("Transaction sent! Waiting for confirmation");
-			// setHash(res.hash);
-			const response = await res.wait(1);
-			// decode transfer event from response.logs
-			const decodedLogs = response.logs.map((log: any) =>
-				{
-					try {
-						return pool.interface.parseLog(log)
-					} catch (e) {
-						console.log(e)
-					}
-				}
-			);
-
-			console.log("decodedLogs", decodedLogs);
-			let log: any = {};
-			for(let i in decodedLogs){
-				if(decodedLogs[i]){
-					if(decodedLogs[i].name == "Deposit"){
-						log = decodedLogs[i];
-					}
-				}
-			}
-			const collateralId = log.args[1].toLowerCase();
-			const depositedAmount = log.args[2].toString();
-			if(approveMax){
-				addCollateralAllowance(collateralId, poolId, ethers.constants.MaxUint256.toString());
-			}
+			const response = await res.wait();
+			updateFromSynthTx(response);
+			updateFromTx(response);
 			if(Number(approvedAmount) > 0){
-				incrementNonce(collateral.token.id);
+				addNonce(collateral.token.id, '1');
 			}
 			setConfirmed(true);
-			updateCollateralWalletBalance(collateralId, poolId, depositedAmount, true);
-			updateCollateralAmount(collateralId, poolId, depositedAmount, false);
 			setAmount('0');
-			// setMessage(
-			// 	"Transaction Successful!"
-			// );
-			// setResponse(`You have deposited ${Big(depositedAmount).div(10**collateral.token.decimals).toString()} ${collateral.token.symbol}`);
 			setApproveMax(false);
 			setApprovedAmount('0');
 			
@@ -239,7 +204,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				title: "Deposit Successful",
 				description: <Box>
 					<Text>
-				{`You have deposited ${Big(depositedAmount).div(10**collateral.token.decimals).toString()} ${collateral.token.symbol}`}
+				{`You have deposited ${amount} ${collateral.token.symbol}`}
 					</Text>
 				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 					<Flex align={'center'} gap={2}>
@@ -255,25 +220,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			});
 			
 		}).catch((err: any) => {
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
 			setLoading(false);
 		});
 	};
@@ -291,31 +238,13 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		)
 		.then(async (res: any) => {
 			const response = await res.wait(1);
-			const decodedLogs = response.logs.map((log: any) =>
-				{
-					try {
-						return collateralContract.interface.parseLog(log)
-					} catch (e) {
-						console.log(e)
-					}
-				}
-			);
-			console.log("decodedLogs", decodedLogs);
-			let log: any = {};
-			for(let i in decodedLogs){
-				if(decodedLogs[i]){
-					if(decodedLogs[i].name == "Approval"){
-						log = decodedLogs[i];
-					}
-				}
-			}
-			addCollateralAllowance(collateral.token.id, pools[tradingPool].id, log.args[2].toString());
+			updateFromTx(response);
 			setApproveLoading(false);
 			toast({
 				title: "Approval Successful",
 				description: <Box>
 					<Text>
-				{`You have approved ${Big(log.args[2].toString()).div(10**collateral.token.decimals).toString()} ${collateral.token.symbol}`}
+				{`You have approved ${collateral.token.symbol}`}
 					</Text>
 				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 					<Flex align={'center'} gap={2}>
@@ -331,31 +260,13 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			})
 		}).catch((err: any) => {
 			console.log(err);
-			if(err?.reason == "user rejected transaction"){
-				toast({
-					title: "Transaction Rejected",
-					description: "You have rejected the transaction",
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			} else {
-				toast({
-					title: "Transaction Failed",
-					description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-					status: "error",
-					duration: 5000,
-					isClosable: true,
-					position: "top-right"
-				})
-			}
+			handleError(err);
+			setApproveLoading(false);
 		})
 	}
 
 	const approve = async () => {
 		setApproveLoading(true);
-		console.log(collateral);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
 		const _amount = Big(amount).toFixed(collateral.token.decimals, 0);
 		const value = approveMax ? ethers.constants.MaxUint256 : ethers.utils.parseUnits(_amount, collateral.token.decimals);
@@ -379,13 +290,11 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				owner: address!,
 				spender: pools[tradingPool].id,
 				value,
-				nonce: collateral.nonce,
+				nonce: nonces[collateral.token.id] ?? 0,
 				deadline: BigNumber.from(_deadline),
 			}
 		})
 			.then(async (res: any) => {
-				// await res.wait(1);
-				console.log(res);
 				setData(res);
 				setDeadline(_deadline);
 				setApprovedAmount(approveMax ? (Number.MAX_SAFE_INTEGER).toString() : _amount);
@@ -408,42 +317,21 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 			})
 			.catch((err: any) => {
 				console.log("err", JSON.stringify(err));
-				if(err?.cause?.reason == "user rejected signing"){
-					toast({
-						title: "Signature Rejected",
-						description: "You have rejected the signature",
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				} else {
-					toast({
-						title: "Transaction Failed",
-						description: err?.data?.message || JSON.stringify(err).slice(0, 100),
-						status: "error",
-						duration: 5000,
-						isClosable: true,
-						position: "top-right"
-					})
-				}
+				handleError(err);
 				setApproveLoading(false);
 			});
 	};
 
 	const { address, isConnected } = useAccount();
 	const { chain: activeChain } = useNetwork();
-
-	const { data: ethBalance } = useBalance({
-		address,
-	});
+	const { prices } = usePriceData();
 
 	const partner = Object.keys(PARTNER_ASSETS).map((key: string) => PARTNER_ASSETS[key].includes(collateral.token.symbol) ? key : null).filter((key: string | null) => key != null)[0];
 
 	return (
 		<>
-			<Box bg={"bg2"} px={5} pt={5} pb={5}>
-				<Box mt={4}>
+			<Box px={5} pt={5} pb={5}>
+				<Box>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
 						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
@@ -475,29 +363,23 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 					<Divider my={2} />
 
 					<Flex justify="space-between">
-						{/* <Text fontSize={"xs"} color="gray.400">
-								1 {asset._mintedTokens[selectedAssetIndex].symbol} = {asset._mintedTokens[selectedAssetIndex].lastPriceUSD}{" "}
-								USD
-							</Text> */}
+						<Flex gap={1}>
+							<Tooltip label='Minimum Loan to Value Ratio'>
 
-							<Flex gap={1}>
-						<Tooltip label='Minimum Loan to Value Ratio'>
+							<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+								Base LTV
+							</Text>
+							</Tooltip>
+							<Text fontSize={"md"} color="whiteAlpha.600">
+							/ 
+							</Text>
+							<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-							Base LTV
-						</Text>
-						</Tooltip>
-						<Text fontSize={"md"} color="whiteAlpha.600">
-						/ 
-						</Text>
-						<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
-
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-							Liq Threshold
-						</Text>
-						</Tooltip>
-							</Flex>
-
+							<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+								Liq Threshold
+							</Text>
+							</Tooltip>
+						</Flex>
 						<Text fontSize={"md"}>
 							{parseFloat(collateral.baseLTV) / 100} % /{" "}
 							{parseFloat(collateral.liqThreshold) / 100} %
@@ -510,30 +392,25 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 							Transaction Overview
 						</Text>
 						<Box
-							// border="1px"
-							// borderColor={"gray.700"}
 							my={4}
 							rounded={8}
-							// p={2}
 						>
 							<Flex justify="space-between">
 								<Text fontSize={"md"} color="whiteAlpha.600">
 									Health Factor
 								</Text>
-								<Text fontSize={"md"}>{numOrZero(pools[tradingPool].userDebt/pools[tradingPool].userCollateral * 100).toFixed(1)} % {"->"} {numOrZero(pools[tradingPool].userDebt /(pools[tradingPool].userCollateral + (amount*collateral.priceUSD)) * 100).toFixed(1)}%</Text>
+								<Text fontSize={"md"}>{(Number(pos.debtLimit) ?? 0).toFixed(2)} % {"->"} {numOrZero((Number(pos.debt) ?? 0) /((Number(pos.collateral) ?? 0) + (amount*prices[collateral.token.id])) * 100).toFixed(2)}%</Text>
 							</Flex>
 							<Divider my={2} />
 							<Flex justify="space-between">
 								<Text fontSize={"md"} color="whiteAlpha.600">
 									Available to issue
 								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format(pools[tradingPool].adjustedCollateral - pools[tradingPool].userDebt)} {"->"} {dollarFormatter.format(pools[tradingPool].adjustedCollateral + amount*collateral.priceUSD*collateral.baseLTV/10000 - pools[tradingPool].userDebt)}</Text>
+								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue) ?? 0)} {"->"} {dollarFormatter.format((Number(pos.adjustedCollateral) ?? 0) + (amount*(prices[collateral.token.id] ?? 0)*collateral.baseLTV/10000) - (Number(pos.debt) ?? 0))}</Text>
 							</Flex>
 						</Box>
 					</Box>
-					{collateral.nonce && (validate().stage == 1 && <Tooltip label='
-						Approve Max will approve unlimited amount. This will save gas fees in the future.
-					'>
+					{collateral.token.isPermit && (validate().stage == 1 && <Tooltip label='Approve Max will approve unlimited amount. This will save gas fees in the future.'>
 					<Flex align={'center'} mb={2} mt={6} color="whiteAlpha.600" gap={2}>
 						<Text fontSize={"sm"} color="whiteAlpha.600" fontWeight={'bold'} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Approve Max
@@ -543,52 +420,49 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 					</Tooltip>)
 					}
 
-				
-					{(validate().stage == 1|| validate().stage == 0) ? <Button
+				<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
-						colorScheme={'primary'}
-						bg={"primary.400"}
-						color='gray.800'
-						mt={2}
+						color='white'
 						width="100%"
-						onClick={collateral.nonce ? approve : approveTx}
+						onClick={collateral.token.isPermit ? approve : approveTx}
 						size="lg"
 						rounded={0}
-						leftIcon={
-							validate().stage ==1 ? <Tooltip label='
-								Approve tokens to be used by the protocol.
-							'>
-							<InfoOutlineIcon/>
-							</Tooltip> : <></>
-						}
+						bg={'transparent'}
+						_hover={{ bg: "transparent" }}
 					>
 						{validate().message}
-					</Button> : <Button
-						isDisabled={validate().stage == 1}
+					</Button>
+					</Box>
+					}
+						
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "secondaryButton":'disabledSecondaryButton'}><Button
+						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
-						bgColor={validate().stage == 1 ? "primary.400" : "primary.400"}
 						width="100%"
 						color="white"
 						rounded={0}
-						mt={2}
+						bg={'transparent'}
 						onClick={deposit}
 						size="lg"
+						_hover={{ bg: "transparent" }}
+
 					>
 						{isConnected && !activeChain?.unsupported ? (
 							Big(amountNumber > 0 ? amount : amountNumber).gt(max()) ? (
 								<>Insufficient Wallet Balance</>
-							) : !amount || amountNumber == 0 ? (
-								<>Enter Amount</>
 							) : (
 								<>Deposit</>
 							)
 						) : (
 							<>Please connect your wallet</>
 						)}
-					</Button>}
+					</Button></Box>}
+					</Box>
+
 
 					{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
 

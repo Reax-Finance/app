@@ -47,7 +47,7 @@ export default function Leaderboard() {
 
   const refresh = async () => {
     setRefreshing(true);
-    fetchData(address || null)
+    fetchData()
     .then(res => {
       setRefreshing(false);
     })

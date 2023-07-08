@@ -29,10 +29,6 @@ import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Skeleton } from "@chakra-ui/react";
 import Debt from "../modals/debt";
 import ThBox from "./ThBox";
-import Big from "big.js";
-import { ESYX_PRICE } from "../../src/const";
-import APRInfo from "../infos/APRInfo";
-import TdBox from "./TdBox";
 
 const pageSize = 5;
 
@@ -48,8 +44,8 @@ export default function CollateralTable() {
 
 	return (
 		<Box>
-			<Box className="cutoutcornersboxright" px={5} pt={6} pb={6}>
-				<Heading size={'md'} color={'secondary.300'}>Synthetic Assets</Heading>			
+			<Box className="containerHeader" px={5} py={5}>
+				<Heading fontSize={'18px'} color={'secondary.300'}>Synthetic Assets</Heading>			
 			</Box>
 			{pools[tradingPool]?.synths.length > 0 ? (
 				<TableContainer>

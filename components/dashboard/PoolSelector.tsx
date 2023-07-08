@@ -79,7 +79,7 @@ export default function PoolSelector() {
 										</Box>
 									</Flex>
 									<Flex align={'center'} color={'whiteAlpha.700'} >
-									<Text fontSize={'xs'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'All Markets' : 'Tap To Close'}</Text>
+									<Text fontSize={'sm'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'All Pools' : 'Tap To Close'}</Text>
 									<motion.div
 										variants={{
 											open: { rotate: 180, marginBottom: '4px' },
@@ -128,47 +128,50 @@ export default function PoolSelector() {
 							width: "450px",
 							zIndex: '100',
 							borderRadius: '0px',
-							background: "linear-gradient(45deg, transparent 10px, #1D1F24 0) bottom left, linear-gradient(-135deg, transparent 10px, #1D1F24 0) top right",
-							backgroundRepeat: 'no-repeat',
-							backgroundSize: '100% 50%',
+							// background: "linear-gradient(45deg, transparent 10px, #1D1F24 0) bottom left, linear-gradient(-135deg, transparent 10px, #1D1F24 0) top right",
+							// backgroundRepeat: 'no-repeat',
+							// backgroundSize: '100% 50%',
+							boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
 						}}
 						
 					>
-						<Box shadow={'xl'}>
-						<motion.div
-							variants={{
-								open: {
-									opacity: 1,
-									y: 0,
-									transition: {
-										ease: "easeOut",
-										duration: 0.1,
-									},
-								},
-								closed: {
-									opacity: 0,
-									y: 20,
-									transition: { duration: 0.1 },
-								},
-							}}
-							style={{
-								padding: "4px 10px",
-								background: "linear-gradient(-135deg, transparent 10px, #2B2E32 0) top right",
-								backgroundRepeat: 'no-repeat',
-								backgroundSize: '100% 100%',
-							}}
-						>
-							<Input
-								placeholder="Search Pool"
-								bg={'transparent'}
-								rounded={0}
-								my={3}
-								pl={1}
-								variant='unstyled'
-								onChange={handleSearch}
-								_active={{ borderColor: "transparent" }}
-							/>
-						</motion.div>
+						<Box shadow={'2xl'} className="containerBody">
+							<Box className="containerHeader">
+								<motion.div
+									variants={{
+										open: {
+											opacity: 1,
+											y: 0,
+											transition: {
+												ease: "easeOut",
+												duration: 0.1,
+											},
+										},
+										closed: {
+											opacity: 0,
+											y: 20,
+											transition: { duration: 0.1 },
+										},
+									}}
+									style={{
+										padding: "4px 10px",
+										// background: "linear-gradient(-135deg, transparent 10px, #2B2E32 0) top right",
+										// backgroundRepeat: 'no-repeat',
+										// backgroundSize: '100% 100%',
+									}}
+								>
+									<Input
+										placeholder="Search Pool"
+										bg={'transparent'}
+										rounded={0}
+										my={3}
+										pl={1}
+										variant='unstyled'
+										onChange={handleSearch}
+										_active={{ borderColor: "transparent" }}
+									/>
+								</motion.div>
+							</Box>
 
 						<Divider />
 
@@ -184,7 +187,7 @@ export default function PoolSelector() {
 									key={index}
 								>
 									<Box
-										_hover={{ bg: "whiteAlpha.50" }}
+										_hover={{ bg: "bg.600" }}
 										cursor="pointer"
 										px={4}
 										my={0}
