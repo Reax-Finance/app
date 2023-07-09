@@ -25,9 +25,9 @@ const mintAmounts: any = {
     "wstETH": "10",
     "ARB": '10', 
     // in use
-	"USDC": "10000000",
-    "WBTC": "100",
-    "ETH": "1000",
+	"USDC": "1000",
+    "WBTC": "0.1",
+    "ETH": "1",
 };
 
 import Head from "next/head";
@@ -52,7 +52,7 @@ import TdBox from "../components/dashboard/TdBox";
 
 export default function Faucet() {
 	const { pools } = useContext(AppDataContext);
-    const { updateBalance } = useBalanceData();
+    const { updateFromTx } = useBalanceData();
     const [loading, setLoading] = React.useState<any>(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [openedCollateral, setOpenedCollateral] = React.useState<any>(null);
@@ -75,9 +75,10 @@ export default function Faucet() {
         const amount = ethers.utils.parseUnits(mintAmounts[openedCollateral.symbol], openedCollateral.decimals);
         send(token, "mint", [address, amount])
             .then(async(res: any) => {
-                await res.wait(1);
+                let response = await res.wait(1);
+                updateFromTx(response);
+
                 setLoading(false);
-                updateBalance(openedCollateral.id, amount.toString(), false);
                 toast({
                     title: `Minted ${openedCollateral.symbol}`,
                     description: `${mintAmounts[openedCollateral.symbol]} ${openedCollateral.symbol} minted to your wallet.`,

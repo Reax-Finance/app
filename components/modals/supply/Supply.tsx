@@ -27,11 +27,6 @@ import useHandleError, { PlatformType } from "../../utils/useHandleError";
 export default function Supply({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
-
-	const [response, setResponse] = useState<string | null>(null);
-	const [hash, setHash] = useState(null);
-	const [confirmed, setConfirmed] = useState(false);
-	const [message, setMessage] = useState("");
 	const { chain } = useNetwork();
 	const [deadline, setDeadline] = useState('0');
 	const { signTypedDataAsync } = useSignTypedData();
@@ -126,10 +121,6 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 	const deposit = async () => {
 		setLoading(true);
-		setMessage("")
-		setConfirmed(false);
-		setResponse(null);
-		setHash(null);
 		const pool = await getContract("LendingPool", chain?.id ?? defaultChain.id, market.protocol._lendingPoolAddress)
 		const _amount = ethers.utils.parseUnits(Big(amount).toFixed(market.inputToken.decimals, 0), market.inputToken.decimals); 
 
@@ -161,9 +152,13 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 		tx.then(async (res: any) => {
 			const response = await res.wait(1);
 			updateFromTx(response);
-			setConfirmed(true);
 			setAmount('');
 			setApprovedAmount('0');
+			setData(null);
+			setDeadline('0')
+			if(Number(approvedAmount) > 0){
+				addNonce(market.inputToken.id, '1');
+			}
 
 			// supplying for first time
 			if(!walletBalances[market.outputToken.id] || Number(walletBalances[market.outputToken.id]) == 0) toggleIsCollateral(market.id);
@@ -426,12 +421,12 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 				{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
 
-				<Response
+				{/* <Response
 					response={response}
 					message={message}
 					hash={hash}
 					confirmed={confirmed}
-				/>
+				/> */}
 			</Box>
 		</>
 	);
