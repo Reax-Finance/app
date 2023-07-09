@@ -36,26 +36,24 @@ export default function ProportionalDeposit({ pool }: any) {
 	const deposit = async () => {
 		setLoading(true);
 		const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"));
-        
+		let _amounts = amounts.map((amount: any, i: number) => Big(amount).mul(10**poolTokens[i].token.decimals).toFixed(0));
+        let _minBptOut = Big(bptOut ?? 0).mul(100).div(100+Number(maxSlippage)).toFixed(0)
+		let maxAmountsIn = poolTokens.map((token: any, i: number) => Big(amounts[i]).mul(10**token.token.decimals).mul(100+Number(maxSlippage)).div(100).toFixed(0));
         let userData = ethers.utils.defaultAbiCoder.encode(
             ['uint256', 'uint256[]', 'uint256'], 
-            [1, amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0)), bptOut ?? 0]
+            [1, _amounts, _minBptOut]
         );
-        let maxAmountsIn = poolTokens.map((token: any, i: number) => Big(Number(amounts[i])).mul(10**token.token.decimals).mul(100+Number(maxSlippage)).div(100).toFixed(0));
-
 		let poolTokenIndex = pool.tokens.findIndex((token: any) => token.token.id == pool.address);
 
 		// Handle first deposit
         if(Big(pool.totalShares ?? 0).eq(0)){
 			userData = ethers.utils.defaultAbiCoder.encode(
 				['uint256', 'uint256[]'], 
-				[0, amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0))]
+				[0, _amounts]
 			);
 			if(poolTokenIndex !== -1) {
-				let _amounts = amounts.map((amount: any, i: number) => Big(Number(amount) || 0).mul(10**poolTokens[i].token.decimals).toFixed(0));
 				// insert 0 in index of pool token
 				_amounts.splice(poolTokenIndex, 0, 0);
-				console.log(_amounts);
 				userData = ethers.utils.defaultAbiCoder.encode(
 					['uint256', 'uint256[]'], 
 					[0, _amounts]
@@ -65,7 +63,6 @@ export default function ProportionalDeposit({ pool }: any) {
 		
 		// insert into maxAmountsIn
 		if(poolTokenIndex !== -1) maxAmountsIn.splice(poolTokenIndex, 0, ethers.constants.MaxUint256);
-		console.log(maxAmountsIn);
         
 		let args = [
 			pool.id,
@@ -134,8 +131,8 @@ export default function ProportionalDeposit({ pool }: any) {
 		// check allowances
 		for(let i = 0; i < poolTokens.length; i++) {
 			if(isNative && poolTokens[i].token.id == WETH_ADDRESS(chain?.id!)) continue;
-			if(isNaN(Number(amounts[i]))) continue;
-			if(Big(allowances[poolTokens[i].token.id]?.[vault.address] ?? 0).lt(Big(Number(amounts[i])).mul(10 ** poolTokens[i].token.decimals))) {
+			if(isNaN(Number(amounts[i])) || Number(amounts[i]) == 0) continue;
+			if(Big(allowances[poolTokens[i].token.id]?.[vault.address] ?? 0).lte(Big(amounts[i] ?? 0).mul(10 ** poolTokens[i].token.decimals))) {
 				return i;
 			}
 		}
