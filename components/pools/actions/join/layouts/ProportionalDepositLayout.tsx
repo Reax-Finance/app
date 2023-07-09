@@ -144,7 +144,7 @@ export default function ProportionalDepositLayout({
     <Box pt={4} pb={'1px'}>
 
     <ValuesTable values={values} pool={pool} bptOut={bptOut} />
-    <Box className="primaryButton" m={4}>
+    <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
     <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} _disabled={{color: 'whiteAlpha.700'}} rounded={0} w={'100%'} onClick={tokenToApprove() >= 0 ? approve : deposit}>
       {validate().message}
     </Button>

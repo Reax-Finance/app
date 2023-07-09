@@ -148,6 +148,7 @@ export default function SingleTokenDeposit({ pool }: any) {
 	}
 
 	const approve = async () => {
+        setLoading(true);
 		let token = await getContract("MockToken", chain?.id!, pool.tokens[tokenSelectedIndex].token.id);
 		send(token, "approve", [
 			vault.address,
@@ -156,9 +157,11 @@ export default function SingleTokenDeposit({ pool }: any) {
 		.then(async(res: any) => {
             let response = await res.wait();
             updateFromTx(response);
+            setLoading(false);
 		})
 		.catch((err: any) => {
-			console.log(err);
+            handleBalError(err);
+            setLoading(false);
 		})
 	}
 
@@ -171,7 +174,7 @@ export default function SingleTokenDeposit({ pool }: any) {
     const values = () => {
         if(!validate().valid) return null;
         if(!bptOut) return null;
-		if(loading) return null;
+		// if(loading) return null;
         let poolValue = poolTokens.reduce((a: any, b: any) => {
             return a.add(Big(b.balance).mul(prices[b.token.id] ?? 0));
         }, Big(0)).toNumber();

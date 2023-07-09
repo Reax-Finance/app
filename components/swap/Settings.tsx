@@ -67,7 +67,7 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
             </Box>
             </Flex>
             <MenuList p={0} m={0} border={0} rounded={0} bg={'transparent'} shadow={'none'}>
-                <Box className='containerBody' pt={1.5} pb={4}>
+                <Box className='containerBody2' pt={1.5} pb={4}>
                 <MenuGroup title="Slippage Tolerance">
                         <Flex mx={4} align={'center'} justify={'space-between'}>
                         {options.map((value) => {

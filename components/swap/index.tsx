@@ -19,8 +19,8 @@ import { parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 
 function Swap() {
-	const [inputAssetIndex, setInputAssetIndex] = useState(4);
-	const [outputAssetIndex, setOutputAssetIndex] = useState(1);
+	const [inputAssetIndex, setInputAssetIndex] = useState(1);
+	const [outputAssetIndex, setOutputAssetIndex] = useState(5);
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState('');
 	const [gas, setGas] = useState(0);
@@ -464,7 +464,7 @@ function Swap() {
 				</title>
 				<link rel="icon" type="image/x-icon" href="/veREAX.svg"></link>
 			</Head>
-			{tokens.length > 0 ? (
+			{tokens.length > 1 ? (
 				<SwapLayout
 					inputAmount={inputAmount}
 					updateInputAmount={updateInputAmount}

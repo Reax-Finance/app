@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function SwapSkeleton() {
   return (
-    <Box height={"382px"} shadow='2xl'>
+    <Box className='containerBody' height={"382px"} shadow='2xl'>
 					<Flex
 						h={"40%"}
 						align={"center"}

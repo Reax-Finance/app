@@ -194,7 +194,7 @@ export default function ProportionalWithdrawLayout({
 		</Box>
 
 			<ValuesTable bptIn={bptIn} values={values} pool={pool} />
-			<Box className="swapButton" m={4}>
+			<Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
 				<Button
 					size={"lg"}
 					isLoading={loading}

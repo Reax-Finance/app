@@ -323,7 +323,7 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={!valid ? 6 : 0.5} mb={5} className="swapButton">
+                <Box mt={!valid ? 6 : 0.5} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
                 <Button
                     size="lg"
                     fontSize={"xl"}
@@ -337,9 +337,6 @@ export default function SwapLayout({
                     _hover={{ opacity: 0.6 }}
                     color="white"
                     height={"55px"}
-                    _disabled={{
-                        color: 'whiteAlpha.700',
-                    }}
                 >
                     {validate().message}
                 </Button>

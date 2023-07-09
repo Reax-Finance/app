@@ -225,7 +225,7 @@ export default function ProportionalWithdraw({ pool }: any) {
 	const setMax = (multiplier = 1) => {
 		const totalShares = pool.totalShares;
 		const yourShares = walletBalances[pool.address];
-		
+
 		const _amounts = poolTokens.map((token: any) => {
 			return Big(token.balance).mul(Big(yourShares).div(Big(totalShares))).mul(multiplier).div(10**18).toString();
 		})

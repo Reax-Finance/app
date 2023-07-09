@@ -128,7 +128,7 @@ export default function StableDepositLayout({
         <Divider mb={4}/>
         
         <ValuesTable values={values} pool={pool} bptOut={bptOut} />
-        <Box className="primaryButton" m={4}>
+        <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={shouldApprove() ? approve : deposit}>
             {validate().message}
         </Button>
