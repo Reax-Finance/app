@@ -295,6 +295,24 @@ function BalanceContextProvider({ children }: any) {
                 newBalances[decodedEvents[i].token] = Big(walletBalances[decodedEvents[i].token] ?? 0)[isOut ? 'minus' : 'add'](decodedEvents[i].args[2].toString()).toFixed(0);
             }
         }
+        // Wrap and Unwrap Events from WETH
+        let wethItf = new ethers.utils.Interface(getABI("WETH9", chain?.id!));
+        events = tx.events.filter((event: any) => event.topics[0] == wethItf.getEventTopic("Deposit"));
+        let depositEvents = events.map((event: any) => (event.address.toLowerCase() == WETH_ADDRESS(chain?.id!)) && {token: event.address.toLowerCase(), args: wethItf.decodeEventLog("Deposit", event.data, event.topics)});
+        events = tx.events.filter((event: any) => event.topics[0] == wethItf.getEventTopic("Withdrawal"));
+        let withdrawalEvents = events.map((event: any) => (event.address.toLowerCase() == WETH_ADDRESS(chain?.id!)) && {token: event.address.toLowerCase(), args: wethItf.decodeEventLog("Withdrawal", event.data, event.topics)});
+        for(let i in depositEvents){
+            if(depositEvents[i] && depositEvents[i].args[0].toLowerCase() == address?.toLowerCase()){
+                newBalances[ADDRESS_ZERO] = Big(walletBalances[ADDRESS_ZERO] ?? 0).sub(depositEvents[i].args[1].toString()).toFixed(0);
+                newBalances[WETH_ADDRESS(chain?.id!)] = Big(walletBalances[WETH_ADDRESS(chain?.id!)] ?? 0).add(depositEvents[i].args[1].toString()).toFixed(0);
+            }
+        }
+        for(let i in withdrawalEvents){
+            if(withdrawalEvents[i] && withdrawalEvents[i].args[0].toLowerCase() == address?.toLowerCase()){
+                newBalances[ADDRESS_ZERO] = Big(walletBalances[ADDRESS_ZERO] ?? 0).add(withdrawalEvents[i].args[1].toString()).toFixed(0);
+                newBalances[WETH_ADDRESS(chain?.id!)] = Big(walletBalances[WETH_ADDRESS(chain?.id!)] ?? 0).sub(withdrawalEvents[i].args[1].toString()).toFixed(0);
+            }
+        }
         setWalletBalances(newBalances);
         // Approve events
         events = tx.events.filter((event: any) => event.topics[0] == tokenItf.getEventTopic("Approval"));
@@ -308,6 +326,7 @@ function BalanceContextProvider({ children }: any) {
             }
         }
         setAllowances(newAllowances);
+        
     }
 
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {

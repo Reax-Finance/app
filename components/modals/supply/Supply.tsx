@@ -150,7 +150,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 			}
 		}
 		tx.then(async (res: any) => {
-			const response = await res.wait(1);
+			const response = await res.wait();
 			updateFromTx(response);
 			setAmount('');
 			setApprovedAmount('0');
@@ -200,7 +200,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 			]
 		)
 		.then(async (res: any) => {
-			const response = await res.wait(1);
+			const response = await res.wait();
 			updateFromTx(response);
 			setApproveLoading(false);
 			toast({

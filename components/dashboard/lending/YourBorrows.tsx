@@ -41,8 +41,12 @@ export default function YourBorrows() {
 		return walletBalances[market._vToken.id] > 0 || walletBalances[market._sToken.id] > 0;
 	});
 
-	if(borrowedMarkets.length > 0) return (
-		<Box h={'100%'}>
+	const suppliedMarkets = markets.filter((market: any) => {
+		return walletBalances[market.outputToken.id] > 0;
+	});
+
+	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (
+		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
 			<Box className="containerHeader" px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Your Borrows</Heading>
 			</Box>
@@ -93,9 +97,9 @@ export default function YourBorrows() {
 						</Table>
 					</TableContainer>
 					
-				: <Box py={5}>
-				<Text textAlign={'center'} color={'whiteAlpha.400'}>You have no borrowed assets.</Text>
-				</Box>
+				: <Flex flexDir={'column'} justify={'center'} h='100%' py={5}>
+				<Text textAlign={'center'} color={'whiteAlpha.600'}>You have no borrowed assets.</Text>
+				</Flex>
 				}
 					</>
 
@@ -110,7 +114,7 @@ export default function YourBorrows() {
 					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
-		</Box>
+		</Flex>
 	);
 
 	else return <></>

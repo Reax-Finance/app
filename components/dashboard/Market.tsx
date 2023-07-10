@@ -13,7 +13,7 @@ import PoolSelector from "./PoolSelector";
 import APRInfo from "../infos/APRInfo";
 import { TokenContext } from "../context/TokenContext";
 import { useAccount, useNetwork } from "wagmi";
-import { getContract } from "../../src/contract";
+import { getContract, send } from "../../src/contract";
 import { usePriceData } from "../context/PriceContext";
 import { useSyntheticsData } from "../context/SyntheticsPosition";
 
@@ -123,10 +123,10 @@ export default function Market() {
 	const claim = async () => {
 		setClaiming(true);
 		const synthex = await getContract("SyntheX", connectedChain!.id);
-		synthex["claimReward"](
+		send(synthex, "claimReward", [
 			[pools[0].rewardTokens[0].id],
 			address,
-			pools.map((pool: any) => pool.id)
+			pools.map((pool: any) => pool.id)]
 		)
 			.then(async (result: any) => {
 				await result.wait(1);
