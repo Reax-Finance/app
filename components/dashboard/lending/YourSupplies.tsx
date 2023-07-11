@@ -54,7 +54,7 @@ export default function YourSupplies() {
 									</ThBox>
 									<ThBox alignBox='center'>
 									<Text w={'100%'} textAlign={'center'}>
-										Balance
+										My Balance
 									</Text>
 									</ThBox>
 									<ThBox alignBox='right' isNumeric>

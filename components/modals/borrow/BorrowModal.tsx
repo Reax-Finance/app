@@ -210,7 +210,7 @@ export default function BorrowModal({
 						</InputGroup>
 					</Box>
 					</Box>
-
+					<Divider />
 					<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 						<TabList>
 							<Tab

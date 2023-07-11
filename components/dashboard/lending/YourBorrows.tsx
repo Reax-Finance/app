@@ -5,37 +5,24 @@ import {
 	Table,
 	Thead,
 	Tbody,
-	Tfoot,
 	Tr,
-	Th,
-	Td,
 	TableContainer,
 	Box,
 	Skeleton,
 	Heading,
-	Divider,
 	Flex,
 	Text
 } from "@chakra-ui/react";
 
 import ThBox from "../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
-
-import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { useBalanceData } from "../../context/BalanceProvider";
-import YourSupply from "../../modals/supply/YourSupply";
 import YourBorrow from "../../modals/borrow/YourBorrow";
-import Big from "big.js";
 import { usePriceData } from "../../context/PriceContext";
-import { dollarFormatter, tokenFormatter } from "../../../src/const";
-import { useSyntheticsData } from "../../context/SyntheticsPosition";
-const pageSize = 9;
 
 export default function YourBorrows() {
-	const { markets } = useLendingData();
-	
+	const { markets } = useLendingData();	
 	const { walletBalances } = useBalanceData();
-	const { prices } = usePriceData();
 	
 	const borrowedMarkets = markets.filter((market: any) => {
 		return walletBalances[market._vToken.id] > 0 || walletBalances[market._sToken.id] > 0;
@@ -52,7 +39,7 @@ export default function YourBorrows() {
 			</Box>
 
 			{markets.length > 0 ? ( <>
-					{borrowedMarkets.length > 0 ? <TableContainer pb={4}>
+					{borrowedMarkets.length > 0 ? <TableContainer h='100%' pb={4}>
 						<Table variant="simple">
 							<Thead>
 								<Tr>
@@ -70,7 +57,7 @@ export default function YourBorrows() {
 									</Text>
 									</ThBox>
 									<ThBox alignBox='right' isNumeric>
-										Balance
+										My Balance
 									</ThBox>
 								</Tr>
 							</Thead>
@@ -96,14 +83,11 @@ export default function YourBorrows() {
 							</Tbody>
 						</Table>
 					</TableContainer>
-					
-				: <Flex flexDir={'column'} justify={'center'} h='100%' py={5}>
-				<Text textAlign={'center'} color={'whiteAlpha.600'}>You have no borrowed assets.</Text>
-				</Flex>
-				}
-					</>
-
-
+					: <Flex flexDir={'column'} justify={'center'} h='100%' py={5}>
+					<Text textAlign={'center'} color={'whiteAlpha.600'}>You have no borrowed assets.</Text>
+					</Flex>
+					}
+				</>
 			) : (
 				<Box pt={0.5}>
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />

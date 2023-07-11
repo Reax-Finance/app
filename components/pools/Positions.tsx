@@ -4,13 +4,8 @@ import {
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
-    Th,
-    Td,
-    TableCaption,
     TableContainer,
-    Button,
     Box,
     Heading,
     Text,
@@ -38,36 +33,35 @@ export default function Positions() {
           <Heading fontSize={'18px'} color={'primary.400'}>Your Balances</Heading>
         </Flex>
       </Box>
-   {yourPositions.length > 0 ? <TableContainer px={4} pb={4}>
-  <Table variant='simple'>
-    <Thead>
-      <Tr>
-        <ThBox>Assets</ThBox>
-        <ThBox alignBox='center'>Composition</ThBox>
-        <ThBox alignBox='center'>
-            <Flex w={'100%'} justify={'center'}>
-            Balance
-            </Flex>
-            </ThBox>
-        <ThBox alignBox='center'>
-        <Flex w={'100%'} justify={'center'}>
-                  Earning
+      {yourPositions.length > 0 ? <TableContainer px={4} pb={4}>
+        <Table variant='simple'>
+          <Thead>
+            <Tr>
+              <ThBox>Assets</ThBox>
+              <ThBox alignBox='center'>Composition</ThBox>
+              <ThBox alignBox='center'>
+                  <Flex w={'100%'} justify={'center'}>
+                    My Balance
                   </Flex>
-        </ThBox>
-        <ThBox isNumeric>.</ThBox>
-      </Tr>
-    </Thead>
-    <Tbody>
-        {yourPositions.map((pool: any, index: number) => {
-        return (
-            <YourPoolPosition key={index} pool={pool} index={index} />
-        )
-    })}
-    </Tbody>
-  </Table>
-</TableContainer> : <><Text color={'whiteAlpha.600'} p={6}>No Active Positions</Text></>}
+                  </ThBox>
+              <ThBox alignBox='center'>
+              <Flex w={'100%'} justify={'center'}>
+                        Earning
+                        </Flex>
+              </ThBox>
+              <ThBox isNumeric>.</ThBox>
+            </Tr>
+          </Thead>
+          <Tbody>
+              {yourPositions.map((pool: any, index: number) => {
+              return (
+                  <YourPoolPosition key={index} pool={pool} index={index} />
+              )
+          })}
+          </Tbody>
+        </Table>
+        </TableContainer> : <><Text color={'whiteAlpha.600'} p={6}>No Active Positions</Text></>}
     </Box>
-    
     </>
   )
 }

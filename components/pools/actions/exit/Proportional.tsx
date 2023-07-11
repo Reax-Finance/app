@@ -244,19 +244,13 @@ export default function ProportionalWithdraw({ pool }: any) {
 					message: "Enter amount"
 				};
 			}
-			if(Big(walletBalances[(isNative && poolTokens[i].token.id == WETH_ADDRESS(chain?.id!)) ? ethers.constants.AddressZero : poolTokens[i].token.id] ?? 0).lt(Big(Number(amounts[i])).mul(10 ** poolTokens[i].token.decimals))) {
-				return {
-					valid: false,
-					message: `Insufficient ${poolTokens[i].token.symbol} balance`
-				};
-			}
 		}
-		if(tokenToApprove() !== -1) {
-			return {
-				valid: true,
-				message: `Approve ${poolTokens[tokenToApprove()].token.symbol} for use`
-			}
-		}
+		// if(tokenToApprove() !== -1) {
+		// 	return {
+		// 		valid: true,
+		// 		message: `Approve ${poolTokens[tokenToApprove()].token.symbol} for use`
+		// 	}
+		// }
 		if(error && error.length > 0) {
 			return {
 				valid: false,
