@@ -10,6 +10,11 @@ export default function useUpdateData() {
 		tradingPool
 	} = useContext(AppDataContext);
     
+    /**
+     * 
+     * @param tokens address of tokens
+     * @returns 
+     */
     const getUpdateData = async (
         tokens = pools[tradingPool].collaterals.map((token: any) => token.token.id).concat(pools[tradingPool].synths.map((token: any) => token.token.id))
     ) => {

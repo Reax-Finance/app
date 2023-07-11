@@ -31,16 +31,16 @@ function BalanceContextProvider({ children }: any) {
     const [tokens, setTokens] = React.useState<any>([]);
 	const { chain } = useNetwork();
 
-    const { markets } = useLendingData();
+    const { pools: lendingPools, markets: selectedLendingMarket } = useLendingData();
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault } = useDexData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && markets.length > 0 && dexPools.length > 0 ) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 ) {
             fetchBalances(address);
         }
-    }, [markets.length, pools.length, dexPools.length, address, status])
+    }, [selectedLendingMarket.length, pools.length, dexPools.length, address, status])
 
 	const fetchBalances = async (_address?: string) => {
         console.log("Fetching balances for:", _address);
@@ -73,12 +73,16 @@ function BalanceContextProvider({ children }: any) {
                 }
             }
         }
-        for(let i = 0; i < markets.length; i++) {
-            const market = markets[i];
-            if(!_tokens.find((token: any) => token.id == market.inputToken.id)) {
-                _tokens.push(market.inputToken);
+        for(let j = 0; j< lendingPools.length; j++){
+            let markets = lendingPools[j];
+            for(let i = 0; i < markets.length; i++) {
+                const market = markets[i];
+                if(!_tokens.find((token: any) => token.id == market.inputToken.id)) {
+                    _tokens.push(market.inputToken);
+                }
             }
         }
+
         for(let i = 0; i < dexPools.length; i++) {
             const dexPool = dexPools[i];
             for(let j = 0; j < dexPool.tokens.length; j++) {
@@ -140,49 +144,52 @@ function BalanceContextProvider({ children }: any) {
         // For lending input tokens, get allowance to lending protocol
         // If wrapped token, get allowance to wrapper and borrow allowace
         // Get balance and totalSupplies of output token, debt tokens
-        for(let i = 0; i < markets.length; i++) {
-            const market = markets[i];
-            // allowance to market
-            calls.push([
-                market.inputToken.id,
-                itf.encodeFunctionData("allowance", [
-                    _address,
-                    market.protocol._lendingPoolAddress
-                ]),
-            ]);
-            calls.push([
-                market.outputToken.id,
-                itf.encodeFunctionData("nonces", [_address]),
-            ]);
-            // if aweth, check allowance for wrapper
-            if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+        for(let j = 0; j < lendingPools.length; j++){
+            let markets = lendingPools[j]
+            for(let i = 0; i < markets.length; i++) {
+                const market = markets[i];
+                // allowance to market
                 calls.push([
                     market.inputToken.id,
                     itf.encodeFunctionData("allowance", [
                         _address,
-                        wrapperAddress
+                        market.protocol._lendingPoolAddress
                     ]),
                 ]);
                 calls.push([
-                    market._vToken.id,
-                    vTokenInterface.encodeFunctionData("borrowAllowance", [_address, wrapperAddress]),
-                ])
-            };
+                    market.outputToken.id,
+                    itf.encodeFunctionData("nonces", [_address]),
+                ]);
+                // if aweth, check allowance for wrapper
+                if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                    calls.push([
+                        market.inputToken.id,
+                        itf.encodeFunctionData("allowance", [
+                            _address,
+                            wrapperAddress
+                        ]),
+                    ]);
+                    calls.push([
+                        market._vToken.id,
+                        vTokenInterface.encodeFunctionData("borrowAllowance", [_address, wrapperAddress]),
+                    ])
+                };
 
-            calls.push([
-                market.outputToken.id,
-                itf.encodeFunctionData("balanceOf", [_address]),
-            ]);
-            // debt
-            calls.push([
-                market._vToken.id,
-                itf.encodeFunctionData("balanceOf", [_address]),
-            ]);
-            calls.push([
-                market._sToken.id,
-                itf.encodeFunctionData("balanceOf", [_address]),
-            ]);
-        };
+                calls.push([
+                    market.outputToken.id,
+                    itf.encodeFunctionData("balanceOf", [_address]),
+                ]);
+                // debt
+                calls.push([
+                    market._vToken.id,
+                    itf.encodeFunctionData("balanceOf", [_address]),
+                ]);
+                calls.push([
+                    market._sToken.id,
+                    itf.encodeFunctionData("balanceOf", [_address]),
+                ]);
+            };
+        }
 
         // check balance for lp tokens and allowance to vault
         for(let i = 0; i < dexPools.length; i++) {
@@ -235,26 +242,29 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                 }
             }
-            for(let i = 0; i < markets.length; i++) {
-                const market = markets[i];
-                if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
-                newAllowances[market.inputToken.id][market.protocol._lendingPoolAddress] = BigNumber.from(res[index]).toString();
-                index++;
-                newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
-                index++;
-                if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
-                    newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+            for(let j = 0; j < lendingPools.length; j++){
+                let markets = lendingPools[j];
+                for(let i = 0; i < markets.length; i++) {
+                    const market = markets[i];
+                    if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
+                    newAllowances[market.inputToken.id][market.protocol._lendingPoolAddress] = BigNumber.from(res[index]).toString();
                     index++;
-                    if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
-                    newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                    newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
+                    index++;
+                    if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        index++;
+                        if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
+                        newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        index++;
+                    }
+                    newBalances[market.outputToken.id] = BigNumber.from(res[index]).toString();
+                    index++;
+                    newBalances[market._vToken.id] = BigNumber.from(res[index]).toString();
+                    index++;
+                    newBalances[market._sToken.id] = BigNumber.from(res[index]).toString();
                     index++;
                 }
-                newBalances[market.outputToken.id] = BigNumber.from(res[index]).toString();
-                index++;
-                newBalances[market._vToken.id] = BigNumber.from(res[index]).toString();
-                index++;
-                newBalances[market._sToken.id] = BigNumber.from(res[index]).toString();
-                index++;
             }
             for(let i = 0; i < dexPools.length; i++) {
                 const dexPool = dexPools[i];

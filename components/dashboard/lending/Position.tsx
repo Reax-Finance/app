@@ -2,29 +2,25 @@ import React from 'react'
 import Info from '../../infos/Info'
 import { Flex, Text, Box, Heading } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
-import { IoMdAnalytics, IoMdCash } from 'react-icons/io'
+import { IoMdCash } from 'react-icons/io'
 import IconBox from './../IconBox'
 import { TbReportMoney } from 'react-icons/tb'
 import Big from 'big.js'
 import { useAppData } from '../../context/AppDataProvider'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
 import { dollarFormatter, tokenFormatter } from '../../../src/const'
-import { useBalanceData } from '../../context/BalanceProvider'
-import { usePriceData } from '../../context/PriceContext'
 import { useSyntheticsData } from '../../context/SyntheticsPosition'
 import { FaPercentage } from 'react-icons/fa'
 
 export default function LendingPosition() {
-    const { pools, tradingPool, account } = useAppData();
-    const { walletBalances } = useBalanceData();
-	const { prices } = usePriceData();
+    const { tradingPool } = useAppData();
     const { lendingPosition, netAPY } = useSyntheticsData();
 
     const pos = lendingPosition();
 
-  return (
+    return (
     <>
-        {Big(pos?.collateral).gt(0) ? <Box
+        {Big(lendingPosition()?.collateral).gt(0) ? <Box
             w='100%'
             display={{ sm: "block", md: "block" }}
             className='halfContainerBody'
@@ -255,8 +251,7 @@ export default function LendingPosition() {
                 ></Box>
             </Box>
         </Box>
-    : <></>    
-    }
+    : <></>}
     </>
   )
 }

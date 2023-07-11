@@ -22,13 +22,10 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { useLendingData } from "../../context/LendingDataProvider";
 
 export default function Redeem({ market, amount, setAmount, amountNumber, isNative, max }: any) {
 	const [loading, setLoading] = useState(false);
-	const [response, setResponse] = useState<string | null>(null);
-	const [hash, setHash] = useState(null);
-	const [confirmed, setConfirmed] = useState(false);
-	const [message, setMessage] = useState("");
 	const toast = useToast();
 
 	const {prices} = usePriceData();
@@ -46,14 +43,11 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const { nonces, allowances, updateFromTx } = useBalanceData();
+	const { markets } = useLendingData();
 
 	const withdraw = async () => {
 		setLoading(true);
-		setMessage("")
-		setConfirmed(false);
-		setResponse(null);
-		setHash(null);
-		const priceFeedUpdateData = await getUpdateData()
+		const priceFeedUpdateData = await getUpdateData(markets.map((m: any) => m.inputToken.id));
 		const _amount = Big(amount).mul(10**market.inputToken.decimals).toFixed(0);
 
 		let tx: any;
@@ -71,11 +65,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 				priceFeedUpdateData
 			];
 			
-			tx = send(
-				pool,
-				"withdraw",
-				args
-			)
+			tx = send(pool, "withdraw", args)
 		}
 		tx.then(async (res: any) => {
 			updateFromTx(await res.wait());

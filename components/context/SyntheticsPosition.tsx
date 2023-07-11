@@ -29,7 +29,7 @@ const SyntheticsPositionContext = React.createContext<SyntheticsPositionValue>({
 
 function SyntheticsPositionProvider({ children }: any) {
     const { pools, tradingPool } = useAppData();
-    const { markets } = useLendingData();
+    const { pools: lendingPools, selectedPool } = useLendingData();
     const { prices } = usePriceData();
     const { walletBalances } = useBalanceData();
 
@@ -47,11 +47,11 @@ function SyntheticsPositionProvider({ children }: any) {
         return res.toString();
     }
 
-    const position = (): Position => {
+    const position = (_tradingPool = tradingPool): Position => {
 		let _totalCollateral = Big(0);
 		let _adjustedCollateral = Big(0);
 		let _totalDebt = Big(0);
-        const _pool = pools[tradingPool];
+        const _pool = pools[_tradingPool];
         if(!_pool) return {collateral: '0', debt: '0', stableDebt: '0', adjustedCollateral: '0', availableToIssue: '0', debtLimit: '0'};
 		for (let i = 0; i < _pool.collaterals.length; i++) {
 			const usdValue = Big(_pool.collaterals[i].balance ?? 0)
@@ -82,11 +82,12 @@ function SyntheticsPositionProvider({ children }: any) {
         }
     }
 
-    const lendingPosition = (): Position => {
+    const lendingPosition = (_selectedPool = selectedPool): Position => {
         let _totalCollateral = Big(0);
         let _adjustedCollateral = Big(0);
         let _totalDebt = Big(0);
         let _totalStableDebt = Big(0);
+        let markets = lendingPools[_selectedPool];
         if(markets.length == 0) return {collateral: '0', debt: '0', stableDebt: '0', adjustedCollateral: '0', availableToIssue: '0', debtLimit: '0'};
         for (let i = 0; i < markets.length; i++) {
             if(!walletBalances[markets[i].outputToken.id] || !prices[markets[i].inputToken.id]) continue;
@@ -115,26 +116,29 @@ function SyntheticsPositionProvider({ children }: any) {
         }
     }
 
-    const supplied = () => {
+    const supplied = (_selectedPool = selectedPool) => {
+        let markets = lendingPools[_selectedPool];
 		return markets.reduce((acc: number, market: any) => {
 			return acc + (Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
 		}, 0);
 	}
 
-    const netSupplyAPY = () => {
+    const netSupplyAPY = (_selectedPool = selectedPool) => {
+        let markets = lendingPools[_selectedPool];
 		// sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
 		let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
 			return acc + (market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) *(Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
 		}, 0);
 		
-		let sumOfBalances = supplied();
+		let sumOfBalances = supplied(_selectedPool);
 
 		return sumOfRatesTimesBalance / sumOfBalances;
 	}
 
     // sum of all stable + variable borrows
-	const borrowed = () => {
+	const borrowed = (_selectedPool = selectedPool) => {
 		let sum = Big(0);
+        let markets = lendingPools[_selectedPool];
 		markets.forEach((market: any) => {
 			sum = sum.plus(Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals));
 			sum = sum.plus(Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals));
@@ -142,10 +146,11 @@ function SyntheticsPositionProvider({ children }: any) {
 		return sum.toNumber();
 	}
 
-	const netBorrowAPY = () => {
+	const netBorrowAPY = (_selectedPool = selectedPool) => {
 		// sum of all(market.rates.filter((rate: any) => rate.side == "BORROWER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
 		let sum = Big(0);
-		let sumBalances = borrowed();
+		let sumBalances = borrowed(_selectedPool);
+        let markets = lendingPools[_selectedPool];
 		markets.forEach((market: any) => {
 			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals)));
 			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals)));
@@ -153,11 +158,11 @@ function SyntheticsPositionProvider({ children }: any) {
 		return sum.div(sumBalances).toNumber();
 	}
 
-    const netAPY = () => {
-        const netSupply = netSupplyAPY();
-        const netBorrow = netBorrowAPY();
-        const _supplied = supplied();
-        const _borrowed = borrowed();
+    const netAPY = (_selectedPool = selectedPool) => {
+        const netSupply = netSupplyAPY(_selectedPool);
+        const netBorrow = netBorrowAPY(_selectedPool);
+        const _supplied = supplied(_selectedPool);
+        const _borrowed = borrowed(_selectedPool);
         return (_supplied * netSupply - _borrowed * netBorrow) / (_supplied + _borrowed);
     }
 

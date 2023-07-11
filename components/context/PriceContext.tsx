@@ -22,20 +22,20 @@ function PriceContextProvider({ children }: any) {
 
 	const { chain } = useNetwork();
 
-    const { markets } = useLendingData();
+    const { markets: selectedLendingMarket, pools: lendingPools } = useLendingData();
     const { pools } = useAppData();
     const { address } = useAccount();
 
     React.useEffect(() => {
-        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && markets.length > 0) {
-            if(markets[0].feed && pools[0].synths[0].feed){
+        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && selectedLendingMarket.length > 0) {
+            if(selectedLendingMarket[0].feed && pools[0].synths[0].feed){
                 setSubStatus(SubStatus.SUBSCRIBED);
                 console.log("Subscribed to price data");
                 updatePrices();
                 setInterval(updatePrices, 30000);
             }
         }
-    }, [markets, pools, address, subStatus]);
+    }, [selectedLendingMarket, pools, address, subStatus]);
 
 	const updatePrices = async () => {
         const chainId = chain?.id ?? defaultChain.id;
@@ -75,18 +75,22 @@ function PriceContextProvider({ children }: any) {
                 }
             }
         }
-        for(let i = 0; i < markets.length; i++) {
-            const market = markets[i];
-            const priceOracle = new ethers.Contract(market.protocol._priceOracle, getABI("PriceOracle", chainId), helper.provider);
-            if(market.feed == ethers.constants.HashZero.toLowerCase() || market.feed.startsWith('0x0000000000000000000000')){
-                reqs.push([
-                    market.protocol._priceOracle,
-                    priceOracle.interface.encodeFunctionData("getAssetPrice", [market.inputToken.id])
-                ])
-            } else {
-                pythFeeds.push(market.feed);
+        for(let j = 0; j< lendingPools.length; j++){
+            let markets = lendingPools[j];
+            for(let i = 0; i < markets.length; i++) {
+                const market = markets[i];
+                const priceOracle = new ethers.Contract(market.protocol._priceOracle, getABI("PriceOracle", chainId), helper.provider);
+                if(market.feed == ethers.constants.HashZero.toLowerCase() || market.feed.startsWith('0x0000000000000000000000')){
+                    reqs.push([
+                        market.protocol._priceOracle,
+                        priceOracle.interface.encodeFunctionData("getAssetPrice", [market.inputToken.id])
+                    ])
+                } else {
+                    pythFeeds.push(market.feed);
+                }
             }
         }
+
 
         const allReqs = [helper.callStatic.aggregate(reqs)];
         if(pythFeeds.length > 0) {
@@ -122,15 +126,18 @@ function PriceContextProvider({ children }: any) {
                     }
                 }
             }
-            for(let i = 0; i < markets.length; i++) {
-                const market = markets[i];
-                if(market.feed == ethers.constants.HashZero.toLowerCase() || market.feed.startsWith('0x0000000000000000000000')){
-                    _prices[market.inputToken.id] = Big(BigNumber.from(res.returnData[reqCount]).toString()).div(1e8).toString();
-                    reqCount += 1;
-                } else {
-                    // update price from pyth feed
-                    _prices[market.inputToken.id] = Big(pythRes.data[pythIndex].price.price).mul(10**pythRes.data[pythIndex].price.expo).toString();
-                    pythIndex += 1;
+            for(let j = 0; j< lendingPools.length; j++){
+                let markets = lendingPools[j];
+                for(let i = 0; i < markets.length; i++) {
+                    const market = markets[i];
+                    if(market.feed == ethers.constants.HashZero.toLowerCase() || market.feed.startsWith('0x0000000000000000000000')){
+                        _prices[market.inputToken.id] = Big(BigNumber.from(res.returnData[reqCount]).toString()).div(1e8).toString();
+                        reqCount += 1;
+                    } else {
+                        // update price from pyth feed
+                        _prices[market.inputToken.id] = Big(pythRes.data[pythIndex].price.price).mul(10**pythRes.data[pythIndex].price.expo).toString();
+                        pythIndex += 1;
+                    }
                 }
             }
             _prices[ADDRESS_ZERO] = _prices[WETH_ADDRESS(chainId)]

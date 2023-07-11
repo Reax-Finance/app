@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
-import { LendingEndpoint, query_lending } from "../../src/queries/lending";
+import { LendingEndpoint, LendingEndpoint2, query_lending } from "../../src/queries/lending";
 
 interface LendingDataValue {
 	status: Status;
@@ -15,6 +15,10 @@ interface LendingDataValue {
 	protocol: any;
 	toggleIsCollateral: (marketId: string) => void;
 	fetchData: (address?: string) => Promise<number>;
+	pools: any[],
+	selectedPool: number, 
+	setSelectedPool: (index: number) => void;
+	protocols: any[],
 }
 
 const LendingDataContext = React.createContext<LendingDataValue>({} as LendingDataValue);
@@ -25,8 +29,20 @@ function LendingDataProvider({ children }: any) {
 	const [message, setMessage] = React.useState<LendingDataValue['message']>("");
 	const { chain } = useNetwork();
 	const { address } = useAccount();
-	const [markets, setMarkets] = React.useState<any[]>([]);
-	const [protocol, setProtocol] = React.useState<any>({});
+	const [pools, setPools] = React.useState<any[]>([[], []]);
+	const [protocols, setProtocols] = React.useState<any[]>([[], []]);
+	const [selectedPool, setSelectedPool] = React.useState<any>(0);
+	const markets = pools[selectedPool];
+	const protocol = protocols[selectedPool];
+
+	useEffect(() => {
+		if(localStorage){
+			const _lendingPool = localStorage.getItem("lendingPool");
+			if(_lendingPool && pools.length > parseInt(_lendingPool)){
+				setSelectedPool(parseInt(_lendingPool));
+			}
+		}
+	}, [selectedPool, pools])
 
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
@@ -34,11 +50,13 @@ function LendingDataProvider({ children }: any) {
 		console.log("fetching lending data for chain", chainId);
 		return new Promise((resolve, reject) => {
 			setStatus(Status.FETCHING);
-			const endpoint = LendingEndpoint(chainId)
-			console.log("lending endpoint", endpoint);
 			if(!_address) _address = ADDRESS_ZERO;
 			Promise.all([
-				axios.post(endpoint, {
+				axios.post(LendingEndpoint2(chainId), {
+					query: query_lending(_address.toLowerCase()),
+					variables: {},
+				}),
+				axios.post(LendingEndpoint(chainId), {
 					query: query_lending(_address.toLowerCase()),
 					variables: {},
 				})
@@ -49,16 +67,19 @@ function LendingDataProvider({ children }: any) {
 					setMessage("Network Error. Please refresh the page or try again later.");
 					reject(res[0].data.errors);
 				} else {
-					const poolsData = res[0].data.data.lendingProtocols[0];
-					setProtocol(poolsData);
-					const _markets = res[0].data.data.markets;
-					if(_address && res[0].data.data.account){
-						const _enabledCollaterals = res[0].data.data.account._enabledCollaterals.map((c: any) => c.id);
-						_markets.forEach((market: any) => {
-							market.isCollateral = _enabledCollaterals.includes(market.id);
-						})
+					const _protocols = res.map((r: any) => r.data.data.lendingProtocols[0]);
+					// setProtocols([res[0].data.data.lendingProtocols[0], res[1].data.data.lendingProtocols[0]]);
+					setProtocols(res.map((r: any) => r.data.data.lendingProtocols[0]));
+					const _pools = res.map((r: any) => r.data.data.markets);
+					for(let i in _pools){
+						if(_address && (res[i].data.data.account)){
+							const _enabledCollaterals = res[i].data.data.account._enabledCollaterals.map((c: any) => c.id);
+							_pools[i].forEach((market: any) => {
+								market.isCollateral = _enabledCollaterals.includes(market.id);
+							})
+						}
 					}
-					_setMarketsPriceFeeds(_markets, poolsData._priceOracle)
+					_setMarketsPriceFeeds(_pools, _protocols)
 					.then((_marketsWithFeeds) => {
 						setStatus(Status.SUCCESS);
 						resolve(0);
@@ -82,8 +103,8 @@ function LendingDataProvider({ children }: any) {
 	 * @returns 
 	 */
 	const _setMarketsPriceFeeds = (
-		_markets: any[],
-		_oracle: string,
+		_pools: any[],
+		_protocols: any[],
 		nTries: number = 0
 	): Promise<any> => {
 		const chainId = chain?.id ?? defaultChain.id;
@@ -95,24 +116,39 @@ function LendingDataProvider({ children }: any) {
 		);
 		return new Promise(async (resolve, reject) => {
 			let calls: any[] = [];
-			const oracle = await getContract("PythOracle", chainId, _oracle);
-			const fallbackOracle = await oracle.getFallbackOracle();
-			for (let i = 0; i < _markets.length; i++) {
-				calls.push([_oracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [_markets[i].inputToken.id])]);
-				calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [_markets[i].inputToken.id])]);
+			for(let i in _pools){
+				let _markets = _pools[i];
+				const oracle = await getContract("PythOracle", chainId, _protocols[i]._priceOracle);
+				const fallbackOracle = await oracle.getFallbackOracle();
+				for (let j = 0; j < _markets.length; j++) {
+					calls.push([_protocols[i]._priceOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [_markets[j].inputToken.id])]);
+					calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [_markets[j].inputToken.id])]);
+				}
 			}
 
 			helper.callStatic.aggregate(calls).then(async (res: any) => {
 				let index = 0;
 				// setting wallet balance and allowance
-				for (let i = 0; i < _markets.length; i++) {
-					_markets[i].feed = res.returnData[index];
-					index += 1;
-					_markets[i].fallbackFeed = res.returnData[index];
-					index += 1;
+				// for (let i = 0; i < _markets.length; i++) {
+				// 	_markets[i].feed = res.returnData[index];
+				// 	index += 1;
+				// 	_markets[i].fallbackFeed = res.returnData[index];
+				// 	index += 1;
+				// }
+				// setMarkets(_markets);
+				// resolve(_markets);
+				for(let i in _pools){
+					let _markets = _pools[i];
+					for (let j = 0; j < _markets.length; j++) {
+						_markets[j].feed = res.returnData[index];
+						index += 1;
+						_markets[j].fallbackFeed = res.returnData[index];
+						index += 1;
+					}
+					_pools[i] = _markets;
 				}
-				setMarkets(_markets);
-				resolve(_markets);
+				setPools(_pools);
+				resolve(_pools);
 			})
 			.catch(err => {
 				console.log("Failed to get price feeds", err, calls);
@@ -128,21 +164,21 @@ function LendingDataProvider({ children }: any) {
 				else {
 					// try again in 5 seconds
 					setTimeout(() => {
-						_setMarketsPriceFeeds(_markets, _oracle, nTries + 1);
+						_setMarketsPriceFeeds(_pools, _protocols, nTries + 1);
 					}, 1000)
-				}	
+				}
 			})
 		});
 	};
 
 	const toggleIsCollateral = (marketId: string) => {
-		const _markets = markets.map((market) => {
-			if (market.id == marketId) {
-				market.isCollateral = !(market.isCollateral ?? false);
-			}
-			return market;
-		});
-		setMarkets(_markets);
+		// const _markets = markets.map((market) => {
+		// 	if (market.id == marketId) {
+		// 		market.isCollateral = !(market.isCollateral ?? false);
+		// 	}
+		// 	return market;
+		// });
+		// setMarkets(_markets);
 	}
 
 	const value: LendingDataValue = {
@@ -151,7 +187,11 @@ function LendingDataProvider({ children }: any) {
 		markets,
 		protocol,
 		toggleIsCollateral,
-		fetchData
+		fetchData,
+		selectedPool,
+		setSelectedPool,
+		pools,
+		protocols
 	};
 
 	return (

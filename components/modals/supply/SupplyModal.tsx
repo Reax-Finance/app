@@ -93,13 +93,6 @@ export default function SupplyModal({
 							width={"32px"}
 						/>
 						<Text>{market.inputToken.symbol}</Text>
-						{chain?.testnet && (
-							<Link href="/faucet">
-								<Button size={"xs"} rounded="full" mb={1}>
-									Use Faucet
-								</Button>
-							</Link>
-						)}
 					</Flex>
 				</ModalHeader>
 				<ModalBody m={0} p={0}>

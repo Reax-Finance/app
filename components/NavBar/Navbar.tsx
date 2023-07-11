@@ -133,23 +133,26 @@ function NavBar() {
 								path={"/"}
 								title="Trade"
 							></NavLocalLink>
-							<NavLocalLink
-								path={"/perps"}
-								title="Perpetuals"
-							></NavLocalLink>
-							
-							<NavLocalLink
-								path={"/synthetics"}
-								title={"Synths"}
-							></NavLocalLink>
+
 							<NavLocalLink
 								path={"/lend"}
 								title="Lend"
 							></NavLocalLink>
+							
+							<NavLocalLink
+								path={"/synthetics"}
+								title={"Synthetics"}
+							></NavLocalLink>
+							
 							<NavLocalLink
 								path={"/pools"}
 								title="Pools"
 							></NavLocalLink>
+
+							{/* <NavLocalLink
+								path={"/perps"}
+								title="Perpetuals"
+							></NavLocalLink> */}
 							{/* <NavLocalLink
 								path={"/pools"}
 								title="Pools"

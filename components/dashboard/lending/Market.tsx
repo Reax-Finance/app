@@ -2,6 +2,7 @@ import { Box, Flex, Heading } from '@chakra-ui/react'
 import React from 'react'
 import { useLendingData } from '../../context/LendingDataProvider'
 import { dollarFormatter } from '../../../src/const';
+import PoolSelector from './PoolSelector';
 
 export default function LendingMarket() {
     const {protocol} = useLendingData();
@@ -16,7 +17,8 @@ export default function LendingMarket() {
             mb={6}
         >
             <Box>
-					<Heading fontSize={{sm: '3xl', md: "3xl", lg: '32px'}} fontWeight='bold'>Lending Market</Heading>
+					{/* <Heading fontSize={{sm: '3xl', md: "3xl", lg: '32px'}} fontWeight='bold'>Lending Market</Heading> */}
+					<PoolSelector />
 					<Flex mt={7} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>

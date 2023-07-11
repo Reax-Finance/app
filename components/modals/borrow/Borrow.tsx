@@ -10,30 +10,20 @@ import {
 	Select,
 } from "@chakra-ui/react";
 import { getAddress, getContract, send } from "../../../src/contract";
-import { useContext, useEffect } from "react";
 import { useAccount, useNetwork } from "wagmi";
 import { WETH_ADDRESS, defaultChain, dollarFormatter, numOrZero, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
-import Response from "../_utils/Response";
 import { BigNumber, ethers } from "ethers";
-import { useRouter } from "next/router";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { useLendingData } from "../../context/LendingDataProvider";
 
 const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
-	const router = useRouter();
 	const [loading, setLoading] = useState(false);
-	const [response, setResponse] = useState<string | null>(null);
-	const [hash, setHash] = useState(null);
-	const [confirmed, setConfirmed] = useState(false);
-	const [message, setMessage] = useState("");
-
-	const [referral, setReferral] = useState<string | null>(null);
-
 	const { isConnected, address } = useAccount();
 	const { chain } = useNetwork();
 	const {getUpdateData} = useUpdateData();
@@ -42,6 +32,8 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
+	const {markets} = useLendingData();
+
 	const toast = useToast();
 
 	const handleError = useHandleError(PlatformType.LENDING);
@@ -49,16 +41,12 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	const borrow = async () => {
 		if (!amount) return;
 		setLoading(true);
-		setConfirmed(false);
-		setHash(null);
-		setResponse("");
-		setMessage("");
 
 		let value = Big(amount)
 			.times(10 ** market.inputToken.decimals)
 			.toFixed(0);
 		
-		const priceFeedUpdateData = await getUpdateData();
+		const priceFeedUpdateData = await getUpdateData(markets.map((m: any) => m.inputToken.id));
 
 		let tx;
 		if(isNative){
