@@ -3,7 +3,7 @@ import { usePriceData } from "../../../context/PriceContext";
 import {
     useToast,
 } from "@chakra-ui/react";
-import { WETH_ADDRESS, defaultChain } from "../../../../src/const";
+import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../../../src/const";
 import { ethers } from "ethers";
 import { getAddress, getArtifact, getContract, send } from "../../../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
@@ -108,10 +108,10 @@ export default function ProportionalDeposit({ pool }: any) {
                     maxAmountsIn: pool.tokens.map((token: any) => ethers.constants.MaxUint256),
                     userData: Big(pool.totalShares ?? 0).eq(0) ? ethers.utils.defaultAbiCoder.encode(
                             ['uint256', 'uint256[]'], 
-                            [0, _amounts.map((amount: any, i: number) => Big(Number(amount)).mul(10**poolTokens[i].token.decimals).toFixed(0))]
+                            [0, _amounts.map((amount: any, i: number) => Big(amount).mul(10**poolTokens[i].token.decimals).toFixed(0))]
                         ) : ethers.utils.defaultAbiCoder.encode(
                             ['uint256', 'uint256[]', 'uint256'], 
-                            [1, _amounts.map((amount: any, i: number) => Big(Number(amount)).mul(10**poolTokens[i].token.decimals).toFixed(0)), 0]
+                            [1, _amounts.map((amount: any, i: number) => Big(amount).mul(10**poolTokens[i].token.decimals).toFixed(0)), 0]
                         ),
                     fromInternalBalance: false
                 }
@@ -252,7 +252,11 @@ export default function ProportionalDeposit({ pool }: any) {
 		let _amounts: string[][] = [];
 		for(let i = 0; i < poolTokens.length; i++){
 			_amounts.push([])
-			let amount = Big(walletBalances[poolTokens[i].token.id] ?? 0).div(10 ** poolTokens[i].token.decimals).toFixed(poolTokens[i].token.decimals);
+			let walletBalance = walletBalances[poolTokens[i].token.id] ?? 0;
+			if(poolTokens[i].token.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && isNative){
+				walletBalance = walletBalances[ADDRESS_ZERO] ?? 0;
+			}
+			let amount = Big(walletBalance).div(10 ** poolTokens[i].token.decimals).toFixed(poolTokens[i].token.decimals);
 			for(let j = 0; j < amounts.length; j++){
 				if(i == j){
 					_amounts[i].push(amount);
