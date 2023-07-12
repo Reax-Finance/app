@@ -126,6 +126,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 
 		let tx;
 		if (isNative) {
+			console.log(isNative);
 			const wrapper = await getContract("WrappedTokenGateway", chain?.id ?? defaultChain.id);
 			tx = send(
 				wrapper,
@@ -142,10 +143,11 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 					[market.inputToken.id, _amount, address, 0, deadline, v, r, s]
 				);
 			} else {
+				console.log([market.inputToken.id, _amount, address]);
 				tx = send(
 					pool,
 					"supply",
-					[market.inputToken.id, _amount, address]
+					[market.inputToken.id, _amount, address, 0]
 				);
 			}
 		}

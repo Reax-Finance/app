@@ -16,8 +16,8 @@ interface Position {
 
 interface SyntheticsPositionValue {
     poolDebt: () => string;
-    position: () => Position;
-    lendingPosition: () => Position;
+    position: (_tradingPool?: number) => Position;
+    lendingPosition: (_tradingPool?: number) => Position;
     netAPY: () => number;
     netBorrowAPY: () => number;
     netSupplyAPY: () => number;

@@ -324,7 +324,7 @@
           "block": "13892037"
       },
       "WrappedTokenGateway": {
-        "address": "0xE44a833886Ec50eb15c4Fe71d3E319ACbF8E2aC7",
+        "address": "0x33a40058A0d603De4ab96B7Ac4c2cb242E42579B",
         "abi": "WrappedTokenGateway"
       },
       "BalancerHelpers": {

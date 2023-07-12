@@ -10,6 +10,7 @@ import Big from "big.js";
 import { useAccount } from "wagmi";
 import { MdRefresh } from "react-icons/md";
 import { usePriceData } from "../context/PriceContext";
+import Positions from "./positions";
 
 export default function Portfolio() {
 	const { account, pools, fetchData } = useContext(AppDataContext);
@@ -96,6 +97,8 @@ export default function Portfolio() {
 					</Text>
 				</Box>
 			</Flex>
+
+			<Positions />
 		</Box>
 	);
 }
