@@ -40,7 +40,7 @@ function BalanceContextProvider({ children }: any) {
         if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 ) {
             fetchBalances(address);
         }
-    }, [selectedLendingMarket.length, pools.length, dexPools.length, address, status])
+    }, [(selectedLendingMarket ?? []).length, pools.length, (dexPools ?? []).length, address, status])
 
 	const fetchBalances = async (_address?: string) => {
         console.log("Fetching balances for:", _address);

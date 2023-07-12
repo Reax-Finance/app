@@ -172,13 +172,18 @@ function LendingDataProvider({ children }: any) {
 	};
 
 	const toggleIsCollateral = (marketId: string) => {
-		// const _markets = markets.map((market) => {
-		// 	if (market.id == marketId) {
-		// 		market.isCollateral = !(market.isCollateral ?? false);
-		// 	}
-		// 	return market;
-		// });
-		// setMarkets(_markets);
+		let _pools = [...pools]
+		for(let i in _pools){
+			const _markets = _pools[i].map((market: any) => {
+				if (market.id == marketId) {
+					market.isCollateral = !(market.isCollateral ?? false);
+				}
+				return market;
+			});
+			_pools[i] = _markets
+		}
+
+		setPools(_pools);
 	}
 
 	const value: LendingDataValue = {
