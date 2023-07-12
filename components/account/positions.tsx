@@ -6,7 +6,8 @@ export default function Positions() {
     <Box>
 
         <Box>
-            <Heading size={'md'}>Lending Positions</Heading>
+            {/* <Heading size={'md'}>Lending Positions</Heading> */}
+
         </Box>
     
     </Box>
