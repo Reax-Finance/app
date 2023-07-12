@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { AppDataContext } from "../components/context/AppDataProvider";
 
-const nonMintable = ["MNT", "WETH", "cUSD", "sUSD", "cBTC", 'cETH', 'cBNB', 'sAAPL', 'sMSFT', 'sCOIN', 'sGOOGL', 'cXRP', 'cDOGE', 'cSOL', 'cDOT', 'cADA', 'cLTC', 'WMNT'];
+const nonMintable = ["MNT", "cMNT", "WETH", "cUSD", "sUSD", "cBTC", 'cETH', 'cBNB', 'sAAPL', 'sMSFT', 'sCOIN', 'sGOOGL', 'cXRP', 'cDOGE', 'cSOL', 'cDOT', 'cADA', 'cLTC', 'WMNT'];
 
 const mintAmounts: any = {
     "USDT": "1000",
@@ -46,7 +46,6 @@ import { useAccount, useNetwork } from "wagmi";
 import { ethers } from "ethers";
 import { useBalanceData } from "../components/context/BalanceProvider";
 import Big from "big.js";
-import { useDexData } from "../components/context/DexDataProvider";
 import ThBox from "../components/dashboard/ThBox";
 import TdBox from "../components/dashboard/TdBox";
 
