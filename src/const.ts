@@ -13,11 +13,11 @@ export const mantleTestnet = {
     },
     rpcUrls: {
         default: {
-            http: ["https://rpc.testnet.mantle.xyz"],
+            http: ["https://mantle-testnet.rpc.thirdweb.com", "https://rpc.testnet.mantle.xyz"],
             // webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
         },
         public: {
-            http: ["https://rpc.testnet.mantle.xyz"],
+            http: ["https://rpc.testnet.mantle.xyz", "https://mantle-testnet.rpc.thirdweb.com"],
             // readonly webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
         }
     },

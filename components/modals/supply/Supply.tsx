@@ -80,6 +80,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 		
 		// check allowance if not native
 		if (!isNative) {
+			// if not approved
 			if (Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).eq(0)){
 				return {
 					stage: 1,
@@ -100,19 +101,20 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 			}
 		}
 
-		if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).gt(
-			parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
-		)) {
+		// if already approved
+		// if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).gt(
+		// 	parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
+		// )) {
 			return {
 				stage: 3,
 				message: ""
 			}
-		}
+		// }
 
-		return {
-			stage: 2,
-			message: `Approved ${market.inputToken.symbol} For Use`
-		}
+		// return {
+		// 	stage: 2,
+		// 	message: `Approved ${market.inputToken.symbol} For Use`
+		// }
 	}
 
 	const toast = useToast();
@@ -143,7 +145,6 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 					[market.inputToken.id, _amount, address, 0, deadline, v, r, s]
 				);
 			} else {
-				console.log([market.inputToken.id, _amount, address]);
 				tx = send(
 					pool,
 					"supply",

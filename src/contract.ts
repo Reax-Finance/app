@@ -34,7 +34,7 @@ export function getAddress(contractName: string, chain: number) {
   const config = require(`../deployments/${chain}/config.json`);
   const deployments = require(`../deployments/${chain}/deployments.json`);
   if(!deployments.contracts[contractName]) throw new Error("Contract address not found: " + contractName)
-  return deployments.contracts[contractName].address;
+  return deployments.contracts[contractName].address.toLowerCase();
 }
 
 export async function getContract(contractName: string, chain: number, address: string|null = null) {

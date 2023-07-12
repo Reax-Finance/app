@@ -281,6 +281,39 @@ function Swap() {
 		}
 	};
 
+	// const querySwap = async () => {
+	// 	const token = tokens[inputAssetIndex];
+	// 	const router = await getContract("Router", chain?.id!);
+	// 	let tx;
+	// 	if(isWrap || isUnwrap){
+	// 		let weth = await getContract("WETH9", chain?.id!, WETH_ADDRESS(chain?.id!));
+	// 		if(isWrap) tx = send(weth, "deposit", [], Big(inputAmount).mul(10**token.decimals).toFixed(0));
+	// 		else tx = send(weth, "withdraw", [Big(outputAmount).mul(10**token.decimals).toFixed(0)]);
+	// 	} else {
+	// 		const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
+	// 		const pythData = await getUpdateData(tokenPricesToUpdate);
+	// 		// concat swap assets[]
+	// 		let _swapData = {...swapData};
+	// 		if(token.id == ADDRESS_ZERO){
+	// 			let ethAmount = Big(inputAmount).mul(10**token.decimals).toFixed(0);
+	// 			tx = router.estimateGas.swap(_swapData, pythData)
+	// 		} else {
+	// 			let calls = [];
+	// 			if(Number(approvedAmount) > 0){
+	// 				const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
+	// 				const {v, r, s} = ethers.utils.splitSignature(data!);
+	// 				calls.push(
+	// 					router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
+	// 				)
+	// 			}
+	// 			calls.push(
+	// 				router.interface.encodeFunctionData("swap", [_swapData, pythData])
+	// 			);
+	// 			tx = router.estimateGas.multicall(...calls)
+	// 		}
+	// 	}
+	// }
+
 	const approveTx = async (token: any, routerAddress: string) => {
 		setLoading(true);
 		const tokenContract = await getContract("MockToken", chain?.id ?? defaultChain.id, token.id);
@@ -293,7 +326,8 @@ function Swap() {
 			]
 		)
 		.then(async (res: any) => {
-			updateFromTx(await res.wait());
+			let response = await res.wait();
+			updateFromTx(response);
 			setLoading(false);
 			toast({
 				title: "Approval Successful",

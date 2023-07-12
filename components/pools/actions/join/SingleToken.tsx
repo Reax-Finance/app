@@ -138,7 +138,7 @@ export default function SingleTokenDeposit({ pool }: any) {
         if(error && error.length > 0) {
             return {
                 valid: false,
-                message: 'Invalid amount'
+                message: error
             };
         }
 		return {

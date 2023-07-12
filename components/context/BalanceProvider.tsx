@@ -3,7 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
-import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain, mantleTestnet } from "../../src/const";
 import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
@@ -297,6 +297,7 @@ function BalanceContextProvider({ children }: any) {
         let events = tx.events.filter((event: any) => event.topics[0] == tokenItf.getEventTopic("Transfer"));
         // Decode events
         let decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Transfer", event.data, event.topics)}});
+        console.log("transfers", decodedEvents);
         const newBalances = {...walletBalances};
         for(let i in decodedEvents){
             let isOut = decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase();
@@ -329,15 +330,36 @@ function BalanceContextProvider({ children }: any) {
         // Decode events
         decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Approval", event.data, event.topics)}});
         let newAllowances = {...allowances};
+        console.log("approvals", decodedEvents);
         for(let i in decodedEvents){
             if(decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase()){
                 if(!newAllowances[decodedEvents[i].token]) newAllowances[decodedEvents[i].token] = {};
                 newAllowances[decodedEvents[i].token][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[2].toString();
             }
         }
+        // BorrowAllowanceDelegated events
+        const vTokenItf = new ethers.utils.Interface(getABI("VToken", chain?.id ?? defaultChain.id));
+        events = tx.events.filter((event: any) => event.topics[0] == vTokenItf.getEventTopic("BorrowAllowanceDelegated"));
+        // Decode events
+        decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: vTokenItf.decodeEventLog("BorrowAllowanceDelegated", event.data, event.topics)}});
+        for(let i in decodedEvents){
+            if(!newAllowances[decodedEvents[i].args[2].toLowerCase()]) newAllowances[decodedEvents[i].args[2].toLowerCase()] = {};
+            newAllowances[decodedEvents[i].token.toLowerCase()][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[3].toString();
+        }
         setAllowances(newAllowances);
-        
     }
+
+    const testRecipt = async () => {
+        let tx = '0xcf38dd8e5efea183c6f1fdbe17c8b051d4ad1bc7d0da847b94efafe48f52a4f6';
+        let provider = new ethers.providers.JsonRpcProvider(mantleTestnet.rpcUrls.default.http[0])
+        let receipt = await provider.getTransactionReceipt(tx);
+        console.log(receipt);
+        updateFromTx({events: receipt.logs});
+    }
+
+    React.useEffect(() => {
+        // testRecipt();
+    }, [])
 
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {
         const newBalances = {...walletBalances};

@@ -38,6 +38,8 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 
 	const handleError = useHandleError(PlatformType.LENDING);
 
+	const [approveLoading, setApproveLoading] = useState(false);
+
 	const borrow = async () => {
 		if (!amount) return;
 		setLoading(true);
@@ -67,7 +69,8 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		}
 
 		tx.then(async (res: any) => {
-			updateFromTx(await res.wait());
+			let response = await res.wait();
+			updateFromTx(response);
 			setAmount("0");
 			setLoading(false);
 			toast({
@@ -100,7 +103,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
 		const _allowance = allowances[market._vToken.id]?.[wrapperAddress] ?? 0;
 		if (Big(_allowance).eq(0) || Big(_allowance).lt(
-			parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
+			Big((Number(amount) || 0) > 0 ? amount : 0).mul(10 ** (market.inputToken.decimals ?? 18))
 		)) {
 			return true
 		}
@@ -108,7 +111,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	}
 
 	const approveTx = async () => {
-		setLoading(true);
+		setApproveLoading(true);
 		const contract = await getContract("VToken", chain?.id ?? defaultChain.id, market._vToken.id);
 		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
 		send(
@@ -120,8 +123,9 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 			]
 		)
 		.then(async (res: any) => {
-			await res.wait();
-			setLoading(false);
+			let response = await res.wait();
+			updateFromTx(response);
+			setApproveLoading(false);
 			toast({
 				title: "Approval Successful",
 				description: <Box>
@@ -142,7 +146,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 			})
 		}).catch((err: any) => {
 			handleError(err);
-			setLoading(false);
+			setApproveLoading(false);
 		})
 	}
 
@@ -242,7 +246,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 			<Box mt={6}>
 					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
 						isDisabled={validate().stage != 1}
-						isLoading={loading}
+						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
 						color='white'
 						width="100%"

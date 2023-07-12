@@ -73,7 +73,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 
 		send(pool, "burn", args)
 		.then(async (res: any) => {
-			const response = await res.wait(1);
+			const response = await res.wait();
 			updateFromTx(response);
 			updateFromSynthTx(response);
 			setAmount("0");

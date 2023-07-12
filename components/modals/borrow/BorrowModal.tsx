@@ -16,6 +16,7 @@ import {
 	Divider,
 } from "@chakra-ui/react";
 import {
+	ADDRESS_ZERO,
 	WETH_ADDRESS,
 	W_NATIVE,
 	dollarFormatter,
@@ -82,7 +83,7 @@ export default function BorrowModal({
 					: Big(walletBalances[market._sToken.id]).div(
 							10 ** market._sToken.decimals
 					  );
-			const v2 = Big(walletBalances[market.inputToken.id] ?? 0).div(
+			const v2 = Big(walletBalances[isNative ? ADDRESS_ZERO : market.inputToken.id] ?? 0).div(
 				10 ** market.inputToken.decimals
 			);
 			return (v1.gt(v2) ? v2 : v1).toFixed(market.inputToken.decimals);
@@ -123,17 +124,17 @@ export default function BorrowModal({
 											size="sm"
 										>
 											<TabList>
-												<Box className={isNative ? "tabButtonLeftSelected" : "tabButtonLeft"}>
-												<Tab>
-													{NATIVE}
-												</Tab>
-												</Box>
-												<Box className={!isNative ? "tabButtonRightSelected" : "tabButtonRight"}>
-												<Tab>
-													{W_NATIVE}
-												</Tab>
-												</Box>
-											</TabList>
+											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
+											<Tab>
+												MNT
+											</Tab>
+											</Box>
+											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
+											<Tab>
+												WMNT
+											</Tab>
+											</Box>
+										</TabList>
 										</Tabs>
 								</Flex>
 							</>

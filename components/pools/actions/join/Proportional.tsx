@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { usePriceData } from "../../../context/PriceContext";
-import {
-    useToast,
-} from "@chakra-ui/react";
 import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../../../src/const";
 import { ethers } from "ethers";
 import { getAddress, getArtifact, getContract, send } from "../../../../src/contract";
@@ -10,7 +7,6 @@ import { useAccount, useNetwork } from "wagmi";
 import { useDexData } from "../../../context/DexDataProvider";
 import { useBalanceData } from "../../../context/BalanceProvider";
 import Big from "big.js";
-import { formatBalError } from "../../../../src/errors";
 import ProportionalDepositLayout from "./layouts/ProportionalDepositLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";

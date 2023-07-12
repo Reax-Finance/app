@@ -83,6 +83,8 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 				message: "Loading..."
 			}
 		}
+
+		let _amount = Big((Number(amount) || 0) > 0 ? amount : 0).mul(10 ** (market.inputToken.decimals ?? 18)).toFixed(0);
 		
 		// check allowance if not native
 		if (!isNative) {
@@ -92,7 +94,7 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 					message: "Approve Use Of" + " " + market.inputToken.symbol
 				}
 			} else if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).lt(
-				parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
+				_amount
 			)) {
 				return {
 					stage: 1,
@@ -106,19 +108,19 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 			}
 		}
 
-		if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).gt(
-			parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
-		)) {
+		// if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).lte(
+		// 	_amount
+		// )) {
 			return {
 				stage: 3,
 				message: ""
 			}
-		}
+		// }
 
-		return {
-			stage: 2,
-			message: `Approved ${market.inputToken.symbol} For Use`
-		}
+		// return {
+		// 	stage: 2,
+		// 	message: `Approved ${market.inputToken.symbol} For Use`
+		// }
 	}
 
 	const repay = async () => {

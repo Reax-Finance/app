@@ -74,7 +74,7 @@ export default function Faucet() {
         const amount = ethers.utils.parseUnits(mintAmounts[openedCollateral.symbol], openedCollateral.decimals);
         send(token, "mint", [address, amount])
             .then(async(res: any) => {
-                let response = await res.wait(1);
+                let response = await res.wait();
                 updateFromTx(response);
 
                 setLoading(false);

@@ -77,7 +77,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 		if(priceFeedUpdateData.length > 0) args.push(priceFeedUpdateData);
 		
 		send(pool, "withdraw", args).then(async (res: any) => {
-			const response = await res.wait(1);
+			const response = await res.wait();
 			updateFromTx(response);
 			updateFromSynthTx(response);
 			setAmount('0');

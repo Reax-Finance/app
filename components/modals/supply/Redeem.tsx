@@ -68,7 +68,8 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 			tx = send(pool, "withdraw", args)
 		}
 		tx.then(async (res: any) => {
-			updateFromTx(await res.wait());
+			let response = await res.wait();
+			updateFromTx(response);
 			setAmount('0');
 			setApprovedAmount('0')
 			setLoading(false);
