@@ -9,14 +9,17 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import TdBox from "../dashboard/TdBox";
-import { dollarFormatter } from "../../src/const";
+import { ESYX_PRICE, dollarFormatter } from "../../src/const";
 import Join from "./actions/join/index";
 import Details from "./actions/Details";
 import { usePriceData } from "../context/PriceContext";
+import Big from "big.js";
+import { useDexData } from "../context/DexDataProvider";
 
 export default function Pool({ pool, index }: any) {
 	const { isOpen: isDepositOpen, onOpen: onDepositOpen, onClose: onDepositClose } = useDisclosure();
 	const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
+	const { dex } = useDexData();
 
 	const calcApy = () => {
 		let totalFees = 0;
@@ -34,6 +37,15 @@ export default function Pool({ pool, index }: any) {
 	const liquidity = pool.tokens.reduce((acc: any, token: any) => {
 		return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
 	}, 0);
+
+	const rewardsApy = liquidity > 0 ? Big(pool.allocPoint ?? 0)
+			.div(dex.totalAllocPoint ?? 1)
+			.mul(dex.sushiPerSecond)
+			.div(1e18)
+			.mul(365 * 24 * 60 * 60 * ESYX_PRICE)
+			.div(liquidity ?? 1)
+			.mul(100)
+			.toFixed(2) : 0;
 
 	return (
 		<>
@@ -97,8 +109,12 @@ export default function Pool({ pool, index }: any) {
 				</TdBox>
 
 				<TdBox isFirst={index == 0} alignBox="center">
-					<Flex w={"100%"} justify={"center"}>
-					{calcApy().toFixed(2)}%
+					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
+						<Text>{calcApy().toFixed(2)}%</Text>
+						{Number(rewardsApy) > 0 && <Flex gap={1.5} mt={1} align={'center'}>
+						<Text color={'whiteAlpha.600'} fontSize={'xs'}>{rewardsApy}%</Text>
+						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						</Flex>}
 					</Flex>
 				</TdBox>
 

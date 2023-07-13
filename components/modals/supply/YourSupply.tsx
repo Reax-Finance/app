@@ -43,9 +43,7 @@ export default function YourSupply({ market, index }: any) {
 	};
 
 	const { prices } = usePriceData();
-	const { lendingPosition } = useSyntheticsData();
 	const { toggleIsCollateral } = useLendingData();
-	const pos = lendingPosition();
 
 	const _onOpen = (e: any) => {
 		// we have a switch (with classname isCollateralSwitch) in this row, so we need to prevent the modal from opening
@@ -83,6 +81,7 @@ export default function YourSupply({ market, index }: any) {
 	const rewardAPY = () => {
 		let index = market.rewardTokens.map((token: any) => token.id.split('-')[0] == "DEPOSIT").indexOf(true);
 		if(index == -1) return '0';
+		if(Number(market.totalDepositBalanceUSD) == 0) return '0';
 		return Big(market.rewardTokenEmissionsAmount[index])
 			.div(1e18)
 			.mul(365 * ESYX_PRICE)
@@ -125,7 +124,6 @@ export default function YourSupply({ market, index }: any) {
 					alignBox='center'
 				>
 					<Box w={'100%'} textAlign={'center'}>
-
 					<Text >
 					{tokenFormatter.format(Big(walletBalances[market.outputToken.id] ?? 0).div(10**(market.outputToken.decimals ?? 18)).toNumber())}
 					</Text>

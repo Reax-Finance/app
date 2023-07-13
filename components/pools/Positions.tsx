@@ -14,13 +14,14 @@ import {
 import ThBox from '../dashboard/ThBox';
 import { useBalanceData } from '../context/BalanceProvider';
 import YourPoolPosition from './YourPoolPosition';
+import Big from 'big.js';
 
 export default function Positions() {
     const {walletBalances} = useBalanceData();
     const { pools: dexPools } = useDexData();
     
     const yourPositions = dexPools.filter((pool: any) => {
-      return walletBalances[pool.address] > 0;
+      return( walletBalances[pool.address] > 0 || Big(pool.stakedBalance).gt(0));
     });
 
     if(yourPositions.length == 0) return <></>;
@@ -40,23 +41,23 @@ export default function Positions() {
               <ThBox>Assets</ThBox>
               <ThBox alignBox='center'>Composition</ThBox>
               <ThBox alignBox='center'>
-                  <Flex w={'100%'} justify={'center'}>
-                    My Balance
-                  </Flex>
-                  </ThBox>
+                <Flex w={'100%'} justify={'center'}>
+                  My Balance
+                </Flex>
+              </ThBox>
               <ThBox alignBox='center'>
-              <Flex w={'100%'} justify={'center'}>
-                        Earning
-                        </Flex>
+                <Flex w={'100%'} justify={'center'}>
+                  Staked
+                </Flex>
               </ThBox>
               <ThBox isNumeric>.</ThBox>
             </Tr>
           </Thead>
           <Tbody>
-              {yourPositions.map((pool: any, index: number) => {
-              return (
-                  <YourPoolPosition key={index} pool={pool} index={index} />
-              )
+          {yourPositions.map((pool: any, index: number) => {
+            return (
+                <YourPoolPosition key={index} pool={pool} index={index} />
+            )
           })}
           </Tbody>
         </Table>

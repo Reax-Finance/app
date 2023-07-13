@@ -49,7 +49,7 @@ export default function YourSupplies() {
 									</ThBox>
 									<ThBox alignBox='center'>
 									<Text w={'100%'} textAlign={'center'}>
-										APY
+										Earning APY
 									</Text>
 									</ThBox>
 									<ThBox alignBox='center'>

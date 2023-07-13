@@ -48,7 +48,7 @@ export default function YourBorrows() {
 									</ThBox>
 									<ThBox alignBox='center'>
 									<Text w={'100%'} textAlign={'center'}>
-										APY
+										Interest APY
 									</Text>
 									</ThBox>
 									<ThBox alignBox='center'>

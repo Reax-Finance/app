@@ -34,7 +34,7 @@ function BalanceContextProvider({ children }: any) {
     const { pools: lendingPools, markets: selectedLendingMarket } = useLendingData();
     const { pools } = useAppData();
     const { address } = useAccount();
-    const { pools: dexPools, vault } = useDexData();
+    const { pools: dexPools, vault, dex } = useDexData();
 
     React.useEffect(() => {
         if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 ) {
@@ -199,6 +199,18 @@ function BalanceContextProvider({ children }: any) {
                 dexPool.address,
                 itf.encodeFunctionData("balanceOf", [_address]),
             ]);
+            // check approval for staking to minichef
+            calls.push([
+                dexPool.address,
+                itf.encodeFunctionData("allowance", [
+                    _address,
+                    dex.miniChef
+                ]),
+            ]);
+            calls.push([
+                dexPool.address,
+                itf.encodeFunctionData("nonces", [_address]),
+            ]);
             for(let j = 0; j < dexPool.tokens.length; j++) {
                 const token = dexPool.tokens[j].token;
                 calls.push([
@@ -269,6 +281,11 @@ function BalanceContextProvider({ children }: any) {
             for(let i = 0; i < dexPools.length; i++) {
                 const dexPool = dexPools[i];
                 newBalances[dexPool.address] = BigNumber.from(res[index]).toString();
+                index++;
+                if(!newAllowances[dexPool.address]) newAllowances[dexPool.address] = {};
+                newAllowances[dexPool.address][dex.miniChef] = BigNumber.from(res[index]).toString();
+                index++;
+                newNonces[dexPool.address] = BigNumber.from(res[index]).toString();
                 index++;
                 for(let j = 0; j < dexPool.tokens.length; j++) {
                     const token = dexPool.tokens[j].token;
