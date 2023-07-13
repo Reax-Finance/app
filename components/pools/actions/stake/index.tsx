@@ -29,15 +29,13 @@ import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import WithdrawAndHarvest from './WithdrawAndHarvest';
 import Deposit from "./Deposit";
 import Harvest from "./Harvest";
+import { usePriceData } from "../../../context/PriceContext";
 
 export default function Stake({ pool, isOpen, onClose }: any) {
     const [amount, setAmount] = useState('');
-    const { walletBalances, nonces, allowances, updateFromTx, addNonce } = useBalanceData();
-    const [loading, setLoading] = useState(false);
-	const [approveLoading, setApproveLoading] = useState(false);
-	const { chain } = useNetwork();
-	const { address, isConnected } = useAccount();
+    const { walletBalances } = useBalanceData();
 	const [tabSelected, setTabSelected] = useState(0);
+    const { prices } = usePriceData();
 
     const max = () => {
         if(tabSelected == 0) {
@@ -47,6 +45,14 @@ export default function Stake({ pool, isOpen, onClose }: any) {
         } else {
             return '0'
         }
+    }
+
+    const amountUSD = () => {
+        const totalShares = pool.totalShares;
+		const liquidity = pool.tokens.reduce((acc: any, token: any) => {
+			return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
+		}, 0);
+		return (Number(amount) / totalShares) * liquidity;
     }
 
 	return (
@@ -116,7 +122,7 @@ export default function Stake({ pool, isOpen, onClose }: any) {
                                         textAlign={"left"}
                                         color={"whiteAlpha.600"}
                                     >
-                                        {dollarFormatter.format(0)}
+                                        {dollarFormatter.format(amountUSD())}
                                     </Text>
                                 </Box>
 

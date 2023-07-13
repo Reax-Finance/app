@@ -30,17 +30,21 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
 
     useEffect(() => {
         if(dex.miniChef && rewardAccrued == null){
-            const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-            const miniChef = new ethers.Contract(dex.miniChef, getABI('MiniChef', chain?.id!), provider);
-            miniChef.pendingSushi(pool.pid, address)
-            .then((res: any) => {
-                setRewardAccrued(res.toString());
-            })
-            .catch((err: any) => {
-                console.log(err);
-            })
+            updateRewards()
         }
-    }, [dex, loading])
+    }, [dex])
+
+    const updateRewards = () => {
+        const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+        const miniChef = new ethers.Contract(dex.miniChef, getABI('MiniChef', chain?.id!), provider);
+        miniChef.pendingSushi(pool.pid, address)
+        .then((res: any) => {
+            setRewardAccrued(res.toString());
+        })
+        .catch((err: any) => {
+            console.log(err);
+        })
+    }
 
     const validate = () => {
         if(isNaN(Number(amount)) || Number(amount) == 0){
@@ -96,6 +100,7 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
                 position: 'top-right'
             })
             setAmount('');
+            updateRewards();
         })
         .catch((err: any) => {
             setLoading(false);

@@ -37,17 +37,21 @@ export default function Harvest({ pool }: any) {
 
     useEffect(() => {
         if(dex.miniChef && rewardAccrued == null){
-            const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-            const miniChef = new ethers.Contract(dex.miniChef, getABI('MiniChef', chain?.id!), provider);
-            miniChef.pendingSushi(pool.pid, address)
-            .then((res: any) => {
-                setRewardAccrued(res.toString());
-            })
-            .catch((err: any) => {
-                console.log(err);
-            })
+            updateRewards();
         }
-    }, [dex, loading])
+    }, [dex])
+
+    const updateRewards = () => {
+        const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+        const miniChef = new ethers.Contract(dex.miniChef, getABI('MiniChef', chain?.id!), provider);
+        miniChef.pendingSushi(pool.pid, address)
+        .then((res: any) => {
+            setRewardAccrued(res.toString());
+        })
+        .catch((err: any) => {
+            console.log(err);
+        })
+    }
 
     const validate = () => {
         if(rewardAccrued == null){
@@ -80,6 +84,7 @@ export default function Harvest({ pool }: any) {
             let response = await res.wait();
             updateFromTx(response);
             setLoading(false);
+            updateRewards();
             toast({
                 title: 'Transaction submitted',
                 description: <Box>
