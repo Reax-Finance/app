@@ -1,12 +1,13 @@
 import { Box, Button, Flex, Heading, useToast, Text } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useLendingData } from '../../context/LendingDataProvider'
-import { dollarFormatter } from '../../../src/const';
+import { defaultChain, dollarFormatter } from '../../../src/const';
 import PoolSelector from './PoolSelector';
 import { TokenContext } from '../../context/TokenContext';
 import { useAccount, useNetwork } from 'wagmi';
-import { getContract } from '../../../src/contract';
+import { getABI, getAddress, getContract, send } from '../../../src/contract';
 import Big from 'big.js';
+import { ethers } from 'ethers';
 
 export default function LendingMarket() {
     const {protocol, markets, pools, selectedPool} = useLendingData();
@@ -24,25 +25,64 @@ export default function LendingMarket() {
 			if (
 				isConnected &&
 				!(connectedChain as any).unsupported &&
-				pools.length > 0
+				pools.length > 0 &&
+				protocol._rewardsController
 			) {
-				// getContract("RewardsController", connectedChain!.id).then((synthex) => {
-				// 	synthex.callStatic
-				// 		.getRewardsAccrued(
-				// 			[pools[0].rewardTokens[0].id],
-				// 			address,
-				// 			[pools[selectedPool].id]
-				// 		)
-				// 		.then((result) => {
-				// 			setSynAccrued(result[0].toString());
-				// 		})
-				// 		.catch((err) => {
-				// 			console.log("Failed to getRewardsAccrued", err);
-				// 		})
-				// });
+				let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+				let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
+				let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
+				controller.getUserRewards(assets, address, getAddress("VestedREAX", defaultChain.id))
+						.then((result: any) => {
+							setSynAccrued(result.toString());
+						})
+						.catch((err: any) => {
+							console.log("Failed to getRewardsAccrued", err);
+						})
 			}
+			
 		}
 	}, [connectedChain, synAccrued, isConnected, pools, address, selectedPool]);
+
+
+	const claim = () => {
+		setClaiming(true);
+		let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+		let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
+		let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
+		send(controller, "claimRewards", [
+				assets,
+				synAccrued,
+				address,
+				getAddress("VestedREAX", defaultChain.id)
+			])
+			.then(async (result: any) => {
+				let response = await result.wait();
+				console.log(response);
+				setClaiming(false);
+				setSynAccrued("0");
+				claimed((synAccrued / 1e18).toString());
+				toast({
+					title: "Claimed!",
+					description: "Your rewards have been claimed.",
+					status: "success",
+					duration: 10000,
+					isClosable: true,
+					position: "top-right",
+				});
+			})
+			.catch((err: any) => {
+				console.log(err);
+				setClaiming(false);
+				toast({
+					title: "Error",
+					description: "There was an error claiming your rewards.",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+					position: "top-right",
+				});
+			});
+	}
 
 
   return (
@@ -91,7 +131,7 @@ export default function LendingMarket() {
 						</Flex>
 						<Box mt={2} w={'100%'} className="outlinedButton">
 						<Button
-							// onClick={claim}
+							onClick={claim}
 							bg={'transparent'}
 							w="100%"
 							rounded={0}

@@ -129,7 +129,7 @@ export default function Market() {
 			pools.map((pool: any) => pool.id)]
 		)
 			.then(async (result: any) => {
-				await result.wait();
+				await result.wait(1);
 				setClaiming(false);
 				setSynAccrued("0");
 				claimed((synAccrued / 1e18).toString());
@@ -195,7 +195,7 @@ export default function Market() {
 									<Heading size={"sm"}>
 										{(
 											Number(debtBurnApr())
-											// + Number(esSyxApr())
+											+ Number(esSyxApr())
 										).toFixed(2)}
 										%
 									</Heading>

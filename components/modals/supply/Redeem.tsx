@@ -12,7 +12,7 @@ import {
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
-import { getAddress, getContract, send } from "../../../src/contract";
+import { getABI, getAddress, getContract, send } from "../../../src/contract";
 import { defaultChain, dollarFormatter } from "../../../src/const";
 import Link from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
@@ -43,7 +43,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const { nonces, allowances, updateFromTx } = useBalanceData();
-	const { markets } = useLendingData();
+	const { markets, protocol } = useLendingData();
 
 	const withdraw = async () => {
 		setLoading(true);
@@ -52,7 +52,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 
 		let tx: any;
 		if(isNative){
-			const wrapper = await getContract("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			const {v, r, s} = ethers.utils.splitSignature(data!);
 			let args = [market.inputToken.id, _amount, address, deadline, v, r, s, []];
 			tx = send(wrapper, "withdrawETHWithPermit", args);

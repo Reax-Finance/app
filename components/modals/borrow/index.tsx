@@ -14,6 +14,7 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import {
+	ESYX_PRICE,
 	tokenFormatter
 } from "../../../src/const";
 import Big from "big.js";
@@ -39,6 +40,17 @@ export default function Debt({ market, index }: any) {
 		onClose();
 	};
 
+	const rewardAPY = (type = "VARIABLE") => {
+		let index = market.rewardTokens.map((token: any) => (token.id.split('-')[0] == "BORROW" && token.id.split('-')[1] == type)).indexOf(true);
+		if(index == -1) return '0';
+		return Big(market.rewardTokenEmissionsAmount[index])
+			.div(1e18)
+			.mul(365 * ESYX_PRICE)
+			.div(market.totalDepositBalanceUSD)
+			.mul(100)
+			.toFixed(2);
+	}
+
 	return (
 		<>
 			<Tr
@@ -58,12 +70,30 @@ export default function Debt({ market, index }: any) {
 					</Text>
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
-				<Text textAlign={'center'} w={'100%'}>
-					{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
-				</Text>
+				<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
+						<Text>
+							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
+						</Text>
+						{Number(rewardAPY("STABLE")) > 0 && <Flex gap={1} mt={0} align={'center'}>
+						<Text fontSize={'xs'}>
+							+{rewardAPY("STABLE")} %
+						</Text>
+						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						</Flex>}
+					</Flex>
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
-					{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
+					<Flex flexDir={'column'} align={'right'} w={'100%'} textAlign={'right'}>
+						<Text>
+							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
+						</Text>
+						{Number(rewardAPY("VARIABLE")) > 0 && <Flex gap={1} mt={0} justify={'end'} align={'center'}>
+						<Text fontSize={'xs'}>
+							+{rewardAPY("VARIABLE")} %
+						</Text>
+						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						</Flex>}
+					</Flex>
 				</TdBox>
 			</Tr>
 

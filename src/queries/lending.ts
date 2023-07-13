@@ -17,10 +17,13 @@ export const query_lending = (address: string) => (
 		lendingProtocols {
 		  id
 		  name
+		  slug
 		  _priceOracle
 		  _lendingPoolAddress
 		  totalDepositBalanceUSD
 		  totalBorrowBalanceUSD
+		  _rewardsController
+		  _wrapper
 		}
 		markets (orderBy: totalValueLockedUSD, orderDirection: desc) {
 		  protocol {
@@ -72,11 +75,16 @@ export const query_lending = (address: string) => (
 			type
 		  }
 		  inputTokenPriceUSD
-		  rewardTokenEmissionsAmount
-		  rewardTokenEmissionsUSD
 		  rewardTokens {
 			id
+			_distributionEnd
+			token{
+			  id
+			  name
+			  symbol
+			}
 		  }
+		  rewardTokenEmissionsAmount
 		  createdTimestamp
 		}
 		account(id: "${address}") {

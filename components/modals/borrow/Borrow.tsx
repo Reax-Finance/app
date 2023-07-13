@@ -9,7 +9,7 @@ import {
 	Link,
 	Select,
 } from "@chakra-ui/react";
-import { getAddress, getContract, send } from "../../../src/contract";
+import { getABI, getAddress, getContract, send } from "../../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { WETH_ADDRESS, defaultChain, dollarFormatter, numOrZero, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
@@ -32,7 +32,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
-	const {markets} = useLendingData();
+	const {markets, protocol} = useLendingData();
 
 	const toast = useToast();
 
@@ -52,7 +52,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 
 		let tx;
 		if(isNative){
-			const wrapper = await getContract("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			let args = [market.inputToken.id, value, debtType, 0, priceFeedUpdateData];
 			tx = send(wrapper, "borrowETH", args);
 		} else {

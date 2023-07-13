@@ -12,7 +12,7 @@ import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
 import { ethers, BigNumber } from 'ethers';
-import { getContract, send } from "../../../src/contract";
+import { getABI, getContract, send } from "../../../src/contract";
 import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import Link from "next/link";
@@ -37,7 +37,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
-	const { toggleIsCollateral } = useLendingData();
+	const { toggleIsCollateral, protocol } = useLendingData();
 
 	const { walletBalances, nonces, allowances, updateFromTx, addNonce } = useBalanceData();
 
@@ -129,7 +129,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 		let tx;
 		if (isNative) {
 			console.log(isNative);
-			const wrapper = await getContract("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			tx = send(
 				wrapper,
 				"depositETH",

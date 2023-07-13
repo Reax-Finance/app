@@ -10,8 +10,9 @@ import {
 	useDisclosure,
 	Switch,
 	useToast,
+	Image
 } from "@chakra-ui/react";
-import { dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ESYX_PRICE, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import { useNetwork } from 'wagmi';
 import TdBox from "../../dashboard/TdBox";
@@ -79,6 +80,17 @@ export default function YourSupply({ market, index }: any) {
 		})
 	}
 
+	const rewardAPY = () => {
+		let index = market.rewardTokens.map((token: any) => token.id.split('-')[0] == "DEPOSIT").indexOf(true);
+		if(index == -1) return '0';
+		return Big(market.rewardTokenEmissionsAmount[index])
+			.div(1e18)
+			.mul(365 * ESYX_PRICE)
+			.div(market.totalDepositBalanceUSD)
+			.mul(100)
+			.toFixed(2);
+	}
+
 	return (
 		<>
 			<Tr
@@ -96,9 +108,17 @@ export default function YourSupply({ market, index }: any) {
 					isFirst={index == 0}
 					alignBox='center'
 				>
-					<Text w={'100%'} textAlign={'center'}>
+					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
+						<Text>
 						{Number(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0).toFixed(2)} %
-					</Text>
+						</Text>
+						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0} align={'center'}>
+						<Text fontSize={'xs'}>
+							+{rewardAPY()} %
+						</Text>
+						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						</Flex>}
+					</Flex>
 				</TdBox>
 				<TdBox
 					isFirst={index == 0}

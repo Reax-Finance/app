@@ -12,6 +12,7 @@ import {
 	ModalOverlay,
 } from "@chakra-ui/react";
 import { RiArrowDropDownLine } from "react-icons/ri";
+import { BsStars } from "react-icons/bs";
 import { motion, Variants } from "framer-motion";
 import { useLendingData } from "../../context/LendingDataProvider";
 
@@ -199,9 +200,15 @@ export default function PoolSelector() {
 											py="20px"
 										>
 											<Box>
+												<Flex gap={2}>
 												<Heading fontSize={"xl"}>
 													{protocols[index].name}
 												</Heading>
+												{protocols[index].slug == 'synthetic' && <Flex rounded={'full'} px={2} py={1} bgGradient={'linear(to-r, secondary.700, secondary.400, primary.400)'}> 
+													<BsStars />
+													<Heading fontSize={'sm'} fontWeight={'bold'}>Synthetic</Heading>
+												</Flex>}
+												</Flex>
 												<Flex
 													justify={"start"}
 													mr={2}

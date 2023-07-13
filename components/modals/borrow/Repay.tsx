@@ -11,7 +11,7 @@ import {
 	Select
 } from "@chakra-ui/react";
 
-import { getContract, send } from "../../../src/contract";
+import { getABI, getContract, send } from "../../../src/contract";
 import { useContext } from "react";
 import { AppDataContext } from "../../context/AppDataProvider";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
@@ -29,6 +29,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatLendingError } from "../../../src/errors";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { useLendingData } from "../../context/LendingDataProvider";
 
 const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
 
@@ -51,6 +52,8 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 	const {walletBalances, addAllowance, nonces, allowances, updateFromTx} = useBalanceData();
+
+	const { protocol } = useLendingData();
 
 	const handleError = useHandleError(PlatformType.LENDING);
 
@@ -135,11 +138,10 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 		let value = Big(amount)
 		.times(10 ** market.inputToken.decimals)
 		.toFixed(0);
-		
 
 		let tx;
 		if (isNative) {
-			const wrapper = await getContract("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			let args = [market.inputToken.id, value, debtType, address];
 			tx = send(wrapper, "repayETH", args, value);
 		} else {
