@@ -9,7 +9,7 @@ export const query_dex = (address: string) => (`
 {
     balancers{
         address
-        pools {
+        pools (where: {isPaused: false}) {
             id
             address
             poolType

@@ -129,7 +129,7 @@ export default function Market() {
 			pools.map((pool: any) => pool.id)]
 		)
 			.then(async (result: any) => {
-				await result.wait(1);
+				await result.wait();
 				setClaiming(false);
 				setSynAccrued("0");
 				claimed((synAccrued / 1e18).toString());
@@ -205,7 +205,7 @@ export default function Market() {
 					</Flex>
 				</Box>
 
-				{/* {
+				{
 					(pools[tradingPool]
 					?.userDebt > 0 || synAccrued > 0) &&
 					<Box textAlign={"right"}>
@@ -235,7 +235,7 @@ export default function Market() {
 						</Button>
 						</Box>
 					</Box>
-				</Box>} */}
+				</Box>}
 			</Box>
 		</>
 	);

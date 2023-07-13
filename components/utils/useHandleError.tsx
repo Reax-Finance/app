@@ -19,6 +19,15 @@ export default function useHandleError(type: PlatformType) {
                 isClosable: true,
                 position: "top-right"
             })
+        } else if(JSON.stringify(err).includes("header not found")){
+            toast({
+                title: "Network RPC Error",
+                description: "Please try again",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right"
+            })
         } else {
             if(formatLendingError(err) && type == PlatformType.LENDING){
                 toast({

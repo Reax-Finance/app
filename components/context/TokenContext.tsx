@@ -239,7 +239,7 @@ function TokenContextProvider({ children }: any) {
 
 	const claimed = async (amount: string) => {
 		const _syn = syn;
-		_syn.sealedBalance = Big(_syn.sealedBalance).add(amount).toString();
+		_syn.sealedBalance = Big(_syn.sealedBalance ?? 0).add(amount).toString();
 		setSyn(_syn);
 		setRefresh(Math.random());
 	};
