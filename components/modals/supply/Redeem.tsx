@@ -54,7 +54,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 		if(isNative){
 			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			const {v, r, s} = ethers.utils.splitSignature(data!);
-			let args = [market.inputToken.id, _amount, address, deadline, v, r, s, []];
+			let args = [market.inputToken.id, _amount, address, deadline, v, r, s, priceFeedUpdateData];
 			tx = send(wrapper, "withdrawETHWithPermit", args);
 		} else {
 			const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);

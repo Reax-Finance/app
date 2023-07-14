@@ -367,11 +367,19 @@ function BalanceContextProvider({ children }: any) {
     }
 
     const testRecipt = async () => {
-        let tx = '0xcf38dd8e5efea183c6f1fdbe17c8b051d4ad1bc7d0da847b94efafe48f52a4f6';
+        let tx = '0x72bcd49bde4c1c55f5d393bc7faf7b273ed03b8126b15f1034b1370e7c3002e4';
         let provider = new ethers.providers.JsonRpcProvider(mantleTestnet.rpcUrls.default.http[0])
-        let receipt = await provider.getTransactionReceipt(tx);
-        console.log(receipt);
-        updateFromTx({events: receipt.logs});
+        let a = await provider.getTransaction(tx);
+        console.log(a);
+        // try {
+        //     let code = await provider.call(a, a.blockNumber)
+        //   } catch (err: any) {
+        //     const code = err.data.replace('Reverted ','');
+        //     console.log({err});
+        //     let reason = ethers.utils.toUtf8String('0x' + code.substr(138));
+        //     console.log('revert reason:', reason);
+        //   }
+        // updateFromTx({events: receipt.logs});
     }
 
     React.useEffect(() => {
