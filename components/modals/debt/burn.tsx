@@ -129,6 +129,11 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 				valid: false,
 				message: "Insufficient collateral",
 			}
+		} else if(loading) {
+			return {
+				valid: false,
+				message: 'Loading'
+			}
 		} else {
 			return {
 				valid: true,

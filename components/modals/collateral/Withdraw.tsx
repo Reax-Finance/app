@@ -29,7 +29,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
-export default function Withdraw({ collateral, amount, setAmount, amountNumber, isNative }: any) {
+export default function Withdraw({ collateral, amount, setAmount, isNative }: any) {
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
 	const [hash, setHash] = useState(null);
@@ -105,6 +105,20 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 			setLoading(false);
 		});
 	};
+
+	const validate = () => {
+		if(!isConnected || chain?.unsupported){
+			return { valid: false, message: 'Please connect your wallet' }
+		} else if (Number(amount) == 0 || isNaN(Number(amount))){
+			return { valid: false, message: 'Enter Amount'}
+		} else if(Big(amount).gt(max())){
+			return { valid: false, message: 'Amount exceeds balance'}
+		} else if (loading) {
+			return { valid: false, message: 'Loading'}
+		} else {
+			return { valid: true, message: 'Withdraw'}
+		}
+	}
 
 	return (
 		<>
@@ -190,18 +204,11 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
 						</Box>
 					</Box>
             
-				<Box mt={6} className="primaryButton">
+				<Box mt={6} className={!validate().valid ? "disabledPrimaryButton" : "primaryButton"}>
                 <Button
-                    isDisabled={
-                        loading ||
-                        !isConnected ||
-                        chain?.unsupported ||
-                        !amount ||
-                        amountNumber == 0 ||
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max()) 
-                    }
+                    isDisabled={!validate().valid}
                     isLoading={loading}
-                    loadingText="Please sign the transaction"
+                    loadingText="Loading"
                     bgColor="transparent"
                     width="100%"
                     color="white"
@@ -212,17 +219,7 @@ export default function Withdraw({ collateral, amount, setAmount, amountNumber, 
                         bg: "transparent",
                     }}
                 >
-                    {isConnected && !chain?.unsupported ? (
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max()) ? (
-                            <>Insufficient Collateral</>
-                        ) : !amount || amountNumber == 0 ? (
-                            <>Enter Amount</>
-                        ) : (
-                            <>Withdraw</>
-                        )
-                    ) : (
-                        <>Please connect your wallet</>
-                    )}
+                    {validate().message}
                 </Button>
 				</Box>
 

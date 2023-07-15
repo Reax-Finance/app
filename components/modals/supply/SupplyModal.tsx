@@ -36,8 +36,6 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 
 export default function SupplyModal({
 	market,
-	amountNumber,
-	setAmountNumber,
 	amount,
 	setAmount,
 }: any) {
@@ -53,7 +51,6 @@ export default function SupplyModal({
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
 		setAmount(e);
-		setAmountNumber(isValidAndPositiveNS(e) ? Number(e) : 0);
 	};
 
 	const selectTab = (index: number) => {
@@ -159,7 +156,7 @@ export default function SupplyModal({
 									>
 										{dollarFormatter.format(
 											prices[market.inputToken.id] *
-												amountNumber
+												Number(amount)
 										)}
 									</Text>
 								</Box>
@@ -224,7 +221,6 @@ export default function SupplyModal({
 								<Supply
 									market={market}
 									amount={amount}
-									amountNumber={amountNumber}
 									setAmount={_setAmount}
 									isNative={isNative}
                                     max={max()}
@@ -234,7 +230,6 @@ export default function SupplyModal({
 								<Redeem
 									market={market}
 									amount={amount}
-									amountNumber={amountNumber}
 									setAmount={_setAmount}
 									isNative={isNative}
                                     max={max()}

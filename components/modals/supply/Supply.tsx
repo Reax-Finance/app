@@ -24,7 +24,7 @@ import { useLendingData } from "../../context/LendingDataProvider";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
-export default function Supply({ market, amount, setAmount, amountNumber, isNative, max }: any) {
+export default function Supply({ market, amount, setAmount, isNative, max }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const { chain } = useNetwork();
@@ -54,23 +54,17 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				message: "Unsupported Network"
 			}
 		}
-		else if(amountNumber == 0){
+		else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (amountNumber > Number(max)) {
+		} else if (Big(amount).gt(max)) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"
 			}
 		} 
-		// else if(Big(amountNumber).mul(10**market.inputToken.decimals).add(collateral.totalDeposits).gt(collateral.cap)){
-		// 	return {
-		// 		stage: 0,
-		// 		message: "Amount Exceeds Cap"
-		// 	}
-		// }
 		else if (!market || !allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]) {
 			return {
 				stage: 0,
@@ -411,7 +405,7 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 						_hover={{ bg: "transparent" }}
 					>
 						{isConnected && !activeChain?.unsupported ? (
-							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
+							Big(amount).gt(max) ? (
 								<>Insufficient Wallet Balance</>
 							) : (
 								<>Deposit</>
@@ -423,13 +417,6 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 				</Box>
 
 				{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
-
-				{/* <Response
-					response={response}
-					message={message}
-					hash={hash}
-					confirmed={confirmed}
-				/> */}
 			</Box>
 		</>
 	);

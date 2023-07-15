@@ -24,7 +24,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 
-export default function Redeem({ market, amount, setAmount, amountNumber, isNative, max }: any) {
+export default function Redeem({ market, amount, setAmount, isNative, max }: any) {
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
 
@@ -165,7 +165,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 			parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
 		)) {
 			return true
-		}
+		} else if(Number(approvedAmount) > 0 && !Big(approvedAmount).eq(amount)){ return true }
 		return false;
 	}
 
@@ -181,12 +181,12 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 				message: "Unsupported Network"
 			}
 		}
-		else if(amountNumber == 0){
+		else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (amountNumber > Number(max)) {
+		} else if (Big(amount).gt(max)) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"
@@ -363,7 +363,7 @@ export default function Redeem({ market, amount, setAmount, amountNumber, isNati
 						_hover={{ bg: "transparent" }}
 					>
 						{isConnected && !chain?.unsupported ? (
-							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
+							Big(amount).gt(max) ? (
 								<>Insufficient Wallet Balance</>
 							) : (
 								<>Withdraw</>

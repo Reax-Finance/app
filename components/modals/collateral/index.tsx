@@ -42,7 +42,6 @@ export default function CollateralModal({ collateral, index }: any) {
 	const [tabSelected, setTabSelected] = useState(0);
 
 	const [amount, setAmount] = React.useState("");
-	const [amountNumber, setAmountNumber] = useState(0);
 	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
 	const { prices } = usePriceData();
@@ -51,7 +50,6 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	const _onClose = () => {
 		setAmount("0");
-		setAmountNumber(0);
 		onClose();
 		setIsNative(false);
 	};
@@ -59,7 +57,6 @@ export default function CollateralModal({ collateral, index }: any) {
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
 		setAmount(e);
-		setAmountNumber(isValidAndPositiveNS(e) ? Number(e) : 0);
 	};
 
 	const selectTab = (index: number) => {
@@ -234,7 +231,7 @@ export default function CollateralModal({ collateral, index }: any) {
 												>
 													{dollarFormatter.format(
 														prices[collateral.token.id] *
-															amountNumber
+															Number(amount)
 													)}
 												</Text>
 											</Box>
@@ -304,7 +301,6 @@ export default function CollateralModal({ collateral, index }: any) {
 									<Deposit
 										collateral={collateral}
 										amount={amount}
-										amountNumber={amountNumber}
 										setAmount={_setAmount}
 										isNative={isNative}
 									/>
@@ -313,8 +309,8 @@ export default function CollateralModal({ collateral, index }: any) {
 									<Withdraw
 										collateral={collateral}
 										amount={amount}
-										amountNumber={amountNumber}
 										setAmount={_setAmount}
+										isNative={isNative}
 									/>
 								</TabPanel>
 							</TabPanels>

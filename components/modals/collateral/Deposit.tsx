@@ -28,7 +28,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
-export default function Deposit({ collateral, amount, setAmount, amountNumber, isNative }: any) {
+export default function Deposit({ collateral, amount, setAmount, isNative }: any) {
 
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -73,25 +73,24 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 				stage: 0,
 				message: "Unsupported Network"
 			}
-		}
-		else if(amountNumber == 0){
+		} else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (amountNumber > Number(max())) {
+		} else if (Big(amount).gt(max())) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"
 			}
 		} 
-		else if(Big(amountNumber).mul(10**collateral.token.decimals).add(collateral.totalDeposits).gt(collateral.cap)){
+		else if(Big(amount).mul(10**collateral.token.decimals).add(collateral.totalDeposits).gt(collateral.cap)){
 			return {
 				stage: 0,
 				message: "Amount Exceeds Cap"
 			}
 		}
-		else if (!collateral || !allowances[collateral.token.id]?.[pools[tradingPool].id]) {
+		else if (loading || !collateral || !allowances[collateral.token.id]?.[pools[tradingPool].id]) {
 			return {
 				stage: 0,
 				message: "Loading..."
@@ -100,13 +99,8 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		
 		// check allowance if not native
 		if (!isNative) {
-			if (Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).eq(0)){
-				return {
-					stage: 1,
-					message: "Approve Use Of" + " " + collateral.token.symbol
-				}
-			} else if (Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).add(Number(approvedAmount) * 10 ** (collateral.token.decimals ?? 18)).lt(
-				parseFloat(amount) * 10 ** (collateral.token.decimals ?? 18) || 1
+			if (Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).add(Big(approvedAmount).mul(10 ** (collateral.token.decimals ?? 18))).lt(
+				Big(amount).mul(10 ** (collateral.token.decimals ?? 18))
 			)) {
 				return {
 					stage: 1,
@@ -121,7 +115,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 		}
 
 		if(Big(allowances[collateral.token.id]?.[pools[tradingPool].id]).gt(
-			parseFloat(amount) * 10 ** (collateral.token.decimals ?? 18) || 1
+			Big(amount).mul(10 ** (collateral.token.decimals ?? 18))
 		)) {
 			return {
 				stage: 3,
@@ -452,7 +446,7 @@ export default function Deposit({ collateral, amount, setAmount, amountNumber, i
 
 					>
 						{isConnected && !activeChain?.unsupported ? (
-							Big(amountNumber > 0 ? amount : amountNumber).gt(max()) ? (
+							Big(amount).gt(max()) ? (
 								<>Insufficient Wallet Balance</>
 							) : (
 								<>Deposit</>

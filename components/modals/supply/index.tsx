@@ -23,12 +23,9 @@ import TokenInfo from "../_utils/TokenInfo";
 export default function Supply({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [amount, setAmount] = React.useState("");
-	const [amountNumber, setAmountNumber] = useState(0);
-	const { walletBalances } = useBalanceData();
 
 	const _onClose = () => {
 		setAmount("0");
-		setAmountNumber(0);
 		onClose();
 	};
 
@@ -99,8 +96,6 @@ export default function Supply({ market, index }: any) {
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
 				<SupplyModal market={market}
-					amountNumber={amountNumber}
-					setAmountNumber={setAmountNumber}
 					amount={amount}
 					setAmount={setAmount}
 				/>
