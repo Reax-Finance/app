@@ -60,7 +60,7 @@ function SyntheticsPositionProvider({ children }: any) {
             _totalCollateral = _totalCollateral.plus(usdValue);
 			_adjustedCollateral = _adjustedCollateral.plus(usdValue.mul(_pool.collaterals[i].baseLTV).div(10000));
 		}
-
+        console.log(_pool.balance, _pool.totalSupply);
 		if(Big(_pool.totalSupply).gt(0)) _totalDebt = Big(_pool.balance ?? 0).div(_pool.totalSupply).mul(poolDebt());
 
         let availableToIssue = '0'

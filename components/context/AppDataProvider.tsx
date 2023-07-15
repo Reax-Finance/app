@@ -235,18 +235,18 @@ function AppDataProvider({ children }: any) {
 		for(let i in decodedTransferEvents) {
 			if(decodedTransferEvents[i].address == pools[tradingPool].id){
 				let amount = decodedTransferEvents[i].args[2].toString();
-				let value = amount * ((_pools[tradingPool].totalDebtUSD / _pools[tradingPool].totalSupply) || 1);
 				let isMinus = true;
 				// if minting debt tokens
 				if(decodedTransferEvents[i].args[0] == ADDRESS_ZERO){
 					isMinus = false;
 				}
+				console.log(isMinus, amount, decodedTransferEvents[i].args);
 				_pools[tradingPool].totalSupply = Big(_pools[tradingPool].totalSupply ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
 				_pools[tradingPool].balance = Big(_pools[tradingPool].balance ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
-				_pools[tradingPool].totalDebtUSD = Big(_pools[tradingPool].totalDebtUSD ?? 0)[isMinus? 'minus' : 'add'](value).toString();
-				_pools[tradingPool].totalDebt = Big(_pools[tradingPool].totalDebt ?? 0)[isMinus? 'minus' : 'add'](value).toNumber();
 			}
 		}
+        console.log("UPDATED", _pools[tradingPool].balance, _pools[tradingPool].totalSupply);
+
 		setPools(_pools);
 	}
 

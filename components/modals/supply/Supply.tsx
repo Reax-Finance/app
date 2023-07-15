@@ -81,14 +81,14 @@ export default function Supply({ market, amount, setAmount, amountNumber, isNati
 		// check allowance if not native
 		if (!isNative) {
 			// if not approved
-			if (Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).eq(0)){
+			if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).lt(
+				Big(amount).mul(10 ** (market.inputToken.decimals ?? 18))
+			)) {
 				return {
 					stage: 1,
 					message: "Approve Use Of" + " " + market.inputToken.symbol
 				}
-			} else if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).lt(
-				parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
-			)) {
+			} else if(Big(approvedAmount).gt(0) && !Big(approvedAmount).eq(amount)){
 				return {
 					stage: 1,
 					message: "Approve Use Of" + " " + market.inputToken.symbol

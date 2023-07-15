@@ -66,10 +66,8 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 			.times(10 ** 18)
 			.toFixed(0);
 
-		let args = [asset.token.id, value];
-
 		const priceFeedUpdateData = await getUpdateData();
-		if (priceFeedUpdateData.length > 0) args.push(priceFeedUpdateData);
+		let args = [asset.token.id, value, priceFeedUpdateData];
 
 		send(pool, "burn", args)
 		.then(async (res: any) => {
@@ -222,7 +220,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 					</Box>
 				</Box>
 
-				<Box mt={6} className="primaryButton">
+				<Box mt={6} className={!validate().valid? "disabledPrimaryButton" : "primaryButton"}>
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}

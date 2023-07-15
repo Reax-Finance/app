@@ -22,7 +22,7 @@ import { usePriceData } from "../../context/PriceContext";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 
-const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
+const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, max }: any) => {
 	const [loading, setLoading] = useState(false);
 	const { isConnected, address } = useAccount();
 	const { chain } = useNetwork();
@@ -103,7 +103,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
 		const _allowance = allowances[market._vToken.id]?.[wrapperAddress] ?? 0;
 		if (Big(_allowance).eq(0) || Big(_allowance).lt(
-			Big((Number(amount) || 0) > 0 ? amount : 0).mul(10 ** (market.inputToken.decimals ?? 18))
+			Big(amount).mul(10 ** (market.inputToken.decimals ?? 18))
 		)) {
 			return true
 		}
@@ -162,12 +162,12 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 				message: "Unsupported Network"
 			}
 		}
-		else if(amountNumber == 0){
+		else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (amountNumber > Number(max)) {
+		} else if (Big(amount).gt(max)) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"
@@ -273,7 +273,7 @@ const Borrow = ({ market, amount, setAmount, amountNumber, isNative, debtType, s
 						_hover={{ bg: "transparent" }}
 					>
 						{isConnected && !chain?.unsupported ? (
-							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
+							Big(amount).gt(max) ? (
 								<>Insufficient Wallet Balance</>
 							) : (
 								<>Borrow</>

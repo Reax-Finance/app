@@ -35,9 +35,7 @@ import { NATIVE } from '../../../src/const';
 export default function BorrowModal({
 	market,
 	amount,
-	setAmount,
-	amountNumber,
-	setAmountNumber,
+	setAmount
 }: any) {
 	const { chain } = useNetwork();
 	const [tabSelected, setTabSelected] = useState(0);
@@ -53,7 +51,6 @@ export default function BorrowModal({
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
 		setAmount(e);
-		setAmountNumber(isNaN(Number(e)) ? 0 : Number(e));
 	};
 
 	const selectTab = (index: number) => {
@@ -170,7 +167,7 @@ export default function BorrowModal({
 									>
 										{dollarFormatter.format(
 											(prices[market.inputToken.id] ??
-												0) * amountNumber
+												0) * Number(amount)
 										)}
 									</Text>
 								</Box>
@@ -244,7 +241,6 @@ export default function BorrowModal({
 								<Borrow
 									market={market}
 									amount={amount}
-									amountNumber={amountNumber}
 									setAmount={_setAmount}
 									isNative={isNative}
 									debtType={debtType}
@@ -256,7 +252,6 @@ export default function BorrowModal({
 								<Repay
 									market={market}
 									amount={amount}
-									amountNumber={amountNumber}
 									setAmount={_setAmount}
 									isNative={isNative}
 									debtType={debtType}

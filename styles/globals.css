@@ -25,6 +25,13 @@ body {
   height: 600px !important;
 }
 
+.grad {
+  background: linear-gradient(45deg, transparent 6px, linear-gradient(to bottom, darkgray, white) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+
 .swapButton {
   background: linear-gradient(45deg, transparent 6px, rgb(246, 78, 0) 0) bottom left, linear-gradient(-135deg, transparent 6px, #F64E00 0) top right;
   background-repeat: no-repeat;
@@ -94,15 +101,15 @@ body {
 }
 
 .primaryButton:hover {
-  background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.75) 0) top right;
+  background: linear-gradient(45deg, transparent 6px, #B34F2B 0) bottom left, linear-gradient(-135deg, transparent 6px, #B34F2B 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .disabledPrimaryButton {
-  background: linear-gradient(45deg, transparent 6px, rgba(246, 78, 0, 0.40) 0) bottom left, linear-gradient(-135deg, transparent 6px, rgba(246, 78, 0, 0.40) 0) top right;
+  background: linear-gradient(45deg, transparent 6px, #713D2F 0) bottom left, linear-gradient(-135deg, transparent 6px, #713D2F 0) top right;
   background-repeat: no-repeat;
-  background-size: 100% 50%;
+  background-size: 100% 51%;
 }
 
 .secondaryButton {
@@ -112,13 +119,13 @@ body {
 }
 
 .secondaryButton:hover {
-  background: linear-gradient(45deg, transparent 6px, #d97f00 0) bottom left, linear-gradient(-135deg, transparent 6px, #d97f00 0) top right;
+  background: linear-gradient(45deg, transparent 6px, #CD832E 0) bottom left, linear-gradient(-135deg, transparent 6px, #CD832E 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
 }
 
 .disabledSecondaryButton {
-  background: linear-gradient(45deg, transparent 6px, #d97f007b 0) bottom left, linear-gradient(-135deg, transparent 6px, #d97f007b 0) top right;
+  background: linear-gradient(45deg, transparent 6px, #765531 0) bottom left, linear-gradient(-135deg, transparent 6px, #765531 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 50%;
 }

@@ -42,6 +42,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatInput, parseInput } from "../../utils/number";
 import TokenInfo from "../_utils/TokenInfo";
+import Success from "./Success";
 
 export default function Debt({ synth, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -49,6 +50,17 @@ export default function Debt({ synth, index }: any) {
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [tabSelected, setTabSelected] = useState(0);
+	const [isSuccess, setIsSuccess] = useState(false);
+	const [successData, setSuccessData] = useState({});
+
+	const onSuccess = (hash: string, type: 'MINT'|'BURN', successAmount: string) => {
+		setIsSuccess(true);
+		setSuccessData({
+			hash,
+			type,
+			amount: successAmount
+		})
+	}
 
 	const { address } = useAccount();
 
@@ -180,77 +192,81 @@ export default function Debt({ synth, index }: any) {
 						</Flex>
 					</ModalHeader>
 					<ModalBody m={0} p={0}>
-						<Divider />
-						<Box bg={'bg.600'} pb={12} pt={6} px={8}>
-                            <Flex justify={"center"} mb={2}>
-                                <Flex
-                                    justify={"center"}
-                                    align="center"
-                                    gap={0.5}
-                                    bg="gray.700"
-                                    rounded="full"
-                                ></Flex>
-                            </Flex>
-                            <InputGroup
-                                mt={5}
-                                variant={"unstyled"}
-                                display="flex"
-                                placeholder="Enter amount"
-                            >
-                                <NumberInput
-                                    w={"100%"}
-                                    value={formatInput(amount)}
-                                    onChange={_setAmount}
-                                    min={0}
-                                    step={0.01}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent={"center"}
-                                >
-                                    <Box ml={10}>
-                                        <NumberInputField
-                                            textAlign={"center"}
-                                            pr={0}
-                                            fontSize={"5xl"}
-                                            placeholder="0"
-                                        />
 
-                                        <Text
-                                            fontSize="sm"
-                                            textAlign={"center"}
-                                            color={"whiteAlpha.600"}
-                                        >
-                                            {dollarFormatter.format(
-                                                ((prices[synth.token.id] ?? 0) *
-                                                    amountNumber)
-                                            )}
-                                        </Text>
-                                    </Box>
-									<Box>
-									<Button
-                                        variant={"unstyled"}
-                                        fontSize="sm"
-                                        fontWeight={"bold"}
-                                        onClick={() => _setAmount(Big(max()).div(2).toString())}
-										py={-2}
-                                    >
-                                        50%
-                                    </Button>
-                                    <Button
-                                        variant={"unstyled"}
-                                        fontSize="sm"
-                                        fontWeight={"bold"}
-                                        onClick={() => _setAmount(Big(max()).mul(0.99).toString())}
-                                    >
-                                        MAX
-                                    </Button>
-									</Box>
+						{isSuccess ? <>
+							<Success successData={successData} synth={synth} />
+						</> : <>
+							<Divider />
+							<Box bg={'bg.600'} pb={12} pt={6} px={8}>
+								<Flex justify={"center"} mb={2}>
+									<Flex
+										justify={"center"}
+										align="center"
+										gap={0.5}
+										bg="gray.700"
+										rounded="full"
+									></Flex>
+								</Flex>
+								<InputGroup
+									mt={5}
+									variant={"unstyled"}
+									display="flex"
+									placeholder="Enter amount"
+								>
+									<NumberInput
+										w={"100%"}
+										value={formatInput(amount)}
+										onChange={_setAmount}
+										min={0}
+										step={0.01}
+										display="flex"
+										alignItems="center"
+										justifyContent={"center"}
+									>
+										<Box ml={10}>
+											<NumberInputField
+												textAlign={"center"}
+												pr={0}
+												fontSize={"5xl"}
+												placeholder="0"
+											/>
 
-                                </NumberInput>
-                            </InputGroup>
-						</Box>
-						<Divider />
-						<Box className="containerFooter">
+											<Text
+												fontSize="sm"
+												textAlign={"center"}
+												color={"whiteAlpha.600"}
+											>
+												{dollarFormatter.format(
+													((prices[synth.token.id] ?? 0) *
+														amountNumber)
+												)}
+											</Text>
+										</Box>
+										<Box>
+										<Button
+											variant={"unstyled"}
+											fontSize="sm"
+											fontWeight={"bold"}
+											onClick={() => _setAmount(Big(max()).div(2).toString())}
+											py={-2}
+										>
+											50%
+										</Button>
+										<Button
+											variant={"unstyled"}
+											fontSize="sm"
+											fontWeight={"bold"}
+											onClick={() => _setAmount(Big(max()).mul(0.99).toString())}
+										>
+											MAX
+										</Button>
+										</Box>
+
+									</NumberInput>
+								</InputGroup>
+							</Box>
+							<Divider />
+							<Box className="containerFooter">
 						<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 							<TabList>
 								<Tab
@@ -284,6 +300,7 @@ export default function Debt({ synth, index }: any) {
 										amount={amount}
 										amountNumber={amountNumber}
 										setAmount={_setAmount}
+										onSuccess={onSuccess}
 									/>
 								</TabPanel>
 								<TabPanel m={0} p={0}>
@@ -297,6 +314,8 @@ export default function Debt({ synth, index }: any) {
 							</TabPanels>
 						</Tabs>
 							</Box>
+						</>}
+
 					</ModalBody>
 					</Box>
 				</ModalContent>

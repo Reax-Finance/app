@@ -4,34 +4,26 @@ import {
 	Box,
 	Text,
 	Flex,
-	useDisclosure,
 	Divider,
 	Link,
-	Tooltip,
 	Select
 } from "@chakra-ui/react";
 
 import { getABI, getContract, send } from "../../../src/contract";
-import { useContext } from "react";
-import { AppDataContext } from "../../context/AppDataProvider";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import { ADDRESS_ZERO, PYTH_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import Response from "../_utils/Response";
-import InfoFooter from "../_utils/InfoFooter";
 import { ExternalLinkIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
-import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import { BigNumber, ethers } from "ethers";
-import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
-import { formatLendingError } from "../../../src/errors";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 
-const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, setDebtType, max }: any) => {
+const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max }: any) => {
 
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
@@ -69,12 +61,12 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 				stage: 0,
 				message: "Unsupported Network"
 			}
-		} else if(amountNumber == 0){
+		} else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (amountNumber > Number(max)) {
+		} else if (Big(amount).gt(max)) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"
@@ -87,18 +79,18 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 			}
 		}
 
-		let _amount = Big((Number(amount) || 0) > 0 ? amount : 0).mul(10 ** (market.inputToken.decimals ?? 18)).toFixed(0);
+		let _amount = Big(amount).mul(10 ** (market.inputToken.decimals ?? 18)).toFixed(0);
 		
 		// check allowance if not native
 		if (!isNative) {
-			if (Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).eq(0)){
+			if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).lt(
+				_amount
+			)) {
 				return {
 					stage: 1,
 					message: "Approve Use Of" + " " + market.inputToken.symbol
 				}
-			} else if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).lt(
-				_amount
-			)) {
+			} else if(Big(approvedAmount).gt(0) && !Big(approvedAmount).eq(amount)){
 				return {
 					stage: 1,
 					message: "Approve Use Of" + " " + market.inputToken.symbol
@@ -367,7 +359,7 @@ const Repay = ({ market, amount, setAmount, amountNumber, isNative, debtType, se
 						_hover={{ bg: "transparent" }}
 					>
 						{isConnected && !chain?.unsupported ? (
-							Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
+							Big(amount).gt(max) ? (
 								<>Insufficient Wallet Balance</>
 							) : (
 								<>Repay</>

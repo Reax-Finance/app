@@ -25,7 +25,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 
-const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
+const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
@@ -40,7 +40,6 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 	const { prices } = usePriceData();
 	const { position } = useSyntheticsData();
 	const pos = position();
-
 	
 	const {
 		pools,
@@ -107,6 +106,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				isClosable: true,
 				position: "top-right",
 			})
+			onSuccess(response.hash, 'MINT', tokenFormatter.format(Number(amount)));
 		})
 		.catch((err: any) => {
 			handleError(err);
@@ -212,7 +212,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber }: any) => {
 				</Box>
 			</Box>
 
-			<Box mt={6} className="secondaryButton">
+			<Box mt={6} className={!validate().valid ? "disabledSecondaryButton" : "secondaryButton"}>
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}

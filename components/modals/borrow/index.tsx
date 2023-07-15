@@ -26,14 +26,12 @@ export default function Debt({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	const [amount, setAmount] = React.useState("");
-	const [amountNumber, setAmountNumber] = useState(0);
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
 	const _onClose = () => {
 		setAmount("");
-		setAmountNumber(0);
 		onClose();
 	};
 
@@ -97,7 +95,7 @@ export default function Debt({ market, index }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<BorrowModal market={market} amount={amount} setAmount={setAmount} amountNumber={amountNumber} setAmountNumber={setAmountNumber} />
+				<BorrowModal market={market} amount={amount} setAmount={setAmount}/>
 			</Modal>
 		</>
 	);
