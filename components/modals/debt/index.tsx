@@ -193,9 +193,7 @@ export default function Debt({ synth, index }: any) {
 					</ModalHeader>
 					<ModalBody m={0} p={0}>
 
-						{isSuccess ? <>
-							<Success successData={successData} synth={synth} />
-						</> : <>
+						{<>
 							<Divider />
 							<Box bg={'bg.600'} pb={12} pt={6} px={8}>
 								<Flex justify={"center"} mb={2}>

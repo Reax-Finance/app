@@ -130,6 +130,11 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 				valid: false,
 				message: "Insufficient collateral",
 			}
+		} else if(loading) {
+			return {
+				valid: false,
+				message: 'Loading'
+			}
 		} else {
 			return {
 				valid: true,
@@ -216,7 +221,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}
-					loadingText="Please sign the transaction"
+					loadingText="Loading"
 					bg="transparent"
 					colorScheme="primary"
 					width="100%"
