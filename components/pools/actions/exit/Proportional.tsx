@@ -210,18 +210,6 @@ export default function ProportionalWithdraw({ pool }: any) {
 		setAmount(amounts[0], 0)
 	}, [pool])
 
-    const tokenToApprove = () => {		
-		// check allowances
-		for(let i = 0; i < poolTokens.length; i++) {
-			if(isNative && poolTokens[i].token.id == WETH_ADDRESS(chain?.id!)) continue;
-			if(isNaN(Number(amounts[i]))) continue;
-			if(Big(allowances[poolTokens[i].token.id]?.[vault.address] ?? 0).lt(Big(Number(amounts[i])).mul(10 ** poolTokens[i].token.decimals))) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
 	const setMax = (multiplier = 1) => {
 		const totalShares = pool.totalShares;
 		const yourShares = walletBalances[pool.address];
@@ -279,6 +267,7 @@ export default function ProportionalWithdraw({ pool }: any) {
 				_amounts[i] = Big(Number(_amount) ?? 0).mul(poolTokens[i].balance).div(poolTokens[index].balance).toString();
 			}
 		}
+		console.log(_amounts);
 		setAmounts(_amounts);
 		if(isValid) {
 			_setBptIn(_amounts);

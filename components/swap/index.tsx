@@ -492,7 +492,7 @@ function Swap() {
 				<title>
 					{" "}
 					{tokenFormatter.format(
-						prices[tokens[inputAssetIndex]?.id] / prices[tokens[outputAssetIndex]?.id]
+						(prices[tokens[inputAssetIndex]?.id] / prices[tokens[outputAssetIndex]?.id]) || 0
 					)}{" "}
 					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | REAX
 				</title>

@@ -71,7 +71,7 @@ export default function SingleTokenDeposit({ pool }: any) {
         return new Promise<string>(async (resolve, reject) => {
             const provider = new ethers.providers.Web3Provider((window as any).ethereum);
             const balancerHelper = new ethers.Contract(getAddress("BalancerHelpers", chain?.id ?? defaultChain.id), getArtifact("BalancerHelpers"), provider);
-            let _amounts = pool.tokens.map((token: any, i: number) => i == tokenSelectedIndex ? Big(Number(_amount)).mul(10**pool.tokens[i].token.decimals).toFixed(0) : 0);
+            let _amounts = pool.tokens.map((token: any, i: number) => i == tokenSelectedIndex ? Big(_amount).mul(10**pool.tokens[i].token.decimals).toFixed(0) : 0);
             // remove that amount from array
             if(indexOfPoolToken != -1) _amounts.splice(indexOfPoolToken, 1);
             let maxAmountsIn = pool.tokens.map((token: any, index: number) => index == Number(tokenSelectedIndex) ? Big(_amount).mul(10**token.token.decimals).mul(100+maxSlippage).div(100).toFixed(0) : ethers.constants.MaxUint256);
@@ -106,8 +106,8 @@ export default function SingleTokenDeposit({ pool }: any) {
 	// return index of token in pool tokens to approve
 	const shouldApprove = () => {
         if(isNative && pool.tokens[tokenSelectedIndex].token.id == WETH_ADDRESS(chain?.id!)) return false;
-        if(isNaN(Number(amount))) return false;
-        if(Big(allowances[pool.tokens[tokenSelectedIndex].token.id]?.[vault.address] ?? 0).lt(Big(Number(amount)).mul(10 ** pool.tokens[tokenSelectedIndex].token.decimals))) {
+        if(isNaN(Number(amount)) || Number(amount) == 0) return false;
+        if(Big(allowances[pool.tokens[tokenSelectedIndex].token.id]?.[vault.address] ?? 0).lt(Big(amount).mul(10 ** pool.tokens[tokenSelectedIndex].token.decimals))) {
             return true;
         }
         return false;

@@ -65,7 +65,7 @@ export default function SupplyModal({
 					: walletBalances[market.inputToken.id]) ?? 0
 			)
 				.div(10 ** market.inputToken.decimals)
-				.toString();
+				.toFixed(market.inputToken.decimals);
 		} else {
             if(!prices[market.inputToken.id]) return "0";
 			const v1 = Big(pos.availableToIssue);
@@ -73,7 +73,7 @@ export default function SupplyModal({
 				10 ** market.outputToken.decimals
 			);
 			// min(v1, v2)
-			return (v1.gt(v2) ? v2 : v1).toString();
+			return (v1.gt(v2) ? v2 : v1).toFixed(market.outputToken.decimals);
 		}
 	};
     

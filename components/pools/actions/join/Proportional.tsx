@@ -185,6 +185,7 @@ export default function ProportionalDeposit({ pool }: any) {
 
 	const setAmount = (_amount: string, index: number) => {
 		_amount = parseInput(_amount);
+		// TODO: Check if required
         if(Number(_amount) < 0 || _amount == '-' || loading) {
 			setAmounts(
 				amounts.map((amount: any, i: number) => {
@@ -195,6 +196,7 @@ export default function ProportionalDeposit({ pool }: any) {
 		}
 		let _amounts: any[] = [...amounts];
 		let isValid = true;
+
 		for(let i = 0; i < _amounts.length; i++){
 			if(Number(i) == index){
 				_amounts[i] = _amount;
@@ -203,7 +205,7 @@ export default function ProportionalDeposit({ pool }: any) {
 					isValid = false;
 					continue;
 				}
-				_amounts[i] = Big(Number(_amount) ?? 0).mul(poolTokens[i].balance).div(poolTokens[index].balance).toFixed(poolTokens[i].token.decimals);
+				_amounts[i] = Big(_amount).mul(poolTokens[i].balance).div(poolTokens[index].balance).toFixed(poolTokens[i].token.decimals);
 			}
 		}
 		setAmounts(_amounts);
@@ -277,7 +279,6 @@ export default function ProportionalDeposit({ pool }: any) {
 		for(let i = 0; i < _amountsMin.length; i++){
 			_amountsMin[i] = Big(_amountsMin[i]).mul(multiplier).toFixed(poolTokens[i].token.decimals);
 		}
-		
 		setAmounts(_amountsMin);
 		setLoading(true);
 		queryJoin(_amountsMin)
