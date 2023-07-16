@@ -63,6 +63,10 @@ function DEXDataProvider({ children }: any) {
 					reject(res[0].data.errors);
 				} else {
 					let _dex: any = {};
+					_dex.totalLiquidity = res[0].data.data.balancers[0].totalLiquidity;
+					_dex.totalSwapVolume = res[0].data.data.balancers[0].totalSwapVolume;
+					_dex.totalSwapFee = res[0].data.data.balancers[0].totalSwapFee;
+
 					const _pools = res[0].data.data.balancers[0].pools;
 
 					const miniChef = res[1].data.data.miniChefs[0];

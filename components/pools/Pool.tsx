@@ -112,7 +112,7 @@ export default function Pool({ pool, index }: any) {
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
 						<Text>{calcApy().toFixed(2)}%</Text>
 						{Number(rewardsApy) > 0 && <Flex gap={1.5} mt={1} align={'center'}>
-						<Text color={'whiteAlpha.600'} fontSize={'xs'}>{rewardsApy}%</Text>
+						<Text color={'whiteAlpha.600'} fontSize={'xs'}>+{rewardsApy}%</Text>
 						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>

@@ -15,6 +15,9 @@ export const query_dex = (address: string) => (`
 {
     balancers{
         address
+        totalLiquidity
+        totalSwapVolume
+        totalSwapFee
         pools (where: {isPaused: false}) {
             id
             address

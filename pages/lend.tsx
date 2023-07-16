@@ -32,7 +32,7 @@ export default function TempPage() {
 			</Head>
 				<Box w={'100%'}>
 				
-				<Box mt={20}>
+				<Box mt={20} mb={2}>
 					<LendingMarket />
 				</Box>
 

@@ -136,7 +136,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 						<Text>{dollarFormatter.format(stakedBalance())}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
 						{Number(rewardsApy) > 0 && <Flex gap={1} mt={0} align={'center'}>
-						<Text fontSize={'xs'}>
+						<Text color={'whiteAlpha.600'} fontSize={'xs'}>
 						{(calcApy()).toFixed(2)}% + {rewardsApy} %
 						</Text>
 						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
