@@ -267,7 +267,6 @@ export default function ProportionalWithdraw({ pool }: any) {
 				_amounts[i] = Big(Number(_amount) ?? 0).mul(poolTokens[i].balance).div(poolTokens[index].balance).toString();
 			}
 		}
-		console.log(_amounts);
 		setAmounts(_amounts);
 		if(isValid) {
 			_setBptIn(_amounts);

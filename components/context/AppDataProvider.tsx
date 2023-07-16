@@ -4,11 +4,11 @@ import { getAddress, getABI, getContract } from "../../src/contract";
 import { ADDRESS_ZERO, defaultChain } from '../../src/const';
 import { ethers } from "ethers";
 import { useEffect } from 'react';
-import { useAccount, useNetwork } from "wagmi";
-const { Big } = require("big.js");
+import { useNetwork } from "wagmi";
 import { __chains } from "../../pages/_app";
 import { Status } from "../utils/status";
-import { Endpoints, query, query_leaderboard, query_referrals } from "../../src/queries/synthetic";
+import { Endpoints, query } from "../../src/queries/synthetic";
+import Big from "big.js";
 
 interface AppDataValue {
 	status: Status;
@@ -68,27 +68,15 @@ function AppDataProvider({ children }: any) {
 				axios.post(endpoint, {
 					query: query(_address?.toLowerCase()),
 					variables: {},
-				}), 
-				axios.post(endpoint, {
-					query: query_leaderboard,
-					variables: {},
-				}),
-				axios.post(endpoint, {
-					query: query_referrals(_address?.toLowerCase()),
-					variables: {},
 				})
 			])
 				.then(async (res) => {
-					if (res[0].data.errors || res[1].data.errors || res[2].data.errors) {
+					if (res[0].data.errors) {
 						setStatus(Status.ERROR);
 						setMessage("Network Error. Please refresh the page or try again later.");
-						reject(res[0].data.errors || res[1].data.errors || res[2].data.errors);
+						reject(res[0].data.errors);
 					} else {
 						const userPoolData = res[0].data.data;
-						const leaderboardData = res[1].data.data.accounts;
-						const _refs = res[2].data.data.accounts;
-						setReferrals(_refs);
-						setLeaderboard(leaderboardData);
 						const _pools = userPoolData.pools;
 						const _account = userPoolData.accounts[0];
 

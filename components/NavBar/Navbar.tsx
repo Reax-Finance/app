@@ -7,6 +7,7 @@ import {
 	IconButton,
 	Heading,
 	Divider,
+	Text
 } from "@chakra-ui/react";
 import AccountButton from '../ConnectButton'; 
 import React, { useEffect, useState } from "react";
@@ -25,13 +26,14 @@ import { Status } from "../utils/status";
 import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
+import { tokenFormatter } from "../../src/const";
 
 function NavBar() {
 	const router = useRouter();
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
 	const { fetchData: fetchLendingData } = useLendingData()
-	const { fetchData: fetchDexData } = useDexData();
+	const { fetchData: fetchDexData, dex } = useDexData();
 
 
 	const { chain, chains } = useNetwork();
@@ -219,9 +221,16 @@ function NavBar() {
 				{/* <NavExternalLink path={'https://synthex.finance/intro/quick-start'} title={'Docs'}></NavExternalLink> */}
 
 				{/* <DAOMenu /> */}
-					{isConnected && <NavLocalLink
-								path={"/faucet"}
-								title="Faucet"></NavLocalLink>}
+					<NavLocalLink
+						path={"/leaderboard"}
+						title={<Flex gap={2} align={'center'}>
+						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> Points
+						</Flex>}></NavLocalLink>
+					{isConnected && <>
+						<NavLocalLink
+							path={"/faucet"}
+							title="Faucet"></NavLocalLink>
+					</>}
 					<Box>
 						<AccountButton />
 					</Box>

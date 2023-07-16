@@ -128,7 +128,7 @@ export default function ProportionalDeposit({ pool }: any) {
 		for(let i = 0; i < poolTokens.length; i++) {
 			if(isNative && poolTokens[i].token.id == WETH_ADDRESS(chain?.id!)) continue;
 			if(isNaN(Number(amounts[i])) || Number(amounts[i]) == 0) continue;
-			if(Big(allowances[poolTokens[i].token.id]?.[vault.address] ?? 0).lte(Big(amounts[i] ?? 0).mul(10 ** poolTokens[i].token.decimals))) {
+			if(Big(allowances[poolTokens[i].token.id]?.[vault.address] ?? 0).lt(Big(amounts[i] ?? 0).mul(10 ** poolTokens[i].token.decimals))) {
 				return i;
 			}
 		}
@@ -174,6 +174,7 @@ export default function ProportionalDeposit({ pool }: any) {
 		])
 		.then(async (res: any) => {
 			let response = await res.wait();
+			console.log(response);
             updateFromTx(response);
 			setLoading(false);
 		})

@@ -92,44 +92,4 @@ export const query = (address: string) => (
 		  }
 		}
 	  }`
-)
-
-export const query_leaderboard = `
-	{
-		accounts{
-			id
-			accountDayData(orderBy: dayId, orderDirection: desc, first: 200){
-				dayId
-				dailySynthsMinted{
-					synth{
-						id
-						pool{
-							id
-						}
-					}
-					amount
-				}
-			}
-		}
-	}
-`;
-
-export const query_referrals = (address: string) => (`
-	{
-		accounts(where: {referredBy: "${address}"}){
-			id
-			accountDayData(first:1, orderBy: dayId, orderDirection: desc){
-				dayId
-				dailySynthsMinted{
-					synth{
-						id
-						pool{
-							id
-						}
-					}
-					amount
-				}
-			}
-		}
-	}
-`);
+);

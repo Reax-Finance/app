@@ -5,7 +5,7 @@ import { ADDRESS_ZERO, defaultChain } from '../../src/const';
 import { ethers } from "ethers";
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
-import { DEX_ENDPOINT, MINICHEF_ENDPOINT, query_dex, query_minichef } from "../../src/queries/dex";
+import { DEX_ENDPOINT, MINICHEF_ENDPOINT, ROUTER_ENDPOINT, query_dex, query_leaderboard, query_minichef } from "../../src/queries/dex";
 import Big from "big.js";
 
 interface DEXDataValue {
@@ -54,6 +54,10 @@ function DEXDataProvider({ children }: any) {
 				axios.post(MINICHEF_ENDPOINT(chainId), {
 					query: query_minichef(_address?.toLowerCase() ?? ADDRESS_ZERO),
 					variables: {},
+				}),
+				axios.post(ROUTER_ENDPOINT(chainId), {
+					query: query_leaderboard(_address?.toLowerCase() ?? ADDRESS_ZERO),
+					variables: {},
 				})
 			])
 			.then(async (res) => {
@@ -63,6 +67,8 @@ function DEXDataProvider({ children }: any) {
 					reject(res[0].data.errors);
 				} else {
 					let _dex: any = {};
+					_dex.leaderboard = res[2].data.data.users;
+					_dex.yourPoints = res[2].data.data.user;
 					_dex.totalLiquidity = res[0].data.data.balancers[0].totalLiquidity;
 					_dex.totalSwapVolume = res[0].data.data.balancers[0].totalSwapVolume;
 					_dex.totalSwapFee = res[0].data.data.balancers[0].totalSwapFee;

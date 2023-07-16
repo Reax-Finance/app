@@ -8,8 +8,13 @@ const MINICHEF_ENDPOINTS: any = {
     [mantleTestnet.id]: 'https://graph.testnet.mantle.xyz/subgraphs/name/prasad-kumkar/minichef'
 }
 
+const ROUTER_ENDPOINTS: any = {
+    [mantleTestnet.id]: 'https://graph.testnet.mantle.xyz/subgraphs/name/prasad-kumkar/router'
+}
+
 export const DEX_ENDPOINT = (chainId: number) => DEX_ENDPOINTS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? DEX_ENDPOINTS[mantleTestnet.id] : DEX_ENDPOINTS[mantleTestnet.id]);
-export const MINICHEF_ENDPOINT = (chainId: number) => MINICHEF_ENDPOINTS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? MINICHEF_ENDPOINTS[mantleTestnet.id] : MINICHEF_ENDPOINTS[mantleTestnet.id])
+export const MINICHEF_ENDPOINT = (chainId: number) => MINICHEF_ENDPOINTS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? MINICHEF_ENDPOINTS[mantleTestnet.id] : MINICHEF_ENDPOINTS[mantleTestnet.id]);
+export const ROUTER_ENDPOINT = (chainId: number) => ROUTER_ENDPOINTS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? ROUTER_ENDPOINTS[mantleTestnet.id] : ROUTER_ENDPOINTS[mantleTestnet.id])
 
 export const query_dex = (address: string) => (`
 {
@@ -57,6 +62,20 @@ export const query_dex = (address: string) => (`
 `);
 
 
+export const query_leaderboard = (address: string) => (`
+{
+    users(orderBy: totalPoints, orderDirection: desc){
+        id
+        totalPoints
+        totalVolumeUSD
+    }
+    user(id: "${address}") {
+        totalPoints
+        totalVolumeUSD
+    }
+}`)
+
+
 export const query_minichef = (address: string) => (`
 {
     miniChefs{
@@ -78,5 +97,4 @@ export const query_minichef = (address: string) => (`
         rewardDebt
         sushiHarvested
     }
-}
-`)
+}`)
