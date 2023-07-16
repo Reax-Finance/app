@@ -42,7 +42,7 @@ export default function Leaderboard() {
       <Box>
       <Heading size={"lg"}>Trading Rewards</Heading>
       <Text mt={2} pb={5} color='whiteAlpha.700'>
-        The more you trade, the more you earn.
+        Get rewarded for trading on REAX. Build for traders, to be owned by traders.
       </Text>
       </Box>
 

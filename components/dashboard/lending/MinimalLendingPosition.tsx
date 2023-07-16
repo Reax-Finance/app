@@ -156,7 +156,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={Big(netAPY(poolIndex)).gt(0) ? 'green.400' : 'red.400'}
+                                                // color={Big(netAPY(poolIndex)).gt(0) ? 'green.400' : 'red.400'}
                                             >
                                                 <Text>
                                                     {(netAPY(poolIndex)).toFixed(2)}%
