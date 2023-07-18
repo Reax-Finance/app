@@ -1,13 +1,10 @@
 import { Alert, AlertIcon, Box, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import React, { useContext } from "react";
-import { chainMapping } from "../../../src/chains";
-import { AppDataContext } from "../../context/AppDataProvider";
 import { useNetwork } from 'wagmi';
 
 const FAILED_MESSAGES: any = {
 	"max fee per gas less than block base fee": "Insufficient gas fee. Please try again with a higher gas fee.",
-
 }
 
 const parseMessage = (message: string) => {
