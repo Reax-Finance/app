@@ -119,11 +119,9 @@ function NavBar() {
 				<Flex justify="space-between" align={"center"} w='100%'>
 					<Flex gap={10} align='center'>
 						<Image
-							// src={"/logo.svg"}
 							src={"/logo-square.svg"}
 							alt=""
 							width="26px"
-							// width={'76px'}
 							mb={0.5}
 						/>
 						<Flex
@@ -150,27 +148,11 @@ function NavBar() {
 								path={"/pools"}
 								title="Pools"
 							></NavLocalLink>
-
-							{/* <NavLocalLink
-								path={"/perps"}
-								title="Perpetuals"
-							></NavLocalLink> */}
-							{/* <NavLocalLink
-								path={"/pools"}
-								title="Pools"
-							></NavLocalLink> */}
-							{/* <NavLocalLink
-								path={"/claim"}
-								title="Claim"
-							></NavLocalLink> */}
-							{/* <NavLocalLink
-								path={"/earn"}
-								title="Earn"
-							></NavLocalLink> */}
 						</Flex>
 					</Flex>
 					
-					<Flex display={{sm: 'flex', md: 'none'}}>
+					<Flex display={{sm: 'flex', md: 'none'}} my={4}>
+						<CustomConnectButton />
 						<IconButton
 							onClick={onToggle}
 							icon={
@@ -193,34 +175,6 @@ function NavBar() {
 					gap={2}
 					w='100%'
 				>
-				{/* <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
-					<Link href={{ pathname: "/leaderboard", query: router.query }} >
-						<Flex
-							align={"center"}
-							h={"38px"}
-							w='100%'
-							px={1}
-							cursor="pointer"
-							rounded={100}
-						>
-							<Box
-								color={"gray.100"}
-								fontSize="sm"
-							>
-								<Flex align={"center"} gap={1}>
-									
-									<Heading size={"sm"} color={'primary.400'}>{(Number(account?.totalPoint ?? '0')).toFixed(0)}</Heading>
-									<Heading size={"xs"} color={router.pathname == '/leaderboard' ? 'primary.400' : 'white'}>Points</Heading>
-
-								</Flex>
-							</Box>
-						</Flex>
-					</Link>
-				</motion.div> */}
-
-				{/* <NavExternalLink path={'https://synthex.finance/intro/quick-start'} title={'Docs'}></NavExternalLink> */}
-
-				{/* <DAOMenu /> */}
 					<NavLocalLink
 						path={"/leaderboard"}
 						title={<Flex gap={2} align={'center'}>
@@ -235,9 +189,7 @@ function NavBar() {
 						<AccountButton />
 					</Box>
 					{<Box>
-						{/* <CustomConnectButton accountStatus="address" chainStatus="icon" showBalance={false} /> */}
 						<CustomConnectButton />
-
 					</Box>}
 				</Flex>
 			</Flex>
@@ -254,57 +206,33 @@ function NavBar() {
 
 const MobileNav = ({}: any) => {
 	const router = useRouter();
-	const { account } = useContext(AppDataContext);
-
+	const { dex } = useDexData();
 	return (
 		<Flex flexDir={"column"} p={4} gap={4}>
 			<NavLocalLink
 				path={"/"}
-				title={"Dashboard"}
+				title={"Trade"}
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/swap"}
-				title="Swap"
+				path={"/lend"}
+				title="Lend"
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/claim"}
-				title="Claim"
+				path={"/synthetics"}
+				title="Synthetics"
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/dao/syx"}
-				title="Token"
+				path={"/pools"}
+				title="Pools"
 			></NavLocalLink>
 
-			<NavLocalLink
-				path={"/dao/vest"}
-				title="Vest"
-			></NavLocalLink>
 
-<motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}}>
-					<Link href={{ pathname: "/leaderboard", query: router.query }} >
-						<Flex
-							align={"center"}
-							h={"38px"}
-							w='100%'
-							px={3}
-							cursor="pointer"
-							rounded={100}
-						>
-							<Box
-								color={"gray.100"}
-								fontSize="sm"
-							>
-								<Flex align={"center"} gap={2}>
-									
-									<Heading size={"sm"} color={router.pathname == '/leaderboard' ? 'primary.400' : 'white'}>{(Number(account?.totalPoint ?? '0')).toFixed(0)} Points</Heading>
-								</Flex>
-							</Box>
-						</Flex>
-					</Link>
-				</motion.div>
-			<Box>
-				<ConnectButton />
-			</Box>
+			<NavLocalLink
+				path={"/leaderboard"}
+				title={<Flex gap={2} align={'center'}>
+				<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> Points
+				</Flex>}
+			></NavLocalLink>
 		</Flex>
 	);
 };

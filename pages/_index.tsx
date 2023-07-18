@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Progress, Text, useBreakpointValue, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, Progress, Text, useBreakpointValue, useMediaQuery, useToast } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/NavBar/Navbar';
@@ -63,17 +63,29 @@ export default function Index({ children }: any) {
 
 	if(!hydrated) return <></>;
 
+	// const [isLargerThan800] = useMediaQuery('(min-width: 800px)')
+	// if(!isLargerThan800) return <>Not supported on Mobile Yet</>
+
 	return (
 		<Box>
-			{/* {process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <Flex align={'center'} justify={'center'} bgColor="#2B2E32" color={'whiteAlpha.700'}>
+			<Flex align={'center'} justify={'center'} bgColor="bg.200" color={'whiteAlpha.700'}>
 				<Text
 					textAlign={'center'} 
 					fontSize={'sm'}
 					fontWeight="medium"
-					p={3}>
-					This is a testnet. Please do not send real assets to these addresses
+					p={1.5}>
+					{process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? "This is a testnet. Please do not send real assets to these addresses" : "We're still in Beta. Even though we are audited, only deposit what you can afford to lose."}
 				</Text>
-			</Flex>} */}
+			</Flex>
+			<Flex display={{sm: 'block', md: 'none'}} align={'center'} justify={'center'} bgColor="bg.400" color={'whiteAlpha.700'}>
+				<Text
+					textAlign={'center'} 
+					fontSize={'sm'}
+					fontWeight="medium"
+					p={1.5}>
+					{"Not supported on Mobile Yet"}
+				</Text>
+			</Flex>
 			{(status == Status.FETCHING || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
 
 			<Box bgColor="gray.800" color={'gray.400'}>

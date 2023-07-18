@@ -37,7 +37,7 @@ export default function MinimalSynthPosition({ poolIndex }: any) {
 						align={"center"}
 						justify={"space-between"}
 						px={5}
-						py={4}
+						py={2}
 						className="containerHeader"
 					>
 						<Heading fontSize={"18px"}>{pools[poolIndex].name}</Heading>

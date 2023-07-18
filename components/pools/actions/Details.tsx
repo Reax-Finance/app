@@ -9,9 +9,40 @@ export default function Details({pool, isOpen, onClose}: any) {
 	
 	const { prices } = usePriceData();
 
-	const tvl = pool.tokens.reduce((acc: any, token: any) => {
+	const liquidity = pool.tokens.reduce((acc: any, token: any) => {
 		return acc + Big(token.balance ?? 0).mul(prices[token.token.id] ?? 0).toNumber()
 	}, 0)
+
+	const calcApy = () => {
+		let totalFees = 0;
+		for(let i in pool.snapshots){
+			totalFees += Number(pool.snapshots[i].swapFees);
+		}
+		const dailyFee = totalFees / pool.snapshots.length;
+		if(liquidity == 0) return (dailyFee * 365);
+		const dailyApy = ((1 + dailyFee / liquidity) ** 365) - 1;
+		return dailyApy * 100;
+	}
+
+	const fees7Days = () => {
+		let totalFees = 0;
+		for(let i in pool.snapshots){
+			if(pool.snapshots[i].timestamp > Date.now()/1000 - 7*24*60*60){
+				totalFees += Number(pool.snapshots[i].swapFees);
+			}
+		}
+		return totalFees;
+	}
+
+	const fees24hrs = () => {
+		let totalFees = 0;
+		for(let i in pool.snapshots){
+			if(pool.snapshots[i].timestamp > Date.now()/1000 - 1*24*60*60){
+				totalFees += Number(pool.snapshots[i].swapFees);
+			}
+		}
+		return totalFees;
+	}
 
   	return (
     <>
@@ -60,103 +91,102 @@ export default function Details({pool, isOpen, onClose}: any) {
 				</Flex>
 				</Flex>
 			</ModalHeader>
-    <ModalBody p={0}>
-        {/* {JSON.stringify(pool)} */}
-		<Divider />
-		<Box bg={'bg.600'}>
-		<Flex>
-		<Box mx={4} my={4}>
-			<Text mt={2} mb={2}>Total Value Locked</Text>
-			<Flex gap={2} flexDir={'column'}>
-				<Heading size={'md'}>
-			{dollarFormatter.format(tvl)}
-			</Heading>
-			</Flex>
-		</Box>
-
-		<Divider orientation="vertical" h={'110px'} />
-
-		<Box mx={4} my={4}>
-			<Text mt={2} mb={2}>24H Volume</Text>
-			<Flex gap={2} flexDir={'column'}>
-				<Heading size={'md'}>
-				{dollarFormatter.format(pool.totalSwapVolume)}
-				</Heading>
-			</Flex>
-		</Box>
-
-		</Flex>
-
-		<Divider />
-
-		<Flex>
-		<Box mx={4} my={4}>
-			<Text mt={2} mb={2}>Fees Generated</Text>
-			<Flex gap={8}>
-				<Box>
-					<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>24hr</Text>
-					<Heading size={'md'}>
-					{dollarFormatter.format(pool.totalSwapFee)}
+			<ModalBody p={0}>
+				<Divider />
+				<Box bg={'bg.600'}>
+				<Flex>
+				<Box mx={4} my={4}>
+					<Text mt={2} mb={2}>Total Value Locked</Text>
+					<Flex gap={2} flexDir={'column'}>
+						<Heading size={'md'}>
+					{dollarFormatter.format(liquidity)}
 					</Heading>
-				</Box>
-
-				<Box>
-					<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>7 Days</Text>
-					<Heading size={'md'}>
-					{dollarFormatter.format(pool.totalSwapFee)}
-					</Heading>
-				</Box>
-
-				<Box>
-					<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>1 Year</Text>
-					<Heading size={'md'}>
-					{dollarFormatter.format(pool.totalSwapFee)}
-					</Heading>
-				</Box>
-			</Flex>
-		</Box>
-
-		<Divider orientation="vertical" h={'130px'} />
-
-		<Box mx={4} my={4}>
-			<Text mt={2} mb={2}>APR</Text>
-			<Box>
-				<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>7d Annualized</Text>
-				<Heading size={'md'}>
-				{dollarFormatter.format(((pool.totalSwapFee / pool.totalSwapVolume) || 0) * 365)}
-				</Heading>
-			</Box>
-		</Box>
-		</Flex>
-
-		<Divider />
-
-		<Box mx={4} my={0}>
-			<Heading size={'md'} mt={2} mb={4}>Pool Composition</Heading>
-			<Flex gap={2} flexDir={'column'}>
-			{pool.tokens.map((token: any, index: number) => {
-				if(token.token.id == pool.address) return <></>
-				return <Flex key={index} justify={'space-between'} >
-					<Flex gap={2}>
-					<Image
-						rounded={"full"}
-						src={`/icons/${token.token.symbol}.svg`}
-						alt=""
-						width={"30px"}
-					/>
-					<Text>{token.token.symbol}</Text>
-					<Text>({tvl > 0 && Big(token.balance ?? 0).mul(prices[token.token.id] ?? 0).div(tvl).mul(100).toFixed(2)}%)</Text>
 					</Flex>
-					<Text size={'md'}>{tokenFormatter.format(token.balance)} ({dollarFormatter.format(Big(token.balance ?? 0).mul(prices[token.token.id] ?? 0).toNumber())})</Text>
+				</Box>
+
+				<Divider orientation="vertical" h={'110px'} />
+
+				<Box mx={4} my={4}>
+					<Text mt={2} mb={2}>24H Volume</Text>
+					<Flex gap={2} flexDir={'column'}>
+						<Heading size={'md'}>
+						{dollarFormatter.format(pool.totalSwapVolume)}
+						</Heading>
+					</Flex>
+				</Box>
+
 				</Flex>
-			})}
-			</Flex>
+
+				<Divider />
+
+				<Flex>
+				<Box mx={4} my={4}>
+					<Text mt={2} mb={2}>Fees Generated</Text>
+					<Flex gap={8}>
+						<Box>
+							<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>24hr</Text>
+							<Heading size={'md'}>
+							{dollarFormatter.format(fees24hrs())}
+							</Heading>
+						</Box>
+
+						<Box>
+							<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>7 Days</Text>
+							<Heading size={'md'}>
+							{dollarFormatter.format(fees7Days())}
+							</Heading>
+						</Box>
+
+						<Box>
+							<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>Total</Text>
+							<Heading size={'md'}>
+							{dollarFormatter.format(pool.totalSwapFee)}
+							</Heading>
+						</Box>
+					</Flex>
+				</Box>
+
+				<Divider orientation="vertical" h={'130px'} />
+
+				<Box mx={4} my={4}>
+					<Text mt={2} mb={2}>APR</Text>
+					<Box>
+						<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>7d Annualized</Text>
+						<Heading size={'md'}>
+						{(calcApy()).toFixed(2)} %
+						</Heading>
+					</Box>
+				</Box>
+				</Flex>
+
+				<Divider />
+
+				<Box mx={4} my={0}>
+					<Heading size={'md'} mt={2} mb={4}>Pool Composition</Heading>
+					<Flex gap={2} flexDir={'column'}>
+					{pool.tokens.map((token: any, index: number) => {
+						if(token.token.id == pool.address) return <></>
+						return <Flex key={index} justify={'space-between'} >
+							<Flex gap={2}>
+							<Image
+								rounded={"full"}
+								src={`/icons/${token.token.symbol}.svg`}
+								alt=""
+								width={"30px"}
+							/>
+							<Text>{token.token.symbol}</Text>
+							<Text>({liquidity > 0 && Big(token.balance ?? 0).mul(prices[token.token.id] ?? 0).div(liquidity).mul(100).toFixed(2)}%)</Text>
+							</Flex>
+							<Text size={'md'}>{tokenFormatter.format(token.balance)} ({dollarFormatter.format(Big(token.balance ?? 0).mul(prices[token.token.id] ?? 0).toNumber())})</Text>
+						</Flex>
+					})}
+					</Flex>
+				</Box>
+				</Box>
+				<Box className='containerFooter2' h={6}></Box>
+			</ModalBody>
 		</Box>
-		</Box>
-		<Box className='containerFooter2' h={6}></Box>
-    </ModalBody>
-	</Box>
-    </ModalContent>
+		</ModalContent>
     </Modal>
     </>
   )

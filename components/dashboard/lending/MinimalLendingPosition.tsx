@@ -34,7 +34,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
             display={{ sm: "block", md: "block" }}
             className='containerBody'
         >
-            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='containerHeader'>
+            <Flex align={'center'} justify={'space-between'} px={5} py={2} className='containerHeader'>
                 <Heading fontSize={'18px'}>
                     {protocols[poolIndex].name}
                 </Heading>

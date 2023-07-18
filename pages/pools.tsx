@@ -54,7 +54,7 @@ export default function PoolsPage() {
   }
 
   useEffect(() => {
-    if(dex.miniChef && pools.length > 0){
+    if(dex.miniChef && pools.length > 0 && address){
       let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0])
       const miniChefContract = new ethers.Contract(dex.miniChef, getABI('MiniChef', defaultChain.id), provider);
       let calls = [];

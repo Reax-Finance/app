@@ -1,7 +1,7 @@
 import { Flex, Td, Tr, Text } from '@chakra-ui/react';
 import React from 'react'
 import { useAccount, useEnsName } from 'wagmi'
-import { defaultChain, dollarFormatter } from '../../src/const';
+import { defaultChain, dollarFormatter, tokenFormatter } from '../../src/const';
 import { IoMdOpen } from 'react-icons/io';
 
 export default function LeaderboardRow({index, _account}: any) {
@@ -27,7 +27,7 @@ export default function LeaderboardRow({index, _account}: any) {
                 </Flex>
 
             </Td>
-            <Td borderColor={'whiteAlpha.50'}>{dollarFormatter.format(_account.totalPoints ?? 0)}</Td>
+            <Td borderColor={'whiteAlpha.50'}>{tokenFormatter.format(_account.totalPoints ?? 0)}</Td>
             <Td borderColor={'whiteAlpha.50'}>{dollarFormatter.format(_account.totalVolumeUSD ?? 0)}</Td>
 
             <Td borderColor={'whiteAlpha.50'} isNumeric>

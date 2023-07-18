@@ -3,7 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
-import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain, mantleTestnet } from "../../src/const";
+import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../src/const";
 import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
@@ -365,26 +365,6 @@ function BalanceContextProvider({ children }: any) {
         }
         setAllowances(newAllowances);
     }
-
-    const testRecipt = async () => {
-        let tx = '0x72bcd49bde4c1c55f5d393bc7faf7b273ed03b8126b15f1034b1370e7c3002e4';
-        let provider = new ethers.providers.JsonRpcProvider(mantleTestnet.rpcUrls.default.http[0])
-        let a = await provider.getTransaction(tx);
-        console.log(a);
-        // try {
-        //     let code = await provider.call(a, a.blockNumber)
-        //   } catch (err: any) {
-        //     const code = err.data.replace('Reverted ','');
-        //     console.log({err});
-        //     let reason = ethers.utils.toUtf8String('0x' + code.substr(138));
-        //     console.log('revert reason:', reason);
-        //   }
-        // updateFromTx({events: receipt.logs});
-    }
-
-    React.useEffect(() => {
-        // testRecipt();
-    }, [])
 
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {
         const newBalances = {...walletBalances};

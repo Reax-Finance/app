@@ -10,7 +10,6 @@ import Big from "big.js";
 import { useAccount } from "wagmi";
 import { MdRefresh } from "react-icons/md";
 import { usePriceData } from "../context/PriceContext";
-import Positions from "./positions";
 import MinimalSynthPosition from "../dashboard/MinimalSynthPosition";
 import MinimalLendingPosition from "../dashboard/lending/MinimalLendingPosition";
 import { useLendingData } from "../context/LendingDataProvider";
@@ -37,7 +36,6 @@ export default function Portfolio() {
 			<MinimalLendingPosition poolIndex={index} />
 			</>)}
 			</Flex>
-			<Positions />
 		</Box>
 	);
 }

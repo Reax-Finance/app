@@ -1,10 +1,11 @@
-import { mantleTestnet } from "../const";
+import { mantleMainnet, mantleTestnet } from "../chains";
 
 const _Endpoints: any = {
 	[mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_5001,
+	[mantleMainnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_5000,
 }
 
-export const Endpoints = (chainId: number) => _Endpoints[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _Endpoints[mantleTestnet.id] : _Endpoints[mantleTestnet.id]); 
+export const Endpoints = (chainId: number) => _Endpoints[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _Endpoints[mantleTestnet.id] : _Endpoints[mantleMainnet.id]); 
 
 export const query = (address: string) => (
 	`{
