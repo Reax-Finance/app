@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { ChainID } from './chains';
 import { defaultChain } from './const';
 
 export function getABI(contractName: string, chain: number) {
