@@ -55,7 +55,7 @@ export default function Debt({ market, index }: any) {
 				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<MarketInfo token={market.inputToken} />
+					<MarketInfo token={market.inputToken} color='secondary.200' />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					<Text textAlign={'center'} w={'100%'}>

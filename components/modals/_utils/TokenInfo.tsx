@@ -5,7 +5,7 @@ import Big from "big.js";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { useNetwork } from "wagmi";
 
-export default function TokenInfo({ token }: any) {
+export default function TokenInfo({ token, color = 'primary.200' }: any) {
 	const { walletBalances } = useBalanceData();
 	const { chain } = useNetwork();
 
@@ -20,7 +20,7 @@ export default function TokenInfo({ token }: any) {
 				<Box>
 					<Text color={"white"}>{token.symbol}</Text>
 					<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-						<Text>
+						<Text >
 							{tokenFormatter.format(
 								(token.id == WETH_ADDRESS(chain?.id!)?.toLowerCase() ? Big(walletBalances[token.id] ?? 0).add(walletBalances[ADDRESS_ZERO] ?? 0) : Big(walletBalances[token.id] ?? 0))
 									.div(10 ** token.decimals)

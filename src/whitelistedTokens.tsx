@@ -1,20 +1,19 @@
 import { ADDRESS_ZERO } from "./const";
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default [
-    "0x5b156dca04f775046064032e1f5e45fd1fcca1e0".toLowerCase(),
-    "0x10736f742c810be853Ff30d8a0A238112875F23b".toLowerCase(),
-    "0xbe28691f9032333076f64e8cbd18beebd84dfc01".toLowerCase(),
-    "0xa2eeff8fa7e7848c3ea6d689e143a0ac2545f6c0".toLowerCase(),
-    "0x71020714cB8F12D20266371f741Cd467F5A8F1EB".toLowerCase(),
-    "0x86fb905bd14923fd66a5353d2cda955564ddb9aa".toLowerCase(),
-    "0xC5463C3E462E730A7BF625569e96dD275D136D2d".toLowerCase(),
-    "0x0faab23342312aca9c4fb40c01ae3e88ea2354d2",
-    "0x3eb2feaa14c191395335ff9f195ed4be6d021961",
-    "0x5f36c0188a8a783e07ed4712f6ebcd8b062cfc44",
-    "0x8d8384e4347976070d51cfbf4de10733d4d76c72",
-    "0xaba002dc6b7c71bee78834b68ce16b00cb362ab0",
-    "0xb24ff17a2e3a650924ac8e8ca3cb68c10c83e078",
-    "0xdcd8310638233cd1beb4c0de6515b91732119d5c",
-    ADDRESS_ZERO,
-
+    "0x0f148bf7a48dc14ee17bb4f81708c1aef20b2397".toLowerCase(),
+    "0x5315586dc37ffce11c532be8073693814ca15170".toLowerCase(),
+    "0x62959ad021402f48d0d8067bc5c4c03f63fceaa4".toLowerCase(),
+    "0x8c1ec9edfcdd0aac3bf1f3a0d01612ee94bd8d6f".toLowerCase(),
+    "0x90412c41aabbbb771a996906dc413da9b7092077".toLowerCase(),
+    "0x9fe08255c161045bbd84ac867514e17b3f66d5e8".toLowerCase(),
+    "0xa84bdecd44e6cee1c588a3c97fcc4482831fde05".toLowerCase(),
+    "0xc6f2af0fd2fdb03b75f5256c68bbb6e59e3b739b".toLowerCase(),
+    "0xf334aaf8e25d543c71c0db81beaec34283b88fa5".toLowerCase(),
+    "0xf7dfe223e19701a514e78f3ce7ba98f2c5fbb5b2".toLowerCase(),
+    "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae".toLowerCase(),
+    "0xcabae6f6ea1ecab08ad02fe02ce9a44f09aebfa2".toLowerCase(),
+    "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111".toLowerCase(),
+    // ADDRESS_ZERO,
 ]

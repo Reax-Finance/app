@@ -97,14 +97,14 @@ export default function YourBorrow({ market, index, type }: any) {
 				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<MarketInfo token={market.inputToken} />
+					<MarketInfo token={market.inputToken} color='secondary.200' />
 				</TdBox>
 				
 				<TdBox isFirst={index == 0} alignBox='center'>
 				<Text textAlign={'center'} w={'100%'}>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text>
-					{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == type)[0]?.rate ?? 0).toFixed(2)} %
+						<Text >
+						{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == type)[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0} align={'center'}>
 						<Text fontSize={'xs'}>
