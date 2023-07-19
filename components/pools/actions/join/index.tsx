@@ -54,17 +54,17 @@ export default function Join({ pool, isOpen, onClose }: any) {
 					<Divider />
 					<Tabs variant={'enclosed'} size={"sm"} isFitted colorScheme="secondary">
 						<TabList>
-							<Tab border={0} py={2}>Single Token</Tab>
-							<Divider orientation="vertical" h={'40px'} />
 							<Tab border={0} py={2}>Pool Tokens</Tab>
+							<Divider orientation="vertical" h={'40px'} />
+							<Tab border={0} py={2}>Single Token</Tab>
 						</TabList>
 
 						<TabPanels>
 							<TabPanel p={0}>
-								<SingleTokenJoin pool={pool} />
+								<ProportionalJoin pool={pool} />
 							</TabPanel>
 							<TabPanel p={0}>
-								<ProportionalJoin pool={pool} />
+								<SingleTokenJoin pool={pool} />
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

@@ -75,7 +75,6 @@ export default function SingleTokenDeposit({ pool }: any) {
             // remove that amount from array
             if(indexOfPoolToken != -1) _amounts.splice(indexOfPoolToken, 1);
             let maxAmountsIn = pool.tokens.map((token: any, index: number) => index == Number(tokenSelectedIndex) ? Big(_amount).mul(10**token.token.decimals).mul(100+maxSlippage).div(100).toFixed(0) : ethers.constants.MaxUint256);
-            console.log(_amounts);
             let args = [
                 pool.id,
                 address,
@@ -97,7 +96,7 @@ export default function SingleTokenDeposit({ pool }: any) {
                 const res = await balancerHelper.callStatic.queryJoin(...args);
                 resolve(res.bptOut.toString());
             } catch (err) {
-                console.log(err);
+                console.log("Failed querying join", err);
                 reject(formatBalError(err));
             }
         })
