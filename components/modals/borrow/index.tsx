@@ -38,7 +38,7 @@ export default function Debt({ market, index }: any) {
 	const rewardAPY = (type = "VARIABLE") => {
 		let index = market.rewardTokens.map((token: any) => (token.id.split('-')[0] == "BORROW" && token.id.split('-')[1] == type)).indexOf(true);
 		if(index == -1) return '0';
-		if(Number(market.totalBorrowBalanceUSD) == 0) return '0';
+		if(Number(market.totalBorrowBalanceUSD) == 0) return 'Infinity';
 		return Big(market.rewardTokenEmissionsAmount[index])
 			.div(1e18)
 			.mul(365 * ESYX_PRICE)

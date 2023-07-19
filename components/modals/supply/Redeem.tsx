@@ -102,7 +102,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
 		const _amount = Big(amount).toFixed(market.inputToken.decimals, 0);
 		const value = ethers.utils.parseUnits(_amount, market.inputToken.decimals);
-		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id!);
+		const wrapperAddress = protocol._wrapper;
 
 		signTypedDataAsync({
 			domain: {
@@ -157,7 +157,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 
 	const shouldApprove = () => {
 		if(!isNative) return false;
-		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+		const wrapperAddress = protocol._wrapper;
 		const _allowance = allowances[market.outputToken.id]?.[wrapperAddress] ?? 0;
 		if (Big(_allowance).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).eq(0)){
 			return true

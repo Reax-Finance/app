@@ -40,7 +40,7 @@ function DEXDataProvider({ children }: any) {
     }, [pools, address, status])
 
 	const fetchData = (_address?: string): Promise<number> => {
-		let chainId = chain?.id ?? defaultChain.id;
+		let chainId = defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
 		console.log("Fetching DEX data for chain", chainId);
 		return new Promise((resolve, reject) => {
@@ -67,8 +67,8 @@ function DEXDataProvider({ children }: any) {
 					reject(res[0].data.errors);
 				} else {
 					let _dex: any = {};
-					_dex.leaderboard = res[2].data.data.users;
-					_dex.yourPoints = res[2].data.data.user;
+					_dex.leaderboard = res[2].data.data?.users;
+					_dex.yourPoints = res[2].data.data?.user;
 					_dex.totalLiquidity = res[0].data.data.balancers[0].totalLiquidity;
 					_dex.totalSwapVolume = res[0].data.data.balancers[0].totalSwapVolume;
 					_dex.totalSwapFee = res[0].data.data.balancers[0].totalSwapFee;
@@ -116,7 +116,7 @@ function DEXDataProvider({ children }: any) {
 	};
 
 	const refreshData = () => {
-		const chainId = chain?.id ?? defaultChain.id;
+		const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),

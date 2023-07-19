@@ -31,7 +31,7 @@ function BalanceContextProvider({ children }: any) {
     const [tokens, setTokens] = React.useState<any>([]);
 	const { chain } = useNetwork();
 
-    const { pools: lendingPools, markets: selectedLendingMarket } = useLendingData();
+    const { pools: lendingPools, markets: selectedLendingMarket, protocols: lendingProtocols } = useLendingData();
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault, dex } = useDexData();
@@ -53,7 +53,6 @@ function BalanceContextProvider({ children }: any) {
 			provider
 		);
         const routerAddress = getAddress("Router", chainId);
-        const wrapperAddress = getAddress("WrappedTokenGateway", chainId);
         const vTokenInterface = new ethers.utils.Interface(getABI("VToken", chainId));
         const itf = new ethers.utils.Interface(getABI("MockToken", chainId));
         
@@ -145,7 +144,8 @@ function BalanceContextProvider({ children }: any) {
         // If wrapped token, get allowance to wrapper and borrow allowace
         // Get balance and totalSupplies of output token, debt tokens
         for(let j = 0; j < lendingPools.length; j++){
-            let markets = lendingPools[j]
+            let markets = lendingPools[j];
+            const wrapperAddress = lendingProtocols[j]._wrapper;
             for(let i = 0; i < markets.length; i++) {
                 const market = markets[i];
                 // allowance to market
@@ -256,6 +256,7 @@ function BalanceContextProvider({ children }: any) {
             }
             for(let j = 0; j < lendingPools.length; j++){
                 let markets = lendingPools[j];
+                const wrapperAddress = lendingProtocols[j]._wrapper;
                 for(let i = 0; i < markets.length; i++) {
                     const market = markets[i];
                     if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};

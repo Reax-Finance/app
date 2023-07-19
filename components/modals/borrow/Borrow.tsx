@@ -100,7 +100,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 
 	const shouldApprove = () => {
 		if(!isNative) return false;
-		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+		const wrapperAddress = protocol._wrapper;
 		const _allowance = allowances[market._vToken.id]?.[wrapperAddress] ?? 0;
 		if (Big(_allowance).eq(0) || Big(_allowance).lt(
 			Big(amount).mul(10 ** (market.inputToken.decimals ?? 18))
@@ -113,7 +113,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const approveTx = async () => {
 		setApproveLoading(true);
 		const contract = await getContract("VToken", chain?.id ?? defaultChain.id, market._vToken.id);
-		const wrapperAddress = getAddress("WrappedTokenGateway", chain?.id ?? defaultChain.id);
+		const wrapperAddress = protocol._wrapper;
 		send(
 			contract,
 			"approveDelegation",

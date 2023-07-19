@@ -157,7 +157,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 								Stake
 							</Button>
 						</Box>
-						<Box className="primaryButton">
+						<Box className="secondaryButton">
 							<Button
 								onClick={onWithdrawOpen}
 								color={"white"}
