@@ -1,27 +1,18 @@
 import { Box, Button, Divider, Flex, Heading, IconButton } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
-import { useContext } from 'react';
-
 import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
-  Td,
-  TableCaption,
   TableContainer,
   Text,
   Image
 } from '@chakra-ui/react'
-import { AppDataContext } from '../components/context/AppDataProvider';
 import { dollarFormatter, tokenFormatter } from '../src/const';
-import { FaMedal } from 'react-icons/fa';
 import Head from 'next/head';
-import { MdRefresh } from 'react-icons/md';
 import { useAccount } from 'wagmi';
-import Big from 'big.js';
 import { useDexData } from '../components/context/DexDataProvider';
 import LeaderboardRow from '../components/others/LeaderboardRow';
 
@@ -74,7 +65,7 @@ export default function Leaderboard() {
           </Box>
         </Flex>
       </Box>
-      <Box mt={4} pt={1} mb={20} borderColor='whiteAlpha.50' className='containerBody'>
+      <Box mt={4} pt={1} mb={20} pb={5} borderColor='whiteAlpha.50' className='containerBody'>
 
       <TableContainer >
       <Table variant='simple'>

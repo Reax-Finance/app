@@ -34,7 +34,7 @@ import { mantleMainnet, mantleTestnet } from "../src/chains";
 
 const _chains = []
 
-if(!process.env.NEXT_PUBLIC_NETWORK || process.env.NEXT_PUBLIC_NETWORK == 'testnet'){
+if(process.env.NEXT_PUBLIC_NETWORK == 'testnet'){
 	_chains.push({...mantleTestnet, iconUrl: '/icons/mantle-logo.png'});
 } else {
 	_chains.push({...mantleMainnet, iconUrl: '/icons/mantle-logo.png'});

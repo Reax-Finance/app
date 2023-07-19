@@ -68,13 +68,13 @@ export default function Index({ children }: any) {
 
 	return (
 		<Box>
-			<Flex align={'center'} justify={'center'} bgColor="bg.200" color={'whiteAlpha.700'}>
+			<Flex align={'center'} justify={'center'} bgColor="bg.600" color={'whiteAlpha.700'}>
 				<Text
 					textAlign={'center'} 
 					fontSize={'sm'}
 					fontWeight="medium"
-					p={1.5}>
-					{process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? "This is a testnet. Please do not send real assets to these addresses" : "We're still in Beta. Even though we are audited, only deposit what you can afford to lose."}
+					p={2}>
+					{process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? "This is a testnet. Please do not send real assets to these addresses" : "We're still in beta. Even though we are audited, only deposit what you can afford to lose."}
 				</Text>
 			</Flex>
 			<Flex display={{sm: 'block', md: 'none'}} align={'center'} justify={'center'} bgColor="bg.400" color={'whiteAlpha.700'}>

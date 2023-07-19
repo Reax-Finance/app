@@ -127,7 +127,7 @@ function AppDataProvider({ children }: any) {
 
 	const setPoolFeeds = (_pools: any[], nTries = 0) => {
 		return new Promise<any>(async (resolve, reject) => {
-			const chainId = chain?.id ?? defaultChain.id;
+			const chainId = defaultChain.id;
 			const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 			const helper = new ethers.Contract(
 				getAddress("Multicall2", chainId),
@@ -141,11 +141,15 @@ function AppDataProvider({ children }: any) {
 				const fallbackOracle = await oracle.getFallbackOracle();
 				for (let j = 0; j < pool.synths.length; j++) {
 					calls.push([pool.oracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.synths[j].token.id])]);
-					calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.synths[j].token.id])]);
+					if(fallbackOracle !== ADDRESS_ZERO){
+						calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.synths[j].token.id])]);
+					}
 				}
 				for(let j = 0; j < pool.collaterals.length; j++){
 					calls.push([pool.oracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.collaterals[j].token.id])]);
-					calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.collaterals[j].token.id])]);
+					if(fallbackOracle !== ADDRESS_ZERO){
+						calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.collaterals[j].token.id])]);
+					}
 				}
 			}
 
@@ -154,15 +158,23 @@ function AppDataProvider({ children }: any) {
 				let index = 0;
 				for(let i in _pools){
 					const pool = _pools[i];
+					const oracle = await getContract("PythOracle", chainId, pool.oracle);
+					const fallbackOracle = await oracle.getFallbackOracle();
 					for (let j = 0; j < pool.synths.length; j++) {
 						pool.synths[j].feed = res.returnData[index].toString();
-						pool.synths[j].fallbackFeed = res.returnData[index + 1].toString();
-						index += 2;
+						index += 1;
+						if(fallbackOracle !== ADDRESS_ZERO){
+							pool.synths[j].fallbackFeed = res.returnData[index + 1].toString();
+							index += 1;
+						}
 					}
 					for(let j = 0; j < pool.collaterals.length; j++){
 						pool.collaterals[j].feed = res.returnData[index].toString();
-						pool.collaterals[j].fallbackFeed = res.returnData[index + 1].toString();
-						index += 2;
+						index += 1;
+						if(fallbackOracle !== ADDRESS_ZERO){
+							pool.collaterals[j].fallbackFeed = res.returnData[index + 1].toString();
+							index += 1;
+						}
 					}
 				}
 				setPools(_pools);
@@ -231,6 +243,7 @@ function AppDataProvider({ children }: any) {
 				console.log(isMinus, amount, decodedTransferEvents[i].args);
 				_pools[tradingPool].totalSupply = Big(_pools[tradingPool].totalSupply ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
 				_pools[tradingPool].balance = Big(_pools[tradingPool].balance ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
+				console.log(_pools[tradingPool].totalSupply, _pools[tradingPool].balance);
 			}
 		}
         console.log("UPDATED", _pools[tradingPool].balance, _pools[tradingPool].totalSupply);

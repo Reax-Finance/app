@@ -37,7 +37,7 @@ export default function Supply({ market, index }: any) {
 	const rewardAPY = () => {
 		let index = market.rewardTokens.map((token: any) => token.id.split('-')[0] == "DEPOSIT").indexOf(true);
 		if(index == -1) return '0';
-		if(Number(market.totalDepositBalanceUSD) == 0) return '0';
+		if(Number(market.totalDepositBalanceUSD) == 0) return 'Infinity';
 		return Big(market.rewardTokenEmissionsAmount[index])
 			.div(1e18)
 			.mul(365 * ESYX_PRICE)
@@ -65,11 +65,11 @@ export default function Supply({ market, index }: any) {
 					alignBox='center'
 				>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text>
+						<Text >
 						{Number(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
-						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0} align={'center'}>
-						<Text fontSize={'xs'}>
+						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0.5} align={'center'}>
+						<Text fontSize={'xs'} >
 							+{rewardAPY()} %
 						</Text>
 						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
@@ -81,7 +81,7 @@ export default function Supply({ market, index }: any) {
 					alignBox='center'
 				>
 					<Flex w={'100%'} justify={'center'}>
-					{market.canUseAsCollateral ? <MdCheck/> : <MdWarning/>}
+					{market.canUseAsCollateral ? <MdCheck color="green" size={'20px'}/> : <MdWarning/>}
 					</Flex>
 				</TdBox>
 				<TdBox

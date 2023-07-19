@@ -45,7 +45,7 @@ function LendingDataProvider({ children }: any) {
 	}, [selectedPool, pools])
 
 	const fetchData = (_address?: string): Promise<number> => {
-		let chainId = chain?.id ?? defaultChain.id;
+		let chainId = defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
 		console.log("fetching lending data for chain", chainId);
 		return new Promise((resolve, reject) => {
@@ -62,10 +62,10 @@ function LendingDataProvider({ children }: any) {
 				})
 			])
 			.then(async (res) => {
-				if (res[0].data.errors) {
+				if (res[0].data.errors || res[1].data.errors) {
 					setStatus(Status.ERROR);
 					setMessage("Network Error. Please refresh the page or try again later.");
-					reject(res[0].data.errors);
+					reject(res[0].data.errors || res[1].data.errors);
 				} else {
 					const _protocols = res.map((r: any) => r.data.data.lendingProtocols[0]);
 					// setProtocols([res[0].data.data.lendingProtocols[0], res[1].data.data.lendingProtocols[0]]);
@@ -107,7 +107,7 @@ function LendingDataProvider({ children }: any) {
 		_protocols: any[],
 		nTries: number = 0
 	): Promise<any> => {
-		const chainId = chain?.id ?? defaultChain.id;
+		const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),

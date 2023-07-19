@@ -26,14 +26,14 @@ export default function Portfolio() {
 			<Heading size={'md'} mb={4}>Synthetics Positions</Heading>
 			<Flex gap={4} wrap={'wrap'}>
 			{pools.map((pool: any, index: number) => <>
-			<MinimalSynthPosition poolIndex={index} />
+				<MinimalSynthPosition poolIndex={index} />
 			</>)}
 			</Flex>
 
 			<Heading size={'md'} mt={14} mb={4}>Lending Positions</Heading>
 			<Flex gap={4} wrap={'wrap'}>
 			{lendingPools.map((pool: any, index: number) => <>
-			<MinimalLendingPosition poolIndex={index} />
+				<MinimalLendingPosition poolIndex={index} />
 			</>)}
 			</Flex>
 		</Box>

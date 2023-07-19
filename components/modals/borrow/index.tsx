@@ -38,7 +38,7 @@ export default function Debt({ market, index }: any) {
 	const rewardAPY = (type = "VARIABLE") => {
 		let index = market.rewardTokens.map((token: any) => (token.id.split('-')[0] == "BORROW" && token.id.split('-')[1] == type)).indexOf(true);
 		if(index == -1) return '0';
-		if(Number(market.totalBorrowBalanceUSD) == 0) return '0';
+		if(Number(market.totalBorrowBalanceUSD) == 0) return 'Infinity';
 		return Big(market.rewardTokenEmissionsAmount[index])
 			.div(1e18)
 			.mul(365 * ESYX_PRICE)
@@ -55,7 +55,7 @@ export default function Debt({ market, index }: any) {
 				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<MarketInfo token={market.inputToken} />
+					<MarketInfo token={market.inputToken} color='secondary.200' />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					<Text textAlign={'center'} w={'100%'}>

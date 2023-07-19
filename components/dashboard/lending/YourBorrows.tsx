@@ -35,7 +35,7 @@ export default function YourBorrows() {
 	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (
 		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
 			<Box className="containerHeader" px={5} py={5}>
-				<Heading fontSize={'18px'} color={'primary.400'}>Your Borrows</Heading>
+				<Heading fontSize={'18px'} color={'secondary.400'}>Your Borrows</Heading>
 			</Box>
 
 			{markets.length > 0 ? ( <>

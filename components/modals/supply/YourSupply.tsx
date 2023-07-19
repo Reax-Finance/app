@@ -81,7 +81,7 @@ export default function YourSupply({ market, index }: any) {
 	const rewardAPY = () => {
 		let index = market.rewardTokens.map((token: any) => token.id.split('-')[0] == "DEPOSIT").indexOf(true);
 		if(index == -1) return '0';
-		if(Number(market.totalDepositBalanceUSD) == 0) return '0';
+		if(Number(market.totalDepositBalanceUSD) == 0) return 'Infinity';
 		return Big(market.rewardTokenEmissionsAmount[index])
 			.div(1e18)
 			.mul(365 * ESYX_PRICE)

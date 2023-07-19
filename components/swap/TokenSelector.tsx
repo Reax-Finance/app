@@ -29,7 +29,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
 
-const POPULAR_TOKENS = ['ETH', 'MNT', 'USDC', 'cUSD']
+const POPULAR_TOKENS = ['WETH', 'WBTC', 'USDT', 'cUSD']
 
 function TokenSelector({
 	onTokenSelected,
