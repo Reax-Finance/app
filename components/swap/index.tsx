@@ -118,6 +118,7 @@ function Swap() {
 			setLoading(true);
 			calculateOutputAmount(value)
 			.then((res: any) => {
+				console.log(res);
 				setOutputAmount(Big(res.fData.estimatedOut).div(10**tokens[outputAssetIndex]?.decimals).toString());
 				setSwapData(res);
 				setLoading(false);
@@ -234,7 +235,6 @@ function Swap() {
 							router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
 						)
 					}
-					console.log(_swapData);
 					calls.push(
 						router.interface.encodeFunctionData("swap", [_swapData, pythData])
 					);

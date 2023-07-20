@@ -43,7 +43,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
-	const {walletBalances, addAllowance, nonces, allowances, updateFromTx} = useBalanceData();
+	const {nonces, allowances, updateFromTx} = useBalanceData();
 
 	const { protocol } = useLendingData();
 
@@ -294,7 +294,6 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 
 	return (
 		<Box px={5} pb={5} pt={0.5}>
-
 			<Box mt={6}>
 				<Flex align={'center'} justify={'space-between'} gap={'50'}>
 					<Text color="whiteAlpha.600">Interest Rate</Text>
@@ -330,20 +329,20 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 					</Box>
 
 					<Box mt={6}>
-					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "primaryButton":'disabledPrimaryButton'}><Button
-						isDisabled={validate().stage != 1}
-						isLoading={approveLoading}
-						loadingText="Please sign the transaction"
-						color='white'
-						width="100%"
-						onClick={approve}
-						size="lg"
-						rounded={0}
-						bg={'transparent'}
-						_hover={{ bg: "transparent" }}
-					>
-						{validate().message}
-					</Button>
+						{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "primaryButton":'disabledPrimaryButton'}><Button
+							isDisabled={validate().stage != 1}
+							isLoading={approveLoading}
+							loadingText="Please sign the transaction"
+							color='white'
+							width="100%"
+							onClick={market.inputToken.isPermit ? approve : approveTx}
+							size="lg"
+							rounded={0}
+							bg={'transparent'}
+							_hover={{ bg: "transparent" }}
+						>
+							{validate().message}
+						</Button>
 					</Box>}
 						
 					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "primaryButton":'disabledPrimaryButton'} > <Button
@@ -369,13 +368,6 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 						)}
 					</Button></Box>}
 				</Box>
-
-						<Response
-							response={response}
-							message={message}
-							hash={hash}
-							confirmed={confirmed}
-						/>
 		</Box>
 		</Box>
 	);

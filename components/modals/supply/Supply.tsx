@@ -122,7 +122,6 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 
 		let tx;
 		if (isNative) {
-			console.log(isNative);
 			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			tx = send(
 				wrapper,

@@ -68,7 +68,6 @@ export default function BorrowModal({
 			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).sub(pos.stableDebt).div(prices[market.inputToken.id] ?? 0);
             if(v1.lt(0)) v1 = Big(0);
             let v2 = Big((0.96 * (market.totalDepositBalanceUSD - market.totalBorrowBalanceUSD) / prices[market.inputToken.id]) ?? 0)
-			console.log(v1.toString(), v2.toString());
             return v1.lt(v2) ? v1.toString() : v2.toString();
 		} else {
 			if (!Big(prices[market.inputToken.id] ?? 0).gt(0)) return "0";
