@@ -59,9 +59,11 @@ export default function PoolsPage() {
       const miniChefContract = new ethers.Contract(dex.miniChef, getABI('MiniChef', defaultChain.id), provider);
       let calls = [];
       for(let i in pools){
-        calls.push(
-          miniChefContract.interface.encodeFunctionData('pendingSushi', [pools[i].pid, address])
-        )
+        if(pools[i].pid){
+          calls.push(
+            miniChefContract.interface.encodeFunctionData('pendingSushi', [pools[i].pid, address])
+          )
+        }
       }
       miniChefContract.callStatic.multicall(calls)
       .then((res: any) => {
