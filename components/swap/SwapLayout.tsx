@@ -316,7 +316,7 @@ export default function SwapLayout({
 
                             <Flex justify={'space-between'}>
                             <Text>Network Fee</Text>
-                            <Text>{dollarFormatter.format((gas * (Number(data?.formatted.gasPrice) + 40000))/1e10)}</Text>
+                            <Text>{dollarFormatter.format((gas * (Number(data?.formatted.gasPrice)))/1e14)}</Text>
                             </Flex>
                             <RouteDetails swapData={swapData} />
                         </Flex></>}
