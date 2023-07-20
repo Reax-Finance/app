@@ -15,5 +15,6 @@ export default [
     "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae".toLowerCase(),
     "0xcabae6f6ea1ecab08ad02fe02ce9a44f09aebfa2".toLowerCase(),
     "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111".toLowerCase(),
-    // ADDRESS_ZERO,
+    "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
+    ADDRESS_ZERO,
 ]

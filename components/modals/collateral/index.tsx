@@ -65,7 +65,6 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	const max = () => {
 		if (tabSelected == 0) {
-			console.log(isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]);
 			return Big((isNative ? walletBalances[ADDRESS_ZERO] : walletBalances[collateral.token.id]) ?? 0)
 				.div(10 ** collateral.token.decimals)
 				.toString();

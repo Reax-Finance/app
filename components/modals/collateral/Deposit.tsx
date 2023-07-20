@@ -253,7 +253,6 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 				position: "top-right"
 			})
 		}).catch((err: any) => {
-			console.log(err);
 			handleError(err);
 			setApproveLoading(false);
 		})
@@ -310,7 +309,6 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 				})
 			})
 			.catch((err: any) => {
-				console.log("err", JSON.stringify(err));
 				handleError(err);
 				setApproveLoading(false);
 			});
