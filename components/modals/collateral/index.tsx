@@ -110,7 +110,7 @@ export default function CollateralModal({ collateral, index }: any) {
 				>
 					<Box color={
 						Big(collateral.balance ?? 0).gt(0)
-							? "whiteAlpha.800"
+							? "primary.200"
 							: "whiteAlpha.500"
 					}>
 

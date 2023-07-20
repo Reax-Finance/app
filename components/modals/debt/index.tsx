@@ -6,12 +6,9 @@ import {
 	ModalOverlay,
 	ModalContent,
 	ModalHeader,
-	ModalFooter,
 	ModalBody,
 	ModalCloseButton,
 	Tr,
-	Th,
-	Td,
 	Flex,
 	Image,
 	Text,
@@ -26,7 +23,6 @@ import {
 	Divider,
 	Tooltip,
 } from "@chakra-ui/react";
-import { AppDataContext } from "../../context/AppDataProvider";
 import {
 	dollarFormatter,
 	tokenFormatter
@@ -42,7 +38,6 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatInput, parseInput } from "../../utils/number";
 import TokenInfo from "../_utils/TokenInfo";
-import Success from "./Success";
 
 export default function Debt({ synth, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -130,7 +125,7 @@ export default function Debt({ synth, index }: any) {
 				_hover={{ bg: 'bg.400' }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<TokenInfo token={synth.token} />
+					<TokenInfo token={synth.token} color='secondary.200' />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					$ {tokenFormatter.format(prices[synth.token.id] ?? 0)}
@@ -151,7 +146,7 @@ export default function Debt({ synth, index }: any) {
 						.div(10**18)
 						.toNumber()
 						)}
-						</Text>
+					</Text>
 				</TdBox>
 			</Tr>
 

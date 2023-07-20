@@ -110,7 +110,7 @@ export default function Pool({ pool, index }: any) {
 
 				<TdBox isFirst={index == 0} alignBox="center">
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text>{calcApy().toFixed(2)}%</Text>
+						<Text color={'primary.200'}>{calcApy().toFixed(2)}%</Text>
 						{Number(rewardsApy) > 0 && <Flex gap={1.5} mt={1} align={'center'}>
 						<Text color={'whiteAlpha.600'} fontSize={'xs'}>+{rewardsApy}%</Text>
 						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />

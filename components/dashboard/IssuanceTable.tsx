@@ -42,6 +42,12 @@ export default function CollateralTable() {
 		}
 	);	
 
+	// sort by synth.totalSupply * price
+	pools[tradingPool]?.synths.sort((a: any, b: any) => {
+		return (b.totalSupply * b.priceUSD) - (a.totalSupply * a.priceUSD);
+	});
+
+
 	return (
 		<Box>
 			<Box className="containerHeader" px={5} py={5}>

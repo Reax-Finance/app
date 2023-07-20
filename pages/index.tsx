@@ -6,8 +6,8 @@ import Swap from "../components/swap/index";
 export default function swap() {
 	return (
 		<Flex >
-			<Box w='100%' h={'100%'}>
-			<Flex justify={"center"} align="center" h={"89.5vh"}>
+			<Box w='100%' h={'100%'} bgGradient={'radial(rgba(247, 110, 17, 0.3), transparent, transparent)'}>
+			<Flex justify={"center"} align="center" h={"84vh"}>
 				<Box w={"43%"} minW="400px" >
 					<motion.div
 						initial={{ opacity: 0, y: 15 }}

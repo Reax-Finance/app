@@ -67,7 +67,7 @@ export default function Debt({ market, index }: any) {
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 				<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text>
+						<Text color='secondary.200'>
 							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY("STABLE")) > 0 && <Flex gap={1} mt={0} align={'center'}>
@@ -80,7 +80,7 @@ export default function Debt({ market, index }: any) {
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
 					<Flex flexDir={'column'} align={'right'} w={'100%'} textAlign={'right'}>
-						<Text>
+						<Text color='secondary.200'>
 							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY("VARIABLE")) > 0 && <Flex gap={1} mt={0} justify={'end'} align={'center'}>

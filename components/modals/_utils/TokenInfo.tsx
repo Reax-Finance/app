@@ -20,7 +20,7 @@ export default function TokenInfo({ token, color = 'primary.200' }: any) {
 				<Box>
 					<Text color={"white"}>{token.symbol}</Text>
 					<Flex color="whiteAlpha.600" fontSize={"sm"} gap={1}>
-						<Text >
+						<Text color={color}>
 							{tokenFormatter.format(
 								(token.id == WETH_ADDRESS(chain?.id!)?.toLowerCase() ? Big(walletBalances[token.id] ?? 0).add(walletBalances[ADDRESS_ZERO] ?? 0) : Big(walletBalances[token.id] ?? 0))
 									.div(10 ** token.decimals)

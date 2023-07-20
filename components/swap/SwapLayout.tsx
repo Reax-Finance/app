@@ -132,7 +132,6 @@ export default function SwapLayout({
                     justify={"space-between"}
                     align="center"
                     mt={4}
-                    mr={2}
                 >
                     <Text>
                         {dollarFormatter.format(
@@ -217,7 +216,6 @@ export default function SwapLayout({
                     align="center"
                     mt={4}
                     mb={-4}
-                    mr={2}
                 >
                     <Text>
                         {dollarFormatter.format(

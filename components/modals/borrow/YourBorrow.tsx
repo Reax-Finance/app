@@ -103,7 +103,7 @@ export default function YourBorrow({ market, index, type }: any) {
 				<TdBox isFirst={index == 0} alignBox='center'>
 				<Text textAlign={'center'} w={'100%'}>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text >
+						<Text color='secondary.200'>
 						{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == type)[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0} align={'center'}>
@@ -116,17 +116,9 @@ export default function YourBorrow({ market, index, type }: any) {
 				</Text>
 				</TdBox>
 
+				
 				<TdBox isFirst={index == 0} alignBox='center'>
-					<Flex w={'100%'} justify={'center'}>
-					<Select disabled={loading} size={'xs'} maxW={'100px'} rounded={0} value={type == 'VARIABLE' ? '2' : '1'} onChange={_onSwapModeChange}>
-						<option value="2">VARIABLE</option>
-						<option value="1">STABLE</option>
-					</Select>
-					</Flex>
-				</TdBox>
-
-				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
-					<Box>
+					<Box w={'100%'} textAlign={'center'}>
 					<Text>
 					{
 						tokenFormatter.format(type == 'VARIABLE' ? Big(walletBalances[market._vToken.id]).div(10**market._vToken.decimals).toNumber() : Big(walletBalances[market._sToken.id]).div(10**market._sToken.decimals).toNumber())
@@ -139,6 +131,16 @@ export default function YourBorrow({ market, index, type }: any) {
 					</Text>
 					</Box>
 				</TdBox>
+
+				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
+					<Flex w={'100%'} justify={'center'}>
+					<Select disabled={loading} size={'xs'} maxW={'100px'} rounded={0} value={type == 'VARIABLE' ? '2' : '1'} onChange={_onSwapModeChange}>
+						<option value="2">VARIABLE</option>
+						<option value="1">STABLE</option>
+					</Select>
+					</Flex>
+				</TdBox>
+
 			</Tr>
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>

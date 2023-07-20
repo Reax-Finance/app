@@ -133,7 +133,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 
 				<TdBox isFirst={index == 0} alignBox="center">
 				<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text>{dollarFormatter.format(stakedBalance())}</Text>
+						<Text color={'secondary.200'}>{dollarFormatter.format(stakedBalance())}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
 						{Number(rewardsApy) > 0 && <Flex gap={1} mt={0} align={'center'}>
 						<Text color={'whiteAlpha.600'} fontSize={'xs'}>

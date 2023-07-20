@@ -53,11 +53,11 @@ export default function YourBorrows() {
 									</ThBox>
 									<ThBox alignBox='center'>
 									<Text w={'100%'} textAlign={'center'}>
-										Type
+									My Balance
 									</Text>
 									</ThBox>
 									<ThBox alignBox='right' isNumeric>
-										My Balance
+									Type
 									</ThBox>
 								</Tr>
 							</Thead>

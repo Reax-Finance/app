@@ -14,9 +14,6 @@ import { ESYX_PRICE, dollarFormatter, tokenFormatter } from "../../../src/const"
 import Big from "big.js";
 import TdBox from "../../dashboard/TdBox";
 import { MdCheck, MdWarning } from "react-icons/md";
-import { useBalanceData } from "../../context/BalanceProvider";
-import { usePriceData } from "../../context/PriceContext";
-import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import SupplyModal from "./SupplyModal";
 import TokenInfo from "../_utils/TokenInfo";
 
@@ -57,7 +54,7 @@ export default function Supply({ market, index }: any) {
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<TokenInfo token={market.inputToken} />
+					<TokenInfo token={market.inputToken} color='primary.200' />
 				</TdBox>
 				
 				<TdBox
@@ -65,7 +62,7 @@ export default function Supply({ market, index }: any) {
 					alignBox='center'
 				>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text >
+						<Text color={'primary.200'}>
 						{Number(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0.5} align={'center'}>

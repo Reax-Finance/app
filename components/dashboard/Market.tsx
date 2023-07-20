@@ -16,6 +16,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { getContract, send } from "../../src/contract";
 import { usePriceData } from "../context/PriceContext";
 import { useSyntheticsData } from "../context/SyntheticsPosition";
+import { BsStars } from "react-icons/bs";
 
 export default function Market() {
 	const { pools, tradingPool, account } = useAppData();
@@ -191,7 +192,7 @@ export default function Market() {
 								debtBurnApr={debtBurnApr()}
 								esSyxApr={esSyxApr()}
 							>
-								<Box cursor={"help"}>
+								<Flex gap={1} align={'center'} cursor={"help"}>
 									<Heading size={"sm"}>
 										{(
 											Number(debtBurnApr())
@@ -199,7 +200,8 @@ export default function Market() {
 										).toFixed(2)}
 										%
 									</Heading>
-								</Box>
+									<BsStars />
+								</Flex>
 							</APRInfo>
 						</Flex>
 					</Flex>
