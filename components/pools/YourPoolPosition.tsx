@@ -140,7 +140,8 @@ export default function YourPoolPosition({ pool, index }: any) {
 						{(calcApy()).toFixed(2)}% + {rewardsApy} %
 						</Text>
 						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
-						</Flex>}						</Flex>
+						</Flex>}
+						</Flex>
 					</Flex>
 				</TdBox>
 
