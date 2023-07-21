@@ -97,8 +97,8 @@ function SyntheticsPositionProvider({ children }: any) {
             _totalStableDebt = _totalStableDebt.add(Big(walletBalances[markets[i]._sToken.id]).div(10**markets[i]._sToken.decimals).mul(prices[markets[i].inputToken.id]));
         }
         let availableToIssue = '0'
-        if(_adjustedCollateral.sub(_totalDebt).gt(0)){
-            availableToIssue = _adjustedCollateral.sub(_totalDebt).toString();
+        if(_adjustedCollateral.sub(_totalDebt).sub(_totalStableDebt).gt(0)){
+            availableToIssue = _adjustedCollateral.sub(_totalDebt).sub(_totalStableDebt).toString();
         }
 
         let debtLimit = Big(0);

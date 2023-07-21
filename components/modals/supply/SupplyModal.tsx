@@ -69,7 +69,7 @@ export default function SupplyModal({
 		} else {
             if(!prices[market.inputToken.id]) return "0";
 			// values in market.inputToken
-			const v1 = Big(pos.availableToIssue).div(prices[market.inputToken.id]);
+			const v1 = Big(pos.availableToIssue).div(prices[market.inputToken.id]).mul(100).div(market.maximumLTV);
 			const v2 = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
 			// Available to withdraw from pool
 			const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
@@ -84,7 +84,7 @@ export default function SupplyModal({
 					return v3.toFixed(market.inputToken.decimals);
 				}
 			}
-			return '0';
+			return '0'
 		}
 	};
     
