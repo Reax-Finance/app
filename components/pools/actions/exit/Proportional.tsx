@@ -276,7 +276,7 @@ export default function ProportionalWithdraw({ pool }: any) {
     const values = () => {
         if(!validate().valid) return null;
         if(!bptIn) return null;
-		if(loading) return null;
+		// if(loading) return null;
 
         // total pool value: sum of Big(poolTokens[i].balance).mul(prices[poolTokens[i].token.id] ?? 0)
         let poolValue = poolTokens.reduce((a: any, b: any) => {

@@ -124,8 +124,10 @@ function Swap() {
 				setLoading(false);
 			})
 			.catch((err) => {
-				setLoading(false);
 				console.log(err);
+				setLoading(false);
+				// If estimation failed, set output to its perivous value
+				setInputAmount(inputAmount)
 			})
 		}
 	};
@@ -149,8 +151,10 @@ function Swap() {
 				})
 			})
 			.catch((err) => {
-				setLoading(false);
 				console.log(err);
+				setLoading(false);
+				// If estimation failed, set output amount to its previous value
+				setOutputAmount(outputAmount);
 			})
 		}
 	};

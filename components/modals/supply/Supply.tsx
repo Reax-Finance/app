@@ -375,7 +375,7 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 				</Box>
 				
 				<Box mt={6}>
-					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
+					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? "disabledSecondaryButton" : 'secondaryButton'}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
@@ -391,7 +391,7 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 					</Button>
 					</Box>}
 						
-					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "secondaryButton":'disabledSecondaryButton'} > <Button
+					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? "disabledSecondaryButton" : 'secondaryButton'} > <Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"

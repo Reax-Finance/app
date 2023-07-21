@@ -29,7 +29,6 @@ export default function Pool({ pool, index }: any) {
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return (dailyFee * 365);
 		const dailyApy = ((1 + dailyFee / liquidity) ** 365) - 1;
-		console.log(dailyApy);
 		return dailyApy * 100;
 	}
 

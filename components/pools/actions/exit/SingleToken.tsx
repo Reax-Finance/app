@@ -211,7 +211,7 @@ export default function SingleTokenWithdraw({ pool }: any) {
     const values = () => {
         if(!validate().valid) return null;
         if(!amount) return null;
-		if(loading) return null;
+		// if(loading) return null;
 
         let poolValue = poolTokens.reduce((a: any, b: any) => {
             return a.add(Big(b.balance).mul(prices[b.token.id] ?? 0));

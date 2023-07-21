@@ -13,7 +13,6 @@ import { getABI, getContract, send } from "../../../src/contract";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import { ADDRESS_ZERO, PYTH_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
-import Response from "../_utils/Response";
 import { ExternalLinkIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import { BigNumber, ethers } from "ethers";
@@ -329,7 +328,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 					</Box>
 
 					<Box mt={6}>
-						{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "primaryButton":'disabledPrimaryButton'}><Button
+						{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? "disabledPrimaryButton":'primaryButton'}><Button
 							isDisabled={validate().stage != 1}
 							isLoading={approveLoading}
 							loadingText="Please sign the transaction"
@@ -345,7 +344,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 						</Button>
 					</Box>}
 						
-					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "primaryButton":'disabledPrimaryButton'} > <Button
+					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? "disabledPrimaryButton":'primaryButton'} > <Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
