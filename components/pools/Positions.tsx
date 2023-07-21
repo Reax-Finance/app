@@ -21,7 +21,7 @@ export default function Positions() {
     const { pools: dexPools } = useDexData();
     
     const yourPositions = dexPools.filter((pool: any) => {
-      return( walletBalances[pool.address] > 0 || Big(pool.stakedBalance ?? 0).gt(0));
+      return (walletBalances[pool.address] > 0 || Big(pool.stakedBalance ?? 0).gt(0));
     });
 
     if(yourPositions.length == 0) return <></>;
