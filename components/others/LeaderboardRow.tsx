@@ -21,7 +21,7 @@ export default function LeaderboardRow({index, _account}: any) {
                 <Flex align={'center'} gap={3}>
 
                 <Text>
-                {(address && address.toLowerCase() == _account.id ? `You (${_account.id.slice(0,8)})` : _account.id.slice(0, 8) + '...' + _account.id.slice(36))}
+                {(address && address.toLowerCase() == _account?.id ? `You (${_account?.id?.slice(0,8)})` : _account?.id?.slice(0, 8) + '...' + _account?.id?.slice(36))}
                 </Text>
                 <IoMdOpen />
                 </Flex>

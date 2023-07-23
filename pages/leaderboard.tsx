@@ -89,7 +89,7 @@ export default function Leaderboard() {
           <LeaderboardRow _account={_account} index={index + 1} />
         </>
         })}
-        {!isAddressInLeaderboard && <LeaderboardRow _account={{id: address?.toLowerCase(), totalPoints: dex?.yourPoints?.totalPoints, totalVolumeUSD: dex?.yourPoints?.totalVolumeUSD}} index={'...'} />}
+        {(!isAddressInLeaderboard && address) && <LeaderboardRow _account={{id: address?.toLowerCase(), totalPoints: dex?.yourPoints?.totalPoints, totalVolumeUSD: dex?.yourPoints?.totalVolumeUSD}} index={'...'} />}
     </Tbody>
   </Table>
 </TableContainer>

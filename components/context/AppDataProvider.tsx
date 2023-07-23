@@ -25,7 +25,6 @@ interface AppDataValue {
 	account: any,
 	setRefresh: (_: number[]) => void; 
 	refresh: number[];
-	referrals: any[];
 	updateFromTx: (tx: any) => void;
 }
 
@@ -51,9 +50,6 @@ function AppDataProvider({ children }: any) {
 
 	const [refresh, setRefresh] = React.useState<number[]>([]);
 	const [block, setBlock] = React.useState(0);
-	const [random, setRandom] = React.useState(0);
-
-	const [referrals, setReferrals] = React.useState<any[]>([]);
 
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
@@ -137,7 +133,7 @@ function AppDataProvider({ children }: any) {
 			let calls: any[] = [];
 			for(let i in _pools){
 				const pool = _pools[i];
-				const oracle = await getContract("PythOracle", chainId, pool.oracle);
+				const oracle = new ethers.Contract(pool.oracle, getABI("PythOracle", chainId), provider);
 				const fallbackOracle = await oracle.getFallbackOracle();
 				for (let j = 0; j < pool.synths.length; j++) {
 					calls.push([pool.oracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.synths[j].token.id])]);
@@ -158,7 +154,7 @@ function AppDataProvider({ children }: any) {
 				let index = 0;
 				for(let i in _pools){
 					const pool = _pools[i];
-					const oracle = await getContract("PythOracle", chainId, pool.oracle);
+					const oracle = new ethers.Contract(pool.oracle, getABI("PythOracle", chainId), provider);
 					const fallbackOracle = await oracle.getFallbackOracle();
 					for (let j = 0; j < pool.synths.length; j++) {
 						pool.synths[j].feed = res.returnData[index].toString();
@@ -240,13 +236,10 @@ function AppDataProvider({ children }: any) {
 				if(decodedTransferEvents[i].args[0] == ADDRESS_ZERO){
 					isMinus = false;
 				}
-				console.log(isMinus, amount, decodedTransferEvents[i].args);
 				_pools[tradingPool].totalSupply = Big(_pools[tradingPool].totalSupply ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
 				_pools[tradingPool].balance = Big(_pools[tradingPool].balance ?? 0)[isMinus? 'minus' : 'add'](amount).toString();
-				console.log(_pools[tradingPool].totalSupply, _pools[tradingPool].balance);
 			}
 		}
-        console.log("UPDATED", _pools[tradingPool].balance, _pools[tradingPool].totalSupply);
 
 		setPools(_pools);
 	}
@@ -270,7 +263,6 @@ function AppDataProvider({ children }: any) {
 			}
 		}
 		setPools(_pools);
-		setRandom(Math.random());
 	};
 
 	const value: AppDataValue = {
@@ -286,7 +278,6 @@ function AppDataProvider({ children }: any) {
 		block,
 		setRefresh,
 		refresh,
-		referrals,
 		updateFromTx
 	};
 

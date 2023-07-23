@@ -151,12 +151,12 @@ function NavBar() {
 						</Flex>
 					</Flex>
 					
-					<Flex display={{sm: 'flex', md: 'none'}} my={4}>
+					<Flex display={{sm: 'flex', md: 'none'}} my={4} gap={2}>
 						<CustomConnectButton />
 						<IconButton
 							onClick={onToggle}
 							icon={
-								isOpen ? (
+								isToggleOpen ? (
 									<CloseIcon w={3} h={3} />
 								) : (
 									<HamburgerIcon w={5} h={5} />
@@ -164,6 +164,7 @@ function NavBar() {
 							}
 							variant={"ghost"}
 							aria-label={"Toggle Navigation"}
+							rounded={0}
 						/>
 					</Flex>
 				</Flex>
@@ -180,11 +181,11 @@ function NavBar() {
 						title={<Flex gap={2} align={'center'}>
 						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> Points
 						</Flex>}></NavLocalLink>
-					{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
-						<NavLocalLink
+						{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
+							<NavLocalLink
 							path={"/faucet"}
 							title="Faucet"></NavLocalLink>
-					</>}
+						</>}
 					<Box>
 						<AccountButton />
 					</Box>
@@ -195,11 +196,12 @@ function NavBar() {
 			</Flex>
 			<Divider/>
 			</Box>
+
+
+		</Flex>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
 			</Collapse>
-
-		</Flex>
 		</>
 	);
 }
@@ -208,7 +210,7 @@ const MobileNav = ({}: any) => {
 	const router = useRouter();
 	const { dex } = useDexData();
 	return (
-		<Flex flexDir={"column"} p={4} gap={4}>
+		<Flex flexDir={"row"} wrap={'wrap'} gap={2}>
 			<NavLocalLink
 				path={"/"}
 				title={"Trade"}
@@ -225,8 +227,6 @@ const MobileNav = ({}: any) => {
 				path={"/pools"}
 				title="Pools"
 			></NavLocalLink>
-
-
 			<NavLocalLink
 				path={"/leaderboard"}
 				title={<Flex gap={2} align={'center'}>

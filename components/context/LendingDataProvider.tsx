@@ -47,7 +47,7 @@ function LendingDataProvider({ children }: any) {
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = defaultChain.id;
 		if(chain?.unsupported) chainId = defaultChain.id;
-		console.log("fetching lending data for chain", chainId);
+		console.log("Fetching lending data for chain", chainId);
 		return new Promise((resolve, reject) => {
 			setStatus(Status.FETCHING);
 			if(!_address) _address = ADDRESS_ZERO;
@@ -68,7 +68,6 @@ function LendingDataProvider({ children }: any) {
 					reject(res[0].data.errors || res[1].data.errors);
 				} else {
 					const _protocols = res.map((r: any) => r.data.data.lendingProtocols[0]);
-					// setProtocols([res[0].data.data.lendingProtocols[0], res[1].data.data.lendingProtocols[0]]);
 					setProtocols(res.map((r: any) => r.data.data.lendingProtocols[0]));
 					const _pools = res.map((r: any) => r.data.data.markets);
 					for(let i in _pools){
@@ -118,7 +117,7 @@ function LendingDataProvider({ children }: any) {
 			let calls: any[] = [];
 			for(let i in _pools){
 				let _markets = _pools[i];
-				const oracle = await getContract("PythOracle", chainId, _protocols[i]._priceOracle);
+				const oracle = new ethers.Contract(_protocols[i]._priceOracle, getABI("PythOracle", chainId), provider);
 				const fallbackOracle = await oracle.getFallbackOracle();
 				for (let j = 0; j < _markets.length; j++) {
 					calls.push([_protocols[i]._priceOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [_markets[j].inputToken.id])]);
@@ -128,15 +127,6 @@ function LendingDataProvider({ children }: any) {
 
 			helper.callStatic.aggregate(calls).then(async (res: any) => {
 				let index = 0;
-				// setting wallet balance and allowance
-				// for (let i = 0; i < _markets.length; i++) {
-				// 	_markets[i].feed = res.returnData[index];
-				// 	index += 1;
-				// 	_markets[i].fallbackFeed = res.returnData[index];
-				// 	index += 1;
-				// }
-				// setMarkets(_markets);
-				// resolve(_markets);
 				for(let i in _pools){
 					let _markets = _pools[i];
 					for (let j = 0; j < _markets.length; j++) {

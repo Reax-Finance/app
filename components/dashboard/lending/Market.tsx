@@ -49,11 +49,9 @@ export default function LendingMarket() {
 		let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
 		let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
-		send(controller, "claimRewards", [
+		send(controller, "claimAllRewards", [
 				assets,
-				synAccrued,
-				address,
-				getAddress("VestedREAX", defaultChain.id)
+				address
 			])
 			.then(async (result: any) => {
 				let response = await result.wait();

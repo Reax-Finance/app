@@ -1,10 +1,8 @@
 import * as React from "react";
 import axios from "axios";
-import { getAddress, getABI, getArtifact } from "../../src/contract";
 import { ADDRESS_ZERO, defaultChain } from '../../src/const';
-import { ethers } from "ethers";
-import { useAccount, useNetwork } from "wagmi";
-import { Status, SubStatus } from "../utils/status";
+import { useNetwork } from "wagmi";
+import { Status } from "../utils/status";
 import { DEX_ENDPOINT, MINICHEF_ENDPOINT, ROUTER_ENDPOINT, query_dex, query_leaderboard, query_minichef } from "../../src/queries/dex";
 import Big from "big.js";
 
@@ -22,22 +20,11 @@ const DEXDataContext = React.createContext<DEXDataValue>({} as DEXDataValue);
 
 function DEXDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<Status>(Status.NOT_FETCHING);
-	const [subStatus, setSubStatus] = React.useState<SubStatus>(SubStatus.NOT_SUBSCRIBED);
 	const [message, setMessage] = React.useState<DEXDataValue['message']>("");
 	const { chain } = useNetwork();
-	const { address } = useAccount();
 	const [pools, setPools] = React.useState<any[]>([]);
 	const [vault, setVault] = React.useState<any>({});
 	const [dex, setDex] = React.useState<any>({});
-
-	React.useEffect(() => {
-        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && address) {
-			setSubStatus(SubStatus.SUBSCRIBED);
-			console.log("Subscribed to DEX data");
-			refreshData()
-			setInterval(refreshData, 30000);
-        }
-    }, [pools, address, status])
 
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = defaultChain.id;
@@ -114,54 +101,6 @@ function DEXDataProvider({ children }: any) {
 			});
 		});
 	};
-
-	const refreshData = () => {
-		const chainId = defaultChain.id;
-		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-		const helper = new ethers.Contract(
-			getAddress("Multicall2", chainId),
-			getABI("Multicall2", chainId),
-			provider
-		);
-		return new Promise(async (resolve, reject) => {
-            let calls: any[] = [];
-			const itf = new ethers.utils.Interface(getABI("MockToken", chainId));
-			const stablePoolItf = new ethers.utils.Interface(getArtifact("ComposableStablePool"));
-			const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"), provider);
-			pools.forEach((pool: any) => {
-				if(pool.totalShares > 0){
-					calls.push([pool.address, stablePoolItf.encodeFunctionData("getActualSupply", [])]);
-					calls.push([vault.address, vaultContract.interface.encodeFunctionData("getPoolTokens", [pool.id])]);
-				}
-			});
-			helper.callStatic.aggregate(calls)
-			.then((res: any) => {
-				// update pool.totalShares
-				let index = 0;
-				const _pools = pools.map((pool: any, i: number) => {
-					if(pool.totalShares > 0){
-						pool.totalShares = ethers.utils.formatEther(ethers.BigNumber.from(res.returnData[index]).toString());
-						index++;
-						const poolTokens = vaultContract.interface.decodeFunctionResult("getPoolTokens", res.returnData[index]);
-						index++;
-						for(let i in poolTokens.tokens){
-							for(let j in pool.tokens){
-								if(poolTokens.tokens[i].toLowerCase() == pool.tokens[j].token.id){
-									pool.tokens[j].balance = Big(poolTokens.balances[i].toString()).div(10**pool.tokens[j].token.decimals).toFixed(pool.tokens[j].token.decimals);
-								}
-							}
-						}
-					}
-					return pool;
-				});
-				setPools(_pools);
-				resolve(0);
-			})
-			.catch((err: any) => {
-				console.log("Failed to refresh dex data", err);
-			})
-		})
-	}
 
 	const updateStakeBalance = (poolAddress: string, value: string, isMinus: boolean) => {
 		let _pools = [...pools];

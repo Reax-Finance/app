@@ -73,7 +73,8 @@ export default function Index({ children }: any) {
 					textAlign={'center'} 
 					fontSize={'sm'}
 					fontWeight="medium"
-					p={2}>
+					p={2}
+					px={4}>
 					{process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? "This is a testnet. Please do not send real assets to these addresses" : "We're still in beta. Even though we are audited, only deposit what you can afford to lose."}
 				</Text>
 			</Flex>
@@ -83,7 +84,7 @@ export default function Index({ children }: any) {
 					fontSize={'sm'}
 					fontWeight="medium"
 					p={1.5}>
-					{"Not supported on Mobile Yet"}
+					{"Not optimised for mobile view yet"}
 				</Text>
 			</Flex>
 			{(status == Status.FETCHING || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
