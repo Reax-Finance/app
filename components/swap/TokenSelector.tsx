@@ -29,7 +29,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
 
-const POPULAR_TOKENS = ['WETH', 'WBTC', 'USDT', 'cUSD']
+const POPULAR_TOKENS = ['WETH', 'MNT', 'USDT', 'cUSD']
 
 function TokenSelector({
 	onTokenSelected,
@@ -42,7 +42,7 @@ function TokenSelector({
 	const { walletBalances, tokens: _tokens } = useBalanceData();
 	const {chain} = useNetwork();
 	const {isConnected} = useAccount();
-    const tokens: any[] = _tokens.concat({ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] });
+    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
 	const selectToken = (tokenIndex: number) => {
 		onTokenSelected(tokenIndex);

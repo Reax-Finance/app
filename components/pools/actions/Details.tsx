@@ -3,7 +3,6 @@ import React from 'react'
 import { dollarFormatter, tokenFormatter } from '../../../src/const';
 import Big from 'big.js';
 import { usePriceData } from '../../context/PriceContext';
-import { CloseIcon } from '@chakra-ui/icons';
 
 export default function Details({pool, isOpen, onClose}: any) {
 	
@@ -15,8 +14,8 @@ export default function Details({pool, isOpen, onClose}: any) {
 
 	const calcApy = () => {
 		let totalFees = 0;
-		for(let i in pool.snapshots){
-			totalFees += Number(pool.snapshots[i].swapFees);
+		if(pool.snapshots.length > 1){
+			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
 		}
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return (dailyFee * 365);
@@ -26,26 +25,22 @@ export default function Details({pool, isOpen, onClose}: any) {
 
 	const fees7Days = () => {
 		let totalFees = 0;
-		for(let i in pool.snapshots){
-			if(pool.snapshots[i].timestamp > Date.now()/1000 - 7*24*60*60){
-				totalFees += Number(pool.snapshots[i].swapFees);
-			}
+		if(pool.snapshots.length > 1){
+			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
 		}
 		return totalFees;
 	}
 
 	const fees24hrs = () => {
 		let totalFees = 0;
-		for(let i in pool.snapshots){
-			if(pool.snapshots[i].timestamp > Date.now()/1000 - 1*24*60*60){
-				totalFees += Number(pool.snapshots[i].swapFees);
-			}
+		// pool.snapshots[-1].swapFees - pool.snapshots[-2].swapFees
+		if(pool.snapshots.length > 1){
+			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[pool.snapshots.length-2].swapFees);
 		}
 		return totalFees;
 	}
 
-  	return (
-    <>
+  	return (<>
     <Modal
 		isCentered
 		isOpen={isOpen}
@@ -107,7 +102,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 				<Divider orientation="vertical" h={'110px'} />
 
 				<Box mx={4} my={4}>
-					<Text mt={2} mb={2}>24H Volume</Text>
+					<Text mt={2} mb={2}>Total Swap Volume</Text>
 					<Flex gap={2} flexDir={'column'}>
 						<Heading size={'md'}>
 						{dollarFormatter.format(pool.totalSwapVolume)}
@@ -151,7 +146,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 				<Box mx={4} my={4}>
 					<Text mt={2} mb={2}>APR</Text>
 					<Box>
-						<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>7d Annualized</Text>
+						<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>Annualized</Text>
 						<Heading size={'md'}>
 						{(calcApy()).toFixed(2)} %
 						</Heading>

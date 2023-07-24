@@ -40,30 +40,21 @@ export default function Leaderboard() {
       <Image mb={-8} src='/rewards-illustration.svg' w='300px' />
       </Flex>
       <Flex align='end' justify='start' my={4}>
-        <Box className='outlinedButton'>
+        <Box className='primaryButton'>
         <Button bg={'transparent'} _hover={{bg: 'transparent'}}>Epoch 1</Button>
         </Box>
-        <Divider/>
+        {/* <Divider/> */}
       </Flex>
-      <Flex gap={10} mt={6}>
-      <Box py={5}>
-        <Heading size={'sm'} color={'whiteAlpha.700'}>Your Points</Heading>
-        <Text fontSize={'3xl'} my={3}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text>
-      </Box>
-
-      <Divider orientation='vertical' mt={5} h='80px'/>
-
-      <Box>
-        <Flex gap={20}>
-        <Box py={5}>
-          <Flex>
-              <Heading size={'sm'} color={'whiteAlpha.700'}>Total Volume</Heading>
-          </Flex>
-          <Text fontSize={'3xl'} my={3}>{dollarFormatter.format(dex?.yourPoints?.totalVolumeUSD ?? 0)}</Text>
-          </Box>
-          </Flex>
-          </Box>
+      <Flex gap={10} my={4} py={4} align={'center'}>
+          <PointBox title='Ending In' value='00:00:00' tbd={true} />
+          <PointDivider />
+          <PointBox title='Total Rewards' value={tokenFormatter.format(0.00) + ' REAX'} tbd={true} />
+          <PointDivider />
+          <PointBox title='Your Points' value={tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)} />
+          <PointDivider />
+          <PointBox title='Your Volume' value={dollarFormatter.format(dex?.yourPoints?.totalVolumeUSD ?? 0)} />
         </Flex>
+
       </Box>
       <Box mt={4} pt={1} mb={20} pb={5} borderColor='whiteAlpha.50' className='containerBody'>
 
@@ -95,5 +86,16 @@ export default function Leaderboard() {
 </TableContainer>
 </Box>
     </>
+  )
+}
+
+const PointDivider = () => (<><Divider orientation='vertical' mt={0} h='40px' /></>)
+
+const PointBox = ({title, value, tbd = false}: any) => {
+  return (
+    <Box>
+      <Text fontSize={'sm'} color={'whiteAlpha.700'}>{title}</Text>
+      <Text fontSize={'lg'} color={tbd ? 'whiteAlpha.500' : 'white'}>{value}</Text>
+    </Box>
   )
 }

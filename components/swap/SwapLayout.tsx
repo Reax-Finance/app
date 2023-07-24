@@ -68,7 +68,7 @@ export default function SwapLayout({
     const { prices } = usePriceData();
     const { account } = useAppData();
     const { chain } = useNetwork();
-    const tokens: any[] = _tokens.concat({ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] });
+    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
 	const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure()
 	const [hidden, setHidden] = useState(!isOpen);
@@ -241,7 +241,7 @@ export default function SwapLayout({
             <Box px="5" pb={'1px'} pt={'1px'} className="containerFooter">
 
 
-            {valid && <Box pb={10} mt={5}>
+            {valid && <Box pb={7} mt={5}>
                 {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} bg={'whiteAlpha.50'} color={'orange'}>
                     <WarningTwoIcon/>
                     <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
@@ -288,7 +288,7 @@ export default function SwapLayout({
                         initial={false}
                         onAnimationStart={() => setHidden(false)}
                         onAnimationComplete={() => setHidden(!isOpen)}
-                        animate={{ height: isOpen ? 90 : 0 }}
+                        animate={{ height: isOpen ? 100 : 0 }}
                         style={{
                             height: 75,
                             width: '100%'
@@ -321,7 +321,7 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={!valid ? 6 : 0.5} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
+                <Box mt={!valid ? 6 : 1} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
                 <Button
                     size="lg"
                     fontSize={"xl"}
