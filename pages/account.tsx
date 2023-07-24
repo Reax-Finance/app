@@ -17,7 +17,6 @@ export default function Account() {
 			{address ? <>
 				<Title/>
 				<Portfolio/>
-				{/* {account && <Referral/>} */}
 			 </>: <>
 				<ConnectBox/>
 			</>}
