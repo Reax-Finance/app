@@ -40,15 +40,18 @@ export default function Leaderboard() {
       <Image mb={-8} src='/rewards-illustration.svg' w='300px' />
       </Flex>
       <Flex align='end' justify='start' my={4}>
-        <Box className='primaryButton'>
+        <Box className='halfContainerBody2'>
         <Button bg={'transparent'} _hover={{bg: 'transparent'}}>Epoch 1</Button>
         </Box>
         {/* <Divider/> */}
       </Flex>
-      <Flex gap={10} my={4} py={4} align={'center'}>
-          <PointBox title='Ending In' value='00:00:00' tbd={true} />
+      <Flex gap={6} className='halfContainerBody2' my={4} p={4} align={'center'}>
+          <PointBox title='Ending On' value={
+            // Time for 4 weeks from now
+            new Date('31 Aug 2023').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
+          } tbd={true} />
           <PointDivider />
-          <PointBox title='Total Rewards' value={tokenFormatter.format(0.00) + ' REAX'} tbd={true} />
+          <PointBox title='Total Rewards' value={tokenFormatter.format(1000000) + ' REAX'} tbd={true} />
           <PointDivider />
           <PointBox title='Your Points' value={tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)} />
           <PointDivider />

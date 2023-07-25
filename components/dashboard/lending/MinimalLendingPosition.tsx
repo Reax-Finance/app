@@ -30,7 +30,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
 
     return (
     <>
-        {Big(lendingPosition()?.collateral).gt(0) ? <Box
+        <Box
             display={{ sm: "block", md: "block" }}
             className='containerBody'
         >
@@ -247,7 +247,6 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                 </Flex>
             </Flex>
         </Box>
-    : <></>}
     </>
   )
 }
