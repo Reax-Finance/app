@@ -67,7 +67,7 @@ export const query_dex = (address: string) => (`
 
 export const query_leaderboard = (address: string) => (`
 {
-    users(orderBy: totalPoints, orderDirection: desc){
+    users(first: 99, orderBy: totalPoints, orderDirection: desc){
         id
         totalPoints
         totalVolumeUSD

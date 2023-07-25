@@ -29,11 +29,11 @@ export default function YourPoolPosition({ pool, index }: any) {
 
 	const calcApy = () => {
 		let totalFees = 0;
-		for(let i in pool.snapshots){
-			totalFees += Number(pool.snapshots[i].swapFees);
+		if(pool.snapshots.length > 1){
+			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
 		}
 		const dailyFee = totalFees / pool.snapshots.length;
-		if(liquidity == 0) return (dailyFee * 365);
+		if(liquidity == 0) return 0;
 		const dailyApy = ((1 + dailyFee / liquidity) ** 365) - 1;
 		return dailyApy * 100;
 	}

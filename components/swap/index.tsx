@@ -20,7 +20,7 @@ import useHandleError, { PlatformType } from "../utils/useHandleError";
 
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(1);
-	const [outputAssetIndex, setOutputAssetIndex] = useState(5);
+	const [outputAssetIndex, setOutputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState('');
 	const [gas, setGas] = useState(0);

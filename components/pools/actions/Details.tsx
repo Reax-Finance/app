@@ -146,7 +146,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 				<Box mx={4} my={4}>
 					<Text mt={2} mb={2}>APR</Text>
 					<Box>
-						<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>Annualized</Text>
+						<Text color={'whiteAlpha.700'} fontSize={'xs'} mb={1}>7d Annualized</Text>
 						<Heading size={'md'}>
 						{(calcApy()).toFixed(2)} %
 						</Heading>
