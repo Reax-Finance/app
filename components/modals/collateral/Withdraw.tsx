@@ -192,14 +192,18 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 								<Text fontSize={"md"} color="whiteAlpha.600">
 									Health Factor
 								</Text>
-								<Text fontSize={"md"}>{numOrZero(pools[tradingPool]?.userDebt/pools[tradingPool]?.userCollateral * 100).toFixed(1)} % {"->"} {(pools[tradingPool]?.userCollateral ?? 0) - numOrZero(pools[tradingPool]?.userDebt /(pools[tradingPool]?.userCollateral - (amount*collateral.priceUSD)) * 100)}%</Text>
+								<Text fontSize={"md"}>
+								{Number(pos.debtLimit).toFixed(2)} % {"->"} {Number(pos.collateral) - amount*prices[collateral.token.id] > 0 ? (Number(pos.debt)/(Number(pos.collateral) - (amount*prices[collateral.token.id])) * 100).toFixed(1) : '0'} %
+								</Text>
 							</Flex>
 							<Divider my={2} />
 							<Flex justify="space-between">
 								<Text fontSize={"md"} color="whiteAlpha.600">
 									Available to issue
 								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format((pools[tradingPool]?.adjustedCollateral ?? 0) - (pools[tradingPool]?.userDebt ?? 0))} {"->"} {dollarFormatter.format((pools[tradingPool]?.adjustedCollateral ?? 0) - (amount*prices[collateral.token.id]*collateral.baseLTV/10000) - (pools[tradingPool]?.userDebt ?? 0))}</Text>
+								<Text fontSize={"md"}>
+								{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) - amount*prices[collateral.token.id]*collateral.baseLTV/10000 - Number(pos.debt))}
+								</Text>
 							</Flex>
 						</Box>
 					</Box>
