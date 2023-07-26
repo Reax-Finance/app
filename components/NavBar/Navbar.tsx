@@ -27,6 +27,7 @@ import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
+import TradeMenu from "./TradeMenu";
 
 function NavBar() {
 	const router = useRouter();
@@ -49,6 +50,7 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
+			address = '0x443557Ce92E31C147EDf3E2e434f33D51D9a1151'
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
 			fetchData(address!);
@@ -129,10 +131,17 @@ function NavBar() {
 							display={{ sm: "none", md: "flex" }}
 							gap={2}
 						>
-							<NavLocalLink
+							{/* <NavLocalLink
 								path={"/"}
 								title="Trade"
 							></NavLocalLink>
+
+							<NavLocalLink
+								path={"/perps"}
+								title="Perpetuals"
+							></NavLocalLink> */}
+
+							<TradeMenu />
 
 							<NavLocalLink
 								path={"/lend"}

@@ -73,18 +73,13 @@ export default function SupplyModal({
 			const v2 = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
 			// Available to withdraw from pool
 			const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
-			
+
 			// find minimum of (v1, v2, v3)
-			for(let i = 0; i < 3; i++) {
-				if(v1.lt(v2) && v1.lt(v3)) {
-					return v1.toFixed(market.inputToken.decimals);
-				} else if(v2.lt(v1) && v2.lt(v3)) {
-					return v2.toFixed(market.inputToken.decimals);
-				} else {
-					return v3.toFixed(market.inputToken.decimals);
-				}
-			}
-			return '0'
+			let min = v1;
+			if(v2.lt(min)) min = v2;
+			if(v3.lt(min)) min = v3;
+
+			return min.toString();
 		}
 	};
     

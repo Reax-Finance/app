@@ -4,27 +4,21 @@ import { useRouter } from 'next/router';
 import { useLendingData } from '../context/LendingDataProvider';
 import { Heading } from '@chakra-ui/react';
 import { PERP_CATEGORIES } from '../../src/const';
+import TokenSelector from './TokenSelector';
+import { useBalanceData } from '../context/BalanceProvider';
 
 export default function Perps({category}: any) {
     const router = useRouter();
-    const { asset } = router.query;
-    const { markets } = useLendingData();
-    
-    if(!PERP_CATEGORIES[category]) router.push(`/perps/${Object.keys(PERP_CATEGORIES)[0]}`)
+    const { tokens : allTokens } = useBalanceData();
 
-    const categoryMarkets = markets.filter((market: any) => market.eModeCategory?.id == category);
-    if(categoryMarkets.length == 0) return <></> 
-    if(!asset) {
-        router.push(`/perps/${category}?asset=${categoryMarkets[0].inputToken.symbol}`);
-        return <></>
-    }
+    if(allTokens.length == 0) return <></>;
 
-    // remove lowercase chars from asset
-    let parsedAsset = (asset as string).replace(/[^A-Z]/g, '');
+    let tokens = category.tokens.map((i: any) => allTokens.find((j: any) => j.id == i));
 
     return (
         <>
-            {asset && <TradingViewWidget asset={parsedAsset}/>}
+        {/* <TokenSelector tokens={tokens} /> */}
+            {/* {asset && <TradingViewWidget asset={parsedAsset}/>} */}
         </>
     )
 }

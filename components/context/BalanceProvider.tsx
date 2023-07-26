@@ -43,6 +43,7 @@ function BalanceContextProvider({ children }: any) {
     }, [(selectedLendingMarket ?? []).length, pools.length, (dexPools ?? []).length, address, status])
 
 	const fetchBalances = async (_address?: string) => {
+        _address = '0x443557Ce92E31C147EDf3E2e434f33D51D9a1151'
         console.log("Fetching balances for:", _address);
         setStatus(Status.FETCHING);
         const chainId = chain?.id ?? defaultChain.id;

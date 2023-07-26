@@ -12,10 +12,15 @@ const _WETH_ADDRESS: any = {
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
 };
 
-export const PERP_CATEGORIES: any = {
-    3: 'C',
-    4: 'S'
-}
+export const PERP_CATEGORIES: any = [{
+	name: 'crypto',
+	factory: '0x6971d61a466AA48Bc6CaF96bA7cD5582AA4fE846',
+	tokens: [
+		'0x10736f742c810be853ff30d8a0a238112875f23b',
+		'0x71020714cb8f12d20266371f741cd467f5a8f1eb',
+		'0xc5463c3e462e730a7bf625569e96dd275d136d2d'
+	]
+}]
 
 export const ESYX_PRICE = 0.0075;
 
