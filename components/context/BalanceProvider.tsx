@@ -365,6 +365,14 @@ function BalanceContextProvider({ children }: any) {
             newAllowances[decodedEvents[i].token.toLowerCase()][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[3].toString();
         }
         setAllowances(newAllowances);
+	updateETHBalance(newBalances);
+    }
+
+    const updateETHBalance = async (_walletBalances = walletBalances) => {
+        if(!address) return;
+        let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+        const balance = (await provider.getBalance(address)).toString();
+        setWalletBalances({..._walletBalances, [ADDRESS_ZERO]: balance});
     }
 
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {
