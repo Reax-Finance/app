@@ -321,7 +321,7 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={!valid ? 6 : 1} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
+                <Box mt={isOpen? 0 : 2.5} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
                 <Button
                     size="lg"
                     fontSize={"xl"}

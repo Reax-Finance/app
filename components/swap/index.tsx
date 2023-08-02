@@ -19,7 +19,7 @@ import { parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 
 function Swap() {
-	const [inputAssetIndex, setInputAssetIndex] = useState(1);
+	const [inputAssetIndex, setInputAssetIndex] = useState(2);
 	const [outputAssetIndex, setOutputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState('');
