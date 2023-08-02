@@ -304,7 +304,7 @@ export default function SwapLayout({
                     {isOpen && 	<>
                         <Divider />
                         <Flex bg={'whiteAlpha.50'} flexDir={'column'} gap={1} mt={0} px={3} py={2} fontSize='sm' color={'whiteAlpha.800'}>
-                            <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'yellow.400'} justify={'space-between'}>
+                            <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'whiteAlpha.800'} justify={'space-between'}>
                             <Text>{priceImpact > 0 ? 'Bonus' : 'Price Impact'}</Text>
                             <Text>{(priceImpact).toFixed(2)}%</Text>
                             </Flex>
