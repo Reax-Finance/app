@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, useToast, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, useToast, Text, Tooltip, IconButton, Image } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useLendingData } from '../../context/LendingDataProvider'
 import { defaultChain, dollarFormatter } from '../../../src/const';
@@ -82,6 +82,20 @@ export default function LendingMarket() {
 			});
 	}
 
+	const addToMetamask = async () => {
+        (window as any).ethereum.request({
+            method: 'wallet_watchAsset',
+            params: {
+              type: 'ERC20', // Initially only supports ERC20, but eventually more!
+              options: {
+                address: getAddress("VestedREAX", defaultChain.id), // The address that the token is at.
+                symbol: "veREAX", // A ticker symbol or shorthand, up to 5 chars.
+                decimals: 18, // The number of decimals in the token
+                image: process.env.NEXT_PUBLIC_VERCEL_URL + '/veREAX.svg', // A string url of the token logo
+              },
+            }
+        });
+    }
 
   return (
     <>
@@ -116,9 +130,26 @@ export default function LendingMarket() {
 					(pools[selectedPool] && synAccrued > 0) 
 					&&
 					<Box textAlign={"right"}>
-					<Heading size={"sm"} color={"whiteAlpha.600"}>
-						Rewards
-					</Heading>
+					<Flex justify={'end'} align={'center'} gap={1}>
+						<Heading size={"sm"} color={"whiteAlpha.600"}>
+							Rewards
+						</Heading>
+						<Tooltip label='Add to Metamask'>
+						<IconButton
+							icon={
+								<Image
+									src="https://cdn.consensys.net/uploads/metamask-1.svg"
+									w={"20px"}
+									alt=""
+								/>
+							}
+							onClick={addToMetamask}
+							size={"xs"}
+							rounded="full"
+							aria-label={""}
+						/>
+						</Tooltip>
+					</Flex>
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{synAccrued ? Big(synAccrued).div(10**18).toFixed(2) : '-'} </Text>
