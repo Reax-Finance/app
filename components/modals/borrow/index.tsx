@@ -47,6 +47,15 @@ export default function Debt({ market, index }: any) {
 			.toFixed(2);
 	}
 
+	const available = () => {
+		if(!pos || !prices[market.inputToken.id]) return Big(0)
+		const v1 = Big(pos?.availableToIssue ?? 0).div(prices[market.inputToken.id]);
+		const v2 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
+		let min = v1.lt(v2) ? v1 : v2;
+		if(min.lt(0)) min = Big(0);
+		return min;
+	}
+
 	return (
 		<>
 			<Tr
@@ -59,10 +68,7 @@ export default function Debt({ market, index }: any) {
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					<Text textAlign={'center'} w={'100%'}>
-						{tokenFormatter.format(Math.min(
-							(Number(pos.availableToIssue) / prices[market.inputToken.id]),
-							0.96 * (market.totalDepositBalanceUSD - market.totalBorrowBalanceUSD) / prices[market.inputToken.id]
-						) || 0)}
+						{tokenFormatter.format(available().toNumber())}
 					</Text>
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>

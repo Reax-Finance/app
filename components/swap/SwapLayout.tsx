@@ -290,7 +290,7 @@ export default function SwapLayout({
                         onAnimationComplete={() => setHidden(!isOpen)}
                         animate={{ height: isOpen ? 100 : 0 }}
                         style={{
-                            height: 75,
+                            height: 100,
                             width: '100%'
                         }}
                     >
@@ -321,7 +321,7 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={isOpen? 0 : 2.5} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
+                <Box mt={isOpen? 0 : 3} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
                 <Button
                     size="lg"
                     fontSize={"xl"}
