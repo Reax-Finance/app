@@ -8,6 +8,7 @@ import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
 import { useDexData } from "./DexDataProvider";
+import { usePerpsData } from "./PerpsDataProvider";
 
 const BalanceContext = React.createContext<BalanceValue>({} as BalanceValue);
 
@@ -35,15 +36,16 @@ function BalanceContextProvider({ children }: any) {
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault, dex } = useDexData();
+    const { positions } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 ) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 && positions.length > 0) {
             fetchBalances(address);
         }
     }, [(selectedLendingMarket ?? []).length, pools.length, (dexPools ?? []).length, address, status])
 
-	const fetchBalances = async (_address?: string) => {
-        _address = '0x443557Ce92E31C147EDf3E2e434f33D51D9a1151'
+    const fetchBalances = async (_address?: string) => {
+        // _address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
         console.log("Fetching balances for:", _address);
         setStatus(Status.FETCHING);
         const chainId = chain?.id ?? defaultChain.id;
@@ -192,6 +194,52 @@ function BalanceContextProvider({ children }: any) {
             };
         }
 
+        for(let j = 0; j < positions.length; j++){
+            const marketsIndex = lendingProtocols.map((protocol: any) => protocol._lendingPoolAddress == positions[j].factory.lendingPool.toLowerCase() ? '1' : '0').indexOf('1');
+            const wrapperAddress = lendingProtocols[marketsIndex]._wrapper;
+            let markets = lendingPools[marketsIndex];
+            for(let i = 0; i < markets.length; i++) {
+                const market = markets[i];
+                // allowance to market
+                calls.push([
+                    market.inputToken.id,
+                    itf.encodeFunctionData("allowance", [
+                        positions[j].id,
+                        market.protocol._lendingPoolAddress
+                    ]),
+                ]);
+                // if aweth, check allowance for wrapper
+                if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                    calls.push([
+                        market.inputToken.id,
+                        itf.encodeFunctionData("allowance", [
+                            positions[j].id,
+                            wrapperAddress
+                        ]),
+                    ]);
+                    calls.push([
+                        market._vToken.id,
+                        vTokenInterface.encodeFunctionData("borrowAllowance", [positions[j].id, wrapperAddress]),
+                    ])
+                };
+
+                calls.push([
+                    market.outputToken.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+                // debt
+                calls.push([
+                    market._vToken.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+                calls.push([
+                    market._sToken.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+            };
+            
+        }
+
         // check balance for lp tokens and allowance to vault
         for(let i = 0; i < dexPools.length; i++) {
             const dexPool = dexPools[i];
@@ -280,6 +328,35 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                 }
             }
+            for(let j = 0; j < positions.length; j++){
+                const marketsIndex = lendingProtocols.map((protocol: any) => protocol._lendingPoolAddress == positions[j].factory.lendingPool.toLowerCase() ? '1' : '0').indexOf('1');
+                const wrapperAddress = lendingProtocols[marketsIndex]._wrapper;
+                let markets = lendingPools[marketsIndex];
+                for(let i = 0; i < markets.length; i++) {
+                    const market = markets[i];
+                    let inputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market.inputToken.id, positions[j].id]));
+                    let outputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market.outputToken.id, positions[j].id]));
+                    let vTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market._vToken.id, positions[j].id]));
+                    let sTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market._sToken.id, positions[j].id]));
+
+                    if(!newAllowances[inputTokenHash]) newAllowances[inputTokenHash] = {};
+                    newAllowances[inputTokenHash][market.protocol._lendingPoolAddress] = BigNumber.from(res[index]).toString();
+                    index++;
+                    if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                        newAllowances[inputTokenHash][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        index++;
+                        if(!newAllowances[vTokenHash]) newAllowances[vTokenHash] = {};
+                        newAllowances[vTokenHash][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        index++;
+                    }
+                    newBalances[outputTokenHash] = BigNumber.from(res[index]).toString();
+                    index++;
+                    newBalances[vTokenHash] = BigNumber.from(res[index]).toString();
+                    index++;
+                    newBalances[sTokenHash] = BigNumber.from(res[index]).toString();
+                    index++;
+                }
+            }
             for(let i = 0; i < dexPools.length; i++) {
                 const dexPool = dexPools[i];
                 newBalances[dexPool.address] = BigNumber.from(res[index]).toString();
@@ -316,7 +393,7 @@ function BalanceContextProvider({ children }: any) {
         let events = tx.events.filter((event: any) => event.topics[0] == tokenItf.getEventTopic("Transfer"));
         // Decode events
         let decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Transfer", event.data, event.topics)}});
-        console.log("transfers", decodedEvents);
+        console.log("Transfers:", decodedEvents);
         const newBalances = {...walletBalances};
         for(let i in decodedEvents){
             let isOut = decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase();
@@ -349,7 +426,7 @@ function BalanceContextProvider({ children }: any) {
         // Decode events
         decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Approval", event.data, event.topics)}});
         let newAllowances = {...allowances};
-        console.log("approvals", decodedEvents);
+        console.log("Approvals:", decodedEvents);
         for(let i in decodedEvents){
             if(decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase()){
                 if(!newAllowances[decodedEvents[i].token]) newAllowances[decodedEvents[i].token] = {};
@@ -366,6 +443,14 @@ function BalanceContextProvider({ children }: any) {
             newAllowances[decodedEvents[i].token.toLowerCase()][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[3].toString();
         }
         setAllowances(newAllowances);
+        updateETHBalance(newBalances);
+    }
+
+    const updateETHBalance = async (_walletBalances = walletBalances) => {
+        if(!address) return;
+        let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+        const balance = (await provider.getBalance(address)).toString();
+        setWalletBalances({..._walletBalances, [ADDRESS_ZERO]: balance});
     }
 
     const updateBalance = async (asset: string, value: string, isMinus: boolean = false) => {

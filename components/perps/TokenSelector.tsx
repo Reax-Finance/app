@@ -1,234 +1,223 @@
-import React, { useContext } from "react";
-import { AppDataContext } from "../context/AppDataProvider";
 import {
 	Box,
+	Text,
 	Flex,
-	Heading,
-	Skeleton,
 	Input,
 	Divider,
 	Image,
-	Text,
-	Tag,
-	ModalOverlay,
+	Button,
+	Tooltip,
+	Heading
 } from "@chakra-ui/react";
-import { RiArrowDropDownLine } from "react-icons/ri";
-import { motion, Variants } from "framer-motion";
-import router from "next/router";
-import { PERP_CATEGORIES } from "../../src/const";
 
-const itemVariants: Variants = {
-	open: {
-		opacity: 1,
-		y: 0,
-		transition: { type: "spring", stiffness: 300, damping: 24 },
-	},
-	closed: { opacity: 0, y: 20, transition: { duration: 0.2 } },
-};
+import { useContext, useState, useEffect } from "react";
+import { AppDataContext } from "../context/AppDataProvider";
+import { tokenFormatter } from "../../src/const";
 
-export default function TokenSelector({tokens}: any) {
-	const [isOpen, setIsOpen] = React.useState(false);
-	const [searchedTokens, setSearchedTokens] = React.useState<any[]>([]);
-    const { asset } = router.query;
+import {
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+} from "@chakra-ui/react";
+import { useBalanceData } from "../context/BalanceProvider";
+import { ethers } from "ethers";
+import { useAccount, useNetwork } from "wagmi";
+import { MdTrendingUp, MdVerified } from "react-icons/md";
+import whitelistedTokens from "../../src/whitelistedTokens";
 
-    if(!asset) router.push('/perps/'+PERP_CATEGORIES[0].name+'/?asset='+PERP_CATEGORIES[0].tokens[0])
+const POPULAR_TOKENS = ['WETH', 'MNT', 'USDT', 'cUSD']
 
-    React.useEffect(() => {
-		setSearchedTokens(tokens);
-	}, [tokens]);
+function TokenSelector({
+	onTokenSelected,
+	isOpen,
+	onClose,
+}: any) {
+	const [searchedTokens, setSearchedTokens] = useState<any[]>([]);
+	const { walletBalances, tokens: _tokens } = useBalanceData();
+	const {chain} = useNetwork();
+	const {isConnected} = useAccount();
+    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
-	window.addEventListener("click", function (e) {
-		if (
-			!document.getElementById("menu-list-123")?.contains(e.target as any)
-		) {
-			setIsOpen(false);
-		}
-	});
-
-    const handleSearch = (e: any) => {
-		const search = e.target.value;
-		// const filteredPools = Object.keys(tokens).filter((pool: any) => {
-		// 	return pools[pool].name.toLowerCase().includes(search.toLowerCase());
-		// });
-		// const newPools: any[] = [];
-		// filteredPools.forEach((pool: any) => {
-		// 	newPools[pool] = pools[pool];
-		// });
-		// setSearchedTokens(newPools);
+	const selectToken = (tokenIndex: number) => {
+		onTokenSelected(tokenIndex);
+        onClose();
 	};
 
-    const token = tokens.find((token: any) => token.id === asset);
+	useEffect(() => {
+		if (tokens.length > 1) {
+			searchToken("");
+		}
+	}, [tokens.length]);
 
-    if(!token) return <></>;
+	const searchToken = (searchTerm: string) => {
+		// search token from all pool _mintedTokens
+		const _searchedTokens = [];
+		for (let j in tokens) {
+			const _token = tokens[j];
+			if (
+				_token.name
+					.toLowerCase()
+					.includes(searchTerm.toLowerCase()) ||
+				_token.symbol
+					.toLowerCase()
+					.includes(searchTerm.toLowerCase())
+			) {
+				_searchedTokens.push({
+					..._token,
+					tokenIndex: j,
+				});
+			}
+		}
+		setSearchedTokens(_searchedTokens);
+	};
 
-    const filterName = (name: string) => name.replace('REAX ', '').split('(')[0];
-    const filterSymbol = (symbol: string) => symbol.slice(1);
+	const _onClose = () => {
+		searchToken("");
+		onClose();
+	}
+
+	if(tokens.length <= 1) return <></>
 
 	return (
-		<Box>
-			<Box id="menu-list-123" h='40px'>
-				<motion.nav
-					initial={false}
-					animate={isOpen ? "open" : "closed"}
-					className="menu"
-				>
-					<Flex zIndex={2} >
-						{tokens.length > 0 ? (
-							<motion.button
-								whileTap={{ scale: 0.97 }}
-								onClick={() => setIsOpen(!isOpen)}
-							>
-								<Flex align={"center"} py={4} gap={6}>
-									<Flex>
-										<Box textAlign={'left'}>
-										<Flex gap={4}>
-										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '32px'}} fontWeight='bold'>
-											{filterSymbol(token.symbol)}
-										</Heading>
-										</Flex>
+		<>
+			<Modal
+				isOpen={isOpen}
+				onClose={_onClose}
+				scrollBehavior={"inside"}
+				isCentered
+			>
+				<ModalOverlay bg="blackAlpha.800" backdropFilter="blur(30px)" />
+				<ModalContent bg={'transparent'} shadow={'none'} rounded={0} maxH={"800px"} mx={2}>
+					<Box className="containerBody">
+						<Box className="containerHeader">
+					<ModalHeader>Select a Token </ModalHeader>
+					<Box mx={5} mb={0}>
+						<Input bg={'bg.600'} size={'lg'} _focus={{border: 0, outline: 0}} focusBorderColor='secondary.100' rounded={0} placeholder="Search by Token Name or Address" onChange={(e) => searchToken(e.target.value)} />
+					</Box>
+					<Box mx={5} mt={2} mb={4}>
+
+						<Flex align={'center'} >
+						{/* <Text mr={2} fontSize={'sm'} color={'whiteAlpha.700'}>Trending </Text> */}
+						<Box p={'3'} border={'1px'} borderColor={'whiteAlpha.300'}>
+						<MdTrendingUp/>
+						</Box>
+							{POPULAR_TOKENS.map((token, index) => (
+								tokens.map((t: any, i: number) => (
+									t.symbol === token && (
+										<Box border={'1px'} borderColor={'whiteAlpha.300'} bg={'bg.200'} py={1} px={3} pr={4} _hover={{bg: 'blackAlpha.50'}} key={i}>
+											<Button size={'sm'} fontWeight={'normal'} variant={'unstyled'} onClick={() => selectToken(i)}>
+												<Flex align={'center'}>
+												<Image src={`/icons/${t.symbol}.svg`} w={'22px'} alt="" />
+												<Text fontSize={'sm'} ml={2} color={'white'}>{t.symbol}</Text>
+												</Flex>
+											</Button>
 										</Box>
-									</Flex>
-									<Flex align={'center'} color={'whiteAlpha.700'} >
-									<Text fontSize={'sm'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'All Markets' : 'Tap To Close'}</Text>
-									<motion.div
-										variants={{
-											open: { rotate: 180, marginBottom: '4px' },
-											closed: { rotate: 0 },
-										}}
-										transition={{ duration: 0.2 }}
-										style={{ originY: 0.55 }}
-									>
-										<RiArrowDropDownLine size={36} />
-									</motion.div>
-									</Flex>
+									)
+								))
+							))}
+						</Flex>
+					</Box>
+					<Divider />
 
-								</Flex>
-							</motion.button>
-						) : (
-							<Skeleton height="30px" width="200px" rounded={0} />
-						)}
-					</Flex>
-					<motion.ul
-						variants={{
-							open: {
-								clipPath: "inset(0% 0% 0% 0%)",
-								transition: {
-									type: "spring",
-									bounce: 0,
-									duration: 0.4,
-									delayChildren: 0.2,
-									staggerChildren: 0.05,
-								},
-							},
-							closed: {
-								clipPath: "inset(00% 50% 90% 50%)",
-								transition: {
-									type: "spring",
-									bounce: 0,
-									duration: 0.3,
-								},
-							},
-						}}
-						style={{
-							pointerEvents: isOpen ? "auto" : "none",
-							listStyle: "none",
-							display: "flex",
-							flexDirection: "column",
-							position: "relative",
-							width: "450px",
-							zIndex: '100',
-							borderRadius: '0px',
-							// background: "linear-gradient(45deg, transparent 10px, #1D1F24 0) bottom left, linear-gradient(-135deg, transparent 10px, #1D1F24 0) top right",
-							// backgroundRepeat: 'no-repeat',
-							// backgroundSize: '100% 50%',
-							boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
-						}}
-						
-					>
-						<Box shadow={'2xl'} className="containerBody">
-							<Box className="containerHeader">
-								<motion.div
-									variants={{
-										open: {
-											opacity: 1,
-											y: 0,
-											transition: {
-												ease: "easeOut",
-												duration: 0.1,
-											},
-										},
-										closed: {
-											opacity: 0,
-											y: 20,
-											transition: { duration: 0.1 },
-										},
-									}}
-									style={{
-										padding: "4px 10px",
-										// background: "linear-gradient(-135deg, transparent 10px, #2B2E32 0) top right",
-										// backgroundRepeat: 'no-repeat',
-										// backgroundSize: '100% 100%',
-									}}
-								>
-									<Input
-										placeholder="Search Pool"
-										bg={'transparent'}
-										rounded={0}
-										my={3}
-										pl={1}
-										variant='unstyled'
-										onChange={handleSearch}
-										_active={{ borderColor: "transparent" }}
-									/>
-								</motion.div>
-							</Box>
+					<ModalCloseButton rounded={'full'} mt={1} />
 
-						<Divider />
+					</Box>
+					<ModalBody bg={'bg.600'} maxH={'55vh'}>
 
-						{searchedTokens.map((token: any, index: number) => {
-							return (
-								<motion.li
-									variants={itemVariants}
-									onClick={() => {
-										localStorage.setItem("tradingPool", index.toString());
-										// setTradingPool(index);
-										setIsOpen(false);
+						{/* Token List */}
+						<Box mx={-6} mt={-2}>
+						{searchedTokens.map(
+							(token: any, tokenIndex: number) => (
+								<Box key={tokenIndex}>
+								<Divider/>
+								<Flex
+									justify="space-between"
+									align={"center"}
+									py={3}
+									px={6}
+									_hover={{
+										bg: "bg.400",
+										cursor: "pointer",
 									}}
-									key={index}
+									onClick={() =>
+										selectToken(
+											token.tokenIndex
+										)
+									}
 								>
 									<Box
-										_hover={{ bg: "bg.600" }}
-										cursor="pointer"
-										px={4}
-										my={0}
+										borderColor={"gray.700"}
 									>
 										<Flex
-											paddingY={1}
-											justify={"space-between"}
-											align="center"
-											py="20px"
+											align={"center"}
+											gap={"2"}
+											ml={-1}
 										>
+											<Image
+												src={
+													"/icons/" +
+													token.symbol +
+													".svg"
+												}
+												height={'40px'}
+												alt={''}
+											/>
+
 											<Box>
-												<Heading fontSize={"xl"}>
-													{filterName(token.name)}
-												</Heading>
+												<Flex gap={1} align={'center'}>
+												<Text>
+													{token.symbol}
+												</Text>
+												{whitelistedTokens.includes(token.id) && (
+													<Tooltip label={'Verified'}>
+														<Box color="green.400">
+														<MdVerified />
+														</Box>
+													</Tooltip>
+												)}
+												</Flex>
+
+												<Text
+													color={
+														"gray.500"
+													}
+													fontSize={"sm"}
+												>
+													{token.name}
+												</Text>
 											</Box>
-											
-											
 										</Flex>
-										{index != tokens.length - 1 && <Divider
-											borderColor={"whiteAlpha.200"}
-											mx={-4}
-											w="109%"
-										/>}
 									</Box>
-								</motion.li>
-							);
-						})}
+
+									{isConnected && <Box
+										borderColor={"gray.700"}
+										pl={2}
+										textAlign="right"
+									>
+										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
+										<Text fontSize={"md"}>
+											{tokenFormatter.format((walletBalances[token.id] ?? 0) / 10 ** (token.decimals ?? 18))}
+										</Text>
+									</Box>}
+								</Flex>
+								</Box>
+							)
+						)}
 						</Box>
-					</motion.ul>
-				</motion.nav>
-			</Box>
-		</Box>
+					</ModalBody>
+					<Flex className="containerFooter" roundedBottom={16} py={1} justify='space-between' px={4} fontSize='sm' >
+						<Text>{tokens.length} Tokens</Text>
+						<Text>Reax Token List</Text>
+					</Flex>
+					</Box>
+				</ModalContent>
+			</Modal>
+		</>
 	);
 }
+
+export default TokenSelector;

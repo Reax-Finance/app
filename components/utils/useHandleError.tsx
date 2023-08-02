@@ -10,6 +10,7 @@ export enum PlatformType {
 export default function useHandleError(type: PlatformType) {
     const toast = useToast();
     return (err: any) => {
+        console.log(err);
         if(err?.reason == "user rejected transaction"){
             toast({
                 title: "Transaction Rejected",

@@ -90,7 +90,7 @@ function SyntheticsPositionProvider({ children }: any) {
         if(markets.length == 0) return {collateral: '0', debt: '0', stableDebt: '0', adjustedCollateral: '0', availableToIssue: '0', debtLimit: '0'};
         for (let i = 0; i < markets.length; i++) {
             if(!walletBalances[markets[i].outputToken.id] || !prices[markets[i].inputToken.id]) continue;
-            const usdValue = Big(walletBalances[markets[i].outputToken.id]).div(10**markets[i].outputToken.decimals).mul(prices[markets[i].inputToken.id]).mul(markets[i].isCollateral ? 1 : 0);
+            const usdValue = Big(walletBalances[markets[i].outputToken.id]).div(10**markets[i].outputToken.decimals).mul(prices[markets[i].inputToken.id]);
             _totalCollateral = _totalCollateral.add(usdValue);
             _adjustedCollateral = _adjustedCollateral.plus(usdValue.mul(markets[i].maximumLTV).div(100));
             _totalDebt = _totalDebt.add(Big(walletBalances[markets[i]._vToken.id]).div(10**markets[i]._vToken.decimals).mul(prices[markets[i].inputToken.id]));

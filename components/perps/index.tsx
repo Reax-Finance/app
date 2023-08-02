@@ -2,23 +2,35 @@ import React from 'react'
 import TradingViewWidget from './TradingViewWidget'
 import { useRouter } from 'next/router';
 import { useLendingData } from '../context/LendingDataProvider';
-import { Heading } from '@chakra-ui/react';
-import { PERP_CATEGORIES } from '../../src/const';
-import TokenSelector from './TokenSelector';
+import { Box, Divider, Flex, Heading } from '@chakra-ui/react';
 import { useBalanceData } from '../context/BalanceProvider';
+import PairSelector from './PairSelector';
+import TitleBar from './TitleBar';
+import Trade from './trade';
+import Positions from './positions';
 
-export default function Perps({category}: any) {
+export default function Perps({pair}: any) {
     const router = useRouter();
     const { tokens : allTokens } = useBalanceData();
 
     if(allTokens.length == 0) return <></>;
 
-    let tokens = category.tokens.map((i: any) => allTokens.find((j: any) => j.id == i));
-
     return (
         <>
-        {/* <TokenSelector tokens={tokens} /> */}
-            {/* {asset && <TradingViewWidget asset={parsedAsset}/>} */}
+            <Box className="containerBody" my={5} px={5}>
+                <TitleBar />
+            </Box>
+            <Flex gap={2}>
+                <Box w={'68%'}>
+                    {pair && <TradingViewWidget/>}
+                </Box>
+                <Divider orientation="vertical" h={'100%'} />
+                <Box w={'32%'} className="containerBody">
+                    <Trade />
+                </Box>
+            </Flex>
+            <Positions />
+
         </>
     )
 }

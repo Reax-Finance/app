@@ -59,8 +59,9 @@ export default function TradeMenu() {
 												<Flex align={"center"}>
 													<Heading
 														size={"xs"}
-														mr={-1}
-														mt={0.5}
+														mr={0}
+														mt={(router.pathname.includes('perps') || router.pathname == '/') ? 1 : 0.5}
+
 													>
 														Trade
 													</Heading>
