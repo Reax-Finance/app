@@ -23,7 +23,7 @@ export const PERP_CATEGORIES: any = {
     4: 'S'
 }
 
-export const ESYX_PRICE = 0.0075;
+export const ESYX_PRICE = 0.01;
 
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
 export const APP_NAME = 'Reax';
