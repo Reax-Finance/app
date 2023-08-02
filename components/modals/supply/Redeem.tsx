@@ -13,7 +13,7 @@ import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import { getABI, getAddress, getContract, send } from "../../../src/contract";
-import { defaultChain, dollarFormatter } from "../../../src/const";
+import { EIP712_VERSION, defaultChain, dollarFormatter } from "../../../src/const";
 import Link from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
@@ -107,7 +107,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		signTypedDataAsync({
 			domain: {
 				name: market.outputToken.name,
-				version: "1",
+				version: EIP712_VERSION(market.outputToken.id),
 				chainId: chain?.id ?? defaultChain.id,
 				verifyingContract: market.outputToken.id,
 			},

@@ -11,7 +11,7 @@ import {
 
 import { getABI, getContract, send } from "../../../src/contract";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
-import { ADDRESS_ZERO, PYTH_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, EIP712_VERSION, PYTH_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 import { ExternalLinkIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
@@ -244,7 +244,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 		signTypedDataAsync({
 			domain: {
 				name: market.inputToken.name,
-				version: "1",
+				version: EIP712_VERSION(market.inputToken.id),
 				chainId: chain?.id ?? defaultChain.id,
 				verifyingContract: market.inputToken.id,
 			},

@@ -7,6 +7,12 @@ export const defaultChain = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? mantl
 export const NATIVE = "MNT";
 export const W_NATIVE = "WMNT";
 
+const VERSIONS = {
+	['0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9'.toLowerCase()]: '2'
+}
+
+export const EIP712_VERSION = (asset: string) => VERSIONS[asset.toLowerCase()] ?? '1';
+
 const _WETH_ADDRESS: any = {
 	[mantleTestnet.id]: "0x5b156dca04f775046064032e1f5e45fd1fcca1e0".toLowerCase(),
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),

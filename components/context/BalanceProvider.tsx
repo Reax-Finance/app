@@ -365,7 +365,7 @@ function BalanceContextProvider({ children }: any) {
             newAllowances[decodedEvents[i].token.toLowerCase()][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[3].toString();
         }
         setAllowances(newAllowances);
-	updateETHBalance(newBalances);
+        updateETHBalance(newBalances);
     }
 
     const updateETHBalance = async (_walletBalances = walletBalances) => {
