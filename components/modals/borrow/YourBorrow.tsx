@@ -133,7 +133,7 @@ export default function YourBorrow({ market, index, type }: any) {
 				</TdBox>
 
 				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
-					<Flex w={'100%'} justify={'center'}>
+					<Flex w={'100%'} justify={'end'}>
 					<Select disabled={loading} size={'xs'} maxW={'100px'} rounded={0} value={type == 'VARIABLE' ? '2' : '1'} onChange={_onSwapModeChange}>
 						<option value="2">VARIABLE</option>
 						<option value="1">STABLE</option>

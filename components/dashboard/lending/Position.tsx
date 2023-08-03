@@ -1,6 +1,6 @@
 import React from 'react'
 import Info from '../../infos/Info'
-import { Flex, Text, Box, Heading } from '@chakra-ui/react'
+import { Flex, Text, Box, Heading, Image } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { IoMdCash } from 'react-icons/io'
 import IconBox from './../IconBox'
@@ -14,7 +14,7 @@ import { FaPercentage } from 'react-icons/fa'
 
 export default function LendingPosition() {
     const { tradingPool } = useAppData();
-    const { lendingPosition, netAPY } = useSyntheticsData();
+    const { lendingPosition, netAPY, netRewardsAPY } = useSyntheticsData();
 
     const pos = lendingPosition();
 
@@ -170,10 +170,13 @@ export default function LendingPosition() {
                                                 fontSize={"lg"}
                                                 gap={1}
                                                 color={Big(netAPY()).gt(0) ? 'green.400' : 'red.400'}
+                                                align={'center'}
                                             >
                                                 <Text>
                                                     {(netAPY()).toFixed(2)}%
                                                 </Text>
+                                                <Text fontSize={'md'} fontWeight={'medium'} color={'whiteAlpha.600'}> + {netRewardsAPY().toFixed(2)}%</Text>
+                                                <Image ml={1} src={'/veREAX.svg'} rounded={'full'} boxSize={'18px'} />
                                             </Flex>
                                         </Flex>
                                     </Box>
