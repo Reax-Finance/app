@@ -80,7 +80,6 @@ export default function SupplyModal({
 			if(v3.lt(min)) min = v3;
 
 			if(min.lt(0)) min = Big(0);
-
 			return min.toString();
 		}
 	};

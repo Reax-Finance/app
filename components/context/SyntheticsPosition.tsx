@@ -4,6 +4,7 @@ import { usePriceData } from "./PriceContext";
 import Big from "big.js";
 import { useBalanceData } from "./BalanceProvider";
 import { useLendingData } from "./LendingDataProvider";
+import { ESYX_PRICE } from "../../src/const";
 
 interface Position {
     collateral: string;
@@ -19,6 +20,7 @@ interface SyntheticsPositionValue {
     position: (_tradingPool?: number) => Position;
     lendingPosition: (_tradingPool?: number) => Position;
     netAPY: (_tradingPool?: number) => number;
+    netRewardsAPY: (_tradingPool?: number) => number;
     netBorrowAPY: () => number;
     netSupplyAPY: () => number;
     supplied: () => number;
@@ -130,7 +132,6 @@ function SyntheticsPositionProvider({ children }: any) {
 		}, 0);
 		
 		let sumOfBalances = supplied(_selectedPool);
-
 		return sumOfRatesTimesBalance / sumOfBalances;
 	}
 
@@ -157,6 +158,47 @@ function SyntheticsPositionProvider({ children }: any) {
 		return sum.div(sumBalances).toNumber();
 	}
 
+    const rewardAPY = (market: any, side = "DEPOSIT", type = "VARIABLE") => {
+		let index = market.rewardTokens.map((token: any) => token.id.split('-')[0] == side && token.id.split('-')[1] == type).indexOf(true);
+		if(index == -1) return '0';
+        let total = Number(side == "DEPOSIT" ? market.totalDepositBalanceUSD : market.totalBorrowBalanceUSD);
+		if(total == 0) return '0';
+		return Big(market.rewardTokenEmissionsAmount[index])
+			.div(1e18)
+			.mul(365 * ESYX_PRICE)
+			.div(total)
+			.mul(100)
+			.toFixed(2);
+	}
+
+    const netSupplyRewardsAPY = (_selectedPool = selectedPool) => {
+        let markets = lendingPools[_selectedPool];
+        // sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
+        let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
+            return acc + Number(rewardAPY(market)) * (Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
+        }, 0)
+		let sumOfBalances = supplied(_selectedPool);
+		return sumOfRatesTimesBalance / sumOfBalances;
+    }
+
+    const netBorrowRewardsAPY = (_selectedPool = selectedPool) => {
+        let markets = lendingPools[_selectedPool];
+        // sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
+        let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
+            return acc + Number(rewardAPY(market, "BORROW", "VARIABLE")) * (Big(walletBalances[market._vToken.id] ?? 0).div(10**market._vToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber()) + Number(rewardAPY(market, "BORROW", "STABLE")) * (Big(walletBalances[market._sToken.id] ?? 0).div(10**market._sToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
+        }, 0)
+        let sumOfBalances = borrowed(_selectedPool);
+        return sumOfRatesTimesBalance / sumOfBalances;
+    }
+
+    const netRewardsAPY = (_selectedPool = selectedPool) => {
+        const netSupply = netSupplyRewardsAPY(_selectedPool);
+        const netBorrow = netBorrowRewardsAPY(_selectedPool);
+        const _supplied = supplied(_selectedPool);
+        const _borrowed = borrowed(_selectedPool);
+        return (_supplied * netSupply + _borrowed * netBorrow) / (_supplied + _borrowed);
+    }
+
     const netAPY = (_selectedPool = selectedPool) => {
         const netSupply = netSupplyAPY(_selectedPool);
         const netBorrow = netBorrowAPY(_selectedPool);
@@ -166,7 +208,7 @@ function SyntheticsPositionProvider({ children }: any) {
     }
 
     return (
-        <SyntheticsPositionContext.Provider value={{ poolDebt, position, lendingPosition, netAPY, netBorrowAPY, netSupplyAPY, supplied, borrowed }}>
+        <SyntheticsPositionContext.Provider value={{ netRewardsAPY, poolDebt, position, lendingPosition, netAPY, netBorrowAPY, netSupplyAPY, supplied, borrowed }}>
             {children}
         </SyntheticsPositionContext.Provider>
     );

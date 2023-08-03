@@ -43,6 +43,8 @@ export default function Supply({ market, index }: any) {
 			.toFixed(2);
 	}
 
+	const liquidity = Big(market?.totalDepositBalanceUSD ?? 0).sub(market?.totalBorrowBalanceUSD ?? 0).gt(0) ? Big(market?.totalDepositBalanceUSD ?? 0).sub(market?.totalBorrowBalanceUSD ?? 0) : Big(0);
+
 	return (
 		<>
 			<Tr
@@ -86,7 +88,14 @@ export default function Supply({ market, index }: any) {
 					alignBox='right'
 					isNumeric
 				>
-					{dollarFormatter.format(market.totalDepositBalanceUSD)}
+					<Flex flexDir={'column'} align={'end'} w={'100%'} textAlign={'center'}>
+						<Text fontSize={'md'}>
+						{dollarFormatter.format(market?.totalDepositBalanceUSD)}
+						</Text>
+						<Text fontSize={'xs'} mt={0.5}>
+						{dollarFormatter.format(liquidity.toNumber())}
+						</Text>
+					</Flex>
 				</TdBox>
 			</Tr>
 

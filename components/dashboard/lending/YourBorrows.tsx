@@ -19,17 +19,25 @@ import { useLendingData } from "../../context/LendingDataProvider";
 import { useBalanceData } from "../../context/BalanceProvider";
 import YourBorrow from "../../modals/borrow/YourBorrow";
 import { usePriceData } from "../../context/PriceContext";
+import Big from "big.js";
 
 export default function YourBorrows() {
 	const { markets } = useLendingData();	
 	const { walletBalances } = useBalanceData();
+	const { prices } = usePriceData();
 	
 	const borrowedMarkets = markets.filter((market: any) => {
-		return walletBalances[market._vToken.id] > 0 || walletBalances[market._sToken.id] > 0;
+		if(!walletBalances[market._vToken.id] || !walletBalances[market._sToken.id] || !prices[market.inputToken.id]) return false;
+		let variableDebt = Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals);
+		let stableDebt = Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals);
+		return variableDebt.gt(0.01) || stableDebt.gt(0.01);
 	});
 
 	const suppliedMarkets = markets.filter((market: any) => {
-		return walletBalances[market.outputToken.id] > 0;
+		// return walletBalances[market.outputToken.id] > 0;
+		if(!walletBalances[market.outputToken.id] || !prices[market.inputToken.id]) return false;
+		let supplied = Big(walletBalances[market.outputToken.id]).mul(prices[market.inputToken.id]).div(10**market.outputToken.decimals);
+		return supplied.gt(0.01);
 	});
 
 	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (

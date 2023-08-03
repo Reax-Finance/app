@@ -49,14 +49,13 @@ function APRInfoBox({ debtBurnApr, esSyxApr }: any) {
 
 				<Divider />
 				<Box px={3} py={1} roundedBottom={8}>
-					<Flex align={"center"} gap={2} mb={2} mt={2}>
-						{/* <TbMoneybag size={"20px"} /> */}
+					{/* <Flex align={"center"} gap={2} mb={2} mt={2}>
 						<Flex gap={2}>
 							<Text>{debtBurnApr} %</Text>
 							<Text color={"whiteAlpha.700"}>Debt Burn</Text>
 						</Flex>
-					</Flex>
-					<Flex align={"center"} gap={2} mb={2}>
+					</Flex> */}
+					<Flex align={"center"} gap={2} my={2}>
 						<Image src="/veREAX.svg" w={5} alt={"veREAX"} />
 						<Flex gap={2}>
 							<Text>{esSyxApr} %</Text>

@@ -70,7 +70,7 @@ export default function CollateralTable() {
 									</Text>
 									</ThBox>
 									<ThBox alignBox='right' isNumeric>
-										Liquidity
+										Total / Liquidity
 									</ThBox>
 								</Tr>
 							</Thead>

@@ -28,9 +28,13 @@ import Big from "big.js";
 export default function YourSupplies() {
 	const { markets } = useLendingData();
 	const { walletBalances } = useBalanceData();
+	const { prices } = usePriceData();
 
 	const suppliedMarkets = markets.filter((market: any) => {
-		return walletBalances[market.outputToken.id] > 0;
+		// return walletBalances[market.outputToken.id] > 0;
+		if(!walletBalances[market.outputToken.id] || !prices[market.inputToken.id]) return false;
+		let supplied = Big(walletBalances[market.outputToken.id]).mul(prices[market.inputToken.id]).div(10**market.outputToken.decimals);
+		return supplied.gt(0.01);
 	});
 
 	if(suppliedMarkets.length > 0) return (

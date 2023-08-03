@@ -58,7 +58,7 @@ export default function CollateralTable() {
 								</ThBox>
 								<ThBox >
 								<Text w={'100%'} textAlign={'center'}>
-										Stable APY
+										Stable APR
 									</Text>
 								</ThBox>
 								<ThBox alignBox='right' isNumeric>

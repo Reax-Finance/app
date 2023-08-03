@@ -7,6 +7,12 @@ export const defaultChain = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? mantl
 export const NATIVE = "MNT";
 export const W_NATIVE = "WMNT";
 
+const VERSIONS = {
+	['0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9'.toLowerCase()]: '2'
+}
+
+export const EIP712_VERSION = (asset: string) => VERSIONS[asset.toLowerCase()] ?? '1';
+
 const _WETH_ADDRESS: any = {
 	[mantleTestnet.id]: "0x5b156dca04f775046064032e1f5e45fd1fcca1e0".toLowerCase(),
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
@@ -59,7 +65,7 @@ const POOLS = {
 
 export const POOL = POOLS[defaultChain.id];
 
-export const ESYX_PRICE = 0.0075;
+export const ESYX_PRICE = 0.01;
 
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
 export const APP_NAME = 'Reax';

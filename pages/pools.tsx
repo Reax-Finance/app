@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Pools from '../components/pools'
 import Positions from '../components/pools/Positions'
-import { Flex, Heading, Text, Box, Button, useToast } from '@chakra-ui/react'
+import { Flex, Heading, Text, Box, Button, useToast, Tooltip, IconButton, Image } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useDexData } from '../components/context/DexDataProvider'
 import { defaultChain, dollarFormatter, tokenFormatter } from '../src/const'
 import Big from 'big.js'
 import { BigNumber, ethers } from 'ethers'
-import { getABI, send } from '../src/contract'
+import { getABI, getAddress, send } from '../src/contract'
 import { useAccount } from 'wagmi'
 
 export default function PoolsPage() {
@@ -76,6 +76,21 @@ export default function PoolsPage() {
     }
   }, [dex])
 
+  const addToMetamask = async () => {
+    (window as any).ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20', // Initially only supports ERC20, but eventually more!
+          options: {
+            address: getAddress("VestedREAX", defaultChain.id), // The address that the token is at.
+            symbol: "veREAX", // A ticker symbol or shorthand, up to 5 chars.
+            decimals: 18, // The number of decimals in the token
+            image: process.env.NEXT_PUBLIC_VERCEL_URL + '/veREAX.svg', // A string url of the token logo
+          },
+        }
+    });
+}
+
   return (
     <>
       <Head>
@@ -100,9 +115,26 @@ export default function PoolsPage() {
         {
 					(Big(rewardsAccrued).gt(0)) &&
 					<Box textAlign={"right"}>
-					<Heading size={"sm"} color={"whiteAlpha.600"}>
-						LP Rewards
-					</Heading>
+					<Flex justify={'end'} align={'center'} gap={1}>
+						<Heading size={"sm"} color={"whiteAlpha.600"}>
+							Rewards
+						</Heading>
+						<Tooltip label='Add to Metamask'>
+						<IconButton
+							icon={
+								<Image
+									src="https://cdn.consensys.net/uploads/metamask-1.svg"
+									w={"20px"}
+									alt=""
+								/>
+							}
+							onClick={addToMetamask}
+							size={"xs"}
+							rounded="full"
+							aria-label={""}
+						/>
+						</Tooltip>
+					</Flex>
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{rewardsAccrued ? Big(rewardsAccrued).div(10**18).toFixed(2) : '-'} </Text>

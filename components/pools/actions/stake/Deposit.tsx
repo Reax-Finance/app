@@ -12,7 +12,7 @@ import {
     Tooltip,
     useToast,
 } from "@chakra-ui/react";
-import { defaultChain, dollarFormatter, tokenFormatter } from "../../../../src/const";
+import { EIP712_VERSION, defaultChain, dollarFormatter, tokenFormatter } from "../../../../src/const";
 import { useBalanceData } from "../../../context/BalanceProvider";
 import Big from "big.js";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
@@ -124,7 +124,7 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
 		signTypedDataAsync({
 			domain: {
 				name: pool.name,
-				version: "1",
+				version: EIP712_VERSION(pool.address),
 				chainId: chain?.id ?? defaultChain.id,
 				verifyingContract: pool.address,
 			},

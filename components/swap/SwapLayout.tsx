@@ -12,7 +12,7 @@ import {
     NumberInput,
     NumberInputField,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
 import { RiArrowDropDownLine, RiArrowDropUpLine, RiArrowUpFill } from "react-icons/ri";
@@ -27,7 +27,7 @@ import { formatInput } from "../utils/number";
 import { AiOutlineWallet } from "react-icons/ai";
 import { useAccount, useFeeData, useNetwork } from "wagmi";
 import Settings from "./Settings";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import RouteDetails from "./RouteDetails";
 
 const inputStyle = {
@@ -68,11 +68,18 @@ export default function SwapLayout({
     const { prices } = usePriceData();
     const { account } = useAppData();
     const { chain } = useNetwork();
+    const [gasPrice, setGasPrice] = useState(0);
+    useEffect(() => {
+        let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+        provider.send('rollup_gasPrices', [])
+            .then((res: any) => {
+                setGasPrice(BigNumber.from(res.l1GasPrice).toNumber() / 1e18);
+            })
+    }, [])
     const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
 	const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure()
 	const [hidden, setHidden] = useState(!isOpen);
-    const { data } = useFeeData();
     const { address, isConnected } = useAccount();
 
     const inputValue = (Number(inputAmount) || 0) * prices[tokens[inputAssetIndex]?.id];
@@ -288,16 +295,16 @@ export default function SwapLayout({
                         initial={false}
                         onAnimationStart={() => setHidden(false)}
                         onAnimationComplete={() => setHidden(!isOpen)}
-                        animate={{ height: isOpen ? 100 : 0 }}
+                        animate={{ height: isOpen ? 150 : 0 }}
                         style={{
-                            height: 75,
+                            height: 150,
                             width: '100%'
                         }}
                     >
                     {isOpen && 	<>
                         <Divider />
                         <Flex bg={'whiteAlpha.50'} flexDir={'column'} gap={1} mt={0} px={3} py={2} fontSize='sm' color={'whiteAlpha.800'}>
-                            <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'red.400' : 'orange.400'} justify={'space-between'}>
+                            <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'whiteAlpha.800'} justify={'space-between'}>
                             <Text>{priceImpact > 0 ? 'Bonus' : 'Price Impact'}</Text>
                             <Text>{(priceImpact).toFixed(2)}%</Text>
                             </Flex>
@@ -314,14 +321,14 @@ export default function SwapLayout({
 
                             <Flex justify={'space-between'}>
                             <Text>Network Fee</Text>
-                            <Text>{dollarFormatter.format((gas * (Number(data?.formatted.gasPrice)))/1e14)}</Text>
+                            <Text>~{dollarFormatter.format((3000 * 0.5 * gasPrice))}</Text>
                             </Flex>
                             <RouteDetails swapData={swapData} />
                         </Flex></>}
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={!valid ? 6 : 1} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
+                <Box mt={(isOpen && valid) ? -4 : valid ? 3 : 5} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
                 <Button
                     size="lg"
                     fontSize={"xl"}

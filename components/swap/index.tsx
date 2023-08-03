@@ -4,7 +4,7 @@ import { getContract, send, estimateGas, getAddress } from "../../src/contract";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import TokenSelector from "./TokenSelector";
-import { ADDRESS_ZERO, ROUTER_ENDPOINT, WETH_ADDRESS, defaultChain, tokenFormatter } from "../../src/const";
+import { ADDRESS_ZERO, EIP712_VERSION, ROUTER_ENDPOINT, WETH_ADDRESS, defaultChain, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from '@chakra-ui/react';
 import useUpdateData from "../utils/useUpdateData";
@@ -19,7 +19,7 @@ import { parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 
 function Swap() {
-	const [inputAssetIndex, setInputAssetIndex] = useState(1);
+	const [inputAssetIndex, setInputAssetIndex] = useState(2);
 	const [outputAssetIndex, setOutputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState('');
@@ -365,7 +365,7 @@ function Swap() {
 		signTypedDataAsync({
 			domain: {
 				name: token.name,
-				version: "1",
+				version: EIP712_VERSION(token.id),
 				chainId: chain?.id ?? defaultChain.id,
 				verifyingContract: token.id,
 			},
