@@ -58,7 +58,7 @@ function NavBar() {
 			fetchLendingData(address!);
 			fetchDexData(address!);
 			fetchTokenData(address!);
-			// fetchPerpsData(address!);
+			fetchPerpsData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
@@ -99,6 +99,7 @@ function NavBar() {
 			fetchData();
 			fetchLendingData();
 			fetchDexData();
+			fetchPerpsData();
 			fetchTokenData();
 		}
 	}, [activeConnector, address, chain?.unsupported, chains, fetchData, init, isConnected, isConnecting, isSubscribed, status]);

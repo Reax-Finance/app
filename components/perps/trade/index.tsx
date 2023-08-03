@@ -295,21 +295,37 @@ export default function Trade() {
         let factory = new ethers.Contract(FACTORY, getABI("PerpFactory", chain?.id!));
         let _amount = ethers.utils.parseUnits(Big(inAmount).toFixed(tokens[inAssetIndex].decimals, 0), tokens[inAssetIndex].decimals);
 		let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(leverage - 1).div(prices[PERP_PAIRS[pair].base]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
+
+		// 1. Transfer inAsset to position if doesn't have enough base asset balance
         if(data){
             // permit position to take cusd
             const {v, r, s} = ethers.utils.splitSignature(data!);
             calls.push(position.interface.encodeFunctionData("call", [tokens[inAssetIndex].id, erc20.interface.encodeFunctionData("permit", [address, position.address, ethers.constants.MaxUint256, deadline, v, r, s]), 0]));
         }
         calls.push(position.interface.encodeFunctionData("call", [tokens[inAssetIndex].id, erc20.interface.encodeFunctionData("transferFrom", [address, position.address, _amount]), 0]));
+
+		// 2. Update pyth data
         const pythUpdateData = await getUpdateData([PERP_PAIRS[pair].quote, PERP_PAIRS[pair].base]);
         calls.push(position.interface.encodeFunctionData("updatePythData", [pythUpdateData]));
 
-        if(tokens[inAssetIndex].id !== PERP_PAIRS[pair].base){   
+		// 3. Swap
+		// Check if swap is needed
+        if(tokens[inAssetIndex].id !== PERP_PAIRS[pair].base){
+			// Fetch route
             calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, PERP_PAIRS[pair].base]));
         }
-		// position approves to supply ceth pool
-        calls.push(position.interface.encodeFunctionData("call", [PERP_PAIRS[pair].base, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
-        calls.push(position.interface.encodeFunctionData("call", [PERP_PAIRS[pair].base, erc20.interface.encodeFunctionData("approve", [PERP_PAIRS[pair].base, ethers.constants.MaxUint256]), 0]));
+		// 4. Approvals
+		let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [PERP_PAIRS[pair].base, positions[selectedPosition].id]));
+        let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [PERP_PAIRS[pair].quote, positions[selectedPosition].id]));
+		if(Big(allowances[baseHash][POOL]).lt(ethers.constants.MaxUint256.div(2).toString())){
+			// Position approves to supply ceth pool
+			calls.push(position.interface.encodeFunctionData("call", [PERP_PAIRS[pair].base, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
+		}
+		if(Big(allowances[baseHash][PERP_PAIRS[pair].base]).lt(ethers.constants.MaxUint256.div(2).toString())){
+			// For repayment of flashloan
+			calls.push(position.interface.encodeFunctionData("call", [PERP_PAIRS[pair].base, erc20.interface.encodeFunctionData("approve", [PERP_PAIRS[pair].base, ethers.constants.MaxUint256]), 0]));
+		}
+                    
         // now we have eth in position contract; supply that to pool
         calls.push(position.interface.encodeFunctionData("supply", [PERP_PAIRS[pair].base, ethers.constants.MaxUint256]));
         // now open position
@@ -321,6 +337,8 @@ export default function Trade() {
 		} else {
 			tx = send(position, "multicall", [calls]);
 		}
+
+		console.log(calls);
 
         tx.then(async (tx: any) => {
             tx = await tx.wait();
@@ -382,8 +400,8 @@ export default function Trade() {
 			}
 		}
 		return {
-			apy: total.gt(0) ? apy.div(total).toFixed(4) : '0',
-			rewardsApy: total.gt(0) ? rewardsApy.div(total).toFixed(2) : '0'
+			apy: total.gt(0) ? apy.mul(leverage - 1).div(total).toFixed(4) : '0',
+			rewardsApy: total.gt(0) ? rewardsApy.mul(leverage - 1).div(total).toFixed(2) : '0'
 		}
 	}
 

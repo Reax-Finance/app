@@ -27,7 +27,7 @@ export default function CollateralTable() {
 	return (
 		<>
 			<Box className="containerHeader" px={5} py={5}>
-				<Heading fontSize={'18px'} color={'primary.400'}>Collaterals</Heading>
+				<Heading fontSize={'18px'} color={'primary.400'}>Add Collaterals</Heading>
 			</Box>
 
 			{pools[tradingPool]?.collaterals.length > 0 ? (

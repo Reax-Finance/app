@@ -125,6 +125,8 @@ export default function Position({position, index}: any) {
 
     if(index == positions.length - 1) return <></>
 
+    const leverage = (Number(details?.collateral) / (Number(details?.collateral) - Number(details?.debt)) || 0);
+
   return (<><Tr>
         <Td>
             <Flex gap={2} align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
@@ -144,14 +146,14 @@ export default function Position({position, index}: any) {
 
                     <Flex flexDir={'row'} gap={1}>
                         <Text color={'whiteAlpha.600'} fontSize={'sm'}>Leverage: </Text>
-                        <Text fontSize={'sm'}>{(Number(details?.collateral) / (Number(details?.collateral) - Number(details?.debt)) || 0).toFixed(2)} x</Text>
+                        <Text fontSize={'sm'}>{(leverage).toFixed(2)} x</Text>
                     </Flex>
 
                     <Flex gap={1} align={'center'}>
                         <Text color={'whiteAlpha.600'} fontSize={'sm'}>Net APY: </Text>
-                        <Text fontSize={'sm'}>{details?.apy} %</Text>
-                        <Text color={'whiteAlpha.700'} fontSize={'sm'}> + {details?.rewardAPY} %</Text>
-                        <Image src='/veREAX.svg' boxSize={'16px'} rounded={'full'} />
+                        <Text fontSize={'sm'}>{(leverage * details?.apy).toFixed(2)} %</Text>
+                        <Text color={'whiteAlpha.700'} fontSize={'sm'}> + {(leverage * details?.rewardAPY).toFixed(2)} %</Text>
+                        <Image src='/veREAX.svg' boxSize={'16px'} rounded={'full'} alt='veREAX' />
 
                     </Flex>
                 </Flex>

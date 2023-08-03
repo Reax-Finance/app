@@ -13,8 +13,7 @@ export default function TitleBar() {
 
     const [baseFundingRate, setBaseFundingRate] = React.useState(['0', '0']);
     const [quoteFundingRate, setQuoteFundingRate] = React.useState(['0', '0']);
-
-
+    
     const { pools } = useLendingData();
     useEffect(() => {
         for(let i in pools){
@@ -34,8 +33,6 @@ export default function TitleBar() {
             }
         }
     }, [pair])
-
-
 
     return (
         <>

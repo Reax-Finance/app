@@ -51,7 +51,7 @@ export default function CollateralTable() {
 	return (
 		<Box>
 			<Box className="containerHeader" px={5} py={5}>
-				<Heading fontSize={'18px'} color={'secondary.300'}>Synthetic Assets</Heading>			
+				<Heading fontSize={'18px'} color={'secondary.300'}>Mint Synthetic Assets</Heading>			
 			</Box>
 			{pools[tradingPool]?.synths.length > 0 ? (
 				<TableContainer>
