@@ -439,6 +439,7 @@ function Swap() {
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
 		else if (chain?.unsupported) return {valid: false, message: "Unsupported Chain"}
+		if(loading) return {valid: false, message: "Loading..."}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
 		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
 		else if (swapInputExceedsBalance()) return {valid: false, message: "Insufficient Balance"}
