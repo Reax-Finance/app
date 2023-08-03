@@ -24,6 +24,7 @@ function Swap() {
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState('');
 	const [gas, setGas] = useState(0);
+	const [error, setError] = useState('');
 	
 	const { chain } = useNetwork();
 	const { prices } = usePriceData();
@@ -126,6 +127,7 @@ function Swap() {
 			.catch((err) => {
 				console.log(err);
 				setLoading(false);
+				setError('Insufficient liquidity')
 				// If estimation failed, set output to its perivous value
 				setInputAmount(inputAmount)
 			})
@@ -153,6 +155,7 @@ function Swap() {
 			.catch((err) => {
 				console.log(err);
 				setLoading(false);
+				setError('Insufficient liquidity')
 				// If estimation failed, set output amount to its previous value
 				setOutputAmount(outputAmount);
 			})
@@ -440,6 +443,7 @@ function Swap() {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
 		else if (chain?.unsupported) return {valid: false, message: "Unsupported Chain"}
 		if(loading) return {valid: false, message: "Loading..."}
+		if(error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
 		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
 		else if (swapInputExceedsBalance()) return {valid: false, message: "Insufficient Balance"}
