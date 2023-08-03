@@ -25,10 +25,8 @@ const LendingDataContext = React.createContext<LendingDataValue>({} as LendingDa
 
 function LendingDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<Status>(Status.NOT_FETCHING);
-	const [subStatus, setSubStatus] = React.useState<SubStatus>(SubStatus.NOT_SUBSCRIBED);
 	const [message, setMessage] = React.useState<LendingDataValue['message']>("");
 	const { chain } = useNetwork();
-	const { address } = useAccount();
 	const [pools, setPools] = React.useState<any[]>([[], []]);
 	const [protocols, setProtocols] = React.useState<any[]>([[], []]);
 	const [selectedPool, setSelectedPool] = React.useState<any>(0);

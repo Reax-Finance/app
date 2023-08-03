@@ -1,10 +1,13 @@
 // TradingViewWidget.jsx
 
+import router from "next/router";
 import React, { useEffect, useRef } from "react";
 
 let tvScriptLoadingPromise: Promise<any>;
 
-export default function TradingViewWidget({asset}: any) {
+export default function TradingViewWidget() {
+  const {pair} = router.query;
+  if(!pair) return <></>;
   const onLoadScriptRef = useRef<any>();
 
   useEffect(() => {
@@ -32,7 +35,7 @@ export default function TradingViewWidget({asset}: any) {
       if (document.getElementById("tradingview") && "TradingView" in window) {
         new (window as any).TradingView.widget({
           autosize: true,
-          symbol: `PYTH:${asset}USD`,
+          symbol: `PYTH:${(pair as string)?.split('-').join('')}`,
           interval: "D",
           theme: "dark",
           style: "1",

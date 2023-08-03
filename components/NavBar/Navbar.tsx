@@ -27,14 +27,16 @@ import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
+import TradeMenu from "./TradeMenu";
+import { usePerpsData } from "../context/PerpsDataProvider";
 
 function NavBar() {
 	const router = useRouter();
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
 	const { fetchData: fetchLendingData } = useLendingData()
+	const { fetchData: fetchPerpsData } = usePerpsData();
 	const { fetchData: fetchDexData, dex } = useDexData();
-
 
 	const { chain, chains } = useNetwork();
 	const [init, setInit] = useState(false);
@@ -49,12 +51,14 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
+			// address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
 			fetchData(address!);
 			fetchLendingData(address!);
 			fetchDexData(address!);
 			fetchTokenData(address!);
+			// fetchPerpsData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
@@ -129,10 +133,17 @@ function NavBar() {
 							display={{ sm: "none", md: "flex" }}
 							gap={2}
 						>
-							<NavLocalLink
+							{/* <NavLocalLink
 								path={"/"}
 								title="Trade"
 							></NavLocalLink>
+
+							<NavLocalLink
+								path={"/perps"}
+								title="Perpetuals"
+							></NavLocalLink> */}
+
+							<TradeMenu />
 
 							<NavLocalLink
 								path={"/lend"}
