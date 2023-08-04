@@ -1,4 +1,4 @@
-# REAX Frontend
+# Frontend
 
 ### How to run
 

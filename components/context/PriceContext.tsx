@@ -145,6 +145,10 @@ function PriceContextProvider({ children }: any) {
         })
         .catch((err: any) => {
             console.log("Error fetching prices", err);
+            // Try again
+            setTimeout(() => {
+                updatePrices();
+            }, 10000)
         })
     }
     const value: PriceValue = {

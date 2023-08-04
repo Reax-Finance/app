@@ -7,6 +7,8 @@ export const defaultChain = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? mantl
 export const NATIVE = "MNT";
 export const W_NATIVE = "WMNT";
 
+export const DOLLAR_PRECISION = 0.01;
+
 const VERSIONS = {
 	['0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9'.toLowerCase()]: '2'
 }
