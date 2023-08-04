@@ -113,7 +113,7 @@ export default function Pool({ pool, index }: any) {
 						<Text color={'primary.200'}>{calcApy().toFixed(2)}%</Text>
 						{Number(rewardsApy) > 0 && <Flex gap={1.5} mt={1} align={'center'}>
 						<Text color={'whiteAlpha.600'} fontSize={'xs'}>+{rewardsApy}%</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>

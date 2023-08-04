@@ -80,7 +80,7 @@ export default function Debt({ market, index }: any) {
 						<Text fontSize={'xs'}>
 							+{rewardAPY("STABLE")} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>
@@ -93,7 +93,7 @@ export default function Debt({ market, index }: any) {
 						<Text fontSize={'xs'}>
 							+{rewardAPY("VARIABLE")} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>

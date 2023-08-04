@@ -27,8 +27,8 @@ export default function TempPage() {
 	return (
 		<>
 			<Head>
-				<title>REAX | Synthetics</title>
-				<link rel="icon" type="image/x-icon" href="/REAX.svg"></link>
+				<title>{process.env.NEXT_PUBLIC_TOKEN_SYMBOL} | Synthetics</title>
+				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
 				<Box w={'100%'}>
 				

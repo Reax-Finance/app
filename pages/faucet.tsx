@@ -118,8 +118,8 @@ export default function Faucet() {
 	return (
 		<>
         <Head>
-				<title>Test Faucet | REAX</title>
-				<link rel="icon" type="image/x-icon" href="/veREAX.png"></link>
+				<title>Test Faucet | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
+				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
 			<Heading mt={'80px'} fontSize={"3xl"}>Faucet</Heading>
             <Text color={'gray.400'} mb={10}>

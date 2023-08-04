@@ -139,7 +139,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 						<Text color={'whiteAlpha.600'} fontSize={'xs'}>
 						{(calcApy()).toFixed(2)}% + {rewardsApy} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 						</Flex>
 					</Flex>

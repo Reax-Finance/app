@@ -31,7 +31,7 @@ export default function LendingMarket() {
 				let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 				let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
 				let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
-				controller.getUserRewards(assets, address, getAddress("VestedREAX", defaultChain.id))
+				controller.getUserRewards(assets, address, getAddress(process.env.NEXT_PUBLIC_VESTED_TOKEN_NAME!, defaultChain.id))
 						.then((result: any) => {
 							setSynAccrued(result.toString());
 						})
@@ -88,10 +88,10 @@ export default function LendingMarket() {
             params: {
               type: 'ERC20', // Initially only supports ERC20, but eventually more!
               options: {
-                address: getAddress("VestedREAX", defaultChain.id), // The address that the token is at.
-                symbol: "veREAX", // A ticker symbol or shorthand, up to 5 chars.
+                address: getAddress(process.env.NEXT_PUBLIC_VESTED_TOKEN_NAME!, defaultChain.id), // The address that the token is at.
+                symbol: process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL!, // A ticker symbol or shorthand, up to 5 chars.
                 decimals: 18, // The number of decimals in the token
-                image: process.env.NEXT_PUBLIC_VERCEL_URL + '/veREAX.svg', // A string url of the token logo
+                image: process.env.NEXT_PUBLIC_VERCEL_URL + `/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL!}.svg`, // A string url of the token logo
               },
             }
         });
@@ -154,7 +154,7 @@ export default function LendingMarket() {
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{synAccrued ? Big(synAccrued).div(10**18).toFixed(2) : '-'} </Text>
 							<Text fontSize={"2xl"} color={"whiteAlpha.400"}>
-								veREAX
+								{process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
 							</Text>
 						</Flex>
 						<Box mt={2} w={'100%'} className="outlinedButton">

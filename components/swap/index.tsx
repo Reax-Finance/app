@@ -470,9 +470,9 @@ function Swap() {
 					{tokenFormatter.format(
 						(prices[tokens[inputAssetIndex]?.id] / prices[tokens[outputAssetIndex]?.id]) || 0
 					)}{" "}
-					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | REAX
+					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
 				</title>
-				<link rel="icon" type="image/x-icon" href="/veREAX.svg"></link>
+				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
 			{tokens.length > 1 ? (
 				<SwapLayout

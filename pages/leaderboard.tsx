@@ -25,15 +25,15 @@ export default function Leaderboard() {
   return (
     <>
     <Head>
-      <title>Trading Rewards | REAX</title>
-      <link rel="icon" type="image/x-icon" href="/logo32.png"></link>
+      <title>Trading Rewards | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
+      <link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
 		</Head>
     <Box pt={'70px'}>
       <Flex justify={'space-between'} align={'end'}>
       <Box>
       <Heading size={"lg"}>Trading Rewards</Heading>
       <Text mt={2} pb={5} color='whiteAlpha.700'>
-        Get rewarded for trading on REAX. Build for traders, to be owned by traders.
+        Get rewarded for trading on {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}. Build for traders, to be owned by traders.
       </Text>
       </Box>
 
@@ -51,7 +51,7 @@ export default function Leaderboard() {
             new Date('31 Aug 2023').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
           } tbd={true} />
           <PointDivider />
-          <PointBox title='Total Rewards' value={tokenFormatter.format(1000000) + ' REAX'} tbd={true} />
+          <PointBox title='Total Rewards' value={tokenFormatter.format(1000000) + ' ' + process.env.NEXT_PUBLIC_TOKEN_SYMBOL} tbd={true} />
           <PointDivider />
           <PointBox title='Your Points' value={tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)} />
           <PointDivider />

@@ -54,3 +54,59 @@ export const mantleMainnet = {
     },
     testnet: false
 };
+
+export const lineaMainnet = {
+    id: 59144,
+    name: "Linea",
+    network: "linea",
+    nativeCurrency: {
+        name: "Ethereum",
+        symbol: "ETH",
+        decimals: 18
+    },
+    rpcUrls: {
+        default: {
+            http: ["https://linea-mainnet.infura.io/v3"],
+            // webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
+        },
+        public: {
+            http: ["https://linea-mainnet.infura.io/v3"],
+            // readonly webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
+        }
+    },
+    blockExplorers: {
+        default: {
+            name: "Etherscan",
+            url: "https://lineascan.build/"
+        }
+    },
+    testnet: false
+};
+
+export const lineaTestnet = {
+    id: 59140,
+    name: "Linea",
+    network: "linea",
+    nativeCurrency: {
+        name: "Ethereum",
+        symbol: "ETH",
+        decimals: 18
+    },
+    rpcUrls: {
+        default: {
+            http: ["https://rpc.goerli.linea.build"],
+            // webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
+        },
+        public: {
+            http: ["https://rpc.goerli.linea.build"],
+            // readonly webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
+        }
+    },
+    blockExplorers: {
+        default: {
+            name: "Etherscan",
+            url: "https://goerli.lineascan.build/"
+        }
+    },
+    testnet: true
+};

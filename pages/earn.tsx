@@ -14,7 +14,7 @@ export default function Earn() {
 	return (
 		<>
 			<Head>
-				<title>Earn | Reax</title>
+				<title>Earn | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
 				<link rel="icon" type="image/x-icon" href="/logo32.png"></link>
 			</Head>
 			<Box textAlign={"left"} pt="100px" maxW={"1200px"}>

@@ -210,7 +210,7 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
                 <Text fontSize={"md"}>
                     {tokenFormatter.format(Big(pool.allocPoint).div(dex.totalAllocPoint).mul(dex.sushiPerSecond).div(1e18).toNumber())} 
                 </Text>
-                <Image src='/veREAX.svg' width={'20px'} />
+                <Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} width={'20px'} />
                 <Text color={'whiteAlpha.600'} fontSize={'sm'}> / second</Text>
                 </Flex>
             </Flex>

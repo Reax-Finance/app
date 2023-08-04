@@ -71,7 +71,7 @@ export default function Supply({ market, index }: any) {
 						<Text fontSize={'xs'} >
 							+{rewardAPY()} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>

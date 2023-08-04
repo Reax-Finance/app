@@ -142,26 +142,11 @@ export default function Harvest({ pool }: any) {
                     {tokenFormatter.format(Big(rewardAccrued ?? 0).div(1e18).toNumber())}
                 </Text>
                 <Text fontSize={"sm"} color={'whiteAlpha.600'}>
-                    veREAX
+                    {process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
                 </Text>
                 </Flex>
             </Flex>
 
-            {/* <Flex justify="space-between">
-                <Flex gap={1}>
-                    <Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-                        Pool Emissions
-                    </Text>
-                </Flex>
-
-                <Flex gap={1.5} align={'center'}>
-                <Text fontSize={"md"}>
-                    {tokenFormatter.format(Big(pool.allocPoint).div(dex.totalAllocPoint).mul(dex.sushiPerSecond).div(1e18).toNumber())} 
-                </Text>
-                <Image src='/veREAX.svg' width={'20px'} />
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}> / second</Text>
-                </Flex>
-            </Flex> */}
             </Flex>
             <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
                 <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={harvest}>

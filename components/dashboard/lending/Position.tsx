@@ -176,7 +176,7 @@ export default function LendingPosition() {
                                                     {(netAPY()).toFixed(2)}%
                                                 </Text>
                                                 <Text fontSize={'md'} fontWeight={'medium'} color={'whiteAlpha.600'}> + {netRewardsAPY().toFixed(2)}%</Text>
-                                                <Image ml={1} src={'/veREAX.svg'} rounded={'full'} boxSize={'18px'} />
+                                                <Image ml={1} src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} boxSize={'18px'} />
                                             </Flex>
                                         </Flex>
                                     </Box>

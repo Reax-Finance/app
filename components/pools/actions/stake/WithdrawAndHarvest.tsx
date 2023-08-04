@@ -142,7 +142,7 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
                     {tokenFormatter.format(Big(rewardAccrued ?? 0).div(1e18).toNumber())}
                 </Text>
                 <Text fontSize={"sm"} color={'whiteAlpha.600'}>
-                    veREAX
+                    {process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
                 </Text>
                 </Flex>
             </Flex>

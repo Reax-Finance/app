@@ -212,7 +212,7 @@ function TokenSelector({
 					</ModalBody>
 					<Flex className="containerFooter" roundedBottom={16} py={1} justify='space-between' px={4} fontSize='sm' >
 						<Text>{tokens.length} Tokens</Text>
-						<Text>Reax Token List</Text>
+						<Text>{process.env.NEXT_PUBLIC_TOKEN_SYMBOL} Token List</Text>
 					</Flex>
 					</Box>
 				</ModalContent>
