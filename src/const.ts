@@ -1,6 +1,13 @@
 import { ethers } from "ethers";
-import { mantleMainnet, mantleTestnet } from "./chains";
+import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet } from "./chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
+
+const NETWORKS = {
+	[5000]: mantleMainnet,
+	[5001]: mantleTestnet,
+	[59144]: lineaMainnet,
+	[59140]: lineaTestnet,
+}
 
 export const defaultChain = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? mantleTestnet: mantleMainnet;
 
@@ -28,7 +35,7 @@ export const PERP_CATEGORIES: any = {
 export const ESYX_PRICE = 0.01;
 
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
-export const APP_NAME = 'Reax';
+export const APP_NAME = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
 
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[mantleMainnet.id]);
 

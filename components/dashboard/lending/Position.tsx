@@ -146,7 +146,7 @@ export default function LendingPosition() {
                                 </Info>
                             </Flex>
 
-                            {Big(pos.debt).gt(0) && <Flex gap={3} align="start">
+                            <Flex gap={3} align="start">
                                 <IconBox>
                                     <FaPercentage size={'16px'} />
                                 </IconBox>
@@ -181,7 +181,7 @@ export default function LendingPosition() {
                                         </Flex>
                                     </Box>
                                 </Info>
-                            </Flex>}
+                            </Flex>
                         </Flex>
                     </motion.div>
                 </Flex>

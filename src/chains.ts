@@ -85,8 +85,8 @@ export const lineaMainnet = {
 
 export const lineaTestnet = {
     id: 59140,
-    name: "Linea",
-    network: "linea",
+    name: "Linea Testnet",
+    network: "linea-testnet",
     nativeCurrency: {
         name: "Ethereum",
         symbol: "ETH",

@@ -143,8 +143,8 @@ function SyntheticsPositionProvider({ children }: any) {
 		let sum = Big(0);
         let markets = lendingPools[_selectedPool];
 		markets.forEach((market: any) => {
-			sum = sum.plus(Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals));
-			sum = sum.plus(Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals));
+			sum = sum.plus(Big(walletBalances[market._vToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._vToken.decimals));
+			sum = sum.plus(Big(walletBalances[market._sToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._sToken.decimals));
 		});
         if(sum.lt(DOLLAR_PRECISION)) sum = Big(0);
 		return sum.toNumber();
@@ -156,8 +156,8 @@ function SyntheticsPositionProvider({ children }: any) {
 		let sumBalances = borrowed(_selectedPool);
         let markets = lendingPools[_selectedPool];
 		markets.forEach((market: any) => {
-			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals)));
-			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals)));
+			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._vToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._vToken.decimals)));
+			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._sToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._sToken.decimals)));
 		})
         if(sumBalances == 0) return 0;
 		return sum.div(sumBalances).toNumber();
@@ -183,6 +183,7 @@ function SyntheticsPositionProvider({ children }: any) {
             return acc + Number(rewardAPY(market)) * (Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
         }, 0)
 		let sumOfBalances = supplied(_selectedPool);
+        if(sumOfBalances == 0) return 0;
 		return sumOfRatesTimesBalance / sumOfBalances;
     }
 
@@ -193,6 +194,7 @@ function SyntheticsPositionProvider({ children }: any) {
             return acc + Number(rewardAPY(market, "BORROW", "VARIABLE")) * (Big(walletBalances[market._vToken.id] ?? 0).div(10**market._vToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber()) + Number(rewardAPY(market, "BORROW", "STABLE")) * (Big(walletBalances[market._sToken.id] ?? 0).div(10**market._sToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
         }, 0)
         let sumOfBalances = borrowed(_selectedPool);
+        if(sumOfBalances == 0) return 0;
         return sumOfRatesTimesBalance / sumOfBalances;
     }
 
