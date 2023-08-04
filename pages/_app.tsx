@@ -64,7 +64,7 @@ const connectors = connectorsForWallets([
 			rainbowWallet({ projectId: PROJECT_ID, chains }),
 			trustWallet({ projectId: PROJECT_ID, chains }),
 			phantomWallet({ chains }),
-			coinbaseWallet({ appName: APP_NAME, chains }),
+			coinbaseWallet({ appName: APP_NAME ?? 'Synth', chains }),
 			rabbyWallet({ chains }),
 		],
 	},
