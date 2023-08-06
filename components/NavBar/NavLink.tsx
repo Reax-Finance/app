@@ -30,7 +30,7 @@ export default function NavLink({
 					px={2}
 					cursor="pointer"
 					flex='stretch'
-					color={isPath ? "white" : "whitelpha.600"}
+					color={isPath ? "white" : "whiteAlpha.600"}
 				>
 					<Box
 						fontWeight={"bold"}
