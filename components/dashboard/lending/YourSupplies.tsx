@@ -14,7 +14,8 @@ import {
 	Skeleton,
 	Heading,
 	Text,
-	Flex
+	Flex,
+	useColorMode
 } from "@chakra-ui/react";
 
 import ThBox from "./../ThBox";
@@ -24,6 +25,7 @@ import YourSupply from "../../modals/supply/YourSupply";
 import { dollarFormatter, tokenFormatter } from '../../../src/const';
 import { usePriceData } from "../../context/PriceContext";
 import Big from "big.js";
+import { VARIANT } from "../../../styles/theme";
 
 export default function YourSupplies() {
 	const { markets } = useLendingData();
@@ -36,10 +38,11 @@ export default function YourSupplies() {
 		let supplied = Big(walletBalances[market.outputToken.id]).mul(prices[market.inputToken.id]).div(10**market.outputToken.decimals);
 		return supplied.gt(0.01);
 	});
+	const { colorMode } = useColorMode();
 
 	if(suppliedMarkets.length > 0) return (
 		<Box>
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Your Supplies</Heading>
 			</Box>
 
@@ -79,7 +82,7 @@ export default function YourSupplies() {
 							</Tbody>
 						</Table>
 					</TableContainer> : <Box py={5}>
-						<Text textAlign={'center'} color={'whiteAlpha.400'}>You have no supplied assets.</Text>
+						<Text textAlign={'center'} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>You have no supplied assets.</Text>
 						</Box>}
 					</>
 			) : (

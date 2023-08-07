@@ -17,9 +17,12 @@ import {
 	NumberInput,
 	NumberInputField,
 	Divider,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
 	ADDRESS_ZERO,
+	NATIVE,
+	W_NATIVE,
 	dollarFormatter,
 } from "../../../src/const";
 import Big from "big.js";
@@ -33,6 +36,7 @@ import { usePriceData } from "../../context/PriceContext";
 import Redeem from "./Redeem";
 import Supply from "./Supply";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
+import { VARIANT } from "../../../styles/theme";
 
 export default function SupplyModal({
 	market,
@@ -84,10 +88,12 @@ export default function SupplyModal({
 		}
 	};
     
+	const { colorMode } = useColorMode();
+	
 	return (
 		<>
 			<ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
-			<Box className="containerBody2">
+			<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 				<ModalCloseButton rounded={"full"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
@@ -100,8 +106,8 @@ export default function SupplyModal({
 					</Flex>
 				</ModalHeader>
 				<ModalBody m={0} p={0}>
-					<Divider />
-					<Box bg={'bg.600'} pb={12} pt={4} px={8}>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.200'}/>
+					<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} pb={12} pt={4} px={8}>
 						{market.inputToken.id ==
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 							<>
@@ -117,14 +123,14 @@ export default function SupplyModal({
 										size="sm"
 									>
 										<TabList>
-											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`)}>
 											<Tab>
-												MNT
+												{NATIVE}
 											</Tab>
 											</Box>
-											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`)}>
 											<Tab>
-												WMNT
+												{W_NATIVE}
 											</Tab>
 											</Box>
 										</TabList>
@@ -159,7 +165,7 @@ export default function SupplyModal({
 									<Text
 										fontSize="sm"
 										textAlign={"center"}
-										color={"whiteAlpha.600"}
+										color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 									>
 										{dollarFormatter.format(
 											prices[market.inputToken.id] *
@@ -194,30 +200,29 @@ export default function SupplyModal({
 							</NumberInput>
 						</InputGroup>
 					</Box>
-					<Divider />
-					<Box className="containerFooter">
+					<Box className={`${VARIANT}-${colorMode}-containerFooter`}>
 					<Tabs variant={'enclosed'} onChange={selectTab}>
 						<TabList>
 							<Tab
 								w={"50%"}
+								borderX={0}
+								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
 									color: "primary.400",
-									borderColor: "primary.400",
 								}}
 								rounded={0}
-								border={0}
 							>
 								Supply
 							</Tab>
-							<Divider orientation="vertical" h={'40px'} />
+							<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'} orientation="vertical" h={'44px'} />
 							<Tab
 								w={"50%"}
+								borderX={0}
+								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
-									color: "secondary.400",
-									borderColor: "secondary.400",
+									color: "secondary.400"
 								}}
 								rounded={0}
-								border={0}
 							>
 								Withdraw
 							</Tab>

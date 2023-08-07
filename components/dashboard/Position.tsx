@@ -1,6 +1,6 @@
 import React from "react";
 import Info from "../infos/Info";
-import { Flex, Text, Box, Heading } from "@chakra-ui/react";
+import { Flex, Text, Box, Heading, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { IoMdAnalytics, IoMdCash } from "react-icons/io";
 import IconBox from "./IconBox";
@@ -10,12 +10,14 @@ import { useAppData } from "../context/AppDataProvider";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { dollarFormatter, tokenFormatter } from "../../src/const";
 import { useSyntheticsData } from "../context/SyntheticsPosition";
+import { VARIANT } from "../../styles/theme";
 
 export default function Position({ poolIndex }: any) {
 	const { pools, tradingPool, account } = useAppData();
 	const { position } = useSyntheticsData();
 
 	const pos = position(tradingPool);
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
@@ -24,14 +26,14 @@ export default function Position({ poolIndex }: any) {
 					mb={-5}
 					w="100%"
 					display={{ sm: "block", md: "block" }}
-					className="halfContainerBody"
+					className={`${VARIANT}-${colorMode}-halfContainerBody`}
 				>
 					<Flex
 						align={"center"}
 						justify={"space-between"}
 						px={5}
 						py={4}
-						className="containerHeader"
+						className={`${VARIANT}-${colorMode}-containerHeader`}
 					>
 						<Heading fontSize={"18px"}>Your Position</Heading>
 
@@ -46,7 +48,7 @@ export default function Position({ poolIndex }: any) {
 								cursor={"help"}
 								fontSize={"sm"}
 							>
-								<Text color="whiteAlpha.700">
+								<Text color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
 									Available to Mint:{" "}
 								</Text>
 								<Text mr={0.5} fontWeight="medium">
@@ -89,7 +91,7 @@ export default function Position({ poolIndex }: any) {
 											<Box cursor={"help"}>
 												<Heading
 													size={"xs"}
-													color="whiteAlpha.700"
+													color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
 													mb={0.5}
 												>
 													Collateral
@@ -98,7 +100,7 @@ export default function Position({ poolIndex }: any) {
 													fontWeight={"semibold"}
 													fontSize={"lg"}
 													gap={1}
-													color={"whiteAlpha.800"}
+													color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
 												>
 													<Text fontWeight={"normal"}>
 														$
@@ -128,7 +130,7 @@ export default function Position({ poolIndex }: any) {
 												<Heading
 													mb={0.5}
 													size={"xs"}
-													color="whiteAlpha.700"
+													color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
 												>
 													Debt
 												</Heading>
@@ -137,7 +139,7 @@ export default function Position({ poolIndex }: any) {
 														fontWeight={"semibold"}
 														fontSize={"lg"}
 														gap={1}
-														color={"whiteAlpha.800"}
+														color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
 													>
 														<Text
 															fontWeight={
@@ -169,6 +171,7 @@ export default function Position({ poolIndex }: any) {
 							<Box
 								textAlign={{ sm: "left", md: "right" }}
 								mt={{ sm: 16, md: 0 }}
+								minW={'200px'}
 							>
 								<Info
 									message={`Your Debt Limit depends on your LTV %. Account would be liquidated if LTV is greater than your Collateral's Liquidation Threshold`}
@@ -182,14 +185,14 @@ export default function Position({ poolIndex }: any) {
 									>
 										<Heading
 											size={"sm"}
-											color="whiteAlpha.700"
+											color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
 										>
 											Borrow Limit
 										</Heading>
 
 										<Box mb={1}>
 											<InfoOutlineIcon
-												color={"whiteAlpha.500"}
+												color={colorMode == 'dark' ?  "whiteAlpha.500" : "blackAlpha.500"}
 												h={3}
 											/>
 										</Box>
@@ -206,24 +209,25 @@ export default function Position({ poolIndex }: any) {
 								>
 									{Number(pos.debtLimit).toFixed(1)} %
 								</Text>
+								<Box
+									mt={2}
+									width={"100%"}
+									bg={colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}
+								>
+									<Box
+										h={1.5}
+										bg={
+											Big(pos.availableToIssue).gt(0)
+												? "green.400"
+												: "primary.400"
+										}
+										width={pos.debtLimit + "%"}
+									></Box>
+								</Box>
 							</Box>
 						</motion.div>
 					</Flex>
-					<Box
-						// mt={2}
-						width={"100%"}
-						bg="whiteAlpha.200"
-					>
-						<Box
-							h={1}
-							bg={
-								Big(pos.availableToIssue).gt(0)
-									? "green.400"
-									: "primary.400"
-							}
-							width={pos.debtLimit + "%"}
-						></Box>
-					</Box>
+					
 				</Box>
 			) : (
 				<></>

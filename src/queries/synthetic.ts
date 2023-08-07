@@ -1,8 +1,9 @@
-import { mantleMainnet, mantleTestnet } from "../chains";
+import { lineaTestnet, mantleMainnet, mantleTestnet } from "../chains";
 
 const _Endpoints: any = {
 	[mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_5001,
 	[mantleMainnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_5000,
+	[lineaTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_URL_59140,
 }
 
 export const Endpoints = (chainId: number) => _Endpoints[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _Endpoints[mantleTestnet.id] : _Endpoints[mantleMainnet.id]); 

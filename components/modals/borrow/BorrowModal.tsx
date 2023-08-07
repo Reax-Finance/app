@@ -14,9 +14,11 @@ import {
 	NumberInputField,
 	Button,
 	Divider,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
 	ADDRESS_ZERO,
+	NATIVE,
 	WETH_ADDRESS,
 	W_NATIVE,
 	dollarFormatter,
@@ -30,6 +32,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import Repay from "./Repay";
 import Borrow from "./Borrow";
 import { formatInput, parseInput } from "../../utils/number";
+import { VARIANT } from "../../../styles/theme";
 
 export default function BorrowModal({
 	market,
@@ -84,10 +87,12 @@ export default function BorrowModal({
 		}
 	};
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<ModalContent width={"30rem"} bg={'transparent'} shadow={'none'} rounded={0} mx={2}>
-				<Box className="containerBody2">
+				<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 				<ModalCloseButton rounded={"full"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
@@ -100,8 +105,8 @@ export default function BorrowModal({
 					</Flex>
 				</ModalHeader>
 				<ModalBody m={0} p={0}>
-					<Divider />
-					<Box bg={'bg.600'}>
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.200'}/>
+					<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'}>
 					<Box pb={12} pt={6} px={8}>
 						{market.inputToken.id ==
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
@@ -118,14 +123,14 @@ export default function BorrowModal({
 											size="sm"
 										>
 											<TabList>
-											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`)}>
 											<Tab>
-												MNT
+												{NATIVE}
 											</Tab>
 											</Box>
-											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`)}>
 											<Tab>
-												WMNT
+												{W_NATIVE}
 											</Tab>
 											</Box>
 										</TabList>
@@ -160,7 +165,7 @@ export default function BorrowModal({
 									<Text
 										fontSize="sm"
 										textAlign={"center"}
-										color={"whiteAlpha.600"}
+										color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 									>
 										{dollarFormatter.format(
 											(prices[market.inputToken.id] ??
@@ -205,29 +210,28 @@ export default function BorrowModal({
 						</InputGroup>
 					</Box>
 					</Box>
-					<Divider />
 					<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 						<TabList>
 							<Tab
 								w={"50%"}
+								borderX={0}
+								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
 									color: "primary.400",
-									borderColor: "primary.400",
 								}}
-								border={0}
 								rounded={0}
 							>
 								Borrow
 							</Tab>
-							<Divider orientation="vertical" h={'40px'} />
+							<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'} orientation="vertical" h={'44px'} />
 							<Tab
 								w={"50%"}
+								borderX={0}
+								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
-									color: "secondary.400",
-									borderColor: "secondary.400",
+									color: "primary.400",
 								}}
 								rounded={0}
-								border={0}
 							>
 								Repay
 							</Tab>

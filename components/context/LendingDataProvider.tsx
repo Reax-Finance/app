@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
-import { LendingEndpoint, LendingEndpoint2, query_lending } from "../../src/queries/lending";
+import { LendingEndpoint, LendingEndpoint2, LendingEndpoints, query_lending } from "../../src/queries/lending";
 
 interface LendingDataValue {
 	status: Status;
@@ -29,8 +29,8 @@ function LendingDataProvider({ children }: any) {
 	const [message, setMessage] = React.useState<LendingDataValue['message']>("");
 	const { chain } = useNetwork();
 	const { address } = useAccount();
-	const [pools, setPools] = React.useState<any[]>([[], []]);
-	const [protocols, setProtocols] = React.useState<any[]>([[], []]);
+	const [pools, setPools] = React.useState<any[]>([[]]);
+	const [protocols, setProtocols] = React.useState<any[]>([[]]);
 	const [selectedPool, setSelectedPool] = React.useState<any>(0);
 	const markets = pools[selectedPool];
 	const protocol = protocols[selectedPool];
@@ -51,18 +51,16 @@ function LendingDataProvider({ children }: any) {
 		return new Promise((resolve, reject) => {
 			setStatus(Status.FETCHING);
 			if(!_address) _address = ADDRESS_ZERO;
-			Promise.all([
-				axios.post(LendingEndpoint2(chainId), {
-					query: query_lending(_address.toLowerCase()),
-					variables: {},
-				}),
-				axios.post(LendingEndpoint(chainId), {
-					query: query_lending(_address.toLowerCase()),
-					variables: {},
-				})
-			])
+			Promise.all(
+				LendingEndpoints(chainId).map((endpoint) => {
+					return axios.post(endpoint, {
+						query: query_lending(_address!.toLowerCase()),
+						variables: {},
+					})
+				}))
 			.then(async (res) => {
-				if (res[0].data.errors || res[1].data.errors) {
+				console.log(res);
+				if (res[0].data.errors || res[1]?.data?.errors) {
 					setStatus(Status.ERROR);
 					setMessage("Network Error. Please refresh the page or try again later.");
 					reject(res[0].data.errors || res[1].data.errors);

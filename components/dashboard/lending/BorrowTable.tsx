@@ -10,7 +10,8 @@ import {
 	Box,
 	Heading,
 	Text,
-	Tfoot
+	Tfoot,
+	useColorMode
 } from "@chakra-ui/react";
 import {
 	Pagination,
@@ -27,6 +28,7 @@ import { Skeleton } from "@chakra-ui/react";
 import Borrow from "../../modals/borrow";
 import ThBox from "../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
+import { VARIANT } from "../../../styles/theme";
 
 const pageSize = 9;
 
@@ -38,11 +40,13 @@ export default function CollateralTable() {
 			pagesCount: Math.ceil((markets?.length ?? 1) / pageSize) ?? 1,
 			initialState: { currentPage: 1 }
 		}
-	);	
+	);
+	
+	const { colorMode } = useColorMode();
 
 	return (
 		<Box>
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'secondary.300'}>Assets to Borrow</Heading>			
 			</Box>
 			{markets.length > 0 ? (

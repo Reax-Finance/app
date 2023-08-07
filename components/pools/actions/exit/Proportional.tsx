@@ -224,6 +224,8 @@ export default function ProportionalWithdraw({ pool }: any) {
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Connect wallet"};
 		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
+		if(loading) return {valid: false, message: "Loading..."}
+
 		// check balances
 		for(let i = 0; i < poolTokens.length; i++) {
 			if(isNaN(Number(amounts[i])) || Number(amounts[i]) == 0) {

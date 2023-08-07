@@ -183,6 +183,8 @@ export default function SingleTokenWithdraw({ pool }: any) {
 	const validate = () => {
         if(!isConnected) return {valid: false, message: "Connect wallet"};
 		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
+		if(loading) return {valid: false, message: "Loading..."}
+
 		// check balances
         if(isNaN(Number(amount)) || Number(amount) == 0) {
             return {

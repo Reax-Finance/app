@@ -10,6 +10,7 @@ import {
 	Link,
 	Text,
     Tooltip,
+    useColorMode,
     useToast,
 } from "@chakra-ui/react";
 import { EIP712_VERSION, defaultChain, dollarFormatter, tokenFormatter } from "../../../../src/const";
@@ -21,6 +22,7 @@ import { useDexData } from "../../../context/DexDataProvider";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 import { getABI, send } from "../../../../src/contract";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { VARIANT } from "../../../../styles/theme";
 
 export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: any) {
     // const [amount, setAmount] = useState('');
@@ -180,12 +182,14 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
         }
     }
 
+    const { colorMode } = useColorMode();
+
 	return (
 		<>
         <Flex flexDir={'column'} gap={2} px={4} mt={6} mb={6}>
             <Flex justify="space-between">
                 <Flex gap={1}>
-                    <Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+                    <Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
                         Total Deposits
                     </Text>
                 </Flex>
@@ -193,7 +197,7 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
                 <Text fontSize={"md"}>
                     {tokenFormatter.format(Big(pool.slpBalance).div(1e18).toNumber())}
                 </Text>
-                <Text fontSize={"sm"} color={'whiteAlpha.600'}>
+                <Text fontSize={"sm"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
                     {pool.symbol}
                 </Text>
                 </Flex>
@@ -201,21 +205,21 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
 
             <Flex justify="space-between">
                 <Flex gap={1}>
-                    <Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+                    <Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
                         Pool Emissions
                     </Text>
                 </Flex>
 
                 <Flex gap={1.5} align={'center'}>
                 <Text fontSize={"md"}>
-                    {tokenFormatter.format(Big(pool.allocPoint).div(dex.totalAllocPoint).mul(dex.sushiPerSecond).div(1e18).toNumber())} 
+                    {dex.totalAllocPoint > 0 && tokenFormatter.format(Big(pool.allocPoint).div(dex.totalAllocPoint).mul(dex.sushiPerSecond).div(1e18).toNumber())} 
                 </Text>
                 <Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} width={'20px'} />
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}> / second</Text>
+                <Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} fontSize={'sm'}> / second</Text>
                 </Flex>
             </Flex>
             </Flex>
-            <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
+            <Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
                 <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={shouldApprove() ? approve : stake}>
                     {validate().message}
                 </Button>

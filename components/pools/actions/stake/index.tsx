@@ -17,6 +17,7 @@ import {
 	NumberInput,
 	NumberInputField,
 	Text,
+    useColorMode,
     useToast,
 } from "@chakra-ui/react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -30,6 +31,7 @@ import WithdrawAndHarvest from './WithdrawAndHarvest';
 import Deposit from "./Deposit";
 import Harvest from "./Harvest";
 import { usePriceData } from "../../../context/PriceContext";
+import { VARIANT } from "../../../../styles/theme";
 
 export default function Stake({ pool, isOpen, onClose }: any) {
     const [amount, setAmount] = useState('');
@@ -55,11 +57,13 @@ export default function Stake({ pool, isOpen, onClose }: any) {
 		return (Number(amount) / totalShares) * liquidity;
     }
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Modal isCentered isOpen={isOpen} onClose={onClose}>
 			<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
 			<ModalContent w={"30rem"} bgColor="transparent" shadow={0} rounded={0} mx={2}>
-				<Box className='containerBody2'>
+				<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 				<ModalCloseButton rounded={"0"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"start"} px={3} gap={2} pt={1} align={"center"}>
@@ -88,8 +92,8 @@ export default function Stake({ pool, isOpen, onClose }: any) {
 					</Flex>
 				</ModalHeader>
 				<ModalBody p={0} m={0}>
-					<Divider />
-                    <Box bg={'bg.600'} px={4}>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+                    <Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} px={4}>
                         <InputGroup
                             pt={7}
                             pb={7}
@@ -120,14 +124,14 @@ export default function Stake({ pool, isOpen, onClose }: any) {
                                     <Text
                                         fontSize="sm"
                                         textAlign={"left"}
-                                        color={"whiteAlpha.600"}
+                                        color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
                                     >
                                         {dollarFormatter.format(amountUSD())}
                                     </Text>
                                 </Box>
 
                                 <Flex flexDir={'column'} align={'end'} w={'100%'}>
-                                <Flex cursor={'pointer'} className="outlinedBox" maxW={'190px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
+                                <Flex cursor={'pointer'} className={`${VARIANT}-${colorMode}-outlinedBox`} maxW={'190px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
                                     <Text mr={5}>{pool.symbol} LP</Text>
                                     {pool.tokens.map((token: any, index: number) => {
                                         return (
@@ -167,8 +171,8 @@ export default function Stake({ pool, isOpen, onClose }: any) {
                             </NumberInput>
                         </InputGroup>
                     </Box>
-                <Divider/>
-                <Box className="containerFooter">
+                <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+                <Box className={`${VARIANT}-${colorMode}-containerFooter`}>
 						<Tabs variant={'enclosed'} onChange={(e) => setTabSelected(e)}>
 							<TabList>
 								<Tab

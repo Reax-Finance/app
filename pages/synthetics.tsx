@@ -1,6 +1,7 @@
 import {
 	Box,
 	Flex,
+	useColorMode,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { AppDataContext } from "../components/context/AppDataProvider";
@@ -12,8 +13,9 @@ import Paused from "../components/dashboard/Paused";
 import Position from "../components/dashboard/Position";
 import Market from "../components/dashboard/Market";
 import { isMarketOpen } from "../src/timings";
+import { VARIANT } from "../styles/theme";
 
-export default function TempPage() {
+export default function Synthetics() {
 	const { pools, tradingPool, account } = useContext(AppDataContext);
 
 	const [hydrated, setHydrated] = React.useState(false);
@@ -23,6 +25,9 @@ export default function TempPage() {
 	}, []);
 
 	if (!hydrated) return <></>;
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
@@ -62,7 +67,7 @@ export default function TempPage() {
 										height: "100%",
 									}}
 								>
-									<Box className="containerBody" h={'100%'}>
+									<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
 										<CollateralTable />
 									</Box>
 								</motion.div>
@@ -75,7 +80,7 @@ export default function TempPage() {
 									transition={{ duration: 0.25 }}
 									key={tradingPool + 2}
 								>
-									<Box className="containerBody" h={'100%'}>
+									<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
 										<IssuanceTable />
 									</Box>
 								</motion.div>

@@ -1,9 +1,11 @@
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, useColorMode } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { RiArrowDropDownLine } from 'react-icons/ri';
+import { VARIANT } from '../../styles/theme';
 
 
 export const CustomConnectButton = () => {
+	const { colorMode } = useColorMode();
   return (
     <ConnectButton.Custom>
       {({
@@ -29,7 +31,7 @@ export const CustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                    <Box className='swapButton' >
+                    <Box className={`${VARIANT}-${colorMode}-primaryButton`} >
                   <Button size={'md'} onClick={openConnectModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
                     Connect Wallet
                   </Button>
@@ -38,9 +40,11 @@ export const CustomConnectButton = () => {
               }
               if (chain.unsupported) {
                 return (
-                  <Button bg={'red.500'} _hover={{bg: 'red.700'}} rounded={0} onClick={openChainModal}>
-                    Wrong network
+                  <Box className={`${VARIANT}-${colorMode}-errorButton`} >
+                  <Button size={'md'}  onClick={openChainModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
+                  Wrong network
                   </Button>
+                  </Box>
                 );
               }
               return (

@@ -1,7 +1,8 @@
-import { Box, Flex, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { VARIANT } from "../../styles/theme";
 
 export default function NavLink({
 	path,
@@ -20,8 +21,10 @@ export default function NavLink({
 		setIsPath(path == router.pathname);
 	}, [setIsPath, router.pathname, path]);
 
+	const { colorMode } = useColorMode();
+
 	return ( <Flex flexDir={'column'} align='center'>
-		<Flex h={'80px'} mb={isPath ? '-2px' : 0} align={"center"}>
+		<Flex h={VARIANT == 'edgy' ? '80px' : '60px'} mb={isPath ? '-2px' : 0} align={"center"}>
 			<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 				<Flex flexDir={'column'} align={'center'} w={'100%'}>
 				<Flex
@@ -30,7 +33,7 @@ export default function NavLink({
 					px={2}
 					cursor="pointer"
 					flex='stretch'
-					color={isPath ? "white" : "whiteAlpha.600"}
+					color={isPath ? (colorMode == 'dark' ? 'white' : 'black') : `${colorMode == 'dark' ? 'white' : 'black'}Alpha.600`}
 				>
 					<Box
 						fontWeight={"bold"}

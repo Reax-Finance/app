@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, IconButton } from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Heading, IconButton, useColorMode } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import {
   Table,
@@ -15,12 +15,15 @@ import Head from 'next/head';
 import { useAccount } from 'wagmi';
 import { useDexData } from '../components/context/DexDataProvider';
 import LeaderboardRow from '../components/others/LeaderboardRow';
+import { VARIANT } from '../styles/theme';
 
 export default function Leaderboard() {
   const { dex } = useDexData();
   const {address} = useAccount();
 
   const isAddressInLeaderboard = dex?.leaderboard?.some((account: any) => account.id.toLowerCase() === address?.toLowerCase());
+
+  const {colorMode} = useColorMode();
 
   return (
     <>
@@ -32,7 +35,7 @@ export default function Leaderboard() {
       <Flex justify={'space-between'} align={'end'}>
       <Box>
       <Heading size={"lg"}>Trading Rewards</Heading>
-      <Text mt={2} pb={5} color='whiteAlpha.700'>
+      <Text mt={2} pb={5} color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
         Get rewarded for trading on {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}. Build for traders, to be owned by traders.
       </Text>
       </Box>
@@ -40,12 +43,12 @@ export default function Leaderboard() {
       <Image mb={-8} src='/rewards-illustration.svg' w='300px' />
       </Flex>
       <Flex align='end' justify='start' my={4}>
-        <Box className='halfContainerBody2'>
+        <Box className={`${VARIANT}-${colorMode}-halfContainerBody2`}>
         <Button bg={'transparent'} _hover={{bg: 'transparent'}}>Epoch 1</Button>
         </Box>
-        {/* <Divider/> */}
+        {/* <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />  */}
       </Flex>
-      <Flex gap={6} className='halfContainerBody2' my={4} p={4} align={'center'}>
+      <Flex gap={6} className={`${VARIANT}-${colorMode}-halfContainerBody2`} my={4} p={4} align={'center'}>
           <PointBox title='Ending On' value={
             // Time for 4 weeks from now
             new Date('31 Aug 2023').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
@@ -59,7 +62,7 @@ export default function Leaderboard() {
         </Flex>
 
       </Box>
-      <Box mt={4} pt={1} mb={20} pb={5} borderColor='whiteAlpha.50' className='containerBody'>
+      <Box mt={4} pt={1} mb={20} pb={5} borderColor='whiteAlpha.50' className={`${VARIANT}-${colorMode}-containerBody`}>
 
       <TableContainer >
       <Table variant='simple'>
@@ -95,10 +98,11 @@ export default function Leaderboard() {
 const PointDivider = () => (<><Divider orientation='vertical' mt={0} h='40px' /></>)
 
 const PointBox = ({title, value, tbd = false}: any) => {
+  const { colorMode } = useColorMode();
   return (
     <Box>
-      <Text fontSize={'sm'} color={'whiteAlpha.700'}>{title}</Text>
-      <Text fontSize={'lg'} color={tbd ? 'whiteAlpha.500' : 'white'}>{value}</Text>
+      <Text fontSize={'sm'} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'}>{title}</Text>
+      <Text fontSize={'lg'} color={tbd ? `${colorMode == 'dark' ? 'white' : 'black'}Alpha.500` : `${colorMode == 'dark' ? 'white' : 'black'}`}>{value}</Text>
     </Box>
   )
 }

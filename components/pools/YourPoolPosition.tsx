@@ -6,6 +6,7 @@ import {
 	Tr,
 	useDisclosure,
 	Box,
+	useColorMode,
 } from "@chakra-ui/react";
 import React from "react";
 import TdBox from "../dashboard/TdBox";
@@ -17,6 +18,7 @@ import { usePriceData } from "../context/PriceContext";
 import Big from "big.js";
 import { useDexData } from "../context/DexDataProvider";
 import Stake from "./actions/stake";
+import { VARIANT } from "../../styles/theme";
 
 export default function YourPoolPosition({ pool, index }: any) {
 	const { isOpen: isWithdrawOpen, onOpen: onWithdrawOpen, onClose: onWithdrawClose } = useDisclosure();
@@ -26,6 +28,7 @@ export default function YourPoolPosition({ pool, index }: any) {
     const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
 	const { dex } = useDexData();
+	const { colorMode } = useColorMode();
 
 	const calcApy = () => {
 		let totalFees = 0;
@@ -60,8 +63,8 @@ export default function YourPoolPosition({ pool, index }: any) {
 		return (yourShares / totalShares) * liquidity / 1e18;
 	}
 
-	const rewardsApy = liquidity > 0 ? Big(pool.allocPoint ?? 0)
-			.div(dex.totalAllocPoint ?? 1)
+	const rewardsApy = (liquidity > 0 && dex.totalAllocPoint > 0) ? Big(pool.allocPoint ?? 0)
+			.div(dex.totalAllocPoint)
 			.mul(dex.sushiPerSecond)
 			.div(1e18)
 			.mul(365 * 24 * 60 * 60 * ESYX_PRICE)
@@ -101,7 +104,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 							return (
 								pool.address !== token.token.id && (
 									<Flex
-										className="outlinedBox"
+										className={`${VARIANT}-${colorMode}-outlinedBox`}
 										p={2}
 										key={index}
 										align="center"
@@ -126,7 +129,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
 						<Text>{dollarFormatter.format(yourBalance())}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
-						<Text color={'whiteAlpha.600'} fontSize={'xs'}>{(calcApy()).toFixed(2)}%</Text>
+						<Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} fontSize={'xs'}>{(calcApy()).toFixed(2)}%</Text>
 						</Flex>
 					</Flex>
 				</TdBox>
@@ -136,7 +139,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 						<Text color={'secondary.200'}>{pool.pid ? dollarFormatter.format(stakedBalance()) : '-'}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
 						{Number(rewardsApy) > 0 && <Flex gap={1} mt={0} align={'center'}>
-						<Text color={'whiteAlpha.600'} fontSize={'xs'}>
+						<Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} fontSize={'xs'}>
 						{(calcApy()).toFixed(2)}% + {rewardsApy} %
 						</Text>
 						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
@@ -147,7 +150,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 
 				<TdBox isNumeric>
 					<Flex gap={2}>
-						{pool.pid && <Box className="primaryButton">
+						{pool.pid && <Box className={`${VARIANT}-${colorMode}-primaryButton`}>
 							<Button
 								onClick={onStakeOpen}
 								color={"white"}
@@ -158,7 +161,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 								Stake
 							</Button>
 						</Box>}
-						<Box className="secondaryButton">
+						<Box className={`${VARIANT}-${colorMode}-secondaryButton`}>
 							<Button
 								onClick={onWithdrawOpen}
 								color={"white"}
@@ -169,7 +172,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 								Withdraw
 							</Button>
 						</Box>
-						<Box className="outlinedButton">
+						<Box className={`${VARIANT}-${colorMode}-outlinedButton`}>
 							<Button onClick={onDepositOpen} size={"md"} bg={'transparent'} _hover={{bg: 'transparent'}}>
 								Deposit
 							</Button>

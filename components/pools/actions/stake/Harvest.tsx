@@ -9,6 +9,7 @@ import {
 	InputGroup,
 	Link,
 	Text,
+    useColorMode,
     useToast,
 } from "@chakra-ui/react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -23,6 +24,7 @@ import { useDexData } from "../../../context/DexDataProvider";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 import { getABI, send } from "../../../../src/contract";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { VARIANT } from "../../../../styles/theme";
 
 export default function Harvest({ pool }: any) {
     // const [amount, setAmount] = useState('');
@@ -112,13 +114,14 @@ export default function Harvest({ pool }: any) {
 
     const toast = useToast();
     const handleError = useHandleError(PlatformType.DEX);
+    const { colorMode } = useColorMode();
 
 	return (
 		<>
             <Flex flexDir={'column'} gap={2} px={4} mt={6} mb={6}>
             <Flex justify="space-between">
                 <Flex gap={1}>
-                    <Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+                    <Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
                         Your Staked Balance
                     </Text>
                 </Flex>
@@ -126,14 +129,14 @@ export default function Harvest({ pool }: any) {
                 <Text fontSize={"md"}>
                     {tokenFormatter.format(Big(pool.stakedBalance).div(1e18).toNumber())}
                 </Text>
-                <Text fontSize={"sm"} color={'whiteAlpha.600'}>
+                <Text fontSize={"sm"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
                     {pool.symbol}
                 </Text>
                 </Flex>
             </Flex>
             <Flex justify="space-between">
                 <Flex gap={1}>
-                    <Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+                    <Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
                         Earned Rewards
                     </Text>
                 </Flex>
@@ -141,14 +144,14 @@ export default function Harvest({ pool }: any) {
                 <Text fontSize={"md"}>
                     {tokenFormatter.format(Big(rewardAccrued ?? 0).div(1e18).toNumber())}
                 </Text>
-                <Text fontSize={"sm"} color={'whiteAlpha.600'}>
+                <Text fontSize={"sm"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
                     {process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
                 </Text>
                 </Flex>
             </Flex>
 
             </Flex>
-            <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
+            <Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
                 <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={harvest}>
                     {validate().message}
                 </Button>

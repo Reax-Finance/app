@@ -8,6 +8,7 @@ import {
 	Divider,
     Tooltip,
 	useToast,
+	useColorMode,
 } from "@chakra-ui/react";
 import Big from "big.js";
 import Response from "../_utils/Response";
@@ -23,6 +24,7 @@ import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
+import { VARIANT } from "../../../styles/theme";
 
 export default function Redeem({ market, amount, setAmount, isNative, max }: any) {
 	const [loading, setLoading] = useState(false);
@@ -204,6 +206,8 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Box px={5} py={5}>
@@ -212,16 +216,16 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 							<Flex gap={1}>
 						<Tooltip label='Minimum Loan to Value Ratio'>
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Base LTV
 						</Text>
 						</Tooltip>
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 						/ 
 						</Text>
 						<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Liq Threshold
 						</Text>
 						</Tooltip>
@@ -235,7 +239,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				</Box>
 				
                 <Box mt={6} mb={6}>
-					<Text fontSize={"sm"} color='whiteAlpha.600' fontWeight={'bold'}>
+					<Text fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'}>
 						Transaction Overview
 					</Text>
 					<Box
@@ -243,7 +247,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 						rounded={8}
 					>
 						<Flex justify="space-between">
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Health Factor
 							</Text>
 							<Text fontSize={"md"}>
@@ -252,7 +256,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 						</Flex>
 						<Divider my={2} />
 						<Flex justify="space-between">
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Available to issue
 							</Text>
 							<Text fontSize={"md"}>
@@ -334,7 +338,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				</Box> */}
 
 				<Box mt={6}>
-					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? "disabledPrimaryButton" : 'primaryButton'}><Button
+					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
@@ -350,7 +354,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 					</Button>
 					</Box>}
 						
-					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? "disabledPrimaryButton":'primaryButton'} > <Button
+					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`} > <Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
