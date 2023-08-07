@@ -123,7 +123,7 @@ function NavBar() {
 				<Flex justify="space-between" align={"center"} w='100%'>
 					<Flex gap={10} align='center'>
 						<Image
-							src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo.svg`}
+							src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo-${colorMode}.svg`}
 							alt=""
 							width="30px"
 							mb={0.5}
@@ -139,13 +139,13 @@ function NavBar() {
 							></NavLocalLink>
 
 							<NavLocalLink
-								path={"/lend"}
-								title="Lend"
-							></NavLocalLink>
-							
-							<NavLocalLink
 								path={"/synthetics"}
-								title={"Synthetics"}
+								title={"Synths"}
+							></NavLocalLink>
+
+							<NavLocalLink
+								path={"/lend"}
+								title="Lend/Borrow"
 							></NavLocalLink>
 							
 							<NavLocalLink
