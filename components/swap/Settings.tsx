@@ -17,8 +17,10 @@ import {
     useRadioGroup,
     useRadio,
     Radio,
+    useColorMode,
 } from "@chakra-ui/react";
 import { SettingsIcon } from '@chakra-ui/icons';
+import { VARIANT } from '../../styles/theme';
 
 const OptionNames: any = {
     '0.1': 'Low (0.1%)',
@@ -55,19 +57,21 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
         }
     })
 
+	const { colorMode } = useColorMode();
+
     return (
     <>
         <Menu flip={false}>
             <Flex align={'center'} gap={0}>
-            {maxSlippage >= 1 && <Flex h={'100%'} px={3} align={'center'} color={'whiteAlpha.700'} bg={'whiteAlpha.50'} fontSize={'sm'}>
+            {maxSlippage >= 1 && <Flex h={'100%'} px={3} align={'center'} color={'whiteAlpha.700'} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} fontSize={'sm'}>
                 <Text >Max Slippage: {maxSlippage}%</Text>
             </Flex>}
-            <Box className='iconButton'>
+            <Box className={`${VARIANT}-${colorMode}-iconButton`}>
             <MenuButton  as={IconButton} rounded={0} aria-label={""} icon={<SettingsIcon />} bg={'transparent'} _hover={{bg: 'transparent'}}></MenuButton>
             </Box>
             </Flex>
             <MenuList p={0} m={0} border={0} rounded={0} bg={'transparent'} shadow={'none'}>
-                <Box className='containerBody2' pt={1.5} pb={4}>
+                <Box className={`${VARIANT}-${colorMode}-containerBody2`} pt={1.5} pb={4}>
                 <MenuGroup title="Slippage Tolerance">
                         <Flex mx={4} align={'center'} justify={'space-between'}>
                         {options.map((value) => {

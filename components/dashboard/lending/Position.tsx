@@ -1,6 +1,6 @@
 import React from 'react'
 import Info from '../../infos/Info'
-import { Flex, Text, Box, Heading, Image } from '@chakra-ui/react'
+import { Flex, Text, Box, Heading, Image, useColorMode } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { IoMdCash } from 'react-icons/io'
 import IconBox from './../IconBox'
@@ -11,21 +11,23 @@ import { InfoOutlineIcon } from '@chakra-ui/icons'
 import { dollarFormatter, tokenFormatter } from '../../../src/const'
 import { useSyntheticsData } from '../../context/SyntheticsPosition'
 import { FaPercentage } from 'react-icons/fa'
+import { VARIANT } from '../../../styles/theme'
 
 export default function LendingPosition() {
     const { tradingPool } = useAppData();
     const { lendingPosition, netAPY, netRewardsAPY } = useSyntheticsData();
 
     const pos = lendingPosition();
+	const { colorMode } = useColorMode();
 
     return (
     <>
         {Big(lendingPosition()?.collateral).gt(0) ? <Box
             w='100%'
             display={{ sm: "block", md: "block" }}
-            className='halfContainerBody'
+            className={`${VARIANT}-${colorMode}-halfContainerBody`}
         >
-            <Flex align={'center'} justify={'space-between'} px={5} py={4} className='containerHeader'>
+            <Flex align={'center'} justify={'space-between'} px={5} py={4} className={`${VARIANT}-${colorMode}-containerHeader`}>
                 <Heading fontSize={'18px'}>
                     Your Position
                 </Heading>
@@ -41,7 +43,7 @@ export default function LendingPosition() {
                         cursor={"help"}
                         fontSize={"sm"} 
                     >
-                        <Text color="whiteAlpha.700">
+                        <Text color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
                             Available to Borrow: {" "}
                         </Text>
                         <Text
@@ -84,7 +86,7 @@ export default function LendingPosition() {
                                 <Box cursor={'help'}>
                                     <Heading
                                         size={"xs"}
-                                        color="whiteAlpha.700"
+                                        color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         mb={0.5}
                                     >
                                         Collateral
@@ -93,7 +95,7 @@ export default function LendingPosition() {
                                         fontWeight={"semibold"}
                                         fontSize={"lg"}
                                         gap={1}
-                                        color={"whiteAlpha.800"}
+                                        color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                                     >
                                         <Text
                                             fontWeight={"normal"}
@@ -123,7 +125,7 @@ export default function LendingPosition() {
                                         <Heading
                                             mb={0.5}
                                             size={"xs"}
-                                            color="whiteAlpha.700"
+                                            color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         >
                                             Debt
                                         </Heading>
@@ -132,7 +134,7 @@ export default function LendingPosition() {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={"whiteAlpha.800"}
+                                                color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                                             >
                                                 <Text fontWeight={"normal"}>
                                                     $
@@ -160,7 +162,7 @@ export default function LendingPosition() {
                                         <Heading
                                             mb={0.5}
                                             size={"xs"}
-                                            color="whiteAlpha.700"
+                                            color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         >
                                             Net APY
                                         </Heading>
@@ -175,7 +177,7 @@ export default function LendingPosition() {
                                                 <Text>
                                                     {(netAPY()).toFixed(2)}%
                                                 </Text>
-                                                <Text fontSize={'md'} fontWeight={'medium'} color={'whiteAlpha.600'}> + {netRewardsAPY().toFixed(2)}%</Text>
+                                                <Text fontSize={'md'} fontWeight={'medium'} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}> + {netRewardsAPY().toFixed(2)}%</Text>
                                                 <Image ml={1} src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} boxSize={'18px'} />
                                             </Flex>
                                         </Flex>
@@ -195,6 +197,7 @@ export default function LendingPosition() {
                     <Box
                         textAlign={{ sm: "left", md: "right" }}
                         mt={{ sm: 16, md: 0 }}
+                        minW={'200px'}
                     >
                         <Info
                             message={`Your Debt Limit depends on your LTV %. Account would be liquidated if LTV is greater than your Collateral's Liquidation Threshold`}
@@ -208,14 +211,14 @@ export default function LendingPosition() {
                             >
                                 <Heading
                                     size={"sm"}
-                                    color="whiteAlpha.700"
+                                    color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                 >
                                     Borrow Limit
                                 </Heading>
 
                                 <Box mb={1}>
                                     <InfoOutlineIcon
-                                        color={"whiteAlpha.500"}
+                                        color={colorMode == 'dark' ?  "whiteAlpha.500" : "blackAlpha.500"}
                                         h={3}
                                     />
                                 </Box>
@@ -233,26 +236,25 @@ export default function LendingPosition() {
                             {Number(pos.debtLimit).toFixed(1)}{" "}
                             %
                         </Text>
+                        <Box
+                            mt={2}
+                            width={"100%"}
+                            bg={colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}
+                            rounded={'full'}
+                        >
+                            <Box
+                                h={1.5}
+                                bg={
+                                    Big(pos.availableToIssue).gt(0)
+                                        ? "green.400"
+                                        : "primary.400"
+                                }
+                                width={pos.debtLimit + "%"}
+                            ></Box>
+                        </Box>
                     </Box>
                 </motion.div>       
             </Flex>
-            <Box
-                // mt={2}
-                width={"100%"}
-                bg="whiteAlpha.200"
-            >
-                <Box
-                    h={'1'}
-                    bg={
-                        Big(pos.availableToIssue).gt(0)
-                                    ? "green.400"
-                                    : "primary.400"
-                    }
-                    width={
-                        pos.debtLimit + "%"
-                    }
-                ></Box>
-            </Box>
         </Box>
     : <></>}
     </>

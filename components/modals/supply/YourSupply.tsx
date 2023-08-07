@@ -10,7 +10,8 @@ import {
 	useDisclosure,
 	Switch,
 	useToast,
-	Image
+	Image,
+	useColorMode
 } from "@chakra-ui/react";
 import { ESYX_PRICE, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
@@ -90,6 +91,8 @@ export default function YourSupply({ market, index }: any) {
 			.toFixed(2);
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
@@ -101,14 +104,14 @@ export default function YourSupply({ market, index }: any) {
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<MarketInfo token={market.inputToken} color='primary.200' />
+					<MarketInfo token={market.inputToken} color={colorMode == 'dark' ? "primary.200" : "primary.600"} />
 				</TdBox>
 				<TdBox
 					isFirst={index == 0}
 					alignBox='center'
 				>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text color='primary.200'>
+						<Text color={colorMode == 'dark' ? "primary.200" : "primary.600"}>
 						{Number(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0} align={'center'}>

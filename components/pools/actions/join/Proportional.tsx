@@ -159,6 +159,7 @@ export default function ProportionalDeposit({ pool }: any) {
 				message: `Approve ${poolTokens[tokenToApprove()].token.symbol} for use`
 			}
 		}
+		if(loading) return {valid: false, message: "Loading..."}
 		return {
 			valid: true,
 			message: "Deposit"

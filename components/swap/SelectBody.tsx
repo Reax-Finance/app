@@ -1,17 +1,16 @@
-import { Box, Flex, Image, Text } from '@chakra-ui/react';
+import { Box, Flex, Image, Text, useColorMode } from '@chakra-ui/react';
 import React from 'react'
 import { RiArrowDropDownLine } from 'react-icons/ri';
+import { VARIANT } from '../../styles/theme';
 
 export default function SelectBody({ asset, onOpen }: any) {
+	const { colorMode } = useColorMode();
 	return (
 		<Box cursor="pointer" onClick={onOpen}>
 			<Flex
+				className={`${VARIANT}-${colorMode}-selectButton`}
 				justify={"space-between"}
 				align={"center"}
-                bgGradient={'linear(45deg, transparent 10px, bg.200 0) bottom left'}
-				_hover={{
-					bgGradient: 'linear(45deg, transparent 10px, bg.400 0) bottom left',
-				}}
 				px={2}
 				py={2}
 				pr={2}
@@ -26,7 +25,7 @@ export default function SelectBody({ asset, onOpen }: any) {
 					alt={asset?.symbol}
 				/>
 
-				<Text fontSize="lg" color="whiteAlpha.800">
+				<Text fontSize="lg" color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}>
 					{asset?.symbol}
 				</Text>
 				<Box>

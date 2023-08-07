@@ -12,6 +12,7 @@ import {
 	NumberInputField,
 	Select,
 	Text,
+    useColorMode,
     useToast,
 } from "@chakra-ui/react";
 import { NATIVE, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../../../../src/const";
@@ -22,6 +23,7 @@ import { formatInput, parseInput } from "../../../../utils/number";
 import { AiOutlineWallet } from "react-icons/ai";
 import { MdRefresh } from "react-icons/md";
 import ValuesTable from "../../others/ValuesTable";
+import { VARIANT } from "../../../../../styles/theme";
 
 export default function StableDepositLayout({
   pool, 
@@ -47,11 +49,12 @@ export default function StableDepositLayout({
     const { chain } = useNetwork();
 
     const _isNativeToken = pool.tokens[tokenSelectedIndex].token.id == WETH_ADDRESS(chain?.id!) && isNative;
+    const { colorMode } = useColorMode();
 
     return (
     <>	
-        <Divider />
-        <Box bg={'bg.600'} px={4}>
+        <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+        <Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} px={4}>
             <InputGroup
                 pt={7}
                 pb={7}
@@ -80,14 +83,14 @@ export default function StableDepositLayout({
                         <Text
                             fontSize="sm"
                             textAlign={"left"}
-                            color={"whiteAlpha.600"}
+                            color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
                         >
                             {dollarFormatter.format(((prices[pool.tokens[tokenSelectedIndex].token.id] ?? 0) * (Number(amount) || 0 )) ?? 0)}
                         </Text>
                     </Box>
 
                     <Flex flexDir={'column'} align={'end'}>
-                    <Flex cursor={'pointer'} className="outlinedBox" w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
+                    <Flex cursor={'pointer'} className={`${VARIANT}-${colorMode}-outlinedBox`} w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
                         <Image rounded={'full'} src={`/icons/${_isNativeToken ? NATIVE : pool.tokens[tokenSelectedIndex].token.symbol}.svg`} alt="" width={"30px"} />
                         <Select mr={-2} w={'110px'} value={tokenSelectedIndex + '-' + (isNative ? 'ETH' : pool.tokens[tokenSelectedIndex].token.symbol)} variant={'unstyled'} onChange={onSelectUpdate}>
                             {pool.tokens.map((token: any, i: number) => {
@@ -124,7 +127,7 @@ export default function StableDepositLayout({
         <Divider mb={4}/>
         
         <ValuesTable values={values} pool={pool} bptOut={bptOut} />
-        <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
+        <Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={shouldApprove() ? approve : deposit}>
             {validate().message}
         </Button>

@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, useToast, Text, Tooltip, IconButton, Image } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, useToast, Text, Tooltip, IconButton, Image, useColorMode } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useLendingData } from '../../context/LendingDataProvider'
 import { defaultChain, dollarFormatter } from '../../../src/const';
@@ -8,6 +8,7 @@ import { useAccount, useNetwork } from 'wagmi';
 import { getABI, getAddress, getContract, send } from '../../../src/contract';
 import Big from 'big.js';
 import { ethers } from 'ethers';
+import { HEADING_FONT, VARIANT } from '../../../styles/theme';
 
 export default function LendingMarket() {
     const {protocol, markets, pools, selectedPool} = useLendingData();
@@ -97,6 +98,8 @@ export default function LendingMarket() {
         });
     }
 
+	const { colorMode } = useColorMode();
+
   return (
     <>
         <Box
@@ -108,7 +111,7 @@ export default function LendingMarket() {
             mb={6}
         >
             <Box>
-					<PoolSelector />
+					{pools.length > 1 ? <PoolSelector /> : <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={{sm: '3xl', md: "3xl", lg: '32px'}}>{protocol?.name}</Heading>}
 					<Flex mt={7} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>
@@ -131,7 +134,7 @@ export default function LendingMarket() {
 					&&
 					<Box textAlign={"right"}>
 					<Flex justify={'end'} align={'center'} gap={1}>
-						<Heading size={"sm"} color={"whiteAlpha.600"}>
+						<Heading size={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Rewards
 						</Heading>
 						<Tooltip label='Add to Metamask'>
@@ -153,11 +156,11 @@ export default function LendingMarket() {
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{synAccrued ? Big(synAccrued).div(10**18).toFixed(2) : '-'} </Text>
-							<Text fontSize={"2xl"} color={"whiteAlpha.400"}>
+							<Text fontSize={"2xl"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
 								{process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
 							</Text>
 						</Flex>
-						<Box mt={2} w={'100%'} className="outlinedButton">
+						<Box mt={2} w={'100%'} className={`${VARIANT}-${colorMode}-outlinedButton`}>
 						<Button
 							onClick={claim}
 							bg={'transparent'}

@@ -9,9 +9,12 @@ import {
 	InputGroup,
 	Select,
 	Text,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
+	NATIVE,
 	WETH_ADDRESS,
+	W_NATIVE,
 	defaultChain,
 	dollarFormatter,
 	tokenFormatter,
@@ -21,6 +24,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { NumberInput, NumberInputField } from "@chakra-ui/react";
 import { formatInput, parseInput } from "../../../../utils/number";
 import ValuesTable from "../../others/ValuesTable2";
+import { VARIANT } from "../../../../../styles/theme";
 
 export default function ProportionalWithdrawLayout({
 	pool,
@@ -42,10 +46,12 @@ export default function ProportionalWithdrawLayout({
 	);
 	const { chain } = useNetwork();
 	const { prices } = usePriceData();
+	const { colorMode } = useColorMode();
+	
 	return (
 		<>
-		<Divider />
-		<Box bg={'bg.600'} mb={4} pt={'1px'}>
+		<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+		<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} mb={4} pt={'1px'}>
 			{amounts.map((amount: any, i: number) => {
 				const _isNativeToken =
 					poolTokens[i].token.id == WETH_ADDRESS(chain?.id!) &&
@@ -82,7 +88,7 @@ export default function ProportionalWithdrawLayout({
 										<Text
 											fontSize="sm"
 											textAlign={"left"}
-											color={"whiteAlpha.600"}
+											color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 										>
 											{dollarFormatter.format(
 												(prices[
@@ -99,7 +105,7 @@ export default function ProportionalWithdrawLayout({
 											gap={2}
 											mt={2}
 										>
-                  <Flex className="outlinedBox" p={2} py={1.5} pl={8} justify={'end'} align={'center'} gap={2} mt={i==0? 4:0}>
+                  <Flex className={`${VARIANT}-${colorMode}-outlinedBox`} p={2} py={1.5} pl={8} justify={'end'} align={'center'} gap={2} mt={i==0? 4:0}>
 
 											<Image
 												rounded={"full"}
@@ -138,10 +144,10 @@ export default function ProportionalWithdrawLayout({
 														}
 													>
 														<option value="ETH">
-															ETH
+															{NATIVE}
 														</option>
 														<option value="WETH">
-															WETH
+															{W_NATIVE}
 														</option>
 													</Select>
 												</>
@@ -180,9 +186,9 @@ export default function ProportionalWithdrawLayout({
 
 							{i !== amounts.length - 1 && (
 								<Flex my={5} align={"center"}>
-									<Divider borderColor={"whiteAlpha.400"} />
-									<PlusSquareIcon color={"whiteAlpha.400"} />
-									<Divider borderColor={"whiteAlpha.400"} />
+									<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />
+									<PlusSquareIcon color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />
+									<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />
 								</Flex>
 							)}
 						</Box>
@@ -194,7 +200,7 @@ export default function ProportionalWithdrawLayout({
 		</Box>
 
 			<ValuesTable bptIn={bptIn} values={values} pool={pool} />
-			<Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
+			<Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
 				<Button
 					size={"lg"}
 					isLoading={loading}

@@ -1,6 +1,4 @@
 import React from "react";
-import { useContext } from "react";
-
 import {
 	Table,
 	Thead,
@@ -11,20 +9,22 @@ import {
 	Skeleton,
 	Heading,
 	Flex,
-	Text
+	Text,
+	useColorMode
 } from "@chakra-ui/react";
-
 import ThBox from "../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { useBalanceData } from "../../context/BalanceProvider";
 import YourBorrow from "../../modals/borrow/YourBorrow";
 import { usePriceData } from "../../context/PriceContext";
 import Big from "big.js";
+import { VARIANT } from "../../../styles/theme";
 
 export default function YourBorrows() {
 	const { markets } = useLendingData();	
 	const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
+	const { colorMode } = useColorMode();
 	
 	const borrowedMarkets = markets.filter((market: any) => {
 		if(!walletBalances[market._vToken.id] || !walletBalances[market._sToken.id] || !prices[market.inputToken.id]) return false;
@@ -42,7 +42,7 @@ export default function YourBorrows() {
 
 	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (
 		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'secondary.400'}>Your Borrows</Heading>
 			</Box>
 
@@ -92,7 +92,7 @@ export default function YourBorrows() {
 						</Table>
 					</TableContainer>
 					: <Flex flexDir={'column'} justify={'center'} h='100%' py={5}>
-					<Text textAlign={'center'} color={'whiteAlpha.600'}>You have no borrowed assets.</Text>
+					<Text textAlign={'center'} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>You have no borrowed assets.</Text>
 					</Flex>
 					}
 				</>

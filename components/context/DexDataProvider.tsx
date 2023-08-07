@@ -5,6 +5,7 @@ import { useNetwork } from "wagmi";
 import { Status } from "../utils/status";
 import { DEX_ENDPOINT, MINICHEF_ENDPOINT, ROUTER_ENDPOINT, query_dex, query_leaderboard, query_minichef } from "../../src/queries/dex";
 import Big from "big.js";
+import { ethers } from "ethers";
 
 interface DEXDataValue {
 	status: Status;
@@ -62,14 +63,14 @@ function DEXDataProvider({ children }: any) {
 
 					const _pools = res[0].data.data.balancers[0].pools;
 
-					const miniChef = res[1].data.data.miniChefs[0];
-					_dex.totalAllocPoint = miniChef.totalAllocPoint;
-					_dex.sushiPerSecond = miniChef.sushiPerSecond;
-					_dex.miniChef = miniChef.id;
+					const miniChef = res[1].data.data.miniChefs[0] ?? {};
+					_dex.totalAllocPoint = miniChef?.totalAllocPoint ?? '0';
+					_dex.sushiPerSecond = miniChef?.sushiPerSecond ?? '0';
+					_dex.miniChef = miniChef?.id ?? ethers.constants.AddressZero;
 
 					const positions = res[1].data.data.users;
 					for(let i in positions){
-						for(let j in miniChef.pools){
+						for(let j in miniChef?.pools ?? []){
 							if(Number(miniChef.pools[j].id) == Number(positions[i].id.split('-')[0])){
 								miniChef.pools[j].stakedBalance = positions[i].amount;
 							}
@@ -77,7 +78,7 @@ function DEXDataProvider({ children }: any) {
 					}
 
 					for(let i in _pools){
-						let mPool = miniChef.pools.find((mpool: any) => mpool.pair == _pools[i].address);
+						let mPool = (miniChef?.pools ?? []).find((mpool: any) => mpool.pair == _pools[i].address);
 						if(!mPool) continue;
 						_pools[i].pid = mPool.id ?? -1;
 						_pools[i].allocPoint = mPool.allocPoint ?? 0;
@@ -94,6 +95,7 @@ function DEXDataProvider({ children }: any) {
 				}
 			})
 			.catch((err) => {
+				console.log(err);
 				setStatus(Status.ERROR);
 				setMessage(
 					"Failed to fetch data. Please refresh the page and try again later."

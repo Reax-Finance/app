@@ -15,10 +15,9 @@ import {
 	Heading,
 	Divider,
 	Flex,
-	Text
+	Text,
+	useColorMode
 } from "@chakra-ui/react";
-import { AppDataContext } from "../../context/AppDataProvider";
-
 import SupplyModal from "../../modals/supply";
 import ThBox from "./../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
@@ -33,6 +32,7 @@ import {
 	PaginationPageGroup,
 } from "@ajna/pagination";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
+import { VARIANT } from "../../../styles/theme";
 const pageSize = 9;
 
 export default function CollateralTable() {
@@ -45,9 +45,11 @@ export default function CollateralTable() {
 		}
 	);
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box >
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Assets to Supply</Heading>
 			</Box>
 

@@ -1,29 +1,28 @@
 import React from 'react'
 import { useDexData } from '../context/DexDataProvider'
 import {
-    Table,
-    Thead,
-    Tbody,
-    Tfoot,
-    Tr,
-    Th,
-    Td,
-    TableCaption,
-    TableContainer,
-    Button,
-    Box,
-    Heading,
-    Text,
-    Flex
-  } from '@chakra-ui/react'
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  TableContainer,
+  Box,
+  Heading,
+  Flex,
+  useColorMode
+} from '@chakra-ui/react'
 import Pool from './Pool';
 import ThBox from '../dashboard/ThBox';
+import { VARIANT } from '../../styles/theme';
 
 export default function Pools() {
+    
     const { pools } = useDexData();
+    const {colorMode} = useColorMode();
+
     return (
-      <Box className='containerBody'>
-        <Box className='containerHeader'>
+      <Box className={`${VARIANT}-${colorMode}-containerBody`}>
+        <Box className={`${VARIANT}-${colorMode}-containerHeader`}>
           <Flex align={'center'} p={4} px={5} gap={4}>
             <Heading fontSize={'18px'} color={'secondary.400'}>All Pools</Heading>
           </Flex>
@@ -36,7 +35,7 @@ export default function Pools() {
                 <ThBox alignBox='center'>Composition</ThBox>
                 <ThBox alignBox='center'>
                   <Flex w={'100%'} justify={'center'}>
-                  Liquidity
+                    Liquidity
                   </Flex>
                 </ThBox>
                 <ThBox alignBox='center'>

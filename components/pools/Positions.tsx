@@ -9,12 +9,14 @@ import {
     Box,
     Heading,
     Text,
-    Flex
+    Flex,
+    useColorMode
   } from '@chakra-ui/react'
 import ThBox from '../dashboard/ThBox';
 import { useBalanceData } from '../context/BalanceProvider';
 import YourPoolPosition from './YourPoolPosition';
 import Big from 'big.js';
+import { VARIANT } from '../../styles/theme';
 
 export default function Positions() {
     const {walletBalances} = useBalanceData();
@@ -26,10 +28,13 @@ export default function Positions() {
 
     if(yourPositions.length == 0) return <></>;
     
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const {colorMode} = useColorMode();
+
     return (
     <>
-    <Box className='containerBody'>
-      <Box className='containerHeader'>
+    <Box className={`${VARIANT}-${colorMode}-containerBody`}>
+      <Box className={`${VARIANT}-${colorMode}-containerHeader`}>
         <Flex align={'center'} p={4} px={5} gap={4}>
           <Heading fontSize={'18px'} color={'primary.400'}>Your Balances</Heading>
         </Flex>
@@ -61,7 +66,7 @@ export default function Positions() {
           })}
           </Tbody>
         </Table>
-        </TableContainer> : <><Text color={'whiteAlpha.600'} p={6}>No Active Positions</Text></>}
+        </TableContainer> : <><Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} p={6}>No Active Positions</Text></>}
     </Box>
     </>
   )
