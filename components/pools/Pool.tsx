@@ -116,7 +116,7 @@ export default function Pool({ pool, index }: any) {
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
 						<Text color={'primary.400'}>{calcApy().toFixed(2)}%</Text>
 						{Number(rewardsApy) > 0 && <Flex gap={1.5} mt={1} align={'center'}>
-						<Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} fontSize={'xs'}>+{rewardsApy}%</Text>
+						<Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'xs'}>+{rewardsApy}%</Text>
 						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>

@@ -14,8 +14,8 @@ const NETWORKS: any = {
 
 export const defaultChain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
 
-export const NATIVE = "ETH";
-export const W_NATIVE = "WETH";
+export const NATIVE = defaultChain.nativeCurrency.symbol;
+export const W_NATIVE = `W${NATIVE}`;
 export const ESYX_PRICE = 0.01;
 export const SUPPORTS_ROLLUP_GASFEES = false;
 

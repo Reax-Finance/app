@@ -129,7 +129,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
 						<Text>{dollarFormatter.format(yourBalance())}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
-						<Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} fontSize={'xs'}>{(calcApy()).toFixed(2)}%</Text>
+						<Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'xs'}>{(calcApy()).toFixed(2)}%</Text>
 						</Flex>
 					</Flex>
 				</TdBox>
@@ -139,7 +139,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 						<Text color={'secondary.200'}>{pool.pid ? dollarFormatter.format(stakedBalance()) : '-'}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
 						{Number(rewardsApy) > 0 && <Flex gap={1} mt={0} align={'center'}>
-						<Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} fontSize={'xs'}>
+						<Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'xs'}>
 						{(calcApy()).toFixed(2)}% + {rewardsApy} %
 						</Text>
 						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
