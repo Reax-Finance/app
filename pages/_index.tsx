@@ -120,7 +120,7 @@ export default function Index({ children }: any) {
 				<Flex
 					justify={'center'}
 					flexDirection={{ sm: 'column', md: 'row' }}
-					minH="96vh"
+					minH="97vh"
 					maxW={'100%'}
 					>
 					<Box zIndex={2} minW={{sm: '0', md: '0', lg: '1200px'}} w={'100%'} px={{sm: '4', md: '0'}}>
@@ -143,7 +143,7 @@ export default function Index({ children }: any) {
 
 					</Box>
 				</Flex>
-						<Footer />
+				<Footer />
 				<Box>
 				</Box>
 

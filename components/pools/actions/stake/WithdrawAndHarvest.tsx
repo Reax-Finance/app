@@ -71,7 +71,6 @@ export default function Deposit({ pool, isOpen, onClose, amount, setAmount }: an
     const withdrawAndHarvest = () => {
         setLoading(true);
         const miniChef = new ethers.Contract(dex.miniChef, getABI('MiniChef', chain?.id!));
-        console.log(miniChef.address);
         const _amount = Big(amount).mul(10**18).toFixed(0)
         let calls = [];
         calls.push(

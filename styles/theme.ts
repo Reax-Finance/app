@@ -30,8 +30,6 @@ if(VARIANT != "rounded"){
 	components.Switch = switchTheme;
 }
 
-
-
 export const theme = extendTheme({
 	components,
 	fonts: {

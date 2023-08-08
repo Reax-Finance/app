@@ -156,6 +156,24 @@
 	background-size: 100% 51%;
 }
 
+.edgy-dark-navLink {
+	
+}
+
+.edgy-dark-navLinkSelected {
+	background: linear-gradient(45deg, transparent 4px, #181e26 0) bottom left,
+		linear-gradient(-135deg, transparent 4px, #181e26 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-navLink:hover {
+	/* background: linear-gradient(45deg, transparent 3px, #181e26 0) bottom left,
+		linear-gradient(-135deg, transparent 3px, #181e26 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%; */
+}
+
 .edgy-dark-outlinedBox {
 	background: linear-gradient(45deg, transparent 5px, #343b48 0) bottom left,
 		linear-gradient(-135deg, transparent 5px, #343b48 0) top right;

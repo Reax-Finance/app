@@ -117,7 +117,7 @@ function NavBar() {
 
 	return (
 		<>
-		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={6} align='center' >
+		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={4} align='center' >
 			<Box minW='0' w={'100%'} maxW='1250px'>
 			<Flex align={"center"} justify="space-between" >
 				<Flex justify="space-between" align={"center"} w='100%'>
@@ -131,7 +131,7 @@ function NavBar() {
 						<Flex
 							align="center"
 							display={{ sm: "none", md: "flex" }}
-							gap={2}
+							// gap={2}
 						>
 							<NavLocalLink
 								path={"/"}
@@ -177,7 +177,7 @@ function NavBar() {
 					display={{ sm: "none", md: "flex" }}
 					justify="flex-end"
 					align={"center"}
-					gap={2}
+					// gap={2}
 					w='100%'
 				>
 					<NavLocalLink
@@ -193,12 +193,12 @@ function NavBar() {
 					<Box>
 						<AccountButton />
 					</Box>
-					{<Box>
+					<Box>
 						<CustomConnectButton />
-					</Box>}
+					</Box>
 				</Flex>
 			</Flex>
-			{VARIANT == "edgy" && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400': 'blackAlpha.400'}/>}
+			{/* {VARIANT == "edgy" && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400': 'blackAlpha.400'}/>} */}
 			</Box>
 
 
