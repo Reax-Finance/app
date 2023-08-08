@@ -227,7 +227,10 @@ export default function ProportionalDeposit({ pool }: any) {
 	}
 
     const values = () => {
-        if(!validate().valid) return null;
+        for(let i in amounts){
+			let amount = amounts[i];
+			if(isNaN(Number(amount)) || Number(amount) == 0) return null;
+		}
         if(!bptOut) return null;
 		// if(loading) return null;
 		let poolValue = poolTokens.reduce((a: any, b: any) => {

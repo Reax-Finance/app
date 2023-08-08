@@ -141,7 +141,7 @@ export default function LendingMarket() {
 						<IconButton
 							icon={
 								<Image
-									src="https://cdn.consensys.net/uploads/metamask-1.svg"
+									src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png"
 									w={"20px"}
 									alt=""
 								/>

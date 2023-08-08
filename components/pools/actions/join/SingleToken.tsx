@@ -172,9 +172,8 @@ export default function SingleTokenDeposit({ pool }: any) {
     }
 
     const values = () => {
-        if(!validate().valid) return null;
+        if(isNaN(Number(amount)) || Number(amount) == 0) return null;
         if(!bptOut) return null;
-		// if(loading) return null;
         let poolValue = poolTokens.reduce((a: any, b: any) => {
             return a.add(Big(b.balance).mul(prices[b.token.id] ?? 0));
         }, Big(0)).toNumber();

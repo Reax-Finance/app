@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { usePriceData } from "../../../context/PriceContext";
-import {
-    useToast,
-} from "@chakra-ui/react";
 import { WETH_ADDRESS, defaultChain } from "../../../../src/const";
 import { ethers } from "ethers";
 import { call, getAddress, getArtifact, getContract, send } from "../../../../src/contract";
@@ -210,13 +207,17 @@ export default function ProportionalWithdraw({ pool }: any) {
 		setAmount(amounts[0], 0)
 	}, [pool])
 
-	const setMax = (multiplier = 1) => {
-		const totalShares = pool.totalShares;
-		const yourShares = walletBalances[pool.address];
+	const max = () => {
+		const totalShares = pool?.totalShares ?? 0;
+		const yourShares = walletBalances[pool.address] ?? 0;
 
-		const _amounts = poolTokens.map((token: any) => {
-			return Big(token.balance).mul(Big(yourShares).div(Big(totalShares))).mul(multiplier).div(10**18).toString();
+		return poolTokens.map((token: any) => {
+			return Big(token.balance ?? 0).mul(Big(yourShares).div(Big(totalShares))).div(10**18).toString();
 		})
+	}
+
+	const setMax = (multiplier = 1) => {
+		let _amounts = max().map((amount: any) => Big(amount).mul(multiplier).toString());
 		setAmounts(_amounts);
 		_setBptIn(_amounts);
 	}
@@ -235,12 +236,15 @@ export default function ProportionalWithdraw({ pool }: any) {
 				};
 			}
 		}
-		// if(tokenToApprove() !== -1) {
-		// 	return {
-		// 		valid: true,
-		// 		message: `Approve ${poolTokens[tokenToApprove()].token.symbol} for use`
-		// 	}
-		// }
+		let _max = max();
+		for(let i = 0; i < amounts.length; i++) {
+			if(Big(amounts[i]).gt(_max[i])) {
+				return {
+					valid: false,
+					message: "Insufficient balance"
+				}
+			}
+		}
 		if(error && error.length > 0) {
 			return {
 				valid: false,
@@ -266,7 +270,11 @@ export default function ProportionalWithdraw({ pool }: any) {
 					isValid = false;
 					continue;
 				}
+				// if(pool.poolType == "ComposableStable"){
+				// 	_amounts[i] = _amount;
+				// } else {
 				_amounts[i] = Big(Number(_amount) ?? 0).mul(poolTokens[i].balance).div(poolTokens[index].balance).toString();
+				// }
 			}
 		}
 		setAmounts(_amounts);
@@ -276,7 +284,10 @@ export default function ProportionalWithdraw({ pool }: any) {
 	}
 
     const values = () => {
-        if(!validate().valid) return null;
+        for(let i in amounts){
+			let amount = amounts[i];
+			if(isNaN(Number(amount)) || Number(amount) == 0) return null;
+		}
         if(!bptIn) return null;
 		// if(loading) return null;
 

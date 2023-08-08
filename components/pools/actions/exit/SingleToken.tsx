@@ -191,17 +191,22 @@ export default function SingleTokenWithdraw({ pool }: any) {
                 valid: false,
                 message: "Enter amount"
             };
-        }
-        if(error && error.length > 0) {
+        } else if(error && error.length > 0) {
             return {
                 valid: false,
                 message: error
             };
+        } else if(Big(amount).gt(max())) {
+            return {
+                valid: false,
+                message: "Insufficient balance"
+            };
+        } else {
+            return {
+                valid: true,
+                message: "Withdraw"
+            }
         }
-		return {
-			valid: true,
-			message: "Withdraw"
-		}
 	}
 
     const onSelectUpdate = (e: any) => {
@@ -211,10 +216,7 @@ export default function SingleTokenWithdraw({ pool }: any) {
     }
 
     const values = () => {
-        if(!validate().valid) return null;
-        if(!amount) return null;
-		// if(loading) return null;
-
+        if(isNaN(Number(amount)) || Number(amount) == 0) return null;
         let poolValue = poolTokens.reduce((a: any, b: any) => {
             return a.add(Big(b.balance).mul(prices[b.token.id] ?? 0));
         }, Big(0)).toNumber();
@@ -251,7 +253,7 @@ export default function SingleTokenWithdraw({ pool }: any) {
         }
     }
 
-    const setMax = (multiplier: number) => {
+    const max = () => {
         const totalShares = Big(pool.totalShares);
         const yourShares = Big(walletBalances[pool.address]).div(10 ** 18);
         const totalPoolValue = pool.tokens.reduce((a: any, b: any) => {
@@ -259,7 +261,11 @@ export default function SingleTokenWithdraw({ pool }: any) {
         }, Big(0));
         let yourPoolValue = yourShares.mul(totalPoolValue).div(totalShares).div(prices[pool.tokens[tokenSelectedIndex].token.id] ?? 0);
         if(yourPoolValue.gt(pool.tokens[tokenSelectedIndex].balance)) yourPoolValue = Big(pool.tokens[tokenSelectedIndex].balance);
-        _setAmount(yourPoolValue.mul(multiplier).toFixed());
+        return yourPoolValue.toString();
+    }
+
+    const setMax = (multiplier: number) => {
+        _setAmount(Big(max()).mul(multiplier).toFixed());
     }
 
 	return (

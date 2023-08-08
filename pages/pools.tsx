@@ -10,6 +10,7 @@ import { BigNumber, ethers } from 'ethers'
 import { getABI, getAddress, send } from '../src/contract'
 import { useAccount } from 'wagmi'
 import { HEADING_FONT, VARIANT } from '../styles/theme'
+import { usePriceData } from '../components/context/PriceContext'
 
 export default function PoolsPage() {
   const { dex, pools } = useDexData();
@@ -90,9 +91,14 @@ export default function PoolsPage() {
           },
         }
     });
-}
+  }
 
-const { colorMode } = useColorMode();
+  const { colorMode } = useColorMode();
+  const { prices } = usePriceData();
+
+  const totalLiquidity = pools.reduce((total: string, pool: any) => Big(total).add(pool.tokens.reduce((acc: any, token: any) => {
+    return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
+  }, 0)), '0');
 
   return (
     <>
@@ -107,7 +113,7 @@ const { colorMode } = useColorMode();
           <Flex gap={8} mt={2}>
             <Flex align={'center'} gap={2}>
               <Heading color={'primary.400'} size={'sm'}>TVL </Heading>
-              <Heading size={'sm'}>{dollarFormatter.format(dex.totalLiquidity ?? 0)}</Heading>
+              <Heading size={'sm'}>{dollarFormatter.format(totalLiquidity ?? 0)}</Heading>
             </Flex>
             <Flex align={'center'} gap={2}>
               <Heading color={'secondary.400'} size={'sm'}>Total Volume </Heading>
@@ -126,7 +132,7 @@ const { colorMode } = useColorMode();
 						<IconButton
 							icon={
 								<Image
-									src="https://cdn.consensys.net/uploads/metamask-1.svg"
+									src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png"
 									w={"20px"}
 									alt=""
 								/>

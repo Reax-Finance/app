@@ -128,7 +128,7 @@ export default function StableWithdrawLayout({
             </Box>
         </Box>
         <Divider mb={4}/>
-        <ValuesTable2 values={values} pool={pool} bptIn={bptIn} />
+        <ValuesTable2 values={values} pool={pool} bptIn={bptIn} maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} />
         <Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={withdraw}>
             {validate().message}

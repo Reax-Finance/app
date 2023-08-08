@@ -70,7 +70,7 @@ export default function Index({ children }: any) {
 	
 	return (
 		<Box>
-			<Flex align={'center'} justify={'center'} bgColor={colorMode == 'dark' ? "bg.600" : 'lightBg.600'} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'}>
+			{/* <Flex align={'center'} justify={'center'} bgColor={colorMode == 'dark' ? "bg.600" : 'lightBg.600'} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'}>
 				<Text
 					textAlign={'center'} 
 					fontSize={'sm'}
@@ -79,7 +79,7 @@ export default function Index({ children }: any) {
 					px={4}>
 					{process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? "This is a testnet. Please do not send real assets to these addresses" : "We're still in beta. Even though we are audited, only deposit what you can afford to lose."}
 				</Text>
-			</Flex>
+			</Flex> */}
 			<Flex display={{sm: 'block', md: 'none'}} align={'center'} justify={'center'} bgColor={colorMode == "dark" ? "darkBg.400" : "lightBg.400"} color={'whiteAlpha.700'}>
 				<Text
 					textAlign={'center'} 

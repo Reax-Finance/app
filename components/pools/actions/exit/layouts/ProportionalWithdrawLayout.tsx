@@ -23,7 +23,7 @@ import { EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
 import { useAccount, useNetwork } from "wagmi";
 import { NumberInput, NumberInputField } from "@chakra-ui/react";
 import { formatInput, parseInput } from "../../../../utils/number";
-import ValuesTable from "../../others/ValuesTable2";
+import ValuesTable from "../../others/ValuesTable";
 import { VARIANT } from "../../../../../styles/theme";
 
 export default function ProportionalWithdrawLayout({

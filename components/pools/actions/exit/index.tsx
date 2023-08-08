@@ -58,17 +58,17 @@ export default function Withdraw({ pool, isOpen, onClose }: any) {
 					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
 					<Tabs variant={'enclosed'} size={"sm"} isFitted colorScheme="secondary">
 						<TabList>
-							<Tab border={0} py={2}>Pool Tokens</Tab>
-							<Divider orientation="vertical" h={'44px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />
 							<Tab border={0} py={2}>Single Token</Tab>
+							<Divider orientation="vertical" h={'44px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />
+							<Tab border={0} py={2}>Pool Tokens</Tab>
 						</TabList>
 
 						<TabPanels>
 							<TabPanel p={0}>
-								<ProportionalWithdraw pool={pool} />
+								<SingleTokenWithdraw pool={pool} />
 							</TabPanel>
 							<TabPanel p={0}>
-								<SingleTokenWithdraw pool={pool} />
+								<ProportionalWithdraw pool={pool} />
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

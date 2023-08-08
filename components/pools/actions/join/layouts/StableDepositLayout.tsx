@@ -22,7 +22,7 @@ import { useBalanceData } from "../../../../context/BalanceProvider";
 import { formatInput, parseInput } from "../../../../utils/number";
 import { AiOutlineWallet } from "react-icons/ai";
 import { MdRefresh } from "react-icons/md";
-import ValuesTable from "../../others/ValuesTable";
+import ValuesTable2 from "../../others/ValuesTable2";
 import { VARIANT } from "../../../../../styles/theme";
 
 export default function StableDepositLayout({
@@ -126,7 +126,7 @@ export default function StableDepositLayout({
         </Box>
         <Divider mb={4}/>
         
-        <ValuesTable values={values} pool={pool} bptOut={bptOut} />
+        <ValuesTable2 values={values} pool={pool} bptOut={bptOut} maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} />
         <Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={shouldApprove() ? approve : deposit}>
             {validate().message}

@@ -312,7 +312,7 @@ const BAL_ERRORS: any = {
     '504': 'INVALID_SIGNATURE',
     '505': 'EXIT_BELOW_MIN',
     '506': 'JOIN_ABOVE_MAX',
-    '507': 'SWAP_LIMIT',
+    '507': 'Slippage above max. Please increase max slippage', // 'SWAP_LIMIT'
     '508': 'SWAP_DEADLINE',
     '509': 'CANNOT_SWAP_SAME_TOKEN',
     '510': 'UNKNOWN_AMOUNT_IN_FIRST_SWAP',
