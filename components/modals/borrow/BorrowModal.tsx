@@ -63,7 +63,7 @@ export default function BorrowModal({
 		if (!address) return "0";
 		if (tabSelected == 0) {
 			if (!prices[market.inputToken.id] || prices[market.inputToken.id] == 0){return "0"}
-			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).sub(pos.stableDebt).div(prices[market.inputToken.id]);
+			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).div(prices[market.inputToken.id]);
             let v2 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]).mul(0.99);
             let min = v1.lt(v2) ? v1 : v2;
 			if(min.lt(0)) min = Big(0);

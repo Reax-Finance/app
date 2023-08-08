@@ -364,7 +364,7 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 								{Big(pos.debtLimit).toFixed(2)} % 
 								{" -> "} 
 								{Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id]).gt(0) ? 
-									Big(pos.debt).add(pos.stableDebt).div(Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id])).mul(100).toFixed(1) 
+									Big(pos.debt).div(Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id])).mul(100).toFixed(1) 
 								: '0'} %
 							</Text>
 						</Flex>
@@ -373,7 +373,7 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Available to issue
 							</Text>
-							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount)*prices[market.inputToken.id]*market.maximumLTV/100 - (Number(pos.debt) + Number(pos.stableDebt)))}</Text>
+							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount)*prices[market.inputToken.id]*market.maximumLTV/100 - (Number(pos.debt)))}</Text>
 						</Flex>
 					</Box>
 				</Box>

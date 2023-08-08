@@ -318,14 +318,14 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 								<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 									Health Factor
 								</Text>
-								<Text fontSize={"md"}>{Number(pos.debtLimit).toFixed(1)} % {"->"} {((Number(pos.debt + pos.stableDebt) - (amount*prices[market.inputToken.id])) / Number(pos.collateral) * 100).toFixed(1)}%</Text>
+								<Text fontSize={"md"}>{Number(pos.debtLimit).toFixed(1)} % {"->"} {((Number(pos.debt) - (amount*prices[market.inputToken.id])) / Number(pos.collateral) * 100).toFixed(1)}%</Text>
 							</Flex>
 							<Divider my={2} />
 							<Flex justify="space-between">
 								<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 									Available to issue
 								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount*prices[market.inputToken.id] ?? 0) - Number(pos.debt + pos.stableDebt))}</Text>
+								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount*prices[market.inputToken.id] ?? 0) - Number(pos.debt))}</Text>
 							</Flex>
 						</Box>
 					</Box>
