@@ -69,7 +69,7 @@ function Swap() {
 					amount: inputAmount,
 					kind: 0,
 					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? ADDRESS_ZERO,
+					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
 					slipage: maxSlippage
 				}
@@ -93,7 +93,7 @@ function Swap() {
 					amount: outputAmount,
 					kind: 1,
 					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? ADDRESS_ZERO,
+					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
 					slipage: maxSlippage
 				}
@@ -211,8 +211,7 @@ function Swap() {
 	const exchange = async () => {
 		const token = tokens[inputAssetIndex];
 		if(!address) return;
-		if(swapData.recipient == ADDRESS_ZERO) {
-			console.log("fetching again w", address);
+		if(swapData.recipient == "XYZ") {
 			updateInputAmount(inputAmount)
 			return;
 		};
