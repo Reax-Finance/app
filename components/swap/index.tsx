@@ -76,6 +76,7 @@ function Swap() {
 			})
 			.then((res) => {
 				resolve(res.data.data);
+				setError('')
 			})
 			.catch((err) => {
 				reject(err);
@@ -99,6 +100,7 @@ function Swap() {
 			})
 			.then((res) => {
 				resolve(res.data.data);
+				setError('');
 			})
 			.catch((err) => {
 				reject(err);
@@ -125,7 +127,6 @@ function Swap() {
 				setLoading(false);
 			})
 			.catch((err) => {
-				console.log(err);
 				setLoading(false);
 				setError('Insufficient liquidity')
 				// If estimation failed, set output to its perivous value
@@ -209,6 +210,12 @@ function Swap() {
 
 	const exchange = async () => {
 		const token = tokens[inputAssetIndex];
+		if(!address) return;
+		if(swapData.recipient == ADDRESS_ZERO) {
+			console.log("fetching again w", address);
+			updateInputAmount(inputAmount)
+			return;
+		};
 		if(shouldApprove()){
 			const routerAddress = getAddress("Router", chain?.id!);
 			if(token.isPermit) approve(token, routerAddress)
