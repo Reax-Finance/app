@@ -17,32 +17,37 @@ import {
 	NumberInput,
 	NumberInputField,
 	Divider,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
 	ADDRESS_ZERO,
+	NATIVE,
+	W_NATIVE,
 	dollarFormatter,
 } from "../../../src/const";
 import Big from "big.js";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import Link from "next/link";
 import { WETH_ADDRESS } from "../../../src/const";
-import { useNetwork, useAccount, useSignTypedData } from "wagmi";
-import { formatInput, isValidAndPositiveNS, parseInput } from "../../utils/number";
+import { useNetwork } from "wagmi";
+import { formatInput, parseInput } from "../../utils/number";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import Redeem from "./Redeem";
 import Supply from "./Supply";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
+import { VARIANT } from "../../../styles/theme";
 
 export default function SupplyModal({
 	market,
 	amount,
 	setAmount,
+	onClose
 }: any) {
 	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
 	const { walletBalances } = useBalanceData();
 	const [tabSelected, setTabSelected] = useState(0);
+	const [isMax, setIsMax] = useState(false);
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
@@ -50,10 +55,18 @@ export default function SupplyModal({
 
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
+		if(tabSelected == 1){
+			const balance = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
+			if(Number(e) > 0 && Big(e).eq(balance)){setIsMax(true)}
+			else {setIsMax(false)}
+		}
+		else {setIsMax(false)}
 		setAmount(e);
 	};
 
 	const selectTab = (index: number) => {
+		_setAmount("0");
+		setIsMax(false);
 		setTabSelected(index);
 	};
 
@@ -78,16 +91,18 @@ export default function SupplyModal({
 			let min = v1;
 			if(v2.lt(min)) min = v2;
 			if(v3.lt(min)) min = v3;
-
 			if(min.lt(0)) min = Big(0);
+
 			return min.toString();
 		}
 	};
     
+	const { colorMode } = useColorMode();
+	
 	return (
 		<>
 			<ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
-			<Box className="containerBody2">
+			<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 				<ModalCloseButton rounded={"full"} mt={1} />
 				<ModalHeader>
 					<Flex justify={"center"} gap={2} pt={1} align={"center"}>
@@ -100,8 +115,8 @@ export default function SupplyModal({
 					</Flex>
 				</ModalHeader>
 				<ModalBody m={0} p={0}>
-					<Divider />
-					<Box bg={'bg.600'} pb={12} pt={4} px={8}>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.200'}/>
+					<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} pb={12} pt={4} px={8}>
 						{market.inputToken.id ==
 							WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 							<>
@@ -117,14 +132,14 @@ export default function SupplyModal({
 										size="sm"
 									>
 										<TabList>
-											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`)}>
 											<Tab>
-												MNT
+												{NATIVE}
 											</Tab>
 											</Box>
-											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`)}>
 											<Tab>
-												WMNT
+												{W_NATIVE}
 											</Tab>
 											</Box>
 										</TabList>
@@ -159,7 +174,7 @@ export default function SupplyModal({
 									<Text
 										fontSize="sm"
 										textAlign={"center"}
-										color={"whiteAlpha.600"}
+										color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 									>
 										{dollarFormatter.format(
 											prices[market.inputToken.id] *
@@ -168,56 +183,58 @@ export default function SupplyModal({
 									</Text>
 								</Box>
 
-								<Box>
+								<Flex flexDir={'column'} justify={'center'}>
 									<Button
 										variant={"unstyled"}
 										fontSize="sm"
 										fontWeight={"bold"}
 										onClick={() =>
 											_setAmount(
-												Big(max()).div(2).toString()
+												Big(max()).div(2).toFixed(market.inputToken.decimals)
 											)
 										}
 										py={-2}
 									>
 										50%
 									</Button>
+									<Box className={isMax ? `${VARIANT}-${colorMode}-primaryButton` : "-"} px={2}>
 									<Button
 										variant={"unstyled"}
 										fontSize="sm"
 										fontWeight={"bold"}
-										onClick={() => _setAmount(max())}
+										onClick={() => _setAmount(Big(max()).toFixed(market.inputToken.decimals))}
+										my={-1}
 									>
-										MAX
+										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
 									</Button>
-								</Box>
+									</Box>
+								</Flex>
 							</NumberInput>
 						</InputGroup>
 					</Box>
-					<Divider />
-					<Box className="containerFooter">
+					<Box className={`${VARIANT}-${colorMode}-containerFooter`}>
 					<Tabs variant={'enclosed'} onChange={selectTab}>
 						<TabList>
 							<Tab
 								w={"50%"}
+								borderX={0}
+								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
 									color: "primary.400",
-									borderColor: "primary.400",
 								}}
 								rounded={0}
-								border={0}
 							>
 								Supply
 							</Tab>
-							<Divider orientation="vertical" h={'40px'} />
+							<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'} orientation="vertical" h={'44px'} />
 							<Tab
 								w={"50%"}
+								borderX={0}
+								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
-									color: "secondary.400",
-									borderColor: "secondary.400",
+									color: "secondary.400"
 								}}
 								rounded={0}
-								border={0}
 							>
 								Withdraw
 							</Tab>
@@ -231,6 +248,7 @@ export default function SupplyModal({
 									setAmount={_setAmount}
 									isNative={isNative}
                                     max={max()}
+									onClose={onClose}
 								/>
 							</TabPanel>
 							<TabPanel m={0} p={0}>
@@ -240,6 +258,8 @@ export default function SupplyModal({
 									setAmount={_setAmount}
 									isNative={isNative}
                                     max={max()}
+									isMax={isMax}
+									onClose={onClose}
 								/>
 							</TabPanel>
 						</TabPanels>

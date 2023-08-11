@@ -8,6 +8,7 @@ import {
 	useToast,
 	Link,
 	Select,
+	useColorMode,
 } from "@chakra-ui/react";
 import { getABI, getAddress, getContract, send } from "../../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
@@ -21,6 +22,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
+import { VARIANT } from "../../../styles/theme";
 
 const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, max }: any) => {
 	const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
-	const {markets, protocol} = useLendingData();
+	const {markets, protocol, updatePositions} = useLendingData();
 
 	const toast = useToast();
 
@@ -73,6 +75,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 			updateFromTx(response);
 			setAmount("0");
 			setLoading(false);
+			updatePositions();
 			toast({
 				title: "Borrow Successful",
 				description: <Box>
@@ -185,12 +188,14 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box px={5} pb={5} pt={0.5} >
 			<Box mt={6}>
 				<Flex align={'center'} justify={'space-between'} gap={'50'}>
-					<Text color="whiteAlpha.600">Interest Rate</Text>
-					<Select borderColor={'whiteAlpha.200'} maxW={'50%'} rounded={0} value={debtType} onChange={(e) => setDebtType(e.target.value) }>
+					<Text color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>Interest Rate</Text>
+					<Select borderColor={colorMode == 'dark' ? 'whiteAlpha.200':'blackAlpha.200'} maxW={'50%'} rounded={0} value={debtType} onChange={(e) => setDebtType(e.target.value) }>
 						<option value='2'>Variable {(Number(market.rates.filter((rate: any) => rate.side == 'BORROWER' && rate.type == 'VARIABLE')[0]?.rate ?? 0)).toFixed(2)} %</option>
 						<option value='1'>Stable {(Number(market.rates.filter((rate: any) => rate.side == 'BORROWER' && rate.type == 'STABLE')[0]?.rate ?? 0)).toFixed(2)} %</option>
 					</Select>
@@ -201,7 +206,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 				<Text
 					mt={6}
 					fontSize={"sm"}
-					color="whiteAlpha.600"
+					color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 					fontWeight={"bold"}
 				>
 					Transaction Overview
@@ -211,7 +216,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 					rounded={8}
 				>
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Health Factor
 						</Text>
 						<Text fontSize={"md"}>
@@ -227,7 +232,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 					</Flex>
 					<Divider my={2} />
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Available to issue
 						</Text>
 						<Text fontSize={"md"}>
@@ -244,7 +249,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 			</Box>
 
 			<Box mt={6}>
-					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? "disabledSecondaryButton":'secondaryButton'}><Button
+					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? `${VARIANT}-${colorMode}-disabledSecondaryButton`: `${VARIANT}-${colorMode}-secondaryButton`}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
@@ -260,7 +265,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 					</Button>
 					</Box>}
 						
-					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? "disabledSecondaryButton":'secondaryButton'} > <Button
+					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? `${VARIANT}-${colorMode}-disabledSecondaryButton`:`${VARIANT}-${colorMode}-secondaryButton`} > <Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"

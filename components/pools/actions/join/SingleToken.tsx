@@ -34,6 +34,7 @@ export default function SingleTokenDeposit({ pool }: any) {
 
 	const deposit = async () => {
 		setLoading(true);
+        if(!address) return;
 		const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"));
         let _amounts = pool.tokens.map((token: any, i: number) => i == tokenSelectedIndex ? Big(amount).mul(10**pool.tokens[i].token.decimals).toFixed(0) : 0);
         // remove that amount from array
@@ -115,6 +116,7 @@ export default function SingleTokenDeposit({ pool }: any) {
 	const validate = () => {
         if(!isConnected) return {valid: false, message: "Connect wallet"};
 		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
+		if(loading) return {valid: false, message: "Loading..."}
 		// check balances
         if(isNaN(Number(amount)) || Number(amount) == 0) {
             return {
@@ -171,9 +173,8 @@ export default function SingleTokenDeposit({ pool }: any) {
     }
 
     const values = () => {
-        if(!validate().valid) return null;
+        if(isNaN(Number(amount)) || Number(amount) == 0) return null;
         if(!bptOut) return null;
-		// if(loading) return null;
         let poolValue = poolTokens.reduce((a: any, b: any) => {
             return a.add(Big(b.balance).mul(prices[b.token.id] ?? 0));
         }, Big(0)).toNumber();

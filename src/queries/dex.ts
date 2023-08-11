@@ -1,18 +1,21 @@
-import { mantleMainnet, mantleTestnet } from "../chains";
+import { lineaTestnet, mantleMainnet, mantleTestnet } from "../chains";
 
 const DEX_ENDPOINTS: any = {
     [mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_DEX_5001,
     [mantleMainnet.id]: process.env.NEXT_PUBLIC_GRAPH_DEX_5000,
+    [lineaTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_DEX_59140,
 }
 
 const MINICHEF_ENDPOINTS: any = {
     [mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_MINICHEF_5001,
     [mantleMainnet.id]: process.env.NEXT_PUBLIC_GRAPH_MINICHEF_5000,
+    [lineaTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_MINICHEF_59140,
 }
 
 const ROUTER_ENDPOINTS: any = {
     [mantleTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_ROUTER_5001,
     [mantleMainnet.id]: process.env.NEXT_PUBLIC_GRAPH_ROUTER_5000,
+    [lineaTestnet.id]: process.env.NEXT_PUBLIC_GRAPH_ROUTER_59140,
 }
 
 export const DEX_ENDPOINT = (chainId: number) => DEX_ENDPOINTS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? DEX_ENDPOINTS[mantleTestnet.id] : DEX_ENDPOINTS[mantleMainnet.id]);

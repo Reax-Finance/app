@@ -69,7 +69,7 @@ function Swap() {
 					amount: inputAmount,
 					kind: 0,
 					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? ADDRESS_ZERO,
+					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
 					slipage: maxSlippage
 				}
@@ -92,7 +92,7 @@ function Swap() {
 					amount: outputAmount,
 					kind: 1,
 					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? ADDRESS_ZERO,
+					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
 					slipage: maxSlippage
 				}
@@ -123,9 +123,9 @@ function Swap() {
 				setOutputAmount(Big(res.fData.estimatedOut).div(10**tokens[outputAssetIndex]?.decimals).toString());
 				setSwapData(res);
 				setLoading(false);
+				setError('');
 			})
 			.catch((err) => {
-				console.log(err);
 				setLoading(false);
 				setError('Insufficient liquidity')
 				// If estimation failed, set output to its perivous value
@@ -147,6 +147,8 @@ function Swap() {
 				setLoading(false);
 				let inputValue = Big(res.fData.estimatedIn).div(10**tokens[inputAssetIndex]?.decimals).toString();
 				setInputAmount(inputValue);
+				setError('');
+
 				calculateOutputAmount(inputValue)
 				.then((res: any) => {
 					setSwapData(res);
@@ -209,6 +211,11 @@ function Swap() {
 
 	const exchange = async () => {
 		const token = tokens[inputAssetIndex];
+		if(!address) return;
+		if(swapData.recipient == "XYZ") {
+			updateInputAmount(inputAmount)
+			return;
+		};
 		if(shouldApprove()){
 			const routerAddress = getAddress("Router", chain?.id!);
 			if(token.isPermit) approve(token, routerAddress)

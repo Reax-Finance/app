@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Info from "../infos/Info";
-import { Flex, Text, Box, Heading, Button, useToast, Divider, Tooltip, IconButton, Image } from "@chakra-ui/react";
+import { Flex, Text, Box, Heading, Button, useToast, Divider, Tooltip, IconButton, Image, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { IoMdAnalytics, IoMdCash } from "react-icons/io";
 import IconBox from "./IconBox";
@@ -17,6 +17,7 @@ import { getAddress, getContract, send } from "../../src/contract";
 import { usePriceData } from "../context/PriceContext";
 import { useSyntheticsData } from "../context/SyntheticsPosition";
 import { BsStars } from "react-icons/bs";
+import { HEADING_FONT, VARIANT } from "../../styles/theme";
 
 export default function Market() {
 	const { pools, tradingPool, account } = useAppData();
@@ -172,6 +173,8 @@ export default function Market() {
         });
     }
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Box
@@ -183,11 +186,11 @@ export default function Market() {
 				mb={6}
 			>
 				<Box>
-					<PoolSelector />
+					{pools.length > 1 ? <PoolSelector /> : <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={{sm: '3xl', md: "3xl", lg: '32px'}}>{pools[0]?.name}</Heading>}
 					<Flex mt={8} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>
-								Total Supply
+								Total Collateral
 							</Heading>
 							<Heading size={"sm"}>{dollarFormatter.format(totalCollateral ?? 0)}</Heading>
 						</Flex>
@@ -227,15 +230,15 @@ export default function Market() {
 					?.userDebt > 0 || synAccrued > 0) &&
 					<Box textAlign={"right"}>
 					<Flex justify={'end'} align={'center'} gap={1}>
-						<Heading size={"sm"} color={"whiteAlpha.600"}>
+						<Heading size={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Rewards
 						</Heading>
 						<Tooltip label='Add to Metamask'>
 						<IconButton
 							icon={
 								<Image
-									src="https://cdn.consensys.net/uploads/metamask-1.svg"
-									w={"20px"}
+									src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png"
+									w={"16px"}
 									alt=""
 								/>
 							}
@@ -243,17 +246,18 @@ export default function Market() {
 							size={"xs"}
 							rounded="full"
 							aria-label={""}
+							p={1}
 						/>
 						</Tooltip>
 					</Flex>
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{synAccrued ? Big(synAccrued).div(10**18).toFixed(2) : '-'} </Text>
-							<Text fontSize={"2xl"} color={"whiteAlpha.400"}>
+							<Text fontSize={"2xl"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
 								{process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL!}
 							</Text>
 						</Flex>
-						<Box mt={2} w={'100%'} className="outlinedButton">
+						<Box mt={2} w={'100%'} className={`${VARIANT}-${colorMode}-outlinedButton`}>
 						<Button
 							onClick={claim}
 							bg={'transparent'}

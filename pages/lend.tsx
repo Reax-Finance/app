@@ -1,6 +1,7 @@
 import {
 	Box,
 	Flex,
+	useColorMode,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { AppDataContext } from "../components/context/AppDataProvider";
@@ -12,8 +13,9 @@ import YourSupplies from "../components/dashboard/lending/YourSupplies";
 import YourBorrows from "../components/dashboard/lending/YourBorrows";
 import LendingMarket from "../components/dashboard/lending/Market";
 import LendingPosition from "../components/dashboard/lending/Position";
+import { VARIANT } from "../styles/theme";
 
-export default function TempPage() {
+export default function Lend() {
 	const { pools, tradingPool, account } = useContext(AppDataContext);
 
 	const [hydrated, setHydrated] = React.useState(false);
@@ -23,6 +25,8 @@ export default function TempPage() {
 	}, []);
 
 	if (!hydrated) return <></>;
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
@@ -60,7 +64,7 @@ export default function TempPage() {
 									height: "100%",
 								}}
 							>
-								<Box className="containerBody" h={'100%'}>
+								<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
 									<YourSupplies />
 								</Box>
 							</motion.div>
@@ -75,7 +79,7 @@ export default function TempPage() {
 									height: "100%",
 								}}
 							>
-								<Box className="containerBody" h={'100%'}>
+								<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
 									<YourBorrows />
 								</Box>
 							</motion.div>
@@ -105,7 +109,7 @@ export default function TempPage() {
 									height: "100%",
 								}}
 							>
-								<Box className="containerBody" h={'100%'}>
+								<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
 									<SupplyTable />
 								</Box>
 							</motion.div>
@@ -118,7 +122,7 @@ export default function TempPage() {
 								transition={{ duration: 0.25 }}
 								key={tradingPool + 2}
 							>
-								<Box className="containerBody" h={'100%'}>
+								<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
 									<BorrowTable />
 								</Box>
 							</motion.div>

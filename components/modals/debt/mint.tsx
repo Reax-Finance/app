@@ -8,6 +8,7 @@ import {
 	Tooltip,
 	useToast,
 	Link,
+	useColorMode,
 } from "@chakra-ui/react";
 import { getContract, send } from "../../../src/contract";
 import { useContext, useEffect } from "react";
@@ -24,6 +25,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { VARIANT } from "../../../styles/theme";
 
 const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 	const router = useRouter();
@@ -143,15 +145,17 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box px={5} pb={5} pt={0.5} bg="transparent">
-			<Box
+			{/* <Box
 				mt={6}
 				rounded={8}
 			>
 				<Tooltip label={`Fee for Minting and Burning ${asset.token.symbol}`}>
 				<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Mint / Burn Fee
 						</Text>
 
@@ -168,13 +172,13 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 						</Text>
 					</Flex> 
 					</Tooltip>
-			</Box>
+			</Box> */}
 
 			<Box>
 				<Text
 					mt={6}
 					fontSize={"sm"}
-					color="whiteAlpha.600"
+					color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 					fontWeight={"bold"}
 				>
 					Transaction Overview
@@ -184,7 +188,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 					rounded={8}
 				>
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Health Factor
 						</Text>
 						<Text fontSize={"md"}>
@@ -201,7 +205,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 					</Flex>
 					<Divider my={2} />
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Available to issue
 						</Text>
 						<Text fontSize={"md"}>
@@ -217,7 +221,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 				</Box>
 			</Box>
 
-			<Box mt={6} className={!validate().valid ? "disabledSecondaryButton" : "secondaryButton"}>
+			<Box mt={6} className={!validate().valid ? `${VARIANT}-${colorMode}-disabledSecondaryButton` : `${VARIANT}-${colorMode}-secondaryButton`}>
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}

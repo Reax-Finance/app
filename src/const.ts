@@ -1,11 +1,23 @@
 import { ethers } from "ethers";
-import { mantleMainnet, mantleTestnet } from "./chains";
+import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet } from "./chains";
+import { mainnet } from "wagmi";
+import { scrollTestnet } from "@wagmi/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
-export const defaultChain = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? mantleTestnet: mantleMainnet;
+const NETWORKS: any = {
+	[mantleMainnet.id]: mantleMainnet,
+	[mantleTestnet.id]: mantleTestnet,
+	[lineaMainnet.id]: lineaMainnet,
+	[lineaTestnet.id]: lineaTestnet,
+	[scrollTestnet.id]: scrollTestnet,
+}
 
-export const NATIVE = "MNT";
-export const W_NATIVE = "WMNT";
+export const defaultChain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
+
+export const NATIVE = defaultChain.nativeCurrency.symbol;
+export const W_NATIVE = `W${NATIVE}`;
+export const ESYX_PRICE = 0.01;
+export const SUPPORTS_ROLLUP_GASFEES = false;
 
 export const DOLLAR_PRECISION = 0.01;
 
@@ -18,6 +30,7 @@ export const EIP712_VERSION = (asset: string) => VERSIONS[asset.toLowerCase()] ?
 const _WETH_ADDRESS: any = {
 	[mantleTestnet.id]: "0x5b156dca04f775046064032e1f5e45fd1fcca1e0".toLowerCase(),
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
+	[lineaTestnet.id]: "0x2c1b868d6596a18e32e61b901e4060c872647b6c".toLowerCase(),
 };
 
 export const PERP_CATEGORIES: any = {
@@ -25,15 +38,13 @@ export const PERP_CATEGORIES: any = {
     4: 'S'
 }
 
-export const ESYX_PRICE = 0.01;
-
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
-export const APP_NAME = 'Reax';
+export const APP_NAME = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
 
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[mantleMainnet.id]);
 
 export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://xc-testnet.pyth.network' : 'https://xc-mainnet.pyth.network';
-export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://routes-api.reax.one' : 'https://mainnet.router-api.reax.one';
+export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://routes.testnet.zksynth.com' : 'https://mainnet.router-api.reax.one';
 export const dollarFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
 	currency: "USD",

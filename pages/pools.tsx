@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Pools from '../components/pools'
 import Positions from '../components/pools/Positions'
-import { Flex, Heading, Text, Box, Button, useToast, Tooltip, IconButton, Image } from '@chakra-ui/react'
+import { Flex, Heading, Text, Box, Button, useToast, Tooltip, IconButton, Image, useColorMode } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useDexData } from '../components/context/DexDataProvider'
 import { defaultChain, dollarFormatter, tokenFormatter } from '../src/const'
@@ -9,6 +9,8 @@ import Big from 'big.js'
 import { BigNumber, ethers } from 'ethers'
 import { getABI, getAddress, send } from '../src/contract'
 import { useAccount } from 'wagmi'
+import { HEADING_FONT, VARIANT } from '../styles/theme'
+import { usePriceData } from '../components/context/PriceContext'
 
 export default function PoolsPage() {
   const { dex, pools } = useDexData();
@@ -89,7 +91,14 @@ export default function PoolsPage() {
           },
         }
     });
-}
+  }
+
+  const { colorMode } = useColorMode();
+  const { prices } = usePriceData();
+
+  const totalLiquidity = pools.reduce((total: string, pool: any) => Big(total).add(pool.tokens.reduce((acc: any, token: any) => {
+    return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
+  }, 0)), '0');
 
   return (
     <>
@@ -100,11 +109,11 @@ export default function PoolsPage() {
       <Flex flexDir={'column'} mb={'7vh'} mt={'80px'} gap={5}>
         <Flex justify={'space-between'} align={'center'}>
         <Flex flexDir={'column'} align={'start'} gap={6} mb={5}>
-          <Heading fontWeight={'bold'} fontSize={'32px'}>DEX Pools</Heading>
+          <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>DEX Pools</Heading>
           <Flex gap={8} mt={2}>
             <Flex align={'center'} gap={2}>
               <Heading color={'primary.400'} size={'sm'}>TVL </Heading>
-              <Heading size={'sm'}>{dollarFormatter.format(dex.totalLiquidity ?? 0)}</Heading>
+              <Heading size={'sm'}>{dollarFormatter.format(totalLiquidity ?? 0)}</Heading>
             </Flex>
             <Flex align={'center'} gap={2}>
               <Heading color={'secondary.400'} size={'sm'}>Total Volume </Heading>
@@ -116,14 +125,14 @@ export default function PoolsPage() {
 					(Big(rewardsAccrued).gt(0)) &&
 					<Box textAlign={"right"}>
 					<Flex justify={'end'} align={'center'} gap={1}>
-						<Heading size={"sm"} color={"whiteAlpha.600"}>
+						<Heading size={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Rewards
 						</Heading>
 						<Tooltip label='Add to Metamask'>
 						<IconButton
 							icon={
 								<Image
-									src="https://cdn.consensys.net/uploads/metamask-1.svg"
+									src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png"
 									w={"20px"}
 									alt=""
 								/>
@@ -138,11 +147,11 @@ export default function PoolsPage() {
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{rewardsAccrued ? Big(rewardsAccrued).div(10**18).toFixed(2) : '-'} </Text>
-							<Text fontSize={"2xl"} color={"whiteAlpha.400"}>
+							<Text fontSize={"2xl"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
               {process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
 							</Text>
 						</Flex>
-						<Box mt={2} w={'100%'} className="outlinedButton">
+						<Box mt={2} w={'100%'} className={`${VARIANT}-${colorMode}-outlinedButton`}>
 						<Button
 							onClick={claim}
 							bg={'transparent'}

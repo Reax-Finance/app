@@ -11,6 +11,7 @@ import {
 	NumberInputField,
 	Select,
 	Text,
+    useColorMode,
     useToast,
 } from "@chakra-ui/react";
 import { NATIVE, WETH_ADDRESS, defaultChain, dollarFormatter } from "../../../../../src/const";
@@ -18,6 +19,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { formatInput, parseInput } from "../../../../utils/number";
 import ValuesTable from "../../others/ValuesTable";
 import ValuesTable2 from "../../others/ValuesTable2";
+import { VARIANT } from "../../../../../styles/theme";
 
 export default function StableWithdrawLayout({
     pool,
@@ -40,12 +42,13 @@ export default function StableWithdrawLayout({
     const { prices } = usePriceData();
 
     const _isNativeToken = pool.tokens[tokenSelectedIndex].token.id == WETH_ADDRESS(chain?.id!) && isNative;
+    const { colorMode } = useColorMode();
 
     return (
     <>
-    <Divider />
+    <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
         <Box>
-            <Box bg={'bg.600'} py={4} pb={6} px={4}>
+            <Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} py={4} pb={6} px={4}>
                 <InputGroup
                     variant={"unstyled"}
                     display="flex"
@@ -72,7 +75,7 @@ export default function StableWithdrawLayout({
                             <Text
                                 fontSize="sm"
                                 textAlign={"left"}
-                                color={"whiteAlpha.600"}
+                                color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
                             >
                                 {dollarFormatter.format(((prices[pool.tokens[tokenSelectedIndex].token.id] ?? 0) * (Number(amount) || 0)) ?? 0)}
                             </Text>
@@ -80,7 +83,7 @@ export default function StableWithdrawLayout({
 
                         <Box>
                         <Flex justify={'end'} align={'center'} gap={2} mt={6}>
-                        <Flex cursor={'pointer'} className="outlinedBox" w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
+                        <Flex cursor={'pointer'} className={`${VARIANT}-${colorMode}-outlinedBox`} w={'125px'} p={2} py={2} pl={3} justify={'end'} align={'center'} gap={2} mt={2}>
 
                             <Image rounded={'full'} src={`/icons/${_isNativeToken ? NATIVE : pool.tokens[tokenSelectedIndex].token.symbol}.svg`} alt="" width={"30px"} />
                             <Select mr={-2} w={'110px'} value={tokenSelectedIndex + '-' + (isNative ? 'ETH' : pool.tokens[tokenSelectedIndex].token.symbol)} variant={'unstyled'} onChange={onSelectUpdate}>
@@ -125,8 +128,8 @@ export default function StableWithdrawLayout({
             </Box>
         </Box>
         <Divider mb={4}/>
-        <ValuesTable2 values={values} pool={pool} bptIn={bptIn} />
-        <Box className={validate().valid ? "primaryButton": "disabledPrimaryButton"} m={4}>
+        <ValuesTable2 values={values} pool={pool} bptIn={bptIn} maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} />
+        <Box className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`} m={4}>
         <Button size={'lg'} isLoading={loading} loadingText='Loading' isDisabled={!validate().valid} bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} onClick={withdraw}>
             {validate().message}
         </Button>

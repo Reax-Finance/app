@@ -21,6 +21,7 @@ interface BalanceValue {
     addAllowance: (asset: string, spender: string, value: string) => void;
     addNonce: (asset: string, value: string) => void;
     updateFromTx: (tx: any) => void;
+    setBalance: (asset: string, value: string) => void;
 }
 
 function BalanceContextProvider({ children }: any) {
@@ -321,7 +322,9 @@ function BalanceContextProvider({ children }: any) {
             let isOut = decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase();
             let isIn = decodedEvents[i].args[1].toLowerCase() == address?.toLowerCase();
             if(isIn || isOut){
+                console.log("Updating balance from", newBalances[decodedEvents[i].token], isOut ? '-' : '+', decodedEvents[i].args[2].toString());
                 newBalances[decodedEvents[i].token] = Big(walletBalances[decodedEvents[i].token] ?? 0)[isOut ? 'minus' : 'add'](decodedEvents[i].args[2].toString()).toFixed(0);
+                if(Big(newBalances[decodedEvents[i].token]).lt(0)) newBalances[decodedEvents[i].token] = "0";
             }
         }
         // Wrap and Unwrap Events from WETH
@@ -365,7 +368,7 @@ function BalanceContextProvider({ children }: any) {
             newAllowances[decodedEvents[i].token.toLowerCase()][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[3].toString();
         }
         setAllowances(newAllowances);
-        updateETHBalance(newBalances);
+        fetchBalances(address);
     }
 
     const updateETHBalance = async (_walletBalances = walletBalances) => {
@@ -382,6 +385,12 @@ function BalanceContextProvider({ children }: any) {
         } else {
             newBalances[asset] = Big(walletBalances[asset] ?? 0).plus(value).toFixed(0);
         }
+        setWalletBalances(newBalances);
+    }
+
+    const setBalance = async (asset: string, value: string) => {
+        const newBalances = {...walletBalances};
+        newBalances[asset] = value;
         setWalletBalances(newBalances);
     }
 
@@ -409,7 +418,8 @@ function BalanceContextProvider({ children }: any) {
         addAllowance,
         addNonce,
         tokens,
-        updateFromTx
+        updateFromTx,
+        setBalance
 	};
 
 	return (

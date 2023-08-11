@@ -10,6 +10,7 @@ import {
 	Text,
 	Box,
 	useDisclosure,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
 	ESYX_PRICE,
@@ -56,15 +57,17 @@ export default function Debt({ market, index }: any) {
 		return min;
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				_hover={{ bg: 'bg.400' }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<MarketInfo token={market.inputToken} color='secondary.200' />
+					<MarketInfo token={market.inputToken} color={colorMode == 'dark' ? "secondary.200" : "secondary.600"} />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					<Text textAlign={'center'} w={'100%'}>
@@ -73,8 +76,8 @@ export default function Debt({ market, index }: any) {
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 				<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text color='secondary.200'>
-							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
+						<Text color={colorMode == 'dark' ? "secondary.200" : "secondary.600"}>
+							-{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY("STABLE")) > 0 && <Flex gap={1} mt={0} align={'center'}>
 						<Text fontSize={'xs'}>
@@ -86,8 +89,8 @@ export default function Debt({ market, index }: any) {
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
 					<Flex flexDir={'column'} align={'right'} w={'100%'} textAlign={'right'}>
-						<Text color='secondary.200'>
-							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
+						<Text color={colorMode == 'dark' ? "secondary.200" : "secondary.600"}>
+							-{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY("VARIABLE")) > 0 && <Flex gap={1} mt={0} justify={'end'} align={'center'}>
 						<Text fontSize={'xs'}>

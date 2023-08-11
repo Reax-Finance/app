@@ -7,7 +7,8 @@ import {
 	IconButton,
 	Heading,
 	Divider,
-	Text
+	Text,
+	useColorMode
 } from "@chakra-ui/react";
 import AccountButton from '../ConnectButton'; 
 import React, { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
+import { VARIANT } from "../../styles/theme";
 
 function NavBar() {
 	const router = useRouter();
@@ -81,11 +83,11 @@ function NavBar() {
 			);
 			setIsSubscribed(true);
 		}
-		if (localStorage.getItem("chakra-ui-color-mode") === "light") {
-			localStorage.setItem("chakra-ui-color-mode", "dark");
-			// reload
-			window.location.reload();
-		}
+		// if (localStorage.getItem("chakra-ui-color-mode") === "light") {
+		// 	localStorage.setItem("chakra-ui-color-mode", "dark");
+		// 	// reload
+		// 	window.location.reload();
+		// }
 		if (
 			(!(isConnected && !isConnecting) || chain?.unsupported) &&
 			status !== Status.FETCHING &&
@@ -111,23 +113,25 @@ function NavBar() {
 
 	});
 
+	const {colorMode} = useColorMode();
+
 	return (
 		<>
-		<Flex justify={'center'} zIndex={0} mt={2} align='center' >
+		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={4} align='center' >
 			<Box minW='0' w={'100%'} maxW='1250px'>
 			<Flex align={"center"} justify="space-between" >
 				<Flex justify="space-between" align={"center"} w='100%'>
 					<Flex gap={10} align='center'>
 						<Image
-							src={"/logo-square.svg"}
+							src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo-${colorMode}.svg`}
 							alt=""
-							width="26px"
+							width="30px"
 							mb={0.5}
 						/>
 						<Flex
 							align="center"
 							display={{ sm: "none", md: "flex" }}
-							gap={2}
+							// gap={2}
 						>
 							<NavLocalLink
 								path={"/"}
@@ -135,13 +139,13 @@ function NavBar() {
 							></NavLocalLink>
 
 							<NavLocalLink
-								path={"/lend"}
-								title="Lend"
-							></NavLocalLink>
-							
-							<NavLocalLink
 								path={"/synthetics"}
-								title={"Synthetics"}
+								title={"Synths"}
+							></NavLocalLink>
+
+							<NavLocalLink
+								path={"/lend"}
+								title="Lending"
 							></NavLocalLink>
 							
 							<NavLocalLink
@@ -173,7 +177,7 @@ function NavBar() {
 					display={{ sm: "none", md: "flex" }}
 					justify="flex-end"
 					align={"center"}
-					gap={2}
+					// gap={2}
 					w='100%'
 				>
 					<NavLocalLink
@@ -189,12 +193,12 @@ function NavBar() {
 					<Box>
 						<AccountButton />
 					</Box>
-					{<Box>
+					<Box ml={2}>
 						<CustomConnectButton />
-					</Box>}
+					</Box>
 				</Flex>
 			</Flex>
-			<Divider/>
+			{/* {VARIANT == "edgy" && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400': 'blackAlpha.400'}/>} */}
 			</Box>
 
 

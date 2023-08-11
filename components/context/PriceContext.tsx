@@ -151,6 +151,7 @@ function PriceContextProvider({ children }: any) {
             }, 10000)
         })
     }
+    
     const value: PriceValue = {
 		prices,
         subStatus

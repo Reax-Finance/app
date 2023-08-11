@@ -1,8 +1,9 @@
-import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider, IconButton } from '@chakra-ui/react'
+import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider, IconButton, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 import { dollarFormatter, tokenFormatter } from '../../../src/const';
 import Big from 'big.js';
 import { usePriceData } from '../../context/PriceContext';
+import { VARIANT } from '../../../styles/theme';
 
 export default function Details({pool, isOpen, onClose}: any) {
 	
@@ -40,6 +41,8 @@ export default function Details({pool, isOpen, onClose}: any) {
 		return totalFees;
 	}
 
+    const {colorMode} = useColorMode();
+
   	return (<>
     <Modal
 		isCentered
@@ -49,7 +52,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 		<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
 		<ModalContent width={"30rem"} bgColor="transparent" shadow={0} rounded={0} mx={2}>
 			<ModalCloseButton variant={'ghost'} rounded={"0"} mt={1} />
-			<Box className='containerBody2'>
+			<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 			<ModalHeader>
 				<Flex justify={'space-between'}>
 				<Flex
@@ -87,8 +90,8 @@ export default function Details({pool, isOpen, onClose}: any) {
 				</Flex>
 			</ModalHeader>
 			<ModalBody p={0}>
-				<Divider />
-				<Box bg={'bg.600'}>
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+				<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'}>
 				<Flex>
 				<Box mx={4} my={4}>
 					<Text mt={2} mb={2}>Total Value Locked</Text>
@@ -112,7 +115,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 
 				</Flex>
 
-				<Divider />
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
 
 				<Flex>
 				<Box mx={4} my={4}>
@@ -154,7 +157,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 				</Box>
 				</Flex>
 
-				<Divider />
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
 
 				<Box mx={4} my={0}>
 					<Heading size={'md'} mt={2} mb={4}>Pool Composition</Heading>
@@ -178,7 +181,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 					</Flex>
 				</Box>
 				</Box>
-				<Box className='containerFooter2' h={6}></Box>
+				<Box className={`${VARIANT}-${colorMode}-containerFooter2`} h={6}></Box>
 			</ModalBody>
 		</Box>
 		</ModalContent>

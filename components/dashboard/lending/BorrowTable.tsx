@@ -10,7 +10,8 @@ import {
 	Box,
 	Heading,
 	Text,
-	Tfoot
+	Tfoot,
+	useColorMode
 } from "@chakra-ui/react";
 import {
 	Pagination,
@@ -27,25 +28,29 @@ import { Skeleton } from "@chakra-ui/react";
 import Borrow from "../../modals/borrow";
 import ThBox from "../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
+import { VARIANT } from "../../../styles/theme";
 
 const pageSize = 9;
 
 export default function CollateralTable() {
-	const { markets } = useLendingData();
+	const { markets, protocol } = useLendingData();
 
 	const { currentPage, setCurrentPage, pagesCount, pages } =
 		usePagination({
 			pagesCount: Math.ceil((markets?.length ?? 1) / pageSize) ?? 1,
 			initialState: { currentPage: 1 }
 		}
-	);	
+	);
+	
+	const { colorMode } = useColorMode();
 
+	const _markets = protocol?.eModeCategory?.assets ? protocol?.eModeCategory?.assets : markets;
 	return (
 		<Box>
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'secondary.300'}>Assets to Borrow</Heading>			
 			</Box>
-			{markets.length > 0 ? (
+			{_markets.length > 0 ? (
 				<TableContainer>
 					<Table variant="simple">
 						<Thead>
@@ -67,7 +72,7 @@ export default function CollateralTable() {
 							</Tr>
 						</Thead>
 						<Tbody>
-							{markets.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(
+							{_markets.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(
 								(market: any, index: number) => (
 									<Borrow market={market} key={index} index={index} />
 								)

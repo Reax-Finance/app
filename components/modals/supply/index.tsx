@@ -9,6 +9,7 @@ import {
 	Text,
 	Box,
 	useDisclosure,
+	useColorMode,
 } from "@chakra-ui/react";
 import { ESYX_PRICE, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
@@ -16,6 +17,7 @@ import TdBox from "../../dashboard/TdBox";
 import { MdCheck, MdWarning } from "react-icons/md";
 import SupplyModal from "./SupplyModal";
 import TokenInfo from "../_utils/TokenInfo";
+import { StarIcon } from "@chakra-ui/icons";
 
 export default function Supply({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -44,19 +46,20 @@ export default function Supply({ market, index }: any) {
 	}
 
 	const liquidity = Big(market?.totalDepositBalanceUSD ?? 0).sub(market?.totalBorrowBalanceUSD ?? 0).gt(0) ? Big(market?.totalDepositBalanceUSD ?? 0).sub(market?.totalBorrowBalanceUSD ?? 0) : Big(0);
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ borderColor: "primary.400", bg: "bg.400" }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<TokenInfo token={market.inputToken} color='primary.200' />
+					<TokenInfo token={market.inputToken} color={colorMode == 'dark' ? "primary.200" : "primary.600"} isNew={(Number(market.createdTimestamp) + 7 * 24 * 3600 > (Date.now() / 1000))} />
 				</TdBox>
 				
 				<TdBox
@@ -64,7 +67,7 @@ export default function Supply({ market, index }: any) {
 					alignBox='center'
 				>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text color={'primary.200'}>
+						<Text color={colorMode == 'dark' ? "primary.200" : "primary.600"}>
 						{Number(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0.5} align={'center'}>
@@ -104,6 +107,7 @@ export default function Supply({ market, index }: any) {
 				<SupplyModal market={market}
 					amount={amount}
 					setAmount={setAmount}
+					onClose={_onClose}
 				/>
 			</Modal>
 		</>

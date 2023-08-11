@@ -16,7 +16,7 @@ export default function useUpdateData() {
      * @returns 
      */
     const getUpdateData = async (
-        tokens = pools[tradingPool].collaterals.map((token: any) => token.token.id).concat(pools[tradingPool].synths.map((token: any) => token.token.id))
+        tokens = (pools[tradingPool]?.collaterals ?? []).map((token: any) => token.token.id).concat((pools[tradingPool]?.synths ?? []).map((token: any) => token.token.id))
     ) => {
         let pythFeeds: string[] = [];
         // get feeds for tokens
