@@ -135,11 +135,12 @@ export default function Debt({ synth, index }: any) {
 					$ {tokenFormatter.format(prices[synth.token.id] ?? 0)}
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
+					
 					{dollarFormatter.format(
-						Big(synth.synthDayData[0]?.dailyMinted ?? 0).add(synth.synthDayData[0]?.dailyBurned ?? 0)
+						Number(synth.synthDayData[0].dayId) == Math.floor(Date.now() / (1000 * 3600 * 24)) ? Big(synth.synthDayData[0]?.dailyMinted ?? 0).add(synth.synthDayData[0]?.dailyBurned ?? 0)
 							.mul(prices[synth.token.id] ?? 0)
                             .div(10**18)
-							.toNumber()
+							.toNumber() : 0
 					)}
 				</TdBox>
 				<TdBox isNumeric isFirst={index == 0} alignBox='right'>

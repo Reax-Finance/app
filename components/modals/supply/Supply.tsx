@@ -26,7 +26,7 @@ import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { VARIANT } from "../../../styles/theme";
 
-export default function Supply({ market, amount, setAmount, isNative, max }: any) {
+export default function Supply({ market, amount, setAmount, isNative, max, onClose }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const { chain } = useNetwork();
@@ -39,7 +39,7 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
-	const { toggleIsCollateral, protocol } = useLendingData();
+	const { toggleIsCollateral, protocol, updatePositions } = useLendingData();
 
 	const { walletBalances, nonces, allowances, updateFromTx, addNonce } = useBalanceData();
 
@@ -153,7 +153,9 @@ export default function Supply({ market, amount, setAmount, isNative, max }: any
 			setAmount('');
 			setApprovedAmount('0');
 			setData(null);
-			setDeadline('0')
+			setDeadline('0');
+			updatePositions();
+			onClose();
 			if(Number(approvedAmount) > 0){
 				addNonce(market.inputToken.id, '1');
 			}

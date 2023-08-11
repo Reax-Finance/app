@@ -49,10 +49,10 @@ function DEXDataProvider({ children }: any) {
 				})
 			])
 			.then(async (res) => {
-				if (res[0].data.errors) {
+				if (res[0].data.errors || res[1].data.errors || res[2].data.errors) {
 					setStatus(Status.ERROR);
 					setMessage("Network Error. Please refresh the page or try again later.");
-					reject(res[0].data.errors);
+					reject(res[0].data.errors ?? res[1].data.errors ?? res[2].data.errors);
 				} else {
 					let _dex: any = {};
 					_dex.leaderboard = res[2].data.data?.users;

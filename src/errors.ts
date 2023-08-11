@@ -124,7 +124,7 @@ const LENDING_ERRORS: any = {
     '55': 'Stable debt supply is not zero',
     '56': 'Variable debt supply is not zero',
     '57': 'Ltv validation failed',
-    '58': 'Inconsistent eMode category',
+    '58': 'Unable to set eMode. Please repay assets that are not in eMode', // Inconsistent eMode category.
     '59': 'Price oracle sentinel validation failed',
     '60': 'Asset is not borrowable in isolation mode',
     '61': 'Reserve has already been initialized',

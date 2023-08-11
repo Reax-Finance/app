@@ -42,7 +42,7 @@ export const query_lending = (address: string) => (
 		  _rewardsController
 		  _wrapper
 		}
-		markets (orderBy: totalValueLockedUSD, orderDirection: desc) {
+		markets (orderBy: totalValueLockedUSD, orderDirection: desc, where: {isActive: true}) {
 		  protocol {
 			_lendingPoolAddress
 			_priceOracle
@@ -108,6 +108,15 @@ export const query_lending = (address: string) => (
 			_enabledCollaterals {
 				id
 			}
+			eModeCategory {
+				id
+			}
+		}
+		emodeCategories {
+			id
+			label
+			ltv
+			liquidationThreshold
 		}
 		_meta {
 		  hasIndexingErrors

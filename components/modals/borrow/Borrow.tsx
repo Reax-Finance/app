@@ -34,7 +34,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const { lendingPosition } = useSyntheticsData();
 	const pos = lendingPosition();
 
-	const {markets, protocol} = useLendingData();
+	const {markets, protocol, updatePositions} = useLendingData();
 
 	const toast = useToast();
 
@@ -75,6 +75,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 			updateFromTx(response);
 			setAmount("0");
 			setLoading(false);
+			updatePositions();
 			toast({
 				title: "Borrow Successful",
 				description: <Box>

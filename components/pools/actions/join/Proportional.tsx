@@ -31,6 +31,7 @@ export default function ProportionalDeposit({ pool }: any) {
 
 	const deposit = async () => {
 		setLoading(true);
+		if(!address) return;
 		const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"));
 		let _amounts = amounts.map((amount: any, i: number) => Big(amount).mul(10**poolTokens[i].token.decimals).toFixed(0));
         let _minBptOut = Big(bptOut ?? 0).mul(100).div(100+Number(maxSlippage)).toFixed(0)

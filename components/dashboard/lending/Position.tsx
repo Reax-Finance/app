@@ -22,7 +22,7 @@ export default function LendingPosition() {
 
     return (
     <>
-        {Big(lendingPosition()?.collateral).gt(0) ? <Box
+        {Big(pos?.collateral).gt(0) ? <Box
             w='100%'
             display={{ sm: "block", md: "block" }}
             className={`${VARIANT}-${colorMode}-halfContainerBody`}

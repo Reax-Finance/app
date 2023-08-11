@@ -43,6 +43,7 @@ export default function BorrowModal({
 	const [tabSelected, setTabSelected] = useState(0);
 	let [debtType, setDebtType] = useState("2");
 	const [isNative, setIsNative] = useState(false);
+	const [isMax, setIsMax] = useState(false);
 
 	const { address } = useAccount();
 	const { walletBalances } = useBalanceData();
@@ -52,10 +53,28 @@ export default function BorrowModal({
 
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
+		if(tabSelected == 1){
+			const debtBalance =
+				debtType == "2"
+					? Big(walletBalances[market._vToken.id]).div(
+							10 ** market._vToken.decimals
+					  )
+					: Big(walletBalances[market._sToken.id]).div(
+							10 ** market._sToken.decimals
+					  );
+			if(Number(e) > 0 && Big(e).eq(debtBalance)){
+				setIsMax(true)
+			} else {
+				setIsMax(false)
+			}
+		}
+		else {setIsMax(false)}
 		setAmount(e);
 	};
 
 	const selectTab = (index: number) => {
+		_setAmount("0");
+		setIsMax(false);
 		setTabSelected(index);
 	};
 
@@ -173,23 +192,24 @@ export default function BorrowModal({
 										)}
 									</Text>
 								</Box>
-								<Box>
+								<Flex flexDir={'column'} justify={'center'} >
 									<Button
 										variant={"unstyled"}
 										fontSize="sm"
 										fontWeight={"bold"}
 										onClick={() =>
 											_setAmount(
-												Big(max()).div(2).toString()
+												Big(max()).div(2).toFixed(market.inputToken.decimals)
 											)
 										}
 										py={-2}
 									>
 										50%
 									</Button>
+									<Box className={isMax ? `${VARIANT}-${colorMode}-primaryButton` : "-"} px={2}>
 									<Button
 										variant={"unstyled"}
-										fontSize="sm"
+										fontSize="xs"
 										fontWeight={"bold"}
 										onClick={() =>
 											_setAmount(
@@ -199,13 +219,15 @@ export default function BorrowModal({
 															? 0.99
 															: 1
 													)
-													.toString()
+													.toFixed(market.inputToken.decimals)
 											)
 										}
+										my={-1}
 									>
-										MAX
+										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
 									</Button>
-								</Box>
+									</Box>
+								</Flex>
 							</NumberInput>
 						</InputGroup>
 					</Box>
@@ -229,7 +251,7 @@ export default function BorrowModal({
 								borderX={0}
 								borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 								_selected={{
-									color: "primary.400",
+									color: "secondary.400",
 								}}
 								rounded={0}
 							>
@@ -258,6 +280,7 @@ export default function BorrowModal({
 									debtType={debtType}
 									setDebtType={setDebtType}
 									max={max()}
+									isMax={isMax}
 								/>
 							</TabPanel>
 						</TabPanels>

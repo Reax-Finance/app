@@ -26,7 +26,7 @@ import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { VARIANT } from "../../../styles/theme";
 
-export default function Redeem({ market, amount, setAmount, isNative, max }: any) {
+export default function Redeem({ market, amount, setAmount, isNative, max, isMax, onClose }: any) {
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
 
@@ -45,18 +45,19 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const { nonces, allowances, updateFromTx } = useBalanceData();
-	const { markets, protocol } = useLendingData();
+	const { markets, protocol, updatePositions } = useLendingData();
 
 	const withdraw = async () => {
 		setLoading(true);
 		const priceFeedUpdateData = await getUpdateData(markets.map((m: any) => m.inputToken.id));
-		const _amount = Big(amount).mul(10**market.inputToken.decimals).toFixed(0);
+		const _amount = isMax ? ethers.constants.MaxUint256.toString() : Big(amount).mul(10**market.inputToken.decimals).toFixed(0);
 
 		let tx: any;
 		if(isNative){
 			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
 			const {v, r, s} = ethers.utils.splitSignature(data!);
 			let args = [market.inputToken.id, _amount, address, deadline, v, r, s, priceFeedUpdateData];
+			console.log(args);
 			tx = send(wrapper, "withdrawETHWithPermit", args);
 		} else {
 			const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
@@ -66,7 +67,6 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				address,
 				priceFeedUpdateData
 			];
-			
 			tx = send(pool, "withdraw", args)
 		}
 		tx.then(async (res: any) => {
@@ -75,6 +75,8 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 			setAmount('0');
 			setApprovedAmount('0')
 			setLoading(false);
+			updatePositions();
+			onClose();
 			toast({
 				title: "Withdrawal Successful",
 				description: <Box>
@@ -103,7 +105,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		setApproveLoading(true);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
 		const _amount = Big(amount).toFixed(market.inputToken.decimals, 0);
-		const value = ethers.utils.parseUnits(_amount, market.inputToken.decimals);
+		const value = isMax ? ethers.constants.MaxUint256 : ethers.utils.parseUnits(_amount, market.inputToken.decimals);
 		const wrapperAddress = protocol._wrapper;
 
 		signTypedDataAsync({
@@ -133,7 +135,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 			.then(async (res: any) => {
 				setData(res);
 				setDeadline(_deadline);
-				setApprovedAmount(_amount);
+				setApprovedAmount(isMax ? ethers.constants.MaxUint256.toString() : _amount);
 				setApproveLoading(false);
 				toast({
 					title: "Approval Signed",
@@ -161,13 +163,15 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		if(!isNative) return false;
 		const wrapperAddress = protocol._wrapper;
 		const _allowance = allowances[market.outputToken.id]?.[wrapperAddress] ?? 0;
-		if (Big(_allowance).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).eq(0)){
-			return true
-		} else if(Big(_allowance).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).lt(
-			parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
+		if(Big(_allowance).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).lte(
+			Big(amount).mul(10 ** (market.inputToken.decimals))
 		)) {
+			console.log(Big(_allowance).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).toString(), parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1);
+			console.log('1');
+			return true;
+		} else if(!isMax && Number(approvedAmount) > 0 && !Big(approvedAmount).eq(amount)){ 
 			return true
-		} else if(Number(approvedAmount) > 0 && !Big(approvedAmount).eq(amount)){ return true }
+		}
 		return false;
 	}
 
@@ -182,7 +186,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				stage: 0,
 				message: "Unsupported Network"
 			}
-		}
+		} else if(loading) {return {stage: 0, message: "Loading..."}}
 		else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
@@ -265,77 +269,6 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 						</Flex>
 					</Box>
 				</Box>
-
-				{/* <Box mt={6}>
-				{shouldApprove() ? <Button
-                    isDisabled={
-                        loading ||
-                        !isConnected ||
-                        chain?.unsupported ||
-                        !amount ||
-                        amountNumber == 0 ||
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) 
-                    }
-                    isLoading={loading}
-                    loadingText="Please sign the transaction"
-                    bgColor="secondary.400"
-                    width="100%"
-                    color="white"
-                    mt={2}
-                    onClick={approve}
-                    size="lg"
-                    rounded={0}
-                    _hover={{
-                        opacity: "0.5",
-                    }}
-                >
-                    {isConnected && !chain?.unsupported ? (
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
-                            <>Insufficient Collateral</>
-                        ) : !amount || amountNumber == 0 ? (
-                            <>Enter Amount</>
-                        ) : (
-                            <>Approve aWMNT</>
-                        )
-                    ) : (
-                        <>Please connect your wallet</>
-                    )}
-                </Button> :
-                <Button
-                    isDisabled={
-                        loading ||
-                        !isConnected ||
-                        chain?.unsupported ||
-                        !amount ||
-                        amountNumber == 0 ||
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) 
-                    }
-                    isLoading={loading}
-                    loadingText="Please sign the transaction"
-                    bgColor="transparent"
-                    width="100%"
-                    color="white"
-                    mt={2}
-                    onClick={withdraw}
-                    size="lg"
-                    rounded={0}
-                    _hover={{
-                        bg: "transparent",
-                    }}
-                >
-                    {isConnected && !chain?.unsupported ? (
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
-                            <>Insufficient Collateral</>
-                        ) : !amount || amountNumber == 0 ? (
-                            <>Enter Amount</>
-                        ) : (
-                            <>Withdraw</>
-                        )
-                    ) : (
-                        <>Please connect your wallet</>
-                    )}
-                </Button>}
-				</Box> */}
 
 				<Box mt={6}>
 					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`}><Button

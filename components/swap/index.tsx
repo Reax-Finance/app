@@ -76,7 +76,6 @@ function Swap() {
 			})
 			.then((res) => {
 				resolve(res.data.data);
-				setError('')
 			})
 			.catch((err) => {
 				reject(err);
@@ -100,7 +99,6 @@ function Swap() {
 			})
 			.then((res) => {
 				resolve(res.data.data);
-				setError('');
 			})
 			.catch((err) => {
 				reject(err);
@@ -125,6 +123,7 @@ function Swap() {
 				setOutputAmount(Big(res.fData.estimatedOut).div(10**tokens[outputAssetIndex]?.decimals).toString());
 				setSwapData(res);
 				setLoading(false);
+				setError('');
 			})
 			.catch((err) => {
 				setLoading(false);
@@ -148,6 +147,8 @@ function Swap() {
 				setLoading(false);
 				let inputValue = Big(res.fData.estimatedIn).div(10**tokens[inputAssetIndex]?.decimals).toString();
 				setInputAmount(inputValue);
+				setError('');
+
 				calculateOutputAmount(inputValue)
 				.then((res: any) => {
 					setSwapData(res);

@@ -16,9 +16,9 @@ import {
 import { useEffect, useState } from "react";
 import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
-import { RiArrowDropDownLine, RiArrowDropUpLine, RiArrowUpFill } from "react-icons/ri";
+import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 import { ADDRESS_ZERO, NATIVE, SUPPORTS_ROLLUP_GASFEES, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
-import { InfoOutlineIcon, SettingsIcon, WarningIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 import SelectBody from "./SelectBody";
 import { useBalanceData } from "../context/BalanceProvider";

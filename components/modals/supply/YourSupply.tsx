@@ -98,7 +98,7 @@ export default function YourSupply({ market, index }: any) {
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ borderColor: "primary.400", bg: "bg.400" }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox
 					isFirst={index == 0}
@@ -153,6 +153,7 @@ export default function YourSupply({ market, index }: any) {
 					setAmountNumber={setAmountNumber}
 					amount={amount}
 					setAmount={setAmount}
+					onClose={_onClose}
 				/>
 			</Modal>
 		</>

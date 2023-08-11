@@ -15,7 +15,6 @@ export default function swap() {
 					<Box bgImage={"/background-2.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100%"} h={"60%"} position={"absolute"} bottom={0} zIndex={-8} />
 					<Box bgGradient={`linear(to-t, ${colorMode == 'dark' ? 'black' : 'white'}Alpha.800, transparent)`} bgSize={"cover"} w={"100%"} h={"50%"} position={"absolute"} bottom={0} zIndex={-9} />
 				</Flex>
-
 				<Box w={"43%"} minW="400px" >
 					<motion.div
 						initial={{ opacity: 0, y: 15 }}

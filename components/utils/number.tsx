@@ -20,6 +20,8 @@ export const formatInput = (amount: string) => {
 }
 
 export const parseInput = (amount: string) => {
+    // remove invalid characters
+    amount = amount.replace(/[^0-9.]/g, '');
     // if more than 1 decimal, remove all decimals after the first
     if(amount.split('.').length > 2) {
         amount = amount.split('.')[0] + '.' + amount.split('.')[1];

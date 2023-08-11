@@ -27,10 +27,9 @@ import {
 } from "../../../src/const";
 import Big from "big.js";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import Link from "next/link";
 import { WETH_ADDRESS } from "../../../src/const";
-import { useNetwork, useAccount, useSignTypedData } from "wagmi";
-import { formatInput, isValidAndPositiveNS, parseInput } from "../../utils/number";
+import { useNetwork } from "wagmi";
+import { formatInput, parseInput } from "../../utils/number";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import Redeem from "./Redeem";
@@ -42,11 +41,13 @@ export default function SupplyModal({
 	market,
 	amount,
 	setAmount,
+	onClose
 }: any) {
 	const [isNative, setIsNative] = useState(false);
 	const { chain } = useNetwork();
 	const { walletBalances } = useBalanceData();
 	const [tabSelected, setTabSelected] = useState(0);
+	const [isMax, setIsMax] = useState(false);
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
@@ -54,10 +55,18 @@ export default function SupplyModal({
 
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
+		if(tabSelected == 1){
+			const balance = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
+			if(Number(e) > 0 && Big(e).eq(balance)){setIsMax(true)}
+			else {setIsMax(false)}
+		}
+		else {setIsMax(false)}
 		setAmount(e);
 	};
 
 	const selectTab = (index: number) => {
+		_setAmount("0");
+		setIsMax(false);
 		setTabSelected(index);
 	};
 
@@ -82,8 +91,8 @@ export default function SupplyModal({
 			let min = v1;
 			if(v2.lt(min)) min = v2;
 			if(v3.lt(min)) min = v3;
-
 			if(min.lt(0)) min = Big(0);
+
 			return min.toString();
 		}
 	};
@@ -174,29 +183,32 @@ export default function SupplyModal({
 									</Text>
 								</Box>
 
-								<Box>
+								<Flex flexDir={'column'} justify={'center'}>
 									<Button
 										variant={"unstyled"}
 										fontSize="sm"
 										fontWeight={"bold"}
 										onClick={() =>
 											_setAmount(
-												Big(max()).div(2).toString()
+												Big(max()).div(2).toFixed(market.inputToken.decimals)
 											)
 										}
 										py={-2}
 									>
 										50%
 									</Button>
+									<Box className={isMax ? `${VARIANT}-${colorMode}-primaryButton` : "-"} px={2}>
 									<Button
 										variant={"unstyled"}
 										fontSize="sm"
 										fontWeight={"bold"}
-										onClick={() => _setAmount(max())}
+										onClick={() => _setAmount(Big(max()).toFixed(market.inputToken.decimals))}
+										my={-1}
 									>
-										MAX
+										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
 									</Button>
-								</Box>
+									</Box>
+								</Flex>
 							</NumberInput>
 						</InputGroup>
 					</Box>
@@ -236,6 +248,7 @@ export default function SupplyModal({
 									setAmount={_setAmount}
 									isNative={isNative}
                                     max={max()}
+									onClose={onClose}
 								/>
 							</TabPanel>
 							<TabPanel m={0} p={0}>
@@ -245,6 +258,8 @@ export default function SupplyModal({
 									setAmount={_setAmount}
 									isNative={isNative}
                                     max={max()}
+									isMax={isMax}
+									onClose={onClose}
 								/>
 							</TabPanel>
 						</TabPanels>

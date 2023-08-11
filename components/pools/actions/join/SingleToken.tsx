@@ -34,6 +34,7 @@ export default function SingleTokenDeposit({ pool }: any) {
 
 	const deposit = async () => {
 		setLoading(true);
+        if(!address) return;
 		const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"));
         let _amounts = pool.tokens.map((token: any, i: number) => i == tokenSelectedIndex ? Big(amount).mul(10**pool.tokens[i].token.decimals).toFixed(0) : 0);
         // remove that amount from array

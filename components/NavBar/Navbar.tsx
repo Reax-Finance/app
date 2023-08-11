@@ -145,7 +145,7 @@ function NavBar() {
 
 							<NavLocalLink
 								path={"/lend"}
-								title="Lend/Borrow"
+								title="Lending"
 							></NavLocalLink>
 							
 							<NavLocalLink
@@ -193,7 +193,7 @@ function NavBar() {
 					<Box>
 						<AccountButton />
 					</Box>
-					<Box>
+					<Box ml={2}>
 						<CustomConnectButton />
 					</Box>
 				</Flex>

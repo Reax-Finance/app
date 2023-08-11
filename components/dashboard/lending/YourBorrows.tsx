@@ -19,9 +19,10 @@ import YourBorrow from "../../modals/borrow/YourBorrow";
 import { usePriceData } from "../../context/PriceContext";
 import Big from "big.js";
 import { VARIANT } from "../../../styles/theme";
+import EModeMenu from "./EModeMenu";
 
 export default function YourBorrows() {
-	const { markets } = useLendingData();	
+	const { markets, protocol } = useLendingData();	
 	const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
 	const { colorMode } = useColorMode();
@@ -30,21 +31,22 @@ export default function YourBorrows() {
 		if(!walletBalances[market._vToken.id] || !walletBalances[market._sToken.id] || !prices[market.inputToken.id]) return false;
 		let variableDebt = Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals);
 		let stableDebt = Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals);
-		return variableDebt.gt(0.01) || stableDebt.gt(0.01);
+		return variableDebt.gt(0) || stableDebt.gt(0);
 	});
 
 	const suppliedMarkets = markets.filter((market: any) => {
 		// return walletBalances[market.outputToken.id] > 0;
 		if(!walletBalances[market.outputToken.id] || !prices[market.inputToken.id]) return false;
 		let supplied = Big(walletBalances[market.outputToken.id]).mul(prices[market.inputToken.id]).div(10**market.outputToken.decimals);
-		return supplied.gt(0.01);
+		return supplied.gt(0);
 	});
 
 	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (
 		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
-			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
-				<Heading fontSize={'18px'} color={'secondary.400'}>Your Borrows</Heading>
-			</Box>
+			<Flex className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={3} align={'center'} justify={'space-between'}>
+				<Heading fontSize={'18px'} color={'secondary.400'} py={2}>Your Borrows</Heading>
+				{protocol.eModes.length > 0 && <EModeMenu />}
+			</Flex>
 
 			{markets.length > 0 ? ( <>
 					{borrowedMarkets.length > 0 ? <TableContainer h='100%' pb={4}>
@@ -61,11 +63,11 @@ export default function YourBorrows() {
 									</ThBox>
 									<ThBox alignBox='center'>
 									<Text w={'100%'} textAlign={'center'}>
-									My Balance
+										My Balance
 									</Text>
 									</ThBox>
 									<ThBox alignBox='right' isNumeric>
-									Type
+										Type
 									</ThBox>
 								</Tr>
 							</Thead>

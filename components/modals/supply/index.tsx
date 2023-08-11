@@ -17,6 +17,7 @@ import TdBox from "../../dashboard/TdBox";
 import { MdCheck, MdWarning } from "react-icons/md";
 import SupplyModal from "./SupplyModal";
 import TokenInfo from "../_utils/TokenInfo";
+import { StarIcon } from "@chakra-ui/icons";
 
 export default function Supply({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -58,7 +59,7 @@ export default function Supply({ market, index }: any) {
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<TokenInfo token={market.inputToken} color={colorMode == 'dark' ? "primary.200" : "primary.600"} />
+					<TokenInfo token={market.inputToken} color={colorMode == 'dark' ? "primary.200" : "primary.600"} isNew={(Number(market.createdTimestamp) + 7 * 24 * 3600 > (Date.now() / 1000))} />
 				</TdBox>
 				
 				<TdBox
@@ -106,6 +107,7 @@ export default function Supply({ market, index }: any) {
 				<SupplyModal market={market}
 					amount={amount}
 					setAmount={setAmount}
+					onClose={_onClose}
 				/>
 			</Modal>
 		</>

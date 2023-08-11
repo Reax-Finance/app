@@ -43,7 +43,7 @@ export default function Footer() {
             <Flex zIndex={1000} align={'center'} gap={1}>
               <Box h={2} w={2} bgColor={block == 0 ? 'red': 'green.400'} rounded='100'></Box>
               <Text fontSize={'xs'}>{chain?.name} ({block == 0 ? 'Not Connected': block})</Text>
-              <Text fontSize={'xs'}>| v1.0.0-beta |</Text>
+              <Text fontSize={'xs'}>| v1.0.1-degen |</Text>
               {colorMode == 'dark' ? <MdDarkMode /> : <MdLightMode/>}
               <Switch zIndex={1000} size="sm" onChange={toggleColorMode} />
             </Flex>
