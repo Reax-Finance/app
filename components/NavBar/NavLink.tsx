@@ -23,7 +23,7 @@ export default function NavLink({
 	const { colorMode } = useColorMode();
 
 	return ( <Flex flexDir={'column'} align='center'>
-		<Flex h={VARIANT == 'edgy' ? '80px' : '60px'} 
+		<Flex my={2}
 		// mb={isPath ? '-2px' : 0} 
 		align={"center"}>
 			<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

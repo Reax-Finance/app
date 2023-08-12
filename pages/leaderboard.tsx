@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, IconButton, useColorMode } from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Heading, IconButton, Tag, useColorMode } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import {
   Table,
@@ -21,7 +21,9 @@ export default function Leaderboard() {
   const { dex } = useDexData();
   const {address} = useAccount();
 
-  const isAddressInLeaderboard = dex?.leaderboard?.some((account: any) => account.id.toLowerCase() === address?.toLowerCase());
+  const rank = dex?.leaderboard?.findIndex((account: any) => account.id.toLowerCase() === address?.toLowerCase()) + 1;
+  const isAddressInLeaderboard = rank > 0;
+  const multiplier = rank <= 0 ? '1x' : rank < 10 ? '2x' : rank < 25 ? '1.5x' : '1x';
 
   const {colorMode} = useColorMode();
 
@@ -36,7 +38,7 @@ export default function Leaderboard() {
       <Box>
       <Heading size={"lg"}>Trading Rewards</Heading>
       <Text mt={2} pb={5} color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
-        Get rewarded for trading on {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}. Build for traders, to be owned by traders.
+        Earn protocol ownership by trading on {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}. Build for traders, to be owned by traders.
       </Text>
       </Box>
 
@@ -48,17 +50,26 @@ export default function Leaderboard() {
         </Box>
         {/* <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />  */}
       </Flex>
-      <Flex gap={6} className={`${VARIANT}-${colorMode}-halfContainerBody2`} my={4} p={4} align={'center'}>
+      <Flex gap={6} className={`${VARIANT}-${colorMode}-halfContainerBody2`} my={4} p={4} align={'center'} wrap={'wrap'}>
           <PointBox title='Ending On' value={
             // Time for 4 weeks from now
-            new Date('31 Aug 2023').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
+            new Date('31 Aug 2023').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) + "*"
           } tbd={true} />
           <PointDivider />
           <PointBox title='Total Rewards' value={tokenFormatter.format(1000000) + ' ' + process.env.NEXT_PUBLIC_TOKEN_SYMBOL} tbd={true} />
           <PointDivider />
-          <PointBox title='Your Points' value={tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)} />
+          <PointBox title='Your Points' value={<Flex gap={1} align={'center'}> {tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)} <Tag p={1} size={'sm'} colorScheme={multiplier == '1.5x' ? 'primary' : (multiplier == "2x" ? 'secondary' : 'white')}>{multiplier}</Tag> </Flex>} />
           <PointDivider />
           <PointBox title='Your Volume' value={dollarFormatter.format(dex?.yourPoints?.totalVolumeUSD ?? 0)} />
+          <PointDivider />
+          <PointBox title='Estimated Rewards' value={tokenFormatter.format(
+            dex?.totalPoints > 0 ? 1000000 * (dex?.yourPoints?.totalPoints / dex?.totalPoints) : 0
+          ) + ' ' + process.env.NEXT_PUBLIC_TOKEN_SYMBOL + "*"} tbd={true} />
+          <Box>
+            <Button colorScheme='primary' size='sm' variant='outline' rounded={0} isDisabled={true}>Claim Rewards</Button>
+          </Box>
+          <PointDivider />
+          <PointBox title='* To be updated' value={""} tbd={true} />
         </Flex>
 
       </Box>

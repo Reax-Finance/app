@@ -117,7 +117,7 @@ function NavBar() {
 
 	return (
 		<>
-		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={4} align='center' >
+		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={8} align='center' >
 			<Box minW='0' w={'100%'} maxW='1250px'>
 			<Flex align={"center"} justify="space-between" >
 				<Flex justify="space-between" align={"center"} w='100%'>
@@ -131,7 +131,6 @@ function NavBar() {
 						<Flex
 							align="center"
 							display={{ sm: "none", md: "flex" }}
-							// gap={2}
 						>
 							<NavLocalLink
 								path={"/"}
@@ -214,18 +213,18 @@ const MobileNav = ({}: any) => {
 	const router = useRouter();
 	const { dex } = useDexData();
 	return (
-		<Flex flexDir={"row"} wrap={'wrap'} gap={2}>
+		<Flex flexDir={"row"} wrap={'wrap'} gap={0}>
 			<NavLocalLink
 				path={"/"}
 				title={"Trade"}
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/lend"}
-				title="Lend"
+				path={"/synthetics"}
+				title="Synths"
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/synthetics"}
-				title="Synthetics"
+				path={"/lend"}
+				title="Lending"
 			></NavLocalLink>
 			<NavLocalLink
 				path={"/pools"}

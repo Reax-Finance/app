@@ -79,6 +79,10 @@ export const query_leaderboard = (address: string) => (`
         totalPoints
         totalVolumeUSD
     }
+    pools(orderBy: totalVolumeUSD, orderDirection: desc) {
+        id
+        totalVolumeUSD
+    }
 }`)
 
 

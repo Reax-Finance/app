@@ -46,7 +46,7 @@ function BalanceContextProvider({ children }: any) {
 	const fetchBalances = async (_address?: string) => {
         console.log("Fetching balances for:", _address);
         setStatus(Status.FETCHING);
-        const chainId = chain?.id ?? defaultChain.id;
+        const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),

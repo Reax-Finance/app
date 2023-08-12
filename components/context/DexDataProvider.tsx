@@ -56,6 +56,7 @@ function DEXDataProvider({ children }: any) {
 				} else {
 					let _dex: any = {};
 					_dex.leaderboard = res[2].data.data?.users;
+					_dex.totalPoints = res[2].data.data?.pools[0].totalVolumeUSD * 0.5 + res[2].data.data?.pools[1].totalVolumeUSD * 1;
 					_dex.yourPoints = res[2].data.data?.user;
 					_dex.totalLiquidity = res[0].data.data.balancers[0].totalLiquidity;
 					_dex.totalSwapVolume = res[0].data.data.balancers[0].totalSwapVolume;

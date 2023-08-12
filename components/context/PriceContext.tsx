@@ -38,7 +38,7 @@ function PriceContextProvider({ children }: any) {
     }, [selectedLendingMarket, pools, address, subStatus]);
 
 	const updatePrices = async () => {
-        const chainId = chain?.id ?? defaultChain.id;
+        const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),
@@ -48,8 +48,6 @@ function PriceContextProvider({ children }: any) {
         let reqs: any[] = [];
         const pythFeeds = [];
         const _prices = {...prices};
-        const itf = new ethers.utils.Interface(getABI("MockToken", chainId));
-        const pool = new ethers.Contract(pools[0].id, getABI("Pool", chainId), helper.provider);
         
         for (let i = 0; i < pools.length; i++) {
             const priceOracle = new ethers.Contract(pools[i].oracle, getABI("PriceOracle", chainId), helper.provider);
@@ -65,13 +63,13 @@ function PriceContextProvider({ children }: any) {
             }
             for(let j in pools[i].synths) {
                 const synth = pools[i].synths[j];
-                if(pools[i].synths[j].feed == ethers.constants.HashZero.toLowerCase() || pools[i].synths[j].feed.startsWith('0x0000000000000000000000')){
+                if(synth.feed == ethers.constants.HashZero.toLowerCase() || synth.feed.startsWith('0x0000000000000000000000')){
                     reqs.push([
                         pools[i].oracle,
-                        priceOracle.interface.encodeFunctionData("getAssetPrice", [pools[i].synths[j].token.id])
+                        priceOracle.interface.encodeFunctionData("getAssetPrice", [synth.token.id])
                     ])
                 } else {
-                    pythFeeds.push(pools[i].synths[j].feed);
+                    pythFeeds.push(synth.feed);
                 }
             }
         }

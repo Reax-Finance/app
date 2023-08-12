@@ -3,6 +3,7 @@ import React from 'react'
 import { useAccount, useEnsName } from 'wagmi'
 import { defaultChain, dollarFormatter, tokenFormatter } from '../../src/const';
 import { IoMdOpen } from 'react-icons/io';
+import { FaMedal } from 'react-icons/fa';
 
 export default function LeaderboardRow({index, _account}: any) {
     const {address} = useAccount();
@@ -13,8 +14,9 @@ export default function LeaderboardRow({index, _account}: any) {
             <Td borderColor={'whiteAlpha.50'}>
             <Flex gap={2} align='center'>
                 <Text>
-                {index}
+                {index} 
                 </Text>
+                {index <= 3 && <FaMedal color={index == 1 ? '#FFD700' : index == 2 ? '#C0C0C0' : '#CD7F32'} />}
             </Flex>
             </Td>
             <Td borderColor={'whiteAlpha.50'} _hover={{cursor: 'pointer'}} onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + _account.id)}>
