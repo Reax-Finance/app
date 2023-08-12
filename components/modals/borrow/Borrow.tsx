@@ -24,7 +24,7 @@ import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { VARIANT } from "../../../styles/theme";
 
-const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, max }: any) => {
+const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, max, onClose }: any) => {
 	const [loading, setLoading] = useState(false);
 	const { isConnected, address } = useAccount();
 	const { chain } = useNetwork();
@@ -76,6 +76,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 			setAmount("0");
 			setLoading(false);
 			updatePositions();
+			onClose();
 			toast({
 				title: "Borrow Successful",
 				description: <Box>

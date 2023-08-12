@@ -12,7 +12,7 @@ import ProportionalWithdrawLayout from "./layouts/ProportionalWithdrawLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
-export default function ProportionalWithdraw({ pool }: any) {
+export default function ProportionalWithdraw({ pool, onClose }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
 	const [amounts, setAmounts] = React.useState(
 		poolTokens.map((token: any) => "")
@@ -56,6 +56,7 @@ export default function ProportionalWithdraw({ pool }: any) {
             updateFromTx(response);
 			setLoading(false);
 			setAmounts(poolTokens.map((token: any) => ""));
+			onClose();
 		})
 		.catch((err: any) => {
 			handleBalError(err);

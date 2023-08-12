@@ -15,7 +15,7 @@ import StableWithdrawLayout from "./layouts/StableWithdrawLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
-export default function SingleTokenWithdraw({ pool }: any) {
+export default function SingleTokenWithdraw({ pool, onClose }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
 	const [amount, setAmount] = React.useState('');
 	const { prices } = usePriceData();
@@ -98,6 +98,7 @@ export default function SingleTokenWithdraw({ pool }: any) {
             updateFromTx(response);
 			setLoading(false);
 			setAmount('');
+            onClose();
 		})
 		.catch((err: any) => {
 			handleBalError(err);

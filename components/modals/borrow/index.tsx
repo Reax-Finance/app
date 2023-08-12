@@ -104,7 +104,7 @@ export default function Debt({ market, index }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<BorrowModal market={market} amount={amount} setAmount={setAmount}/>
+				<BorrowModal market={market} amount={amount} setAmount={setAmount} onClose={_onClose} />
 			</Modal>
 		</>
 	);

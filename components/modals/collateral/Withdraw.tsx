@@ -26,7 +26,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { VARIANT } from "../../../styles/theme";
 
-export default function Withdraw({ collateral, amount, setAmount, isNative }: any) {
+export default function Withdraw({ collateral, amount, setAmount, isNative, onClose }: any) {
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
 	const [hash, setHash] = useState(null);
@@ -79,6 +79,7 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 			updateFromSynthTx(response);
 			setAmount('0');
 			setLoading(false);
+			onClose();
 			toast({
 				title: "Withdrawal Successful",
 				description: <Box>

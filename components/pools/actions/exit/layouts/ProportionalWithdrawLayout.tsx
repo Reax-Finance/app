@@ -175,7 +175,7 @@ export default function ProportionalWithdrawLayout({
 												fontWeight={"normal"}
 												textDecor={'underline'}
 												textDecorationStyle="dashed"
-												onClick={() => setMax(0.9999 - pool.swapFee)}
+												onClick={() => setMax(0.9999)}
 											>
 												MAX
 											</Button>

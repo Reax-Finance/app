@@ -11,7 +11,7 @@ import ProportionalDepositLayout from "./layouts/ProportionalDepositLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
-export default function ProportionalDeposit({ pool }: any) {
+export default function ProportionalDeposit({ pool, onClose }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
 	const [amounts, setAmounts] = React.useState(
 		poolTokens.map((token: any) => "")
@@ -79,6 +79,7 @@ export default function ProportionalDeposit({ pool }: any) {
 			updateFromTx(response);
 			setLoading(false);
 			setAmounts(poolTokens.map((token: any) => ""));
+			onClose();
 		})
 		.catch((err: any) => {
 			handleBalError(err);

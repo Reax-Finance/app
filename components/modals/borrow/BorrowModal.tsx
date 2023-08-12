@@ -37,7 +37,8 @@ import { VARIANT } from "../../../styles/theme";
 export default function BorrowModal({
 	market,
 	amount,
-	setAmount
+	setAmount,
+	onClose
 }: any) {
 	const { chain } = useNetwork();
 	const [tabSelected, setTabSelected] = useState(0);
@@ -82,7 +83,7 @@ export default function BorrowModal({
 		if (!address) return "0";
 		if (tabSelected == 0) {
 			if (!prices[market.inputToken.id] || prices[market.inputToken.id] == 0){return "0"}
-			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).div(prices[market.inputToken.id]);
+			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).div(prices[market.inputToken.id]).mul(0.999);
             let v2 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]).mul(0.99);
             let min = v1.lt(v2) ? v1 : v2;
 			if(min.lt(0)) min = Big(0);
@@ -212,15 +213,7 @@ export default function BorrowModal({
 										fontSize="xs"
 										fontWeight={"bold"}
 										onClick={() =>
-											_setAmount(
-												Big(max())
-													.mul(
-														tabSelected == 0
-															? 0.99
-															: 1
-													)
-													.toFixed(market.inputToken.decimals)
-											)
+											_setAmount(Big(max()).mul(1).toFixed(market.inputToken.decimals))
 										}
 										my={-1}
 									>
@@ -269,6 +262,7 @@ export default function BorrowModal({
 									debtType={debtType}
 									setDebtType={setDebtType}
 									max={max()}
+									onClose={onClose}
 								/>
 							</TabPanel>
 							<TabPanel m={0} p={0}>
@@ -281,6 +275,7 @@ export default function BorrowModal({
 									setDebtType={setDebtType}
 									max={max()}
 									isMax={isMax}
+									onClose={onClose}
 								/>
 							</TabPanel>
 						</TabPanels>
