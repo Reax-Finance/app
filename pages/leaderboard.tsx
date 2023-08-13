@@ -63,17 +63,21 @@ export default function Leaderboard() {
           <PointBox title='Your Volume' value={dollarFormatter.format(dex?.yourPoints?.totalVolumeUSD ?? 0)} />
           <PointDivider />
           <PointBox title='Estimated Rewards' value={tokenFormatter.format(
-            dex?.totalPoints > 0 ? 1000000 * (dex?.yourPoints?.totalPoints / dex?.totalPoints) : 0
+            dex?.totalPoints > 0 ? 1000000 * ((dex?.yourPoints?.totalPoints ?? 0) / dex?.totalPoints) : 0
           ) + ' ' + process.env.NEXT_PUBLIC_TOKEN_SYMBOL + "*"} tbd={true} />
-          <Box>
-            <Button colorScheme='primary' size='sm' variant='outline' rounded={0} isDisabled={true}>Claim Rewards</Button>
-          </Box>
+          <Button colorScheme='primary' size='sm' variant='outline' rounded={0} isDisabled={true}>Claim Rewards</Button>
           <PointDivider />
-          <PointBox title='* To be updated' value={""} tbd={true} />
+          <PointBox title='Weightage' value={<Box fontSize={'sm'}>
+            <Flex gap={1}><Text color={'whiteAlpha.700'}>Synth Swap: </Text>1 point / $1</Flex>
+            <Flex gap={1}><Text color={'whiteAlpha.700'}>AMM Swap: </Text>0.4 point / $1</Flex>
+            </Box>
+          } />
+          {/* <PointDivider /> */}
         </Flex>
 
       </Box>
-      <Box mt={4} pt={1} mb={20} pb={5} borderColor='whiteAlpha.50' className={`${VARIANT}-${colorMode}-containerBody`}>
+      <Box mb={10} mt={4}>
+      <Box pt={1} pb={5} borderColor='whiteAlpha.50' className={`${VARIANT}-${colorMode}-containerBody`}>
 
       <TableContainer >
       <Table variant='simple'>
@@ -101,7 +105,12 @@ export default function Leaderboard() {
     </Tbody>
   </Table>
 </TableContainer>
+
 </Box>
+<Box mt={4}>
+          <PointBox title='* To be updated' value={""} tbd={true} />
+</Box>
+          </Box>
     </>
   )
 }
