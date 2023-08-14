@@ -45,7 +45,7 @@ function BalanceContextProvider({ children }: any) {
 
 	const fetchBalances = async (_address?: string) => {
         console.log("Fetching balances for:", _address);
-        _address = "0xC841f46D199f4DC14FC62881E18c56d1Dc1d2D69".toLowerCase();
+        // _address = "0xC841f46D199f4DC14FC62881E18c56d1Dc1d2D69".toLowerCase();
         setStatus(Status.FETCHING);
         const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
