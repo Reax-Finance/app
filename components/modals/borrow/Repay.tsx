@@ -205,9 +205,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 	const approve = async () => {
 		setApproveLoading(true);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
-		const value = isMax ? ethers.constants.MaxUint256.toString() : Big(amount)
-		.times(10 ** market.inputToken.decimals)
-		.toFixed(0);
+		const value = isMax ? ethers.constants.MaxUint256.toString() : Big(amount).times(10 ** market.inputToken.decimals).toFixed(0);
 		signTypedDataAsync({
 			domain: {
 				name: market.inputToken.name,
@@ -235,7 +233,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 			.then(async (res: any) => {
 				setData(res);
 				setDeadline(_deadline);
-				setApprovedAmount(isMax ? ethers.constants.MaxUint256.toString() : Big(value).div(10 ** market.inputToken.decimals).toFixed(0));
+				setApprovedAmount(isMax ? ethers.constants.MaxUint256.toString() : Big(value).div(10 ** market.inputToken.decimals).toFixed(market.inputToken.decimals));
 				setApproveLoading(false);
 				toast({
 					title: "Approval Signed",

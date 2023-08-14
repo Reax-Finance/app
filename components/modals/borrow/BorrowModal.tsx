@@ -217,7 +217,7 @@ export default function BorrowModal({
 										}
 										my={-1}
 									>
-										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
+										{tabSelected == 1 && isMax ? 'CLOSE' : 'MAX'}
 									</Button>
 									</Box>
 								</Flex>

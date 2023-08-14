@@ -69,7 +69,7 @@ export default function Leaderboard() {
           <PointDivider />
           <PointBox title='Weightage' value={<Box fontSize={'sm'}>
             <Flex gap={1}><Text color={'whiteAlpha.700'}>Synth Swap: </Text>1 point / $1</Flex>
-            <Flex gap={1}><Text color={'whiteAlpha.700'}>AMM Swap: </Text>0.4 point / $1</Flex>
+            <Flex gap={1}><Text color={'whiteAlpha.700'}>AMM Swap: </Text>0.5 point / $1</Flex>
             </Box>
           } />
           {/* <PointDivider /> */}
