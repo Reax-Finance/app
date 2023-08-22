@@ -10,6 +10,8 @@ import { useRouter } from 'next/router';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 import { Status } from '../components/utils/status';
 import { defaultChain } from '../src/const';
+import { usePriceData } from '../components/context/PriceContext';
+import Success from '../components/modals/debt/Success';
 
 export default function Index({ children }: any) {
 	const router = useRouter();
@@ -39,6 +41,8 @@ export default function Index({ children }: any) {
 
 	const [hydrated, setHydrated] = useState(false);
 	const { status, message } = useContext(AppDataContext);
+	const { status: priceStatus } = usePriceData();
+
 	const { chain } = useNetwork();
 
 	useEffect(() => {
@@ -101,7 +105,7 @@ export default function Index({ children }: any) {
 					Switch to {defaultChain.name}
 				</Button>
 			</Flex>}
-			{(status == Status.FETCHING || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
+			{(status == Status.FETCHING || priceStatus !== Status.SUCCESS || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
 
 			<Box bgColor="gray.800" color={'gray.400'}>
 			{status == Status.ERROR && (

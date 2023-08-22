@@ -87,7 +87,7 @@ export default function Debt({ synth, index }: any) {
 					: 0
 			).toString();
 		} else {
-			const v1 = Big(pos.debt ?? 0).mul(0.9999).div(prices[synth.token.id] ?? 0);
+			const v1 = Big(pos.debt ?? 0).div(prices[synth.token.id] ?? 0);
 			const v2 = Big(walletBalances[synth.token.id] ?? 0).div(10 ** 18);
 			return (v1.gt(v2) ? v2 : v1).toString();
 		}

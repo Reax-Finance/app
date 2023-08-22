@@ -72,12 +72,12 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
 		const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"));
         
 		let args = [
-			1,
+			0,
 			[{
                 poolId: pool.id,
                 assetInIndex: pool.tokens.findIndex((t: any) => t.token.id == pool.address),
                 assetOutIndex: tokenSelectedIndex,
-                amount: Big(amount).mul(10**pool.tokens[tokenSelectedIndex].token.decimals).toFixed(0),
+                amount: Big(bptIn).toFixed(0),
                 userData: '0x'
             }],
 			pool.tokens.map((token: any, index: number) => token.token.id),
@@ -179,6 +179,45 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
 		})
 	}
 
+    const queryAmountOutWithSwap = (_bptIn = bptIn) => {
+		return new Promise((resolve, reject) => {
+			const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+			const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"), provider);
+            console.log(pool.tokens, tokenSelectedIndex);
+			let args = [
+				0,
+				[{
+                    poolId: pool.id,
+                    assetInIndex: pool.tokens.findIndex((t: any) => t.token.id == pool.address),
+                    assetOutIndex: tokenSelectedIndex,
+                    amount: Big(_bptIn).mul(10**18).toFixed(0),
+                    userData: '0x'
+                }],
+				pool.tokens.map((token: any, index: number) => token.token.id),
+				{
+					sender: address,
+					fromInternalBalance: false,
+					recipient: address,
+					toInternalBalance: false
+				}
+			];
+
+			vaultContract.callStatic.queryBatchSwap(...args)
+			.then((res: any) => {
+				resolve(Big(res[tokenSelectedIndex].toString()).abs().toString());
+				setLoading(false);
+			})
+			.catch((err: any) => {
+				if(formatBalError(err)){
+					reject(formatBalError(err));
+				} else {
+					reject(JSON.stringify(err));
+				}
+				setLoading(false);
+			})
+		})
+	}
+
     const queryBptIn = pool.poolType == 'ComposableStable' ? queryBptInWithSwap : queryBptInWithExit;
 
 	const validate = () => {
@@ -187,7 +226,7 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
 		if(loading) return {valid: false, message: "Loading..."}
 
 		// check balances
-        if(isNaN(Number(amount)) || Number(amount) == 0) {
+        if(isNaN(Number(bptIn)) || Number(bptIn) == 0) {
             return {
                 valid: false,
                 message: "Enter amount"
@@ -197,7 +236,7 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
                 valid: false,
                 message: error
             };
-        } else if(Big(amount).gt(max())) {
+        } else if(Big(bptIn).gt(walletBalances[pool.address])) {
             return {
                 valid: false,
                 message: "Insufficient balance"
@@ -242,7 +281,6 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
             setError('');
             setBptIn('');
             queryBptIn(value).then((res: any) => {
-                console.log(res);
                 setLoading(false);
                 setError('');
                 setBptIn(res);
@@ -254,19 +292,19 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
         }
     }
 
-    const max = () => {
-        const totalShares = Big(pool.totalShares);
-        const yourShares = Big(walletBalances[pool.address]).div(10 ** 18);
-        const totalPoolValue = pool.tokens.reduce((a: any, b: any) => {
-            return a.add(Big(b.balance).mul(prices[b.token.id] ?? 0));
-        }, Big(0));
-        let yourPoolValue = yourShares.mul(totalPoolValue).div(totalShares).div(prices[pool.tokens[tokenSelectedIndex].token.id] ?? 0);
-        if(yourPoolValue.gt(pool.tokens[tokenSelectedIndex].balance)) yourPoolValue = Big(pool.tokens[tokenSelectedIndex].balance);
-        return yourPoolValue.toString();
-    }
-
     const setMax = (multiplier: number) => {
-        _setAmount(Big(max()).mul(multiplier).toFixed());
+        setLoading(true);
+        let _bptIn = Big(walletBalances[pool.address]).div(10**18).mul(multiplier).toFixed(18);
+        queryAmountOutWithSwap(_bptIn)
+        .then((res: any) => {
+            setBptIn(Big(walletBalances[pool.address]).mul(multiplier).toString())
+            setAmount(Big(res).div(10**pool.tokens[tokenSelectedIndex].token.decimals).toFixed());
+            setLoading(false)
+        })
+        .catch((err) => {
+            console.log(err);
+            setLoading(false)
+        })
     }
 
 	return (

@@ -166,8 +166,6 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 		if(Big(_allowance).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).lte(
 			Big(amount).mul(10 ** (market.inputToken.decimals))
 		)) {
-			console.log(Big(_allowance).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).toString(), parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1);
-			console.log('1');
 			return true;
 		} else if(!isMax && Number(approvedAmount) > 0 && !Big(approvedAmount).eq(amount)){ 
 			return true

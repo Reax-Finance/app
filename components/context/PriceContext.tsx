@@ -3,22 +3,24 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
-import { ADDRESS_ZERO, PYTH_ENDPOINT, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, PYTH_ENDPOINT, REPLACED_FEEDS, WETH_ADDRESS, defaultChain } from "../../src/const";
 import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status, SubStatus } from "../utils/status";
 import axios from 'axios';
+import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 
 const PriceContext = React.createContext<PriceValue>({} as PriceValue);
 
 interface PriceValue {
     prices: any;
-    subStatus: SubStatus;
+    status: Status;
 }
 
 function PriceContextProvider({ children }: any) {
-    const [subStatus, setSubStatus] = React.useState<SubStatus>(SubStatus.NOT_SUBSCRIBED);
+    const [status, setStatus] = React.useState<Status>(Status.NOT_FETCHING);
 	const [prices, setPrices] = React.useState<any>({});
+    const [refresh, setRefresh] = React.useState(0);
 
 	const { chain } = useNetwork();
 
@@ -27,17 +29,16 @@ function PriceContextProvider({ children }: any) {
     const { address } = useAccount();
 
     React.useEffect(() => {
-        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools.length > 0 && selectedLendingMarket.length > 0) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0) {
             if(selectedLendingMarket[0].feed && pools[0].synths[0].feed){
-                setSubStatus(SubStatus.SUBSCRIBED);
-                console.log("Subscribed to price data");
                 updatePrices();
-                setInterval(updatePrices, 30000);
             }
         }
-    }, [selectedLendingMarket, pools, address, subStatus]);
+    }, [selectedLendingMarket, pools, address, status]);
 
 	const updatePrices = async () => {
+        setStatus(Status.FETCHING);
+        console.log("Fetching prices");
         const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
@@ -46,19 +47,24 @@ function PriceContextProvider({ children }: any) {
 			provider
 		);
         let reqs: any[] = [];
-        const pythFeeds = [];
+        const pythFeeds: any[] = [];
+        let _feedToAsset: any = {};
         const _prices = {...prices};
         
         for (let i = 0; i < pools.length; i++) {
             const priceOracle = new ethers.Contract(pools[i].oracle, getABI("PriceOracle", chainId), helper.provider);
             for(let j in pools[i].collaterals) {
-                if(pools[i].collaterals[j].feed == ethers.constants.HashZero.toLowerCase() || pools[i].collaterals[j].feed.startsWith('0x0000000000000000000000')){
+                let collateral = pools[i].collaterals[j];
+                if(collateral.feed == ethers.constants.HashZero.toLowerCase() || collateral.feed.startsWith('0x0000000000000000000000')){
                     reqs.push([
                         pools[i].oracle,
                         priceOracle.interface.encodeFunctionData("getAssetPrice", [pools[i].collaterals[j].token.id])
                     ])
                 } else {
-                    pythFeeds.push(pools[i].collaterals[j].feed);
+                    if(REPLACED_FEEDS[collateral.feed]) collateral.feed = REPLACED_FEEDS[collateral.feed];
+                    pythFeeds.push(collateral.feed);
+                    if(!_feedToAsset[collateral.feed]) _feedToAsset[collateral.feed] = [];
+                    _feedToAsset[collateral.feed].push(collateral.token.id);
                 }
             }
             for(let j in pools[i].synths) {
@@ -69,7 +75,10 @@ function PriceContextProvider({ children }: any) {
                         priceOracle.interface.encodeFunctionData("getAssetPrice", [synth.token.id])
                     ])
                 } else {
+                    if(REPLACED_FEEDS[synth.feed]) synth.feed = REPLACED_FEEDS[synth.feed];
                     pythFeeds.push(synth.feed);
+                    if(!_feedToAsset[synth.feed]) _feedToAsset[synth.feed] = [];
+                    _feedToAsset[synth.feed].push(synth.token.id);
                 }
             }
         }
@@ -84,18 +93,22 @@ function PriceContextProvider({ children }: any) {
                         priceOracle.interface.encodeFunctionData("getAssetPrice", [market.inputToken.id])
                     ])
                 } else {
+                    if(REPLACED_FEEDS[market.feed]) market.feed = REPLACED_FEEDS[market.feed];
                     pythFeeds.push(market.feed);
+                    if(!_feedToAsset[market.feed]) _feedToAsset[market.feed] = []
+                    _feedToAsset[market.feed].push(market.inputToken.id);
                 }
             }
-        }
+    }
 
-
+        const pythPriceService = new EvmPriceServiceConnection(PYTH_ENDPOINT);
         const allReqs = [helper.callStatic.aggregate(reqs)];
         if(pythFeeds.length > 0) {
             allReqs.push(
-                axios.get(PYTH_ENDPOINT + '/api/latest_price_feeds?ids[]=' + pythFeeds.join('&ids[]='))
-            )
+                pythPriceService.getLatestPriceFeeds(pythFeeds)
+            );
         }
+
         Promise.all(allReqs).then(async ([res, pythRes]: any) => {
             let pythIndex = 0;
             let reqCount = 0;
@@ -107,7 +120,7 @@ function PriceContextProvider({ children }: any) {
                         reqCount += 1;
                     } else {
                         // update price from pyth feed
-                        _prices[pools[i].collaterals[j].token.id] = Big(pythRes.data[pythIndex].price.price).mul(10**pythRes.data[pythIndex].price.expo).toString();
+                        _prices[pools[i].collaterals[j].token.id] = Big(pythRes[pythIndex].price.price).mul(10**pythRes[pythIndex].price.expo).toString();
                         pythIndex += 1;
                     }
                 }
@@ -119,7 +132,7 @@ function PriceContextProvider({ children }: any) {
                         reqCount += 1;
                     } else {
                         // update price from pyth feed
-                        _prices[pools[i].synths[j].token.id] = Big(pythRes.data[pythIndex].price.price).mul(10**pythRes.data[pythIndex].price.expo).toString();
+                        _prices[pools[i].synths[j].token.id] = Big(pythRes[pythIndex].price.price).mul(10**pythRes[pythIndex].price.expo).toString();
                         pythIndex += 1;
                     }
                 }
@@ -133,16 +146,20 @@ function PriceContextProvider({ children }: any) {
                         reqCount += 1;
                     } else {
                         // update price from pyth feed
-                        _prices[market.inputToken.id] = Big(pythRes.data[pythIndex].price.price).mul(10**pythRes.data[pythIndex].price.expo).toString();
+                        _prices[market.inputToken.id] = Big(pythRes[pythIndex].price.price).mul(10**pythRes[pythIndex].price.expo).toString();
                         pythIndex += 1;
                     }
                 }
             }
-            _prices[ADDRESS_ZERO] = _prices[WETH_ADDRESS(chainId)]
+            if(pythFeeds.length > 0) {
+                await pythPriceService.subscribePriceFeedUpdates(pythFeeds, (feed: any) => updatePythPrices(feed, _feedToAsset, _prices))
+            }
+            setStatus(Status.SUCCESS);
+            _prices[ADDRESS_ZERO] = _prices[WETH_ADDRESS(chainId)];
             setPrices(_prices);
         })
         .catch((err: any) => {
-            console.log("Error fetching prices", err);
+            // console.log("Error fetching prices", err);
             // Try again
             setTimeout(() => {
                 updatePrices();
@@ -150,15 +167,28 @@ function PriceContextProvider({ children }: any) {
         })
     }
     
+    const updatePythPrices = (res: any, feedToAsset: any, _prices: any) => {
+        for (let i in feedToAsset["0x"+res.id]){
+            _prices[feedToAsset["0x"+res.id][i]] = Big(res.price.price).mul(10**res.price.expo).toString();
+            if(feedToAsset["0x"+res.id][i] == WETH_ADDRESS(defaultChain.id)){
+                _prices[ADDRESS_ZERO] = _prices[WETH_ADDRESS(defaultChain.id)];
+            }
+        }
+        setPrices(_prices);
+        setRefresh(Math.random());
+    }
+
     const value: PriceValue = {
 		prices,
-        subStatus
+        status
 	};
+    
 
 	return (
 		<PriceContext.Provider value={value}>{children}</PriceContext.Provider>
 	);
 }
+
 
 const usePriceData = () => {
     const context = React.useContext(PriceContext);

@@ -16,7 +16,7 @@ export const defaultChain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainn
 
 export const NATIVE = defaultChain.nativeCurrency.symbol;
 export const W_NATIVE = `W${NATIVE}`;
-export const ESYX_PRICE = 0.01;
+export const ESYX_PRICE = 0.0075;
 export const SUPPORTS_ROLLUP_GASFEES = false;
 
 export const DOLLAR_PRECISION = 0.01;
@@ -45,6 +45,11 @@ export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (proc
 
 export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://xc-testnet.pyth.network' : 'https://xc-mainnet.pyth.network';
 export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://routes.testnet.zksynth.com' : 'https://mainnet.router-api.reax.one';
+
+export const REPLACED_FEEDS: any = {
+	"0x0e9ec6a3f2fba0a3df73db71c84d736b8fc1970577639c9456a2fee0c8f66d93": "0xd45b6d47bf43faa700e6f6fec4f8989fcc80eabb2f2eff862d7258d60026d1b5"
+}
+
 export const dollarFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
 	currency: "USD",

@@ -29,7 +29,7 @@ export default function ValuesTable({values, bptIn, pool, maxSlippage, setMaxSli
                 </Flex>
                 <Divider orientation="vertical" h='20px' borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />
                 <Flex gap={1}>
-                    <Text>{Number(values.slippage)}</Text>
+                    <Text>{Number(values.slippage).toFixed(2)}</Text>
                     <Text>%</Text>
                 </Flex>
             </Flex>

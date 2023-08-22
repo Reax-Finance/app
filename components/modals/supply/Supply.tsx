@@ -137,7 +137,7 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 				tx = send(
 					pool,
 					"supplyWithPermit",
-					[market.inputToken.id, _amount, address, 0, deadline, v, r, s]
+					[{asset: market.inputToken.id, amount: _amount, onBehalfOf: address, referralCode: 0, deadline, permitV: v, permitR: r, permitS: s}]
 				);
 			} else {
 				tx = send(

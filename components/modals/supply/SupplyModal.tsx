@@ -85,12 +85,12 @@ export default function SupplyModal({
 			const v1 = Big(pos.availableToIssue).div(prices[market.inputToken.id]).mul(100).div(market.maximumLTV);
 			const v2 = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
 			// Available to withdraw from pool
-			const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
-			
+			// const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
+
 			// find minimum of (v1, v2, v3)
 			let min = v1;
 			if(v2.lt(min)) min = v2;
-			if(v3.lt(min)) min = v3;
+			// if(v3.lt(min)) min = v3;
 			if(min.lt(0)) min = Big(0);
 
 			return min.toString();

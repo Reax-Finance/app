@@ -2153,7 +2153,7 @@
           "inputs": [
             {
               "internalType": "contract IPoolAddressesProvider",
-              "name": "poolAddressesProvider",
+              "name": "provider",
               "type": "address"
             }
           ],
@@ -2823,6 +2823,25 @@
         {
           "inputs": [
             {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "name": "borrowFees",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
               "internalType": "uint8",
               "name": "id",
               "type": "uint8"
@@ -2861,34 +2880,6 @@
             }
           ],
           "name": "configureEModeCategory",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "asset",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "onBehalfOf",
-              "type": "address"
-            },
-            {
-              "internalType": "uint16",
-              "name": "referralCode",
-              "type": "uint16"
-            }
-          ],
-          "name": "deposit",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -3268,50 +3259,6 @@
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            }
-          ],
-          "name": "getUserAccountData",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "totalCollateralBase",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "totalDebtBase",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "availableBorrowsBase",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "currentLiquidationThreshold",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "ltv",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "healthFactor",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "components": [
                 {
                   "internalType": "address",
@@ -3324,7 +3271,7 @@
                   "type": "bytes[]"
                 }
               ],
-              "internalType": "struct Pool_V2.GetUserAccountDataStruct",
+              "internalType": "struct IPool.GetUserAccountDataStruct",
               "name": "params",
               "type": "tuple"
             }
@@ -3452,39 +3399,6 @@
             }
           ],
           "name": "initialize",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "collateralAsset",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "debtAsset",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "debtToCover",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "receiveAToken",
-              "type": "bool"
-            }
-          ],
-          "name": "liquidationCall",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -3788,19 +3702,6 @@
               "internalType": "uint8",
               "name": "categoryId",
               "type": "uint8"
-            }
-          ],
-          "name": "setUserEMode",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint8",
-              "name": "categoryId",
-              "type": "uint8"
             },
             {
               "internalType": "bytes[]",
@@ -3863,43 +3764,69 @@
           "inputs": [
             {
               "internalType": "address",
-              "name": "asset",
+              "name": "",
               "type": "address"
-            },
+            }
+          ],
+          "name": "supplyFees",
+          "outputs": [
             {
               "internalType": "uint256",
-              "name": "amount",
+              "name": "",
               "type": "uint256"
-            },
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
             {
-              "internalType": "address",
-              "name": "onBehalfOf",
-              "type": "address"
-            },
-            {
-              "internalType": "uint16",
-              "name": "referralCode",
-              "type": "uint16"
-            },
-            {
-              "internalType": "uint256",
-              "name": "deadline",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint8",
-              "name": "permitV",
-              "type": "uint8"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "permitR",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "permitS",
-              "type": "bytes32"
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "asset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "onBehalfOf",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint16",
+                  "name": "referralCode",
+                  "type": "uint16"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "deadline",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "permitV",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "permitR",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "permitS",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct IPool.SupplyWithPermitParams",
+              "name": "params",
+              "type": "tuple"
             }
           ],
           "name": "supplyWithPermit",
@@ -3921,6 +3848,29 @@
             }
           ],
           "name": "swapBorrowRateMode",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "asset",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "supplyFee",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowFee",
+              "type": "uint256"
+            }
+          ],
+          "name": "updateAssetFees",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"

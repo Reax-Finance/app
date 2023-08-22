@@ -80,12 +80,12 @@ export default function EModeMenu({}: any) {
               className={`${VARIANT}-${colorMode}-outlinedBox`}
             >
                 <MdBolt color='orange' />
-                <Text fontSize={'sm'}>E-Mode: </Text>
-                {loading ? <CircularProgress isIndeterminate size={'16px'} color='secondary.400' /> : <Heading size={'xs'} color={'secondary.300'}>{protocol.eModeCategory ? protocol.eModeCategory.label : "Disabled"}</Heading>}
+                <Text color={colorMode == 'dark' ? 'white' : 'black'} fontSize={'sm'}>E-Mode: </Text>
+                {loading ? <CircularProgress isIndeterminate size={'16px'} color='secondary.400' /> : protocol.eModeCategory ? <Heading size={'xs'} color={'secondary.300'}>{protocol.eModeCategory.label}</Heading> : <Heading size={'xs'} color={colorMode == 'dark' ? 'white' : 'black'}>Disabled</Heading>}
             </Flex>
             </Box>
             <MenuList p={0} m={0} border={0} rounded={0} bg={'transparent'} shadow={'none'}>
-                <Box className={`${VARIANT}-${colorMode}-containerBody2`} pt={4} pb={2}>
+                <Box className={`${VARIANT}-${colorMode}-outlinedBox`} pt={4} pb={2}>
                 {protocol.eModes.map((eMode: any, index: number) => <>
                   <MenuDivider m={0} borderColor={'whiteAlpha.400'} />
                   <Box>

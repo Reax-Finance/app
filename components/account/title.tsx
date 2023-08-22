@@ -10,12 +10,20 @@ export default function Title() {
 
   return (
     <Flex pt="100px" justify={'space-between'}>
-    <Box >
-				<Heading size={"lg"}>
-					Your Account
-				</Heading>
-				<Text mt={1} color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>{address}</Text>				
-			</Box>
+    <Flex align={'end'} gap={2}>
+		{/* <Box className='primaryButton' maxW={'120px'}>
+					
+		</Box> */}
+		<Box>
+		<Heading size={"lg"}>
+			Your Account
+		</Heading>
+		<Heading fontSize={'md'} mt={1} color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
+			{address}
+		</Heading>
+		</Box>
+	</Flex>
+	
 
       <Box textAlign={'right'}>
 					<Heading size={"sm"} color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
