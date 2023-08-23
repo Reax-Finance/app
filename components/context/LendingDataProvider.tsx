@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
-import { LendingEndpoint, LendingEndpoint2, LendingEndpoints, query_lending } from "../../src/queries/lending";
+import { LendingEndpoints, query_lending } from "../../src/queries/lending";
 import useUpdateData from "../utils/useUpdateData";
 
 interface LendingDataValue {
@@ -142,8 +142,7 @@ function LendingDataProvider({ children }: any) {
 			let resultData = res[1];
 			let _positions = [];
 			for(let i = 0; i < resultData.length; i++){
-				if(i % 2 == 0) continue;
-				const _pool = await getContract("LendingPool", chainId, protocols[Math.floor(i/2)]._lendingPoolAddress);
+				const _pool = await getContract("LendingPool", chainId, protocols[i]._lendingPoolAddress);
 				const _marketDataDecoded = _pool.interface.decodeFunctionResult("getUserAccountData((address,bytes[]))", resultData[i]);
 				_positions.push({
 					totalCollateralBase: _marketDataDecoded[0].toString(),

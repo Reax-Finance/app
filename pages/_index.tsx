@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/NavBar/Navbar';
@@ -131,7 +131,6 @@ export default function Index({ children }: any) {
 					>
 					<Box zIndex={2} minW={{sm: '0', md: '0', lg: '1200px'}} w={'100%'} px={{sm: '4', md: '0'}}>
 						<Flex justify='center'>
-						
 							<Box minW={'0'} w='100%' maxW={'1200px'}>
 						<Navbar />
 						<motion.div 
@@ -141,8 +140,12 @@ export default function Index({ children }: any) {
 							transition={{duration: 0.25}}
 						>
 							<Box zIndex={1}>
-							
-							{children}
+								{process.env.NEXT_PUBLIC_UNDER_MAINTAINANCE == "true" ? <Flex h={'80vh'} align={'center'} justify={'center'}>
+									<Box textAlign={'center'}>
+									<Heading>App in under maintainance</Heading>
+									<Text color={'whiteAlpha.600'}>Please Check Back Again in a moment</Text>
+									</Box>
+								</Flex>:<>{children}</>}
 							</Box>
 						</motion.div>
 						</Box>
