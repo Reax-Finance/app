@@ -31,7 +31,7 @@ export default function YourBorrow({ market, index, type }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
-	const { walletBalances } = useBalanceData();
+	const { walletBalances, updateFromTx } = useBalanceData();
 	const { prices } = usePriceData();
 	const [loading, setLoading] = useState(false);
 
@@ -58,7 +58,7 @@ export default function YourBorrow({ market, index, type }: any) {
 		const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
 		send(pool, "swapBorrowRateMode", [market.inputToken.id, type == 'VARIABLE' ? '2' : '1'])
 		.then(async (res: any) => {
-			await res.wait();
+			updateFromTx(await res.wait(2));
 			toast({
 				title: `Switched ${type} to ${
 					type == "VARIABLE" ? "STABLE" : "VARIABLE"

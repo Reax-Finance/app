@@ -183,7 +183,6 @@ export default function SingleTokenWithdraw({ pool, onClose }: any) {
 		return new Promise((resolve, reject) => {
 			const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 			const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"), provider);
-            console.log(pool.tokens, tokenSelectedIndex);
 			let args = [
 				0,
 				[{

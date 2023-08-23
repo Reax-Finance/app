@@ -93,7 +93,7 @@ function SyntheticsPositionProvider({ children }: any) {
                 availableToIssue: Big(positions[_selectedPool].availableBorrowsBase).div(10**8).toString(),
                 collateral: Big(positions[_selectedPool].totalCollateralBase).div(10**8).toString(),
                 debt: Big(positions[_selectedPool].totalDebtBase).div(10**8).toString(),
-                debtLimit: Big(positions[_selectedPool].totalCollateralBase).gt(0) ? Big(positions[_selectedPool].totalDebtBase).div(positions[_selectedPool].totalCollateralBase).mul(100).toString(): 'Infinity',
+                debtLimit: Big(positions[_selectedPool].totalCollateralBase).gt(0) ? Big(positions[_selectedPool].totalDebtBase).div(positions[_selectedPool].totalCollateralBase).mul(100).toString(): '0',
                 adjustedCollateral: Big(positions[_selectedPool].totalCollateralBase).div(10**8).mul(positions[_selectedPool].ltv).div(10000).toString(),
                 ltv: positions[_selectedPool].ltv,
                 liqLtv: positions[_selectedPool].liquidationThreshold,

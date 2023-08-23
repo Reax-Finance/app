@@ -205,7 +205,7 @@ export default function SupplyModal({
 										onClick={() => _setAmount(Big(max()).toFixed(market.inputToken.decimals))}
 										my={-1}
 									>
-										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
+										{tabSelected == 1 && isMax ? 'CLOSE' : 'MAX'}
 									</Button>
 									</Box>
 								</Flex>

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { AppDataContext } from '../context/AppDataProvider';
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import { PYTH_ENDPOINT } from '../../src/const';
+import { PYTH_ENDPOINT, REPLACED_FEEDS } from '../../src/const';
 import { ethers } from 'ethers';
 
 export default function useUpdateData() {
@@ -23,12 +23,12 @@ export default function useUpdateData() {
         for(let i in pools){
             for(let j in pools[i].collaterals){
                 if(tokens.findIndex((token: any) => token == pools[i].collaterals[j].token.id) !== -1 && pools[i].collaterals[j].feed.slice(0, 20) !== ethers.constants.HashZero.slice(0, 20)){
-                    pythFeeds.push(pools[i].collaterals[j].feed);
+                    pythFeeds.push(REPLACED_FEEDS[pools[i].collaterals[j].feed] ?? pools[i].collaterals[j].feed);
                 }
             }
             for(let j in pools[i].synths){
                 if(tokens.findIndex((token: any) => token == pools[i].synths[j].token.id) !== -1 && pools[i].synths[j].feed.slice(0, 20) !== ethers.constants.HashZero.slice(0, 20)){
-                    pythFeeds.push(pools[i].synths[j].feed);
+                    pythFeeds.push(REPLACED_FEEDS[pools[i].synths[j].feed] ?? pools[i].synths[j].feed);
                 }
             }
         }

@@ -48,13 +48,11 @@ export default function EModeMenu({}: any) {
     let pool = await getContract('LendingPool', chain?.id!, protocol._lendingPoolAddress);
     let tx;
     let position = lendingPosition();
+    let data: string[] = [] 
     if(Number(position.debt) > 0){
-      const data = await getUpdateData(markets.map((m: any) => m.inputToken.id));
-      tx = send(pool, "setUserEMode(uint8,bytes[])", [eMode, data])
-    } else {
-      tx = send(pool, "setUserEMode(uint8)", [eMode])
+      data = await getUpdateData(markets.map((m: any) => m.inputToken.id));
     }
-    tx.then(async (res: any) => {
+    send(pool, "setUserEMode(uint8,bytes[])", [eMode, data]).then(async (res: any) => {
       res = await res.wait();
       setUserEMode(eMode);
       updatePositions();
