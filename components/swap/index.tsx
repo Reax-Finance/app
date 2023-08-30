@@ -212,7 +212,7 @@ function Swap() {
 	const exchange = async () => {
 		const token = tokens[inputAssetIndex];
 		if(!address) return;
-		if(swapData.recipient == "XYZ") {
+		if(swapData?.recipient == "XYZ") {
 			updateInputAmount(inputAmount)
 			return;
 		};

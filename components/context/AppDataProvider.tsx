@@ -57,7 +57,7 @@ function AppDataProvider({ children }: any) {
 		return new Promise((resolve, reject) => {
 			setStatus(Status.FETCHING);
 			const endpoint = Endpoints(chainId)
-			console.log("endpoint", endpoint);
+			console.log("Endpoint", endpoint);
 			if(!_address) _address = ADDRESS_ZERO;
 			Promise.all([
 				axios.post(endpoint, {

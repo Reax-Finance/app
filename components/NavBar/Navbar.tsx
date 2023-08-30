@@ -182,7 +182,7 @@ function NavBar() {
 					<NavLocalLink
 						path={"/leaderboard"}
 						title={<Flex gap={2} align={'center'}>
-						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> Points
+						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> <Text color={'white'}>Points</Text>
 						</Flex>}></NavLocalLink>
 						{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
 							<NavLocalLink
@@ -197,10 +197,7 @@ function NavBar() {
 					</Box>
 				</Flex>
 			</Flex>
-			{/* {VARIANT == "edgy" && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400': 'blackAlpha.400'}/>} */}
 			</Box>
-
-
 		</Flex>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
