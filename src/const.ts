@@ -38,6 +38,12 @@ export const PERP_CATEGORIES: any = {
     4: 'S'
 }
 
+export const EPOCH_REWARDS: any = {
+	1: 1_000_000,
+	2: 250_000,
+	3: 250_000
+}
+
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
 export const APP_NAME = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
 

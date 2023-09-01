@@ -20,6 +20,27 @@
 	background-size: 100% 51%;
 }
 
+.edgy-dark-halfButton {
+	background: linear-gradient(45deg, transparent 0px, #191e25 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #191e25 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-halfButton:hover {
+	background: linear-gradient(45deg, transparent 0px, #343d4d 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #343d4d 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-halfButtonSelected {
+	background: linear-gradient(45deg, transparent 0px, #252b36 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #252b36 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
 .edgy-dark-containerBody2 {
 	background: linear-gradient(45deg, transparent 10px, #252b36 0) bottom left,
 		linear-gradient(-135deg, transparent 10px, #252b36 0) top right;

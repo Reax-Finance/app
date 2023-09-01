@@ -70,20 +70,31 @@ export const query_dex = (address: string) => (`
 
 export const query_leaderboard = (address: string) => (`
 {
-    users(first: 49, orderBy: totalPoints, orderDirection: desc){
+    epoches{
+      id
+      totalVolumeUSD
+      userCount
+      totalPoints
+      merkleRoot
+      rewardsContract
+      users(first: 49, orderBy: totalPoints, orderDirection: desc){
+          id
+          address
+          totalPoints
+          totalVolumeUSD
+      }
+      startAt
+      endAt
+    }
+    epochUsers(where: {address_in: ["${address}"]}) {
+      epoch{
         id
-        totalPoints
-        totalVolumeUSD
+      }
+      address
+      totalPoints
+      totalVolumeUSD
     }
-    user(id: "${address}") {
-        totalPoints
-        totalVolumeUSD
-    }
-    pools(orderBy: totalVolumeUSD, orderDirection: desc) {
-        id
-        totalVolumeUSD
-    }
-}`)
+  }`)
 
 
 export const query_minichef = (address: string) => (`
