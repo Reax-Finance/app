@@ -89,7 +89,7 @@ export default function Debt({ synth, index }: any) {
 		} else {
 			const v1 = Big(pos.debt ?? 0).div(prices[synth.token.id] ?? 0);
 			const v2 = Big(walletBalances[synth.token.id] ?? 0).div(10 ** 18);
-			return (v1.gt(v2) ? v2 : v1).toString();
+			return (v1.gt(v2) ? v2 : v1).toFixed(18);
 		}
 	};
 
@@ -234,7 +234,7 @@ export default function Debt({ synth, index }: any) {
 											variant={"unstyled"}
 											fontSize="sm"
 											fontWeight={"bold"}
-											onClick={() => _setAmount(Big(max()).div(2).toString())}
+											onClick={() => _setAmount(Big(max()).div(2).toFixed(18))}
 											py={-2}
 										>
 											50%
@@ -243,7 +243,7 @@ export default function Debt({ synth, index }: any) {
 											variant={"unstyled"}
 											fontSize="sm"
 											fontWeight={"bold"}
-											onClick={() => _setAmount(Big(max()).toString())}
+											onClick={() => _setAmount(Big(max()).toFixed(18))}
 										>
 											MAX
 										</Button>

@@ -1,9 +1,10 @@
 import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider, IconButton, useColorMode } from '@chakra-ui/react'
 import React from 'react'
-import { dollarFormatter, tokenFormatter } from '../../../src/const';
+import { defaultChain, dollarFormatter, tokenFormatter } from '../../../src/const';
 import Big from 'big.js';
 import { usePriceData } from '../../context/PriceContext';
 import { VARIANT } from '../../../styles/theme';
+import { MdOpenInNew } from 'react-icons/md';
 
 export default function Details({pool, isOpen, onClose}: any) {
 	
@@ -14,10 +15,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 	}, 0)
 
 	const calcApy = () => {
-		let totalFees = 0;
-		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
-		}
+		let totalFees = fees7Days() / 2;
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return (dailyFee * 365);
 		const dailyApy = ((1 + dailyFee / liquidity) ** 365) - 1;
@@ -27,7 +25,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 	const fees7Days = () => {
 		let totalFees = 0;
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
+			totalFees = Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[pool.snapshots.length-1].swapFees);
 		}
 		return totalFees;
 	}
@@ -36,7 +34,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 		let totalFees = 0;
 		// pool.snapshots[-1].swapFees - pool.snapshots[-2].swapFees
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[pool.snapshots.length-2].swapFees);
+			totalFees = Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[1].swapFees);
 		}
 		return totalFees;
 	}
@@ -91,6 +89,12 @@ export default function Details({pool, isOpen, onClose}: any) {
 			</ModalHeader>
 			<ModalBody p={0}>
 				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+				<Flex bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} px={4} py={3} align={'center'} gap={1} _hover={{cursor: 'pointer'}} onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + pool.address)}>
+					<Text fontSize={'sm'}>{pool.address}</Text>
+					<MdOpenInNew size={'14px'}/>
+				</Flex>
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+
 				<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'}>
 				<Flex>
 				<Box mx={4} my={4}>

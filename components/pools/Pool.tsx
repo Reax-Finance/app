@@ -26,7 +26,7 @@ export default function Pool({ pool, index }: any) {
 	const calcApy = () => {
 		let totalFees = 0;
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
+			totalFees = (Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[pool.snapshots.length-1].swapFees)) / 2;
 		}
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return 0;

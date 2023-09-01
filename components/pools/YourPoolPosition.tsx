@@ -33,7 +33,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 	const calcApy = () => {
 		let totalFees = 0;
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
+			totalFees = (Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[pool.snapshots.length-1].swapFees)) / 2;
 		}
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return 0;
@@ -127,7 +127,7 @@ export default function YourPoolPosition({ pool, index }: any) {
 
 				<TdBox isFirst={index == 0} alignBox="center">
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text>{dollarFormatter.format(yourBalance())}</Text>
+						<Text color={'primary.200'}>{dollarFormatter.format(yourBalance())}</Text>
 						<Flex gap={1.5} mt={1} align={'center'}>
 						<Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'xs'}>{(calcApy()).toFixed(2)}%</Text>
 						</Flex>

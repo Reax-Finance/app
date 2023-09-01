@@ -57,7 +57,7 @@ export const query_dex = (address: string) => (`
             }
             tokensList
             totalShares
-            snapshots(first:7){
+            snapshots(first:7, orderBy: timestamp, orderDirection: desc){
               swapVolume
               swapFees
               timestamp

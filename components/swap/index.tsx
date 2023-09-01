@@ -242,11 +242,10 @@ function Swap() {
 					tx = send(router, "swap", [_swapData, pythData], ethAmount)
 				} else {
 					let calls = [];
-					if(Number(approvedAmount) > 0){
-						const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
+					if(Big(approvedAmount ?? 0).gt(0)){
 						const {v, r, s} = ethers.utils.splitSignature(data!);
 						calls.push(
-							router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
+							router.interface.encodeFunctionData("permit", [approvedAmount, deadline, token.id, v, r, s])
 						)
 					}
 					calls.push(
@@ -281,7 +280,7 @@ function Swap() {
 				setInputAmount('');
 				setOutputAmount('0');
 				setSwapData(null);
-				if(Number(approvedAmount) > 0){
+				if(Big(approvedAmount ?? 0).gt(0)){
 					addNonce(token.id, '1')
 					setApprovedAmount('0');
 					setDeadline('0');
@@ -337,8 +336,8 @@ function Swap() {
 	const approve = async (token: any, routerAddress: string) => {
 		setLoading(true);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * deadline_m).toFixed(0);
-		const _amount = Big(inputAmount).toFixed(token.decimals, 0);
-		const value = BigNumber.from(Big(_amount).mul(10**token.decimals).toFixed(0));
+		// const _amount = Big(inputAmount).toFixed(token.decimals, 0);
+		const value = ethers.constants.MaxUint256;
 		signTypedDataAsync({
 			domain: {
 				name: token.name,
@@ -366,16 +365,13 @@ function Swap() {
 			.then(async (res: any) => {
 				setData(res);
 				setDeadline(_deadline);
-				setApprovedAmount(_amount);
+				setApprovedAmount(ethers.constants.MaxUint256.toString());
 				setLoading(false);
 				toast({
 					title: "Approval Signed",
 					description: <Box>
 						<Text>
-							{`for ${_amount} ${token.symbol}`}
-						</Text>
-						<Text>
-							Please continue
+							{`For use of ${token.symbol}`}
 						</Text>
 					</Box>,
 					status: "info",
@@ -444,10 +440,9 @@ function Swap() {
 			tx = new Promise((resolve, reject) => resolve(100000));
 		} else {
 			let calls = [];
-			if(Number(approvedAmount) > 0){
-				const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
+			if(Big(approvedAmount ?? 0).gt(0)){
 				const {v, r, s} = ethers.utils.splitSignature(data!);
-				calls.push(router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s]))
+				calls.push(router.interface.encodeFunctionData("permit", [approvedAmount, deadline, token.id, v, r, s]))
 			}
 			calls.push(
 				router.interface.encodeFunctionData("swap", [_swapData, pythData])
