@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, IconButton, Tag, useColorMode } from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Heading, IconButton, Tag, Tooltip, useColorMode } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import {
   Table,
@@ -58,10 +58,12 @@ export default function Leaderboard({epochIndex}: any) {
           <PointDivider />
           <PointBox title='Your Volume' value={dollarFormatter.format(user?.totalVolumeUSD ?? 0)} />
           <PointDivider />
-          <PointBox title='Your Estimated Rewards' value={tokenFormatter.format(
+          <PointBox title={ending().title == "Ended" ? "Your Rewards" : 'Your Estimated Rewards'} value={tokenFormatter.format(
             epoches[epochIndex]?.totalPoints > 0 ? (EPOCH_REWARDS[Number(epoches[epochIndex]?.id) + 1] ?? 0) * ((user?.totalPoints ?? 0) / epoches[epochIndex]?.totalPoints) : 0
-          ) + ' ' + process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL + "*"} tbd={true} />
-          {/* <Button colorScheme='primary' size='sm' variant='outline' rounded={0} isDisabled={true}>Claim Rewards</Button> */}
+          ) + ' ' + process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL + (ending().title !== "Ended" ? "*" : '')} tbd={true} />
+          {ending().title == "Ended" && <Tooltip label="Reward distribution will start soon" placement="top">
+          <Button colorScheme='primary' size='sm' variant='outline' rounded={0} isDisabled={true}>Claim Rewards</Button>
+          </Tooltip>}
           {/* <PointDivider /> */}
           {/* <PointBox title='Weightage' value={<Box fontSize={'sm'}>
             <Flex gap={1}><Text color={'whiteAlpha.700'}>Synth Swap: </Text>1 point / $1</Flex>
