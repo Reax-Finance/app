@@ -34,15 +34,15 @@ export default function Leaderboard({epochIndex}: any) {
   const [days, hours, minutes, seconds] = useCountdown(epoches[epochIndex]?.endAt * 1000 || Date.now());
   // If ending today, show countdown from endAt, else show date
   const ending = () => {
-        if ((new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})) == new Date(Date.now()).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})){
+        if ((new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})) == new Date(Date.now()).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) && (epoches[epochIndex]?.endAt * 1000) > Date.now()){
             return {title: "Ending In", value: hours + ":"+ minutes + ":"+ seconds}
         }
         // If already ended, show ended
-        else if (new Date(epoches[epochIndex]?.endAt * 1000) < new Date(Date.now())){
-            return {title: "Ended", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
-        }        
+        else if ((epoches[epochIndex]?.endAt * 1000) < Date.now()){
+          return {title: "Ended", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+        }
         else {
-            return {title: "Ending On", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+          return {title: "Ending On", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
         }
     }
 
