@@ -90,11 +90,35 @@ export const query_leaderboard = (address: string) => (`
       epoch{
         id
       }
+      claim
+      claimAmount
       address
       totalPoints
       totalVolumeUSD
     }
   }`)
+
+  export const query_claim_rewards = (address: string, epoch: string) =>(
+   `{
+         epoch(id: "${epoch}") {
+          rewardsContract
+          users(where: {address: "${address}"}) {
+            claim
+            claimAmount
+          }
+        }
+    }`
+  )
+
+//   {
+//     epoch(id: "0") {
+//       rewardsContract
+//       users(where: {address: "0xbf59b84c9a7ad688d87abe3357f70039c1540006"}) {
+//         claim
+//         claimAmount
+//       }
+//     }
+//   }
 
 
 export const query_minichef = (address: string) => (`
