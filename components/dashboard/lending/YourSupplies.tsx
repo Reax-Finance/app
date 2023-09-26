@@ -38,10 +38,17 @@ export default function YourSupplies() {
 		return supplied.gt(0);
 	});
 
+	const borrowedMarkets = markets.filter((market: any) => {
+		if(!walletBalances[market._vToken.id] || !walletBalances[market._sToken.id] || !prices[market.inputToken.id]) return false;
+		let variableDebt = Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals);
+		let stableDebt = Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals);
+		return variableDebt.gt(0) || stableDebt.gt(0);
+	});
+
 	const { colorMode } = useColorMode();
 
-	if(suppliedMarkets.length > 0) return (
-		<Box>
+	if(suppliedMarkets.length > 0 || borrowedMarkets.length > 0) return (
+		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
 			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Your Supplies</Heading>
 			</Box>
@@ -81,9 +88,9 @@ export default function YourSupplies() {
 								)}
 							</Tbody>
 						</Table>
-					</TableContainer> : <Box py={5}>
+					</TableContainer> : <Flex flexDir={'column'} justify={'center'} h='100%' py={5}>
 						<Text textAlign={'center'} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>You have no supplied assets.</Text>
-						</Box>}
+						</Flex>}
 					</>
 			) : (
 				<Box pt={0.5}>
@@ -95,7 +102,7 @@ export default function YourSupplies() {
 					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
-		</Box>
+		</Flex>
 	);
 
 	else return <></>;
