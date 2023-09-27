@@ -20,12 +20,16 @@ import { usePriceData } from "../../context/PriceContext";
 import Big from "big.js";
 import { VARIANT } from "../../../styles/theme";
 import EModeMenu from "./EModeMenu";
+import { useRouter } from "next/router";
 
 export default function YourBorrows() {
-	const { markets, protocol } = useLendingData();	
+	const { pools, protocols } = useLendingData();	
 	const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
 	const { colorMode } = useColorMode();
+
+	const router = useRouter();
+	const markets = pools[Number(router.query.market) ?? 0] ?? [];
 	
 	const borrowedMarkets = markets.filter((market: any) => {
 		if(!walletBalances[market._vToken.id] || !walletBalances[market._sToken.id] || !prices[market.inputToken.id]) return false;
@@ -45,7 +49,7 @@ export default function YourBorrows() {
 		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
 			<Flex className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={3} align={'center'} justify={'space-between'}>
 				<Heading fontSize={'18px'} color={'secondary.400'} py={2}>Your Borrows</Heading>
-				{protocol.eModes.length > 0 && <EModeMenu />}
+				{protocols[Number(router.query.market) ?? 0].eModes.length > 0 && <EModeMenu />}
 			</Flex>
 
 			{markets.length > 0 ? ( <>

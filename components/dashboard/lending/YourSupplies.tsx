@@ -22,15 +22,17 @@ import ThBox from "./../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { useBalanceData } from "../../context/BalanceProvider";
 import YourSupply from "../../modals/supply/YourSupply";
-import { dollarFormatter, tokenFormatter } from '../../../src/const';
 import { usePriceData } from "../../context/PriceContext";
 import Big from "big.js";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 export default function YourSupplies() {
-	const { markets } = useLendingData();
+	const { pools } = useLendingData();
 	const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
+	const router = useRouter();
+	const markets = pools[Number(router.query.market) ?? 0] ?? [];
 
 	const suppliedMarkets = markets.filter((market: any) => {
 		if(!walletBalances[market.outputToken.id] || !prices[market.inputToken.id]) return false;

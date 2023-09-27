@@ -137,19 +137,19 @@ function NavBar() {
 								title="Trade"
 							></NavLocalLink>
 
-							<NavLocalLink
+							{/* <NavLocalLink
 								path={"/synthetics"}
 								title={"Synths"}
-							></NavLocalLink>
+							></NavLocalLink> */}
 
 							<NavLocalLink
 								path={"/lend"}
-								title="Lending"
+								title="Markets"
 							></NavLocalLink>
 							
 							<NavLocalLink
 								path={"/pools"}
-								title="Pools"
+								title="Liquidity"
 							></NavLocalLink>
 						</Flex>
 					</Flex>

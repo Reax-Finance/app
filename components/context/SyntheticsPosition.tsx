@@ -18,21 +18,21 @@ interface Position {
 
 interface SyntheticsPositionValue {
     poolDebt: () => string;
-    position: (_tradingPool?: number) => Position;
-    lendingPosition: (_tradingPool?: number) => Position;
-    netAPY: (_tradingPool?: number) => number;
-    netRewardsAPY: (_tradingPool?: number) => number;
-    netBorrowAPY: () => number;
-    netSupplyAPY: () => number;
-    supplied: () => number;
-    borrowed: () => number;
+    position: (_tradingPool: number) => Position;
+    lendingPosition: (_tradingPool: number) => Position;
+    netAPY: (_tradingPool: number) => number;
+    netRewardsAPY: (_tradingPool: number) => number;
+    netBorrowAPY: (_tradingPool: number) => number;
+    netSupplyAPY: (_tradingPool: number) => number;
+    supplied: (_tradingPool: number) => number;
+    borrowed: (_tradingPool: number) => number;
 }
 
 const SyntheticsPositionContext = React.createContext<SyntheticsPositionValue>({} as SyntheticsPositionValue);
 
 function SyntheticsPositionProvider({ children }: any) {
     const { pools, tradingPool } = useAppData();
-    const { pools: lendingPools, protocols: lendingProtocols, selectedPool, positions } = useLendingData();
+    const { pools: lendingPools, protocols: lendingProtocols, positions } = useLendingData();
     const { prices } = usePriceData();
     const { walletBalances } = useBalanceData();
 
@@ -87,7 +87,7 @@ function SyntheticsPositionProvider({ children }: any) {
         }
     }
 
-    const lendingPosition = (_selectedPool = selectedPool): Position => {
+    const lendingPosition = (_selectedPool: number): Position => {
         if(positions[_selectedPool] && positions[_selectedPool].ltv) {
             return {
                 availableToIssue: Big(positions[_selectedPool].availableBorrowsBase).div(10**8).toString(),
@@ -135,7 +135,7 @@ function SyntheticsPositionProvider({ children }: any) {
         }
     }
 
-    const supplied = (_selectedPool = selectedPool) => {
+    const supplied = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
 		let sum = markets.reduce((acc: number, market: any) => {
 			return acc + (Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
@@ -143,7 +143,7 @@ function SyntheticsPositionProvider({ children }: any) {
         return sum;
 	}
 
-    const netSupplyAPY = (_selectedPool = selectedPool) => {
+    const netSupplyAPY = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
 		// sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
 		let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
@@ -156,7 +156,7 @@ function SyntheticsPositionProvider({ children }: any) {
 	}
 
     // sum of all stable + variable borrows
-	const borrowed = (_selectedPool = selectedPool) => {
+	const borrowed = (_selectedPool: number) => {
 		let sum = Big(0);
         let markets = lendingPools[_selectedPool];
 		markets.forEach((market: any) => {
@@ -166,7 +166,7 @@ function SyntheticsPositionProvider({ children }: any) {
 		return sum.toNumber();
 	}
 
-	const netBorrowAPY = (_selectedPool = selectedPool) => {
+	const netBorrowAPY = (_selectedPool: number) => {
 		// sum of all(market.rates.filter((rate: any) => rate.side == "BORROWER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
 		let sum = Big(0);
 		let sumBalances = borrowed(_selectedPool);
@@ -192,7 +192,7 @@ function SyntheticsPositionProvider({ children }: any) {
 			.toFixed(2);
 	}
 
-    const netSupplyRewardsAPY = (_selectedPool = selectedPool) => {
+    const netSupplyRewardsAPY = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
         // sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
         let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
@@ -203,7 +203,7 @@ function SyntheticsPositionProvider({ children }: any) {
 		return sumOfRatesTimesBalance / sumOfBalances;
     }
 
-    const netBorrowRewardsAPY = (_selectedPool = selectedPool) => {
+    const netBorrowRewardsAPY = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
         // sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
         let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
@@ -214,7 +214,7 @@ function SyntheticsPositionProvider({ children }: any) {
         return sumOfRatesTimesBalance / sumOfBalances;
     }
 
-    const netRewardsAPY = (_selectedPool = selectedPool) => {
+    const netRewardsAPY = (_selectedPool: number) => {
         const netSupply = netSupplyRewardsAPY(_selectedPool);
         const netBorrow = netBorrowRewardsAPY(_selectedPool);
         const _supplied = supplied(_selectedPool);
@@ -223,7 +223,7 @@ function SyntheticsPositionProvider({ children }: any) {
         return (_supplied * netSupply + _borrowed * netBorrow) / (_supplied + _borrowed);
     }
 
-    const netAPY = (_selectedPool = selectedPool) => {
+    const netAPY = (_selectedPool: number) => {
         const netSupply = netSupplyAPY(_selectedPool);
         const netBorrow = netBorrowAPY(_selectedPool);
         const _supplied = supplied(_selectedPool);

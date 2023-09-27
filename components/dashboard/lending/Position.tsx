@@ -12,12 +12,14 @@ import { dollarFormatter, tokenFormatter } from '../../../src/const'
 import { useSyntheticsData } from '../../context/SyntheticsPosition'
 import { FaPercentage } from 'react-icons/fa'
 import { VARIANT } from '../../../styles/theme'
+import { useRouter } from 'next/router'
 
 export default function LendingPosition() {
     const { tradingPool } = useAppData();
     const { lendingPosition, netAPY, netRewardsAPY } = useSyntheticsData();
+    const router = useRouter();
 
-    const pos = lendingPosition();
+    const pos = lendingPosition(Number(router.query.market ?? 0));
 	const { colorMode } = useColorMode();
 
     return (
