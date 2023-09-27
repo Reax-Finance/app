@@ -53,7 +53,6 @@ export default function Lend() {
 					>
 						<Box
 							w={{ sm: "100%", md: "49%" }}
-							
 						>
 							<motion.div
 								initial={{ opacity: 0, y: 15 }}
