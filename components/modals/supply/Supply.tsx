@@ -365,8 +365,8 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 							<Text fontSize={"md"}>
 								{Big(pos.debtLimit).toFixed(2)} % 
 								{" -> "} 
-								{Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id]).gt(0) ? 
-									Big(pos.debt).div(Big(pos.collateral).add(Number(amount)*prices[market.inputToken.id])).mul(100).toFixed(1) 
+								{Big(pos.collateral).add(Number(amount)*(prices[market.inputToken.id] ?? 0)).gt(0) ? 
+									Big(pos.debt).div(Big(pos.collateral).add(Number(amount)*(prices[market.inputToken.id] ?? 0))).mul(100).toFixed(1) 
 								: '0'} %
 							</Text>
 						</Flex>
