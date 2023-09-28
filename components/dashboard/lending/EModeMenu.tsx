@@ -52,7 +52,7 @@ export default function EModeMenu({}: any) {
     setLoading(true);
     let pool = await getContract('LendingPool', chain?.id!, protocol._lendingPoolAddress);
     let tx;
-    let position = lendingPosition();
+    let position = lendingPosition(Number(router.query.market));
     let data: string[] = [] 
     if(Number(position.debt) > 0){
       data = await getUpdateData(markets.map((m: any) => m.inputToken.id));

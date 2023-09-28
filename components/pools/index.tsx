@@ -43,7 +43,7 @@ export default function Pools() {
                   APR
                   </Flex>
                 </ThBox>
-                <ThBox isNumeric>.</ThBox>
+                <ThBox isNumeric></ThBox>
               </Tr>
             </Thead>
             <Tbody>

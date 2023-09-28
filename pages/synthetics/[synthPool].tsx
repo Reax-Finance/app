@@ -4,16 +4,16 @@ import {
 	useColorMode,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
-import { AppDataContext } from "../components/context/AppDataProvider";
-import CollateralTable from "../components/dashboard/CollateralTable";
-import IssuanceTable from "../components/dashboard/IssuanceTable";
+import { AppDataContext } from "../../components/context/AppDataProvider";
+import CollateralTable from "../../components/dashboard/CollateralTable";
+import IssuanceTable from "../../components/dashboard/IssuanceTable";
 import { motion } from "framer-motion";
 import Head from "next/head";
-import Paused from "../components/dashboard/Paused";
-import Position from "../components/dashboard/Position";
-import Market from "../components/dashboard/Market";
-import { isMarketOpen } from "../src/timings";
-import { VARIANT } from "../styles/theme";
+import Paused from "../../components/dashboard/Paused";
+import Position from "../../components/dashboard/Position";
+import Market from "../../components/dashboard/Market";
+import { isMarketOpen } from "../../src/timings";
+import { VARIANT } from "../../styles/theme";
 
 export default function Synthetics() {
 	const { pools, tradingPool, account } = useContext(AppDataContext);

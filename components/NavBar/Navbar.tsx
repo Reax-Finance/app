@@ -8,21 +8,18 @@ import {
 	Heading,
 	Divider,
 	Text,
-	useColorMode
+	useColorMode,
+	Button
 } from "@chakra-ui/react";
-import AccountButton from '../ConnectButton'; 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import "../../styles/Home.module.css";
 import { useAccount, useNetwork } from "wagmi";
 import { useContext } from "react";
 import { AppDataContext } from "../context/AppDataProvider";
 import { TokenContext } from "../context/TokenContext";
-import { motion } from "framer-motion";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Status } from "../utils/status";
 import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
@@ -31,7 +28,6 @@ import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
 
 function NavBar() {
-	const router = useRouter();
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
 	const { fetchData: fetchLendingData } = useLendingData()
@@ -114,6 +110,7 @@ function NavBar() {
 	});
 
 	const {colorMode} = useColorMode();
+	const router = useRouter();
 
 	return (
 		<>
@@ -124,9 +121,8 @@ function NavBar() {
 					<Flex gap={10} align='center'>
 						<Image
 							src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo-${colorMode}.svg`}
-							alt=""
-							width="30px"
-							mb={0.5}
+							alt="reax logo"
+							height="16px"
 						/>
 						<Flex
 							align="center"
@@ -137,10 +133,10 @@ function NavBar() {
 								title="Trade"
 							></NavLocalLink>
 
-							{/* <NavLocalLink
+							<NavLocalLink
 								path={"/synthetics"}
-								title={"Synths"}
-							></NavLocalLink> */}
+								title={"Pools"}
+							></NavLocalLink>
 
 							<NavLocalLink
 								path={"/lend"}
@@ -179,19 +175,33 @@ function NavBar() {
 					// gap={2}
 					w='100%'
 				>
+					{/* <Button mr={4} size={'sm'} bg={'secondary.600'} _hover={{bg: 'secondary.800'}} px={3} py={1} rounded={'full'} onClick={() => router.push('/synthetics')}>
+						<Flex ml={-1.5} mr={1.5}>
+							<Box border={'0px white solid'} rounded={'full'}>
+								<Image src={'/icons/cBTC.svg'} w={'25px'} />
+							</Box>
+							<Box border={'0px white solid'} rounded={'full'} ml={-2}>
+								<Image src={'/icons/cETH.svg'} w={'25px'}  />
+							</Box>
+							<Box border={'0px white solid'} rounded={'full'} ml={-2}>
+								<Image src={'/icons/cSOL.svg'} w={'25px'} />
+							</Box>
+						</Flex>
+						Mint Synths & Earn {"20"}% APY
+					</Button> */}
 					<NavLocalLink
 						path={"/leaderboard"}
 						title={<Flex gap={2} align={'center'}>
-						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> <Text color={'white'}>Points</Text>
+						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> <Text color={colorMode == 'dark' ? 'white' : 'black'}>Points</Text>
 						</Flex>}></NavLocalLink>
 						{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
 							<NavLocalLink
 							path={"/faucet"}
 							title="Faucet"></NavLocalLink>
 						</>}
-					<Box>
+					{/* <Box>
 						<AccountButton />
-					</Box>
+					</Box> */}
 					<Box ml={2}>
 						<CustomConnectButton />
 					</Box>

@@ -63,7 +63,7 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
     <>
         <Menu flip={false}>
             <Flex align={'center'} gap={0}>
-            {maxSlippage >= 1 && <Flex h={'100%'} px={3} align={'center'} color={'whiteAlpha.700'} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} fontSize={'sm'}>
+            {maxSlippage >= 1 && <Flex h={'100%'} px={3} pr={5} mr={-2} align={'center'} color={'whiteAlpha.700'} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} fontSize={'sm'}>
                 <Text >Max Slippage: {maxSlippage}%</Text>
             </Flex>}
             <Box className={`${VARIANT}-${colorMode}-iconButton`}>

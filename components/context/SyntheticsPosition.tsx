@@ -103,7 +103,7 @@ function SyntheticsPositionProvider({ children }: any) {
             let _adjustedCollateral = Big(0);
             let _totalDebt = Big(0);
             let markets = lendingPools[_selectedPool];
-            if(markets.length == 0) return {collateral: '0', debt: '0', adjustedCollateral: '0', availableToIssue: '0', debtLimit: '0', ltv: '0', liqLtv: '0'};
+            if(!markets || markets.length == 0) return {collateral: '0', debt: '0', adjustedCollateral: '0', availableToIssue: '0', debtLimit: '0', ltv: '0', liqLtv: '0'};
             for (let i = 0; i < markets.length; i++) {
                 if(!walletBalances[markets[i].outputToken.id] || !prices[markets[i].inputToken.id]) continue;
                 const isEMode = markets[i].eModeCategory?.id && (markets[i].eModeCategory?.id == lendingProtocols[_selectedPool].eModeCategory?.id);
@@ -137,6 +137,7 @@ function SyntheticsPositionProvider({ children }: any) {
 
     const supplied = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
+        if(!markets || markets.length == 0) return 0;
 		let sum = markets.reduce((acc: number, market: any) => {
 			return acc + (Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
 		}, 0);
@@ -145,6 +146,7 @@ function SyntheticsPositionProvider({ children }: any) {
 
     const netSupplyAPY = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
+        if(!markets || markets.length == 0) return 0;
 		// sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
 		let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
 			return acc + (market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) *(Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
@@ -159,6 +161,7 @@ function SyntheticsPositionProvider({ children }: any) {
 	const borrowed = (_selectedPool: number) => {
 		let sum = Big(0);
         let markets = lendingPools[_selectedPool];
+        if(!markets || markets.length == 0) return 0;
 		markets.forEach((market: any) => {
 			sum = sum.plus(Big(walletBalances[market._vToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._vToken.decimals));
 			sum = sum.plus(Big(walletBalances[market._sToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._sToken.decimals));
@@ -171,6 +174,7 @@ function SyntheticsPositionProvider({ children }: any) {
 		let sum = Big(0);
 		let sumBalances = borrowed(_selectedPool);
         let markets = lendingPools[_selectedPool];
+        if(!markets || markets.length == 0) return 0;
 		markets.forEach((market: any) => {
 			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._vToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._vToken.decimals)));
 			sum = sum.plus(Big(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).mul(Big(walletBalances[market._sToken.id] ?? 0).mul(prices[market.inputToken.id] ?? 0).div(10**market._sToken.decimals)));
@@ -194,6 +198,7 @@ function SyntheticsPositionProvider({ children }: any) {
 
     const netSupplyRewardsAPY = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
+        if(!markets || markets.length == 0) return 0;
         // sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
         let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
             return acc + Number(rewardAPY(market)) * (Big(walletBalances[market.outputToken.id] ?? 0).div(10**market.outputToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());
@@ -205,6 +210,7 @@ function SyntheticsPositionProvider({ children }: any) {
 
     const netBorrowRewardsAPY = (_selectedPool: number) => {
         let markets = lendingPools[_selectedPool];
+        if(!markets || markets.length == 0) return 0;
         // sum of all(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0) * market balance) / sum of all(market balance)
         let sumOfRatesTimesBalance = markets.reduce((acc: number, market: any) => {
             return acc + Number(rewardAPY(market, "BORROW", "VARIABLE")) * (Big(walletBalances[market._vToken.id] ?? 0).div(10**market._vToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber()) + Number(rewardAPY(market, "BORROW", "STABLE")) * (Big(walletBalances[market._sToken.id] ?? 0).div(10**market._sToken.decimals).mul(prices[market.inputToken.id] ?? 0).toNumber());

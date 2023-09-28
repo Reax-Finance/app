@@ -173,13 +173,13 @@ export default function LendingPosition() {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={Big(netAPY()).gt(0) ? 'green.400' : 'red.400'}
+                                                color={Big(netAPY(Number(router.query.market ?? 0))).gt(0) ? 'green.400' : 'red.400'}
                                                 align={'center'}
                                             >
                                                 <Text>
-                                                    {(netAPY()).toFixed(2)}%
+                                                    {(netAPY(Number(router.query.market ?? 0))).toFixed(2)}%
                                                 </Text>
-                                                <Text fontSize={'md'} fontWeight={'medium'} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}> + {netRewardsAPY().toFixed(2)}%</Text>
+                                                <Text fontSize={'md'} fontWeight={'medium'} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}> + {netRewardsAPY(Number(router.query.market ?? 0)).toFixed(2)}%</Text>
                                                 <Image ml={1} src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} boxSize={'18px'} />
                                             </Flex>
                                         </Flex>

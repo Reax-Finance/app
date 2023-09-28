@@ -32,21 +32,15 @@ export default function YourBorrows() {
 	const markets = pools[Number(router.query.market) ?? 0] ?? [];
 	
 	const borrowedMarkets = markets.filter((market: any) => {
-		if(!walletBalances[market._vToken.id] || !walletBalances[market._sToken.id] || !prices[market.inputToken.id]) return false;
-		let variableDebt = Big(walletBalances[market._vToken.id]).mul(prices[market.inputToken.id]).div(10**market._vToken.decimals);
-		let stableDebt = Big(walletBalances[market._sToken.id]).mul(prices[market.inputToken.id]).div(10**market._sToken.decimals);
-		return variableDebt.gt(0) || stableDebt.gt(0);
+		return Big(walletBalances[market._vToken.id] ?? 0).gt(0) || Big(walletBalances[market._sToken.id] ?? 0).gt(0);
 	});
 
 	const suppliedMarkets = markets.filter((market: any) => {
-		// return walletBalances[market.outputToken.id] > 0;
-		if(!walletBalances[market.outputToken.id] || !prices[market.inputToken.id]) return false;
-		let supplied = Big(walletBalances[market.outputToken.id]).mul(prices[market.inputToken.id]).div(10**market.outputToken.decimals);
-		return supplied.gt(0);
+		return Big(walletBalances[market.outputToken.id] ?? 0).gt(0);
 	});
 
 	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (
-		<Flex flexDir={'column'} justify={'center'} h={'100%'}>
+		<Flex flexDir={'column'} justify={'start'} h={'100%'}>
 			<Flex className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={3} align={'center'} justify={'space-between'}>
 				<Heading fontSize={'18px'} color={'secondary.400'} py={2}>Your Borrows</Heading>
 				{protocols[Number(router.query.market) ?? 0].eModes.length > 0 && <EModeMenu />}

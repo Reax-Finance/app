@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, Image, Text, Tooltip, useColorMode } from "@chakra-ui/react";
+import { Box, Divider, Flex, Heading, Image, Skeleton, Text, Tooltip, useColorMode } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useLendingData } from "../../components/context/LendingDataProvider";
 import {
@@ -29,8 +29,10 @@ export default function Lend() {
     useEffect(() => {
         if(pools.length > 0) return;
         if(!allPools[0][0] || !protocols[0]._lendingPoolAddress) return;
+        // clone allPools
+        let allPoolsClone = JSON.parse(JSON.stringify(allPools));
         // Sort pools by protocols[index].totaldepositbalance, and add to pools array, preserving index number
-        let sortedPools = allPools.sort((a: any, b: any) => {
+        let sortedPools = allPoolsClone.sort((a: any, b: any) => {
             return protocols.find((protocol: any) => protocol._lendingPoolAddress == b[0].protocol._lendingPoolAddress).totalDepositBalanceUSD - protocols.find((protocol: any) => protocol._lendingPoolAddress == a[0].protocol._lendingPoolAddress).totalDepositBalanceUSD
         });
         // Set index to sorted pools
@@ -42,14 +44,14 @@ export default function Lend() {
             })
         });
         setPools(sortedPools);
-    }, [allPools, protocols])
+    }, [allPools, protocols]);
 
 	return (
 		<Box mt={"80px"}>
             <Flex flexDir={'column'} align={'start'} gap={6} mb={10}>
             <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>Lending Pools</Heading>
             <Text color={'whiteAlpha.600'}>
-                Isolated pools for secure and simple lending
+                Isolated pools for secure and simple Lending/Borrowing
             </Text>
             </Flex>
 			<Box mt={4} className={`${VARIANT}-${colorMode}-containerBody`}>
@@ -66,15 +68,16 @@ export default function Lend() {
 								<ThBox alignBox='center'>Assets</ThBox>
 								<ThBox alignBox='center'>Total Supplied</ThBox>
 								<ThBox alignBox='center'>Total Borrowed</ThBox>
-								<ThBox isNumeric alignBox='right'>.</ThBox>
+								<ThBox isNumeric alignBox='right'></ThBox>
 							</Tr>
 						</Thead>
 						<Tbody>
-							{pools.map((pool: any, index: number) => (
+							{pools.length > 0 ? pools.map((pool: any, index: number) => (
 								<>
 									<Tr cursor={'pointer'} _hover={{bg:'whiteAlpha.100'}} onClick={() => {
                                         // open in new /lend/[poolIndex]
-                                        window.open(`/lend/${pool[0].poolIndex}`, '_blank');
+                                        // window.open(`/lend/${pool[0].poolIndex}`, '_blank');
+                                        router.push(`/lend/${pool[0].poolIndex}`);
                                     }}>
                                     <TdBox alignBox='left'>
                                         #{pool[0].poolIndex}
@@ -122,7 +125,22 @@ export default function Lend() {
                                     </TdBox>
                                 </Tr>
                             </>
-							))}
+							)) : <>
+                                <Tr>
+                                    <Td>
+                                        <Skeleton height="40px" />
+                                    </Td>
+                                    <Td>
+                                        <Skeleton height="40px" />
+                                    </Td>
+                                    <Td>
+                                        <Skeleton height="40px" />
+                                    </Td>
+                                    <Td>
+                                        <Skeleton height="40px" />
+                                    </Td>
+                                </Tr>
+                            </>}
 						</Tbody>
 					</Table>
 				</TableContainer>

@@ -76,7 +76,7 @@ export default function Positions() {
                   Staked
                 </Flex>
               </ThBox>
-              <ThBox isNumeric>.</ThBox>
+              <ThBox isNumeric></ThBox>
             </Tr>
           </Thead>
           <Tbody>

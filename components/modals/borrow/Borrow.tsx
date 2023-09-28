@@ -23,6 +23,7 @@ import { usePriceData } from "../../context/PriceContext";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, max, onClose }: any) => {
 	const [loading, setLoading] = useState(false);
@@ -32,7 +33,8 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const {updateFromTx, walletBalances, allowances} = useBalanceData();
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+    const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) ?? 0);
 
 	const {markets, protocol, updatePositions} = useLendingData();
 
