@@ -13,7 +13,7 @@ import {
 	TableContainer,
 } from "@chakra-ui/react";
 import { BsArrowRight, BsArrowRightShort, BsStars } from "react-icons/bs";
-import { ESYX_PRICE, dollarFormatter } from "../../src/const";
+import { ESYX_PRICE, POOL_COLORS, dollarFormatter, tokenFormatter } from "../../src/const";
 import ThBox from "../../components/dashboard/ThBox";
 import { HEADING_FONT, VARIANT } from "../../styles/theme";
 import TdBox from "../../components/dashboard/TdBox";
@@ -24,12 +24,14 @@ import { usePriceData } from "../../components/context/PriceContext";
 import { Status } from "../../components/utils/status";
 import APRInfo from "../../components/infos/APRInfo";
 import Skeleton1 from "../../components/others/Skeleton1";
+import { useSyntheticsData } from "../../components/context/SyntheticsPosition";
 
 export default function Lend() {
 	const { pools: allPools } = useAppData();
 	const { colorMode } = useColorMode();
     const router = useRouter();
     const {prices, status} = usePriceData();
+    const {position} = useSyntheticsData();
 
     const [pools, setPools] = useState<any>([]);
 
@@ -102,60 +104,80 @@ export default function Lend() {
             {pools.length > 0? 
                 pools.map((pool: any, index: number) => (
 			    <Box maxW={'400px'} key={index} className={`${VARIANT}-${colorMode}-halfButton2`} cursor={'pointer'} onClick={() => router.push('/synthetics/'+index)}>
-                    <Flex mt={4} p={4} px={5} align={'center'} justify={'space-between'} className={`${VARIANT}-${colorMode}-halfContainerBody2`} gap={4}>
-                        <Heading fontSize={'22px'} fontWeight={'bold'}>{pool.name}</Heading>
-                        <Flex>
-                            {pool.synths.slice(0, 5).map((synth: any, index: number) => (<Box key={index} ml={-3} mt={-0} border={'1.5px white solid'} rounded={'full'}>
-                                <Tooltip label={synth.token.symbol} placement={'top'}>
-                                    <Image src={`/icons/${synth.token.symbol}.svg`} w={'32px'} key={index} />
-                                </Tooltip>
-                            </Box>))}
+                    <Box className={`${VARIANT}-${colorMode}-halfContainerBody2`} >
+                        <Flex py={4} px={5} align={'center'} justify={'space-between'} gap={4} >
+                            <Heading fontSize={'22px'} fontWeight={'bold'}>{pool.name}</Heading>
+                            <Flex>
+                                {pool.synths.slice(0, 5).map((synth: any, index: number) => (<Box key={index} ml={-3} border={'1.5px white solid'} rounded={'full'}>
+                                    <Tooltip label={synth.token.symbol} placement={'top'}>
+                                        <Image src={`/icons/${synth.token.symbol}.svg`} w={'32px'} key={index} />
+                                    </Tooltip>
+                                </Box>))}
+                            </Flex>
                         </Flex>
-                    </Flex>
-                    <Divider />
-                    <Flex mx={4} mt={4}>
-                        <Box>
-                            <Text fontSize={'sm'} color={'whiteAlpha.600'}>TVL</Text>
-                            <Flex gap={1.5}>
-                            <Text fontSize={'lg'}>{dollarFormatter.format(Number(pool.totalCollateral))}</Text>
-                            <Flex ml={1}>
-                            {pool.collaterals.map((collateral: any, index: number) => (<Box key={index} ml={-1}>
-                                <Tooltip label={collateral.token.symbol} placement={'top'}>
-                                    <Image src={`/icons/${collateral.token.symbol}.svg`} w={'22px'} key={index} />
-                                </Tooltip>
-                            </Box>))}
-                            </Flex>
-                            </Flex>
-                        </Box>
-                    </Flex>
-                
-
-                <Flex justify={'space-between'} align={'end'} mx={4} mt={4} pb={6}>
-                    <Box>
-                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>APR</Text>
-                        <Box maxW={'100px'}>
-                        <APRInfo
-                            debtBurnApr={pool.debtBurnApr}
-                            esSyxApr={pool.rewardAPY}
-                        >
-                            <Flex gap={1} align={'center'} cursor={"help"} color={'primary.400'}>
-                                <Heading size={"md"} >
-                                    {(
-                                        Number(pool.debtBurnApr)
-                                        + Number(pool.rewardAPY)
-                                    ).toFixed(2)}
-                                    %
-                                </Heading>
-                                <BsStars />
-                            </Flex>
-                        </APRInfo>
-                        </Box>
                     </Box>
-                    <Flex align={'center'} color={'whiteAlpha.600'}>
-                        <Text>Enter Now</Text>
-                        <BsArrowRightShort />
-                    </Flex>
-                </Flex>
+                        <Box pt={4} >
+                        <Flex mx={4} >
+                            <Box>
+                                <Text fontSize={'sm'} color={'whiteAlpha.600'}>TVL</Text>
+                                <Flex gap={1.5}>
+                                <Text fontSize={'lg'}>{dollarFormatter.format(Number(pool.totalCollateral))}</Text>
+                                <Flex ml={1}>
+                                {pool.collaterals.map((collateral: any, index: number) => (<Box key={index} ml={-1}>
+                                    <Tooltip label={collateral.token.symbol} placement={'top'}>
+                                        <Image src={`/icons/${collateral.token.symbol}.svg`} w={'22px'} key={index} />
+                                    </Tooltip>
+                                </Box>))}
+                                </Flex>
+                                </Flex>
+                            </Box>
+                        </Flex>
+                        <Box mx={4} mt={4}>
+                            <Text fontSize={'sm'} color={'whiteAlpha.600'}>APR</Text>
+                            <Box maxW={'100px'}>
+                            <APRInfo
+                                debtBurnApr={pool.debtBurnApr}
+                                esSyxApr={pool.rewardAPY}
+                            >
+                                <Flex gap={1} align={'center'} cursor={"help"} color={'primary.400'}>
+                                    <Heading size={"md"} >
+                                        {(
+                                            Number(pool.debtBurnApr)
+                                            + Number(pool.rewardAPY)
+                                        ).toFixed(2)}
+                                        %
+                                    </Heading>
+                                    <BsStars />
+                                </Flex>
+                            </APRInfo>
+                            </Box>
+                        </Box>
+                        <Box border={'1px white dotted'} borderColor={'whiteAlpha.400'} bg='darkBg.400' borderRadius={6} p={2} mx={4} mt={4}>
+                                <Text fontSize={'sm'}>Your Position</Text>
+                                <Flex gap={2}>
+                                    <Flex gap={1} align={'end'}>
+                                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>Collateral:</Text>
+                                        <Text>{dollarFormatter.format(Number(position(index).collateral))}</Text>
+                                    </Flex>
+
+                                    <Flex gap={1} align={'end'}>
+                                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>Debt:</Text>
+                                        <Text>{dollarFormatter.format(Number(position(index).debt))}</Text>
+                                    </Flex>
+
+                                    <Flex gap={1} align={'end'}>
+                                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>Health:</Text>
+                                        <Text>{(Number(position(index).debtLimit)).toFixed(2)}</Text>
+                                    </Flex>
+                                </Flex>
+                        </Box>
+                        <Flex justify={'end'} align={'end'} mx={4} mt={4} pb={6}>
+                            <Flex align={'center'} color={'whiteAlpha.600'}>
+                                <Text>Enter Now</Text>
+                                <BsArrowRightShort />
+                            </Flex>
+                        </Flex>
+                    </Box>
 			</Box>
             )): <Skeleton1 />}
 		</Box>

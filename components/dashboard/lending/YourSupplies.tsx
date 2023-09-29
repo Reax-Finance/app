@@ -31,7 +31,7 @@ export default function YourSupplies() {
 	const { pools } = useLendingData();
 	const { walletBalances } = useBalanceData();
 	const router = useRouter();
-	const markets = pools[Number(router.query.market) ?? 0] ?? [];
+	const markets = pools[Number(router.query.market) || 0] ?? [];
 
 	const borrowedMarkets = markets.filter((market: any) => {
 		return Big(walletBalances[market._vToken.id] ?? 0).gt(0) || Big(walletBalances[market._sToken.id] ?? 0).gt(0);
@@ -43,7 +43,7 @@ export default function YourSupplies() {
 
 	const { colorMode } = useColorMode();
 
-	if(suppliedMarkets.length > 0 || borrowedMarkets.length > 0) return (
+	return (
 		<Flex flexDir={'column'} justify={'start'} h={'100%'}>
 			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Your Supplies</Heading>
@@ -93,13 +93,8 @@ export default function YourSupplies() {
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
 		</Flex>
 	);
-
-	else return <></>;
 }

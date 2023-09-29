@@ -25,6 +25,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 export default function Redeem({ market, amount, setAmount, isNative, max, isMax, onClose }: any) {
 	const [loading, setLoading] = useState(false);
@@ -32,7 +33,8 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 
 	const {prices} = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const {getUpdateData} = useUpdateData();
 	const handleError = useHandleError(PlatformType.LENDING);

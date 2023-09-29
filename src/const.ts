@@ -38,6 +38,10 @@ export const PERP_CATEGORIES: any = {
     4: 'S'
 }
 
+export const POOL_COLORS: any = {
+	0: 'linear(to-t, #002FFE, rgb(2,246,211), rgba(2,246,211,0.1))',
+}
+
 export const EPOCH_REWARDS: any = {
 	1: 1_000_000,
 	2: 250_000,

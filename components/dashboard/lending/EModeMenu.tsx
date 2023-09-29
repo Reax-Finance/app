@@ -44,8 +44,8 @@ export default function EModeMenu({}: any) {
 
   const router = useRouter();
 
-  const protocol = protocols[Number(router.query.market) ?? 0] ?? [];
-  const markets = pools[Number(router.query.market) ?? 0] ?? [];
+  const protocol = protocols[Number(router.query.market) || 0] ?? [];
+  const markets = pools[Number(router.query.market) || 0] ?? [];
 
   const setEMode = async (eMode: any) => {
     if(eMode === protocol.eModeCategory?.id) return;

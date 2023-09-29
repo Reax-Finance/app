@@ -34,7 +34,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
     const router = useRouter();
-	const pos = lendingPosition(Number(router.query.market) ?? 0);
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const {markets, protocol, updatePositions} = useLendingData();
 

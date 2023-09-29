@@ -22,6 +22,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import BorrowModal from "./BorrowModal";
 import MarketInfo from "../_utils/TokenInfo";
+import { useRouter } from "next/router";
 
 export default function Debt({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,7 +30,8 @@ export default function Debt({ market, index }: any) {
 	const [amount, setAmount] = React.useState("");
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const _onClose = () => {
 		setAmount("");

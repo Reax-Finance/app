@@ -29,7 +29,7 @@ export default function YourBorrows() {
 	const { colorMode } = useColorMode();
 
 	const router = useRouter();
-	const markets = pools[Number(router.query.market) ?? 0] ?? [];
+	const markets = pools[Number(router.query.market) || 0] ?? [];
 	
 	const borrowedMarkets = markets.filter((market: any) => {
 		return Big(walletBalances[market._vToken.id] ?? 0).gt(0) || Big(walletBalances[market._sToken.id] ?? 0).gt(0);
@@ -39,11 +39,11 @@ export default function YourBorrows() {
 		return Big(walletBalances[market.outputToken.id] ?? 0).gt(0);
 	});
 
-	if(borrowedMarkets.length > 0 || suppliedMarkets.length > 0) return (
-		<Flex flexDir={'column'} justify={'start'} h={'100%'}>
+	return (
+		<Flex flexDir={'column'} justify={'start'} h={'100%'} minH={'150px'}>
 			<Flex className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={3} align={'center'} justify={'space-between'}>
 				<Heading fontSize={'18px'} color={'secondary.400'} py={2}>Your Borrows</Heading>
-				{protocols[Number(router.query.market) ?? 0].eModes.length > 0 && <EModeMenu />}
+				{protocols[Number(router.query.market) || 0]?.eModes?.length > 0 && <EModeMenu />}
 			</Flex>
 
 			{markets.length > 0 ? ( <>
@@ -101,13 +101,8 @@ export default function YourBorrows() {
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
 		</Flex>
 	);
-
-	else return <></>
 }

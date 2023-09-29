@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { ADDRESS_ZERO, EIP712_VERSION, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
-import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
 import { ethers, BigNumber } from 'ethers';
 import { getABI, getContract, send } from "../../../src/contract";
@@ -25,6 +24,7 @@ import { useLendingData } from "../../context/LendingDataProvider";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 export default function Supply({ market, amount, setAmount, isNative, max, onClose }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
@@ -37,7 +37,9 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const { toggleIsCollateral, protocol, updatePositions } = useLendingData();
 

@@ -36,7 +36,7 @@ const pageSize = 9;
 export default function CollateralTable() {
 	const { pools, protocols } = useLendingData();
 	const router = useRouter();
-	const markets = pools[Number(router.query.market) ?? 0] ?? [];
+	const markets = pools[Number(router.query.market) || 0] ?? [];
 
 	const { currentPage, setCurrentPage, pagesCount, pages } =
 		usePagination({
@@ -47,7 +47,7 @@ export default function CollateralTable() {
 	
 	const { colorMode } = useColorMode();
 
-	const _markets = protocols[Number(router.query.market) ?? 0]?.eModeCategory?.assets ? protocols[Number(router.query.market) ?? 0]?.eModeCategory?.assets : markets;
+	const _markets = protocols[Number(router.query.market) || 0]?.eModeCategory?.assets ? protocols[Number(router.query.market) || 0]?.eModeCategory?.assets : markets;
 	return (
 		<Box>
 			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>

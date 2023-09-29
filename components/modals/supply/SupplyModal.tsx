@@ -36,6 +36,7 @@ import Redeem from "./Redeem";
 import Supply from "./Supply";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 export default function SupplyModal({
 	market,
@@ -51,7 +52,9 @@ export default function SupplyModal({
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const _setAmount = (e: string) => {
 		e = parseInput(e);

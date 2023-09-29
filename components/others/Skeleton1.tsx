@@ -13,20 +13,6 @@ export default function Skeleton1({isLoaded}: any) {
           <Skeleton height='40px'/>
         </Stack>
       </Box>
-      <Box className={`${VARIANT}-${colorMode}-halfButton2`} w={'400px'}>
-        <Stack padding={4} spacing={1} >
-          <Skeleton height='40px'/>
-          <Skeleton height='40px'/>
-          <Skeleton height='40px'/>
-        </Stack>
-      </Box>
-      <Box className={`${VARIANT}-${colorMode}-halfButton2`} w={'400px'}>
-        <Stack padding={4} spacing={1} >
-          <Skeleton height='40px'/>
-          <Skeleton height='40px'/>
-          <Skeleton height='40px'/>
-        </Stack>
-      </Box>
     </Flex>
   )
 }
