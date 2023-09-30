@@ -25,7 +25,6 @@ import { useRouter } from "next/router";
 export default function YourBorrows() {
 	const { pools, protocols } = useLendingData();	
 	const { walletBalances } = useBalanceData();
-	const { prices } = usePriceData();
 	const { colorMode } = useColorMode();
 
 	const router = useRouter();
@@ -33,10 +32,6 @@ export default function YourBorrows() {
 	
 	const borrowedMarkets = markets.filter((market: any) => {
 		return Big(walletBalances[market._vToken.id] ?? 0).gt(0) || Big(walletBalances[market._sToken.id] ?? 0).gt(0);
-	});
-
-	const suppliedMarkets = markets.filter((market: any) => {
-		return Big(walletBalances[market.outputToken.id] ?? 0).gt(0);
 	});
 
 	return (
@@ -99,8 +94,6 @@ export default function YourBorrows() {
 			) : (
 				<Box pt={0.5}>
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />
-					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
 		</Flex>

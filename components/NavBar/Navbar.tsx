@@ -135,7 +135,7 @@ function NavBar() {
 
 							<NavLocalLink
 								path={"/synthetics"}
-								title={"Pools"}
+								title={"Synths"}
 							></NavLocalLink>
 
 							<NavLocalLink

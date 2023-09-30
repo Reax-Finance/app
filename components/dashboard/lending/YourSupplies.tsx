@@ -33,10 +33,6 @@ export default function YourSupplies() {
 	const router = useRouter();
 	const markets = pools[Number(router.query.market) || 0] ?? [];
 
-	const borrowedMarkets = markets.filter((market: any) => {
-		return Big(walletBalances[market._vToken.id] ?? 0).gt(0) || Big(walletBalances[market._sToken.id] ?? 0).gt(0);
-	});
-
 	const suppliedMarkets = markets.filter((market: any) => {
 		return Big(walletBalances[market.outputToken.id] ?? 0).gt(0);
 	});
@@ -91,8 +87,6 @@ export default function YourSupplies() {
 			) : (
 				<Box pt={0.5}>
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />
-					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
 		</Flex>

@@ -165,7 +165,7 @@ function BalanceContextProvider({ children }: any) {
                 // if aweth, check allowance for wrapper
                 if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
                     calls.push([
-                        market.inputToken.id,
+                        market.outputToken.id,
                         itf.encodeFunctionData("allowance", [
                             _address,
                             wrapperAddress
@@ -267,7 +267,8 @@ function BalanceContextProvider({ children }: any) {
                     newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
                     index++;
                     if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
-                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        if(!newAllowances[market.outputToken.id]) newAllowances[market.outputToken.id] = {};
+                        newAllowances[market.outputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
                         index++;
                         if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
                         newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
@@ -303,6 +304,7 @@ function BalanceContextProvider({ children }: any) {
             setNonces(newNonces);
         })
         .catch((err: any) => {
+            console.log("Failed to fetch balances", err);
             setStatus(Status.ERROR);
         })
 	};

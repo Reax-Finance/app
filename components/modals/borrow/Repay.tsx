@@ -141,6 +141,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 			setAmount('0');
 			setLoading(false);
 			updatePositions();
+			console.log(onClose);
 			onClose();
 			toast({
 				title: "Repayment Successful!",

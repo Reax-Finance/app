@@ -3,12 +3,9 @@ import {
 	Modal,
 	ModalOverlay,
 	Tr,
-	Th,
-	Td,
 	Flex,
 	Image,
 	Text,
-	Box,
 	useDisclosure,
 	useColorMode,
 } from "@chakra-ui/react";

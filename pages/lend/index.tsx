@@ -107,7 +107,7 @@ export default function Lend() {
                                                 </>
                                             ))}
                                         </Flex>
-                                        <Text fontSize={"lg"} textAlign={'left'} pt={3}>
+                                        <Text fontSize={"lg"} textAlign={'left'} pt={2}>
                                             {protocols[pool[0].poolIndex].name}
                                         </Text>
                                         </Box>

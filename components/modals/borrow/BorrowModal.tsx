@@ -35,12 +35,8 @@ import { formatInput, parseInput } from "../../utils/number";
 import { VARIANT } from "../../../styles/theme";
 import { useRouter } from "next/router";
 
-export default function BorrowModal({
-	market,
-	amount,
-	setAmount,
-	onClose
-}: any) {
+export default function BorrowModal(props: any) {
+	const {market, amount, setAmount, onClose} = props;
 	const { chain } = useNetwork();
 	const [tabSelected, setTabSelected] = useState(0);
 	let [debtType, setDebtType] = useState("2");
@@ -215,7 +211,7 @@ export default function BorrowModal({
 										fontSize="xs"
 										fontWeight={"bold"}
 										onClick={() =>
-											_setAmount(Big(max()).mul(1).toFixed(market.inputToken.decimals))
+											_setAmount(Big(max()).mul(0.9999).toFixed(market.inputToken.decimals))
 										}
 										my={-1}
 									>
@@ -227,6 +223,7 @@ export default function BorrowModal({
 						</InputGroup>
 					</Box>
 					</Box>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'}/>
 					<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 						<TabList>
 							<Tab

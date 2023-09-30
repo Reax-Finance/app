@@ -39,13 +39,15 @@ export const PERP_CATEGORIES: any = {
 }
 
 export const POOL_COLORS: any = {
-	0: 'linear(to-t, #002FFE, rgb(2,246,211), rgba(2,246,211,0.1))',
+	0: 'linear(to-t, #002FFE, rgba(2,246,211))',
 }
 
 export const EPOCH_REWARDS: any = {
 	1: 1_000_000,
 	2: 250_000,
-	3: 250_000
+	3: 250_000,
+	4: 100_000,
+	5: 100_000,
 }
 
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';

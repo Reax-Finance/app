@@ -14,7 +14,7 @@ import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import { getABI, getAddress, getContract, send } from "../../../src/contract";
-import { EIP712_VERSION, defaultChain, dollarFormatter } from "../../../src/const";
+import { EIP712_VERSION, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Link from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
@@ -56,11 +56,17 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 
 		let tx: any;
 		if(isNative){
-			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
-			const {v, r, s} = ethers.utils.splitSignature(data!);
-			let args = [market.inputToken.id, _amount, address, deadline, v, r, s, priceFeedUpdateData];
-			console.log(args);
-			tx = send(wrapper, "withdrawETHWithPermit", args);
+			if(Big(approvedAmount).gt(0)){
+				const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
+				const {v, r, s} = ethers.utils.splitSignature(data!);
+				let args = [market.inputToken.id, _amount, address, deadline, v, r, s, priceFeedUpdateData];
+				console.log(args);
+				tx = send(wrapper, "withdrawETHWithPermit", args);
+			} else {
+				const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
+				let args = [market.inputToken.id, _amount, address, priceFeedUpdateData];
+				tx = send(wrapper, "withdrawETH", args);
+			}
 		} else {
 			const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
 			let args = [
@@ -83,7 +89,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 				title: "Withdrawal Successful",
 				description: <Box>
 					<Text>
-						{`You have withdrawn ${amount} ${market.inputToken.symbol}`}
+						{`You have withdrawn ${tokenFormatter.format(amount)} ${market.inputToken.symbol}`}
 					</Text>
 					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 						<Flex align={'center'} gap={2}>
@@ -192,7 +198,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (Big(amount).gt(max)) {
+		} else if (Big(amount).gt(Big(max).toFixed(market.inputToken.decimals))) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"

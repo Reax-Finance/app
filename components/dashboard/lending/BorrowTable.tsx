@@ -90,7 +90,6 @@ export default function CollateralTable() {
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
-					<Skeleton height="50px" rounded={12} m={6} />
 				</Box>
 			)}
 

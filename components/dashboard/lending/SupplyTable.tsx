@@ -40,7 +40,7 @@ export default function CollateralTable() {
 	const { pools } = useLendingData();
 
 	const router = useRouter();
-	const markets = pools[Number(router.query.market) || 0] ?? [];
+	const markets = pools[Number(router.query.market) ?? 0] ?? [];
 
 	const { currentPage, setCurrentPage, pagesCount, pages } =
 		usePagination({
@@ -96,7 +96,6 @@ export default function CollateralTable() {
 			) : (
 				<Box pt={0.5}>
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />
-					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />

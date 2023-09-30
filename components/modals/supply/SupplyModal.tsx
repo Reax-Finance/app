@@ -89,7 +89,10 @@ export default function SupplyModal({
 			const v2 = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
 			// Available to withdraw from pool
 			// const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
-
+			if(!market.isCollateral){
+				return v2.toString();
+			}
+			
 			// find minimum of (v1, v2, v3)
 			let min = v1;
 			if(v2.lt(min)) min = v2;
@@ -216,6 +219,7 @@ export default function SupplyModal({
 						</InputGroup>
 					</Box>
 					<Box className={`${VARIANT}-${colorMode}-containerFooter`}>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'}/>
 					<Tabs variant={'enclosed'} onChange={selectTab}>
 						<TabList>
 							<Tab

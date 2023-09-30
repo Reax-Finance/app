@@ -9,11 +9,14 @@ import {
   Box,
   Heading,
   Flex,
-  useColorMode
+  useColorMode,
+  Skeleton,
+  Td
 } from '@chakra-ui/react'
 import Pool from './Pool';
 import ThBox from '../dashboard/ThBox';
 import { VARIANT } from '../../styles/theme';
+import TdBox from '../dashboard/TdBox';
 
 export default function Pools() {
     
@@ -47,9 +50,24 @@ export default function Pools() {
               </Tr>
             </Thead>
             <Tbody>
-              {pools.map((pool: any, index: number) => (
+              {pools.length > 0 ? pools.map((pool: any, index: number) => (
                   <Pool key={index} pool={pool} index={index} />
-              ))}
+              )) : <>
+              <Tr>
+                <Td>
+                  <Skeleton height='40px' my={2}/>
+                </Td>
+                <Td>
+                  <Skeleton height='40px' my={2}/>
+                </Td>
+                <Td>
+                  <Skeleton height='40px' my={2}/>
+                </Td>
+                <Td isNumeric>
+                  <Skeleton height='40px' my={2}/>
+                </Td>
+              </Tr>
+              </>}
             </Tbody>
           </Table>
       </TableContainer>

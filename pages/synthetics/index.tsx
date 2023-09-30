@@ -132,46 +132,46 @@ export default function Lend() {
                                 </Flex>
                             </Box>
                         </Flex>
-                        <Box mx={4} mt={4}>
-                            <Text fontSize={'sm'} color={'whiteAlpha.600'}>APR</Text>
-                            <Box maxW={'100px'}>
-                            <APRInfo
-                                debtBurnApr={pool.debtBurnApr}
-                                esSyxApr={pool.rewardAPY}
-                            >
-                                <Flex gap={1} align={'center'} cursor={"help"} color={'primary.400'}>
-                                    <Heading size={"md"} >
-                                        {(
-                                            Number(pool.debtBurnApr)
-                                            + Number(pool.rewardAPY)
-                                        ).toFixed(2)}
-                                        %
-                                    </Heading>
-                                    <BsStars />
+                        
+                        {/* <Box border={'1px white dotted'} borderColor={'whiteAlpha.400'} bg='darkBg.400' borderRadius={6} p={2} mx={4} mt={4}>
+                            <Flex justify={'space-between'}>
+                                <Flex gap={1} align={'end'}>
+                                    <Text fontSize={'sm'} color={'whiteAlpha.600'}>Your Collateral:</Text>
+                                    <Text>{dollarFormatter.format(Number(position(index).collateral))}</Text>
                                 </Flex>
-                            </APRInfo>
+
+                                <Flex gap={1} align={'end'}>
+                                    <Text fontSize={'sm'} color={'whiteAlpha.600'}>Debt:</Text>
+                                    <Text>{dollarFormatter.format(Number(position(index).debt))}</Text>
+                                </Flex>
+
+                                <Flex gap={1} align={'end'}>
+                                    <Text fontSize={'sm'} color={'whiteAlpha.600'}>Health:</Text>
+                                    <Text>{(Number(position(index).debtLimit)).toFixed(2)}</Text>
+                                </Flex>
+                            </Flex>
+                        </Box> */}
+                        <Flex justify={'space-between'} align={'end'} mx={4} mt={4} pb={6}>
+                            <Box>
+                                <Text fontSize={'sm'} color={'whiteAlpha.600'}>APR</Text>
+                                <Box maxW={'100px'}>
+                                <APRInfo
+                                    debtBurnApr={pool.debtBurnApr}
+                                    esSyxApr={pool.rewardAPY}
+                                >
+                                    <Flex gap={1} align={'center'} cursor={"help"} color={'primary.400'}>
+                                        <Heading size={"md"} >
+                                            {(
+                                                Number(pool.debtBurnApr)
+                                                + Number(pool.rewardAPY)
+                                            ).toFixed(2)}
+                                            %
+                                        </Heading>
+                                        <BsStars />
+                                    </Flex>
+                                </APRInfo>
+                                </Box>
                             </Box>
-                        </Box>
-                        <Box border={'1px white dotted'} borderColor={'whiteAlpha.400'} bg='darkBg.400' borderRadius={6} p={2} mx={4} mt={4}>
-                                <Text fontSize={'sm'}>Your Position</Text>
-                                <Flex gap={2}>
-                                    <Flex gap={1} align={'end'}>
-                                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>Collateral:</Text>
-                                        <Text>{dollarFormatter.format(Number(position(index).collateral))}</Text>
-                                    </Flex>
-
-                                    <Flex gap={1} align={'end'}>
-                                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>Debt:</Text>
-                                        <Text>{dollarFormatter.format(Number(position(index).debt))}</Text>
-                                    </Flex>
-
-                                    <Flex gap={1} align={'end'}>
-                                        <Text fontSize={'sm'} color={'whiteAlpha.600'}>Health:</Text>
-                                        <Text>{(Number(position(index).debtLimit)).toFixed(2)}</Text>
-                                    </Flex>
-                                </Flex>
-                        </Box>
-                        <Flex justify={'end'} align={'end'} mx={4} mt={4} pb={6}>
                             <Flex align={'center'} color={'whiteAlpha.600'}>
                                 <Text>Enter Now</Text>
                                 <BsArrowRightShort />

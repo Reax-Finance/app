@@ -14,7 +14,7 @@ import { getABI, getAddress, getContract, send } from "../../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { WETH_ADDRESS, defaultChain, dollarFormatter, numOrZero, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
@@ -37,11 +37,8 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const {markets, protocol, updatePositions} = useLendingData();
-
 	const toast = useToast();
-
 	const handleError = useHandleError(PlatformType.LENDING);
-
 	const [approveLoading, setApproveLoading] = useState(false);
 
 	const borrow = async () => {
@@ -83,7 +80,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 				title: "Borrow Successful",
 				description: <Box>
 					<Text>
-						{`You have borrowed ${amount} ${market.inputToken.symbol}`}
+						{`You have borrowed ${tokenFormatter.format(amount)} ${market.inputToken.symbol}`}
 					</Text>
 					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 						<Flex align={'center'} gap={2}>
