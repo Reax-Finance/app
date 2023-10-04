@@ -105,12 +105,12 @@ export default function SwapLayout({
   return (
     <>
         <Box className={`${VARIANT}-${colorMode}-containerBody`}>
-            <Box className={`${VARIANT}-${colorMode}-containerHeader`} p={5}>
+            <Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={4}>
                 <Flex align={'center'} justify={'space-between'}>
                     <Flex align={'center'} gap={4}>
-                        <Heading size={'md'}>Spot</Heading>
+                        <Heading size={'sm'}>Spot</Heading>
                         <Tooltip label={'Coming Soon'} placement={'top'}>
-                        <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>Margin</Heading>
+                        <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>Margin [10x]</Heading>
                         </Tooltip>
                     </Flex>
                     <Flex>
@@ -263,7 +263,7 @@ export default function SwapLayout({
 
             <Box px="5" pb={'1px'} pt={'1px'} >
 
-            {valid && <Box pb={7}>
+            {valid && <Box>
                 {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} my={2} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} color={'orange'}>
                     <WarningTwoIcon/>
                     <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
@@ -271,7 +271,7 @@ export default function SwapLayout({
                 <Flex
                     justify="space-between"
                     align={"center"}
-                    mb={!isOpen ? !account ? '-4' : '-6' : '0'}
+                    // mb={!isOpen ? !account ? '-4' : '-6' : '0'}
                     bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'}
                     color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                     px={4}
@@ -308,9 +308,8 @@ export default function SwapLayout({
                         initial={false}
                         onAnimationStart={() => setHidden(false)}
                         onAnimationComplete={() => setHidden(!isOpen)}
-                        animate={{ height: isOpen ? 130 : 0 }}
+                        animate={{ height: isOpen ? '144px' : 0 }}
                         style={{
-                            height: 140,
                             width: '100%'
                         }}
                     >
@@ -341,12 +340,11 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mb={5} className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`}>
+                <Box mt={3} mb={5} className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`}>
                 <Button
                     size="lg"
                     fontSize={"xl"}
                     width={"100%"}
-                    rounded={0}
                     onClick={exchange}
                     bg={'transparent'}
                     isDisabled={!validate().valid}

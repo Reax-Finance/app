@@ -66,8 +66,8 @@ export default function Settings({maxSlippage, setMaxSlippage, deadline, setDead
             {maxSlippage >= 1 && <Flex h={'100%'} px={3} pr={5} mr={-2} align={'center'} color={'whiteAlpha.700'} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} fontSize={'sm'}>
                 <Text >Max Slippage: {maxSlippage}%</Text>
             </Flex>}
-            <Box className={`${VARIANT}-${colorMode}-iconButton`}>
-            <MenuButton  as={IconButton} rounded={0} aria-label={""} icon={<SettingsIcon />} bg={'transparent'} _hover={{bg: 'transparent'}}></MenuButton>
+            <Box >
+                <MenuButton h={6} p={1} as={IconButton} aria-label={""} icon={<SettingsIcon />} bg={'transparent'} _hover={{bg: 'transparent'}}></MenuButton>
             </Box>
             </Flex>
             <MenuList p={0} m={0} border={0} rounded={0} bg={'transparent'} shadow={'none'}>
