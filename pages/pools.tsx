@@ -96,10 +96,6 @@ export default function PoolsPage() {
   const { colorMode } = useColorMode();
   const { prices } = usePriceData();
 
-  const totalLiquidity = pools.reduce((total: string, pool: any) => Big(total).add(pool.tokens.reduce((acc: any, token: any) => {
-    return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
-  }, 0)), '0');
-
   return (
     <>
       <Head>
@@ -113,7 +109,18 @@ export default function PoolsPage() {
           <Flex gap={8} mt={2}>
             <Flex align={'center'} gap={2}>
               <Heading color={'primary.400'} size={'sm'}>TVL </Heading>
-              <Heading size={'sm'}>{dollarFormatter.format(totalLiquidity ?? 0)}</Heading>
+              <Heading size={'sm'}>{dollarFormatter.format(dex.totalLiquidity ?? 0)}</Heading>
+            </Flex>
+            <Flex align={'center'} gap={2}>
+              <Heading color={'secondary.400'} size={'sm'}>24h Volume </Heading>
+              <Heading size={'sm'}>{
+                dollarFormatter.format(Number(pools.reduce((total: string, pool: any) => Big(total).add(
+                    ((Math.round(Date.now()/1000) - (Math.round(Date.now()/1000) % 24*3600) - pool.snapshots?.[0]?.timestamp)) < 24*3600 ? 
+                    pool.snapshots[0].swapVolume - pool.snapshots[1].swapVolume :
+                    '0'
+                    // pool.snapshots[0].swapVolume - pool.snapshots[1].swapVolume
+                  ).toString(), '0')))
+              }</Heading>
             </Flex>
             <Flex align={'center'} gap={2}>
               <Heading color={'secondary.400'} size={'sm'}>Total Volume </Heading>

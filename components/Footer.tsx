@@ -13,6 +13,7 @@ import { AppDataContext } from './context/AppDataProvider';
 import { useNetwork } from 'wagmi';
 import { Switch } from '@chakra-ui/react'
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
+import { BsBook } from 'react-icons/bs';
 
 export default function Footer() {
   const {block} = useContext(AppDataContext);
@@ -43,13 +44,21 @@ export default function Footer() {
             <Flex zIndex={1000} align={'center'} gap={1}>
               <Box h={2} w={2} bgColor={block == 0 ? 'red': 'green.400'} rounded='100'></Box>
               <Text fontSize={'xs'}>{chain?.name} ({block == 0 ? 'Not Connected': block})</Text>
-              <Text fontSize={'xs'}>| v1.0.1-degen |</Text>
+              <Text fontSize={'xs'} color={'whiteAlpha.600'}>| v1.1.0-beta |</Text>
+              
+              <Text fontSize={'xs'} color={'whiteAlpha.600'}> Note: We{"'"}re still in beta. Use with caution</Text>
+            </Flex>
+            <Stack direction={'row'} align={'center'} spacing={4}>
+              <Flex gap={2} align={'center'}>
               {colorMode == 'dark' ? <MdDarkMode /> : <MdLightMode/>}
               <Switch zIndex={1000} size="sm" onChange={toggleColorMode} />
-            </Flex>
-            <Stack direction={'row'} spacing={6}>
+              <Text>|</Text>
+              </Flex>
               <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_TWITTER_LINK}>
                 <FaTwitter />
+              </Link>
+              <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_TWITTER_LINK}>
+                <BsBook />
               </Link>
               <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_DISCORD_LINK}>
                 <FaDiscord />

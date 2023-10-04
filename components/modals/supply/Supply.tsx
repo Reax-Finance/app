@@ -8,9 +8,8 @@ import {
 	Tooltip,
 	useColorMode,
 } from "@chakra-ui/react";
-import { ADDRESS_ZERO, EIP712_VERSION, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
+import { ADDRESS_ZERO, EIP712_VERSION, defaultChain, dollarFormatter, numOrZero, tokenFormatter } from '../../../src/const';
 import Big from "big.js";
-import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork, useSignTypedData } from 'wagmi';
 import { ethers, BigNumber } from 'ethers';
 import { getABI, getContract, send } from "../../../src/contract";
@@ -25,6 +24,7 @@ import { useLendingData } from "../../context/LendingDataProvider";
 import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 export default function Supply({ market, amount, setAmount, isNative, max, onClose }: any) {
 	const [approveLoading, setApproveLoading] = useState(false);
@@ -37,7 +37,9 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const { toggleIsCollateral, protocol, updatePositions } = useLendingData();
 
@@ -148,6 +150,9 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 			}
 		}
 		tx.then(async (res: any) => {
+			// supplying for first time
+			if((!walletBalances[market.outputToken.id] || Number(walletBalances[market.outputToken.id]) == 0) && !market.isCollateral) toggleIsCollateral(market.id);
+
 			const response = await res.wait();
 			updateFromTx(response);
 			setAmount('');
@@ -159,16 +164,13 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 			if(Number(approvedAmount) > 0){
 				addNonce(market.inputToken.id, '1');
 			}
-
-			// supplying for first time
-			if(!walletBalances[market.outputToken.id] || Number(walletBalances[market.outputToken.id]) == 0) toggleIsCollateral(market.id);
 			
 			setLoading(false);
 			toast({
 				title: "Deposit Successful",
 				description: <Box>
 					<Text>
-						{`You have deposited ${Big(_amount.toString()).div(10**market.inputToken.decimals).toString()} ${market.inputToken.symbol}`}
+						{`You have deposited ${tokenFormatter.format(Big(_amount.toString()).div(10**market.inputToken.decimals).toNumber())} ${market.inputToken.symbol}`}
 					</Text>
 					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 						<Flex align={'center'} gap={2}>
@@ -375,7 +377,7 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Available to issue
 							</Text>
-							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount)*prices[market.inputToken.id]*market.maximumLTV/100 - (Number(pos.debt)))}</Text>
+							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount)*(prices[market.inputToken.id] ?? 0)*market.maximumLTV/100 - (Number(pos.debt)))}</Text>
 						</Flex>
 					</Box>
 				</Box>

@@ -182,8 +182,6 @@ export default function Market() {
 				display={{ sm: "block", md: "flex" }}
 				justifyContent={"space-between"}
 				alignContent={"start"}
-				mt={10}
-				mb={6}
 			>
 				<Box>
 					{pools.length > 1 ? <PoolSelector /> : <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={{sm: '3xl', md: "3xl", lg: '32px'}}>{pools[0]?.name}</Heading>}

@@ -9,9 +9,13 @@ import { getABI, getAddress, getContract, send } from '../../../src/contract';
 import Big from 'big.js';
 import { ethers } from 'ethers';
 import { HEADING_FONT, VARIANT } from '../../../styles/theme';
+import { useRouter } from 'next/router';
 
 export default function LendingMarket() {
-    const {protocol, markets, pools, selectedPool} = useLendingData();
+    const {markets, pools, protocols} = useLendingData();
+	const {query} = useRouter();
+	const selectedPool = Number(query.market);
+	const protocol = protocols[selectedPool];
 
 	const [synAccrued, setSynAccrued] = useState<any>(null);
 	const [claiming, setClaiming] = useState(false);
@@ -107,8 +111,6 @@ export default function LendingMarket() {
             display={{ sm: "block", md: "flex" }}
             justifyContent={"space-between"}
             alignContent={"start"}
-            mt={10}
-            mb={6}
         >
             <Box>
 					{pools.length > 1 ? <PoolSelector /> : <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={{sm: '3xl', md: "3xl", lg: '32px'}}>{protocol?.name}</Heading>}

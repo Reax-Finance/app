@@ -30,14 +30,12 @@ import useHandleError, { PlatformType } from "../../utils/useHandleError";
 export default function YourBorrow({ market, index, type }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [amount, setAmount] = React.useState("");
-	const [amountNumber, setAmountNumber] = useState(0);
 	const { walletBalances, updateFromTx } = useBalanceData();
 	const { prices } = usePriceData();
 	const [loading, setLoading] = useState(false);
 
 	const _onClose = () => {
 		setAmount("");
-		setAmountNumber(0);
 		onClose();
 	};
 
@@ -148,7 +146,7 @@ export default function YourBorrow({ market, index, type }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<BorrowModal market={market} amount={amount} setAmount={setAmount} amountNumber={amountNumber} setAmountNumber={setAmountNumber} />
+				<BorrowModal market={market} amount={amount} setAmount={setAmount} onClose={_onClose} />
 			</Modal>
 		</>
 	);

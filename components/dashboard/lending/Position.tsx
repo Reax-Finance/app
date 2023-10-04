@@ -12,12 +12,14 @@ import { dollarFormatter, tokenFormatter } from '../../../src/const'
 import { useSyntheticsData } from '../../context/SyntheticsPosition'
 import { FaPercentage } from 'react-icons/fa'
 import { VARIANT } from '../../../styles/theme'
+import { useRouter } from 'next/router'
 
 export default function LendingPosition() {
     const { tradingPool } = useAppData();
     const { lendingPosition, netAPY, netRewardsAPY } = useSyntheticsData();
+    const router = useRouter();
 
-    const pos = lendingPosition();
+    const pos = lendingPosition(Number(router.query.market ?? 0));
 	const { colorMode } = useColorMode();
 
     return (
@@ -171,13 +173,13 @@ export default function LendingPosition() {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={Big(netAPY()).gt(0) ? 'green.400' : 'red.400'}
+                                                color={Big(netAPY(Number(router.query.market ?? 0))).gt(0) ? 'green.400' : 'red.400'}
                                                 align={'center'}
                                             >
                                                 <Text>
-                                                    {(netAPY()).toFixed(2)}%
+                                                    {(netAPY(Number(router.query.market ?? 0))).toFixed(2)}%
                                                 </Text>
-                                                <Text fontSize={'md'} fontWeight={'medium'} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}> + {netRewardsAPY().toFixed(2)}%</Text>
+                                                <Text fontSize={'md'} fontWeight={'medium'} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}> + {netRewardsAPY(Number(router.query.market ?? 0)).toFixed(2)}%</Text>
                                                 <Image ml={1} src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} boxSize={'18px'} />
                                             </Flex>
                                         </Flex>

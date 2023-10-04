@@ -54,7 +54,7 @@ export default function Debt({ synth, index }: any) {
 
 	const { prices } = usePriceData();
 	const { position } = useSyntheticsData();
-	const pos = position();
+	const pos = position(0);
 
 	const _onClose = () => {
 		setAmount("");
