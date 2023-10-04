@@ -36,20 +36,20 @@ export default function Lend() {
 			</Head>
 				<Box w={'100%'}>
 				
-				<Box mt={20} mb={2}>
+				<Box pt={20} pb={4} my={2}>
 					<LendingMarket />
 				</Box>
 
-				<Box>
+				<Box my={2}>
 					<LendingPosition />
 				</Box>
 
-				<Box mt={5} w='100%'>
+				<Box w='100%' my={4}>
 					<Flex
 						flexDir={{ sm: "column", md: "row" }}
 						align={"stretch"}
-						gap={"2%"}
 						zIndex={1}
+						gap={4}
 					>
 						<Box
 							w={{ sm: "100%", md: "49%" }}
@@ -86,13 +86,12 @@ export default function Lend() {
 					</Flex>
 				</Box>
 
-				<Box pb={"70px"} w='100%'>
+				<Box pb={"70px"} w='100%' my={2}>
 					<Flex
 						flexDir={{ sm: "column", md: "row" }}
 						align={"stretch"}
-						gap={"2%"}
 						zIndex={1}
-						mt={5}
+						gap={4}
 					>
 						<Box
 							w={{ sm: "100%", md: "49%" }}

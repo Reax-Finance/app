@@ -25,7 +25,6 @@ export default function Position({ poolIndex }: any) {
 				<Flex
 					flexDir={'column'}
 					wrap={"wrap"}
-					mb={-5}
 					w="100%"
 					className={`${VARIANT}-${colorMode}-halfContainerBody`}
 				>

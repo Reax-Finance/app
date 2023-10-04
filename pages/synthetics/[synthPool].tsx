@@ -37,20 +37,20 @@ export default function Synthetics() {
 			</Head>
 				<Box w={'100%'}>
 				
-				<Box pt={10}>
+				<Box pt={20} pb={4} my={2}>
 					<Market/>
 				</Box>
-			
+				<Box py={2}>
 					<Position/>
+				</Box>
 
-				<Box pb={"70px"} mt={10} w='100%'>
+				<Box pb={"70px"} w='100%' my={2}>
 					{(pools[tradingPool]?.paused || !isMarketOpen(pools[tradingPool]?.name ?? 'Crypto Market')) ?(
 						<Paused />
 					) : (
 						<Flex
 							flexDir={{ sm: "column", md: "row" }}
 							align={"stretch"}
-							gap={8}
 							zIndex={1}
 						>
 							<Box
@@ -67,7 +67,7 @@ export default function Synthetics() {
 										height: "100%",
 									}}
 								>
-									<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
+									<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'} mr={2}>
 										<CollateralTable />
 									</Box>
 								</motion.div>
@@ -79,8 +79,11 @@ export default function Synthetics() {
 									exit={{ opacity: 0, y: 15 }}
 									transition={{ duration: 0.25 }}
 									key={tradingPool + 2}
+									style={{
+										height: "100%",
+									}}
 								>
-									<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'}>
+									<Box className={`${VARIANT}-${colorMode}-containerBody`} h={'100%'} ml={2}>
 										<IssuanceTable />
 									</Box>
 								</motion.div>

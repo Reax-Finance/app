@@ -48,6 +48,7 @@ export const EPOCH_REWARDS: any = {
 	3: 250_000,
 	4: 100_000,
 	5: 100_000,
+	6: 100_000,
 }
 
 export const PROJECT_ID = '9635a0d9de95bced3f125a11f3ace2b5';
