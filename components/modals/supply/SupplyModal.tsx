@@ -84,15 +84,17 @@ export default function SupplyModal({
 				.toFixed(market.inputToken.decimals);
 		} else {
             if(!prices[market.inputToken.id]) return "0";
+			
 			// values in market.inputToken
 			const v1 = Big(pos.availableToIssue).div(prices[market.inputToken.id]).mul(100).div(market.maximumLTV);
 			const v2 = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
 			// Available to withdraw from pool
 			// const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
+
+			// If not collateral, return all balance
 			if(!market.isCollateral){
 				return v2.toString();
 			}
-			
 			// find minimum of (v1, v2, v3)
 			let min = v1;
 			if(v2.lt(min)) min = v2;
