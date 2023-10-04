@@ -57,7 +57,7 @@ export default function Footer() {
               <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_TWITTER_LINK}>
                 <FaTwitter />
               </Link>
-              <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_TWITTER_LINK}>
+              <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_DOCS_LINK}>
                 <BsBook />
               </Link>
               <Link zIndex={1000} target={'_blank'} href={process.env.NEXT_PUBLIC_DISCORD_LINK}>
