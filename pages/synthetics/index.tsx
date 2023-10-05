@@ -25,6 +25,7 @@ import { Status } from "../../components/utils/status";
 import APRInfo from "../../components/infos/APRInfo";
 import Skeleton1 from "../../components/others/Skeleton1";
 import { useSyntheticsData } from "../../components/context/SyntheticsPosition";
+import Head from "next/head";
 
 export default function Lend() {
 	const { pools: allPools } = useAppData();
@@ -91,7 +92,11 @@ export default function Lend() {
     }, [allPools, status, prices, pools.length]);
 
 
-	return (
+	return (<>
+        <Head>
+            <title>{process.env.NEXT_PUBLIC_TOKEN_SYMBOL} | Synthetics</title>
+            <link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
+        </Head>
 		<Box mt={"80px"}>
             <Flex flexDir={'column'} align={'start'} gap={6} mb={10}>
             <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>
@@ -181,5 +186,6 @@ export default function Lend() {
 			</Box>
             )): <Skeleton1 />}
 		</Box>
+    </>
 	);
 }

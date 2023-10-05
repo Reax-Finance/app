@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, Image, Skeleton, Text, Tooltip, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, Image, Input, Skeleton, Text, Tooltip, useColorMode } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useLendingData } from "../../components/context/LendingDataProvider";
 import {
@@ -18,6 +18,9 @@ import ThBox from "../../components/dashboard/ThBox";
 import { HEADING_FONT, VARIANT } from "../../styles/theme";
 import TdBox from "../../components/dashboard/TdBox";
 import { useRouter } from "next/router";
+import Head from "next/head";
+
+const POPULAR_ASSETS = ['USDT', 'ETH', 'cUSD', 'MNT']
 
 export default function Lend() {
 	const { pools: allPools, protocols } = useLendingData();
@@ -25,6 +28,8 @@ export default function Lend() {
     const router = useRouter();
 
     const [pools, setPools] = useState<any>([]);
+    const [searchedPools, setSearchedPools] = useState<any>([]);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     useEffect(() => {
         if(pools.length > 0) return;
@@ -44,22 +49,66 @@ export default function Lend() {
             })
         });
         setPools(sortedPools);
+        setSearchedPools(sortedPools);
     }, [allPools, protocols]);
 
-	return (
+
+    const search = (term: string) => {
+        let _searchedPools = [];
+        term = term.toLowerCase();
+        for(let i in pools){
+            for (let j in pools[i]){
+                let market = pools[i][j];
+                if(market.inputToken.symbol.toLowerCase().includes(term) || market.inputToken.name.toLowerCase().includes(term)){
+                    _searchedPools.push(pools[i]);
+                    break;
+                }
+            }
+        }
+        setSearchedPools(_searchedPools);
+        setSearchTerm(term);
+    }
+
+	return (<>
+        <Head>
+            <title>{process.env.NEXT_PUBLIC_TOKEN_SYMBOL} | Lend</title>
+            <link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
+        </Head>
 		<Box mt={"80px"}>
-            <Flex flexDir={'column'} align={'start'} gap={6} mb={10}>
-            <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>Lending Pools</Heading>
-            <Text color={'whiteAlpha.600'}>
-                Isolated pools for secure and simple Lending/Borrowing
-            </Text>
+            <Flex justify={'space-between'} align={'start'}>
+                <Flex flexDir={'column'} align={'start'} gap={6} mb={10}>
+                <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>Lending Pools</Heading>
+                <Text color={'whiteAlpha.600'}>
+                    Isolated pools for secure and simple Lending/Borrowing
+                </Text>
+                </Flex>
+                <Flex>
+                    {/* <Box className={`${VARIANT}-${colorMode}-outlinedButton`}>
+                        <Button bg={'transparent'} _hover={{bg: 'transparent'}} isDisabled={true}>Create A New Pool</Button>
+                    </Box> */}
+                </Flex>
             </Flex>
 			<Box mt={4} className={`${VARIANT}-${colorMode}-containerBody`}>
-            <Box className={`${VARIANT}-${colorMode}-containerHeader`}>
+            <Flex justify={'space-between'} className={`${VARIANT}-${colorMode}-containerHeader`}>
                 <Flex align={'center'} p={4} px={5} gap={4}>
-                <Heading fontSize={'18px'} color={'secondary.400'}>All Pools</Heading>
+                    <Heading fontSize={'18px'} color={'secondary.400'}>All Pools</Heading>
                 </Flex>
-            </Box>
+
+                <Flex align={'center'} mr={5}>
+                    {/* Search Pool by Name */}
+                    <Input placeholder="Filter by Token" variant="filled" size="sm" w={'200px'} onChange={(e) => search(e.target.value)} />
+                    {POPULAR_ASSETS.map((asset: string) => {
+                        return (
+                            <>
+                            <Divider orientation="vertical" h={'30px'} borderColor={'whiteAlpha.400'}/>
+                            <Button size={'sm'} rounded={0} gap={2} key={asset} onClick={() => searchTerm == asset ? search('') : search(asset)} bg={searchTerm == asset ? 'whiteAlpha.600' : 'whiteAlpha.200'}> 
+                                <Image src={`/icons/${asset}.svg`} alt="" w={'20px'} />
+                            </Button>
+                            </>
+                        )
+                    })}
+                </Flex>
+            </Flex>
 				<TableContainer h={'100%'} pb={4}>
 					<Table variant="simple">
 						<Thead>
@@ -72,11 +121,9 @@ export default function Lend() {
 							</Tr>
 						</Thead>
 						<Tbody>
-							{pools.length > 0 ? pools.map((pool: any, index: number) => (
+							{pools.length > 0 ? searchedPools.length > 0 ? searchedPools.map((pool: any, index: number) => (
 								<>
 									<Tr cursor={'pointer'} _hover={{bg:'whiteAlpha.100'}} onClick={() => {
-                                        // open in new /lend/[poolIndex]
-                                        // window.open(`/lend/${pool[0].poolIndex}`, '_blank');
                                         router.push(`/lend/${pool[0].poolIndex}`);
                                     }}>
                                     <TdBox alignBox='left'>
@@ -126,6 +173,10 @@ export default function Lend() {
                                 </Tr>
                             </>
 							)) : <>
+                                <Flex w={'100%'} py={4} px={6}>
+                                    <Text color={'whiteAlpha.400'}>No Pools Found for {'"'}{searchTerm}{'"'}</Text>
+                                </Flex>
+                            </> : <>
                                 <Tr>
                                     <Td>
                                         <Skeleton height="40px" />
@@ -146,5 +197,6 @@ export default function Lend() {
 				</TableContainer>
 			</Box>
 		</Box>
+        </>
 	);
 }
