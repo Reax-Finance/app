@@ -28,7 +28,7 @@ import { getContract, send } from '../../src/contract';
 export default function Leaderboard({epochIndex}: any) {
   const { epoches } = useDexData();
   const { address } = useAccount();
-
+  const [loading, setLoading] = React.useState(true);
 
   const rank = epoches[epochIndex]?.users?.findIndex((user: any) => user.address.toLowerCase() === address?.toLowerCase()) + 1;
   const isAddressInLeaderboard = rank > 0;
@@ -41,79 +41,116 @@ export default function Leaderboard({epochIndex}: any) {
   const [days, hours, minutes, seconds] = useCountdown(epoches[epochIndex]?.endAt * 1000 || Date.now());
   // If ending today, show countdown from endAt, else show date
   const ending = () => {
-        if ((new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})) == new Date(Date.now()).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) && (epoches[epochIndex]?.endAt * 1000) > Date.now()){
-            return {title: "Ending In", value: hours + ":"+ minutes + ":"+ seconds}
-        }
-        // If already ended, show ended
-        else if ((epoches[epochIndex]?.endAt * 1000) < Date.now()){
-          return {title: "Ended", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
-        }
-        else {
-          return {title: "Ending On", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
-        }
+    if ((new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})) == new Date(Date.now()).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) && (epoches[epochIndex]?.endAt * 1000) > Date.now()){
+        return {title: "Ending In", value: hours + ":"+ minutes + ":"+ seconds}
     }
+    // If already ended, show ended
+    else if ((epoches[epochIndex]?.endAt * 1000) < Date.now()){
+      return {title: "Ended", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+    }
+    else {
+      return {title: "Ending On", value: new Date(epoches[epochIndex]?.endAt * 1000).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+    }
+  }
 
-    const claimRewards = async () => {
-      if (!address) {
-        return;
-      }
-      const chainId: number = Number(process.env.NEXT_PUBLIC_CHAIN_ID as string);
-  
-      let _getDataForProof = fetch(
-        `https://rewards-testnet-api.reax.one/epoch/user/${
-          epochIndex - 1
-        }/${address?.toLowerCase()}`
-      );
-  
-      let _getEpochData = axios.post(ROUTER_ENDPOINT(chainId), {
-        query: query_claim_rewards(
-          address.toLowerCase(),
-          (epochIndex - 1).toString()
-        ),
-        variables: {},
-      });
-  
-      const data = await Promise.all([_getDataForProof, _getEpochData]);
-      console.log("data", data);
+  const [claimData, setClaimData] = React.useState<any>({});
+
+  useEffect(() => {
+    if(claimData[epochIndex]) return;
+    if(!address) return;
+    if(!epoches[epochIndex]?.id) return;
+    const chainId: number = Number(process.env.NEXT_PUBLIC_CHAIN_ID as string);
+
+    let _getDataForProof = fetch(
+      `https://rewards-testnet-api.reax.one/epoch/user/${
+        epoches[epochIndex].id
+      }/${address?.toLowerCase()}`
+    );
+
+    let _getEpochData = axios.post(ROUTER_ENDPOINT(chainId), {
+      query: query_claim_rewards(
+        address.toLowerCase(),
+        epoches[epochIndex].id
+      ),
+      variables: {},
+    });
+
+    Promise.all([_getDataForProof, _getEpochData]).then(async (data) => {
+      console.log(data, epochIndex);
       const getDataForProof = data[0];
       const getEpochData = data[1];
-  
+
       if (getDataForProof.status !== 200) {
-        console.log("EPOCH_PROOF_API_DATA_NOT_FOUND");
+        setClaimData({...claimData, [epochIndex]: {
+          message: "EPOCH_PROOF_API_DATA_NOT_FOUND",
+          canClaim: false,
+        }})
         return;
       }
-  
+
       if (getEpochData.status !== 200) {
-        console.log("EPOCH_GRAPH_DATA_NOT_FOUND");
+        setClaimData({...claimData, [epochIndex]: {
+          message: "EPOCH_GRAPH_DATA_NOT_FOUND",
+          canClaim: false,
+        }})
         return;
       }
-  
+
       const claimRewardsContractAddress =
         getEpochData.data.data.epoch.rewardsContract;
       const isClaim = getEpochData.data.data.epoch.users[0].claim;
       if (!claimRewardsContractAddress) {
-        console.log("CLAIM_REWARDS_ADDRESS_NOT_FOUND");
+        setClaimData({...claimData, [epochIndex]: {
+          message: "CLAIM_REWARDS_CONTRACT_NOT_FOUND",
+          canClaim: false,
+        }})
         return;
       }
       if (isClaim) {
-        console.log("REWARDS_ALREADY_CLAIMED");
+        setClaimData({...claimData, [epochIndex]: {
+          message: "ALREADY_CLAIMED",
+          canClaim: false,
+        }})
         return;
       }
-  
+
       const getProofAndAmount = (await getDataForProof.json()).data;
       const { proof, userData } = getProofAndAmount;
       const { rewardTokenAlloted } = userData;
-  
-      const claimRewardsContract = await getContract(
-        "ClaimRewards",
-        chainId,
-        claimRewardsContractAddress
-      );
-      await send(claimRewardsContract, "claimReward", [
-        rewardTokenAlloted,
+
+      setClaimData({...claimData, [epochIndex]: {
+        canClaim: true,
         proof,
-      ]);
-    };
+        rewardTokenAlloted,
+        claimRewardsContractAddress
+      }});
+    })
+  }, [address, epochIndex, epoches])
+
+  const claimRewards = async () => {
+    if (!address || !claimData[epochIndex]?.canClaim) {
+      return;
+    }
+
+    const chainId: number = Number(process.env.NEXT_PUBLIC_CHAIN_ID as string);
+
+    const claimRewardsContract = await getContract(
+      "ClaimRewards",
+      chainId,
+      claimData[epochIndex].claimRewardsContractAddress
+    );
+
+    send(claimRewardsContract, "claimReward", [
+      claimData[epochIndex].rewardTokenAlloted,
+      claimData[epochIndex].proof,
+    ])
+      .then((res: any) => {
+        console.log("res", res);
+      })
+      .catch((err: any) => {
+        console.log("err", err);
+      });
+  };
 
   return (
     <>
@@ -130,7 +167,9 @@ export default function Leaderboard({epochIndex}: any) {
           <PointBox title={ending().title == "Ended" ? "Your Rewards" : 'Your Estimated Rewards'} value={tokenFormatter.format(
             epoches[epochIndex]?.totalPoints > 0 ? (EPOCH_REWARDS[Number(epoches[epochIndex]?.id) + 1] ?? 0) * ((user?.totalPoints ?? 0) / epoches[epochIndex]?.totalPoints) : 0
           ) + ' ' + process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL + (ending().title !== "Ended" ? "*" : '')} tbd={true} />
-          {ending().title == "Ended" && <Button colorScheme='primary' size='sm' variant='outline' rounded={0} onClick={claimRewards}>Claim Rewards</Button>}
+          {ending().title == "Ended" && <Tooltip label={claimData[epochIndex]?.message || ''}> 
+            <Button colorScheme='primary' size='sm' variant='outline' rounded={0} onClick={claimRewards} isDisabled={!claimData[epochIndex]?.canClaim}>Claim Rewards</Button>
+          </Tooltip>}
         </Flex>
 
       </Box>
@@ -138,37 +177,37 @@ export default function Leaderboard({epochIndex}: any) {
       <Box pt={1} pb={5} borderColor='whiteAlpha.50' className={`${VARIANT}-${colorMode}-containerBody`}>
 
       <TableContainer >
-      <Table variant='simple'>
-        <Thead>
-          <Tr>
-            <Th>
-              <Flex>
-              Rank
-              </Flex>
-              </Th>
-            <Th>Account</Th>
-            <Th>Total Points</Th>
-            <Th>Total Volume (USD)</Th>
+        <Table variant='simple'>
+          <Thead>
+            <Tr>
+              <Th>
+                <Flex>
+                Rank
+                </Flex>
+                </Th>
+              <Th>Account</Th>
+              <Th>Total Points</Th>
+              <Th>Total Volume (USD)</Th>
 
-            <Th isNumeric>Multiplier</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-        {epoches[epochIndex]?.users?.map((_account: any, index: number): any => {
-        return <>
-          <LeaderboardRow _account={_account} index={index + 1} />
-        </>
-        })}
-        {(!isAddressInLeaderboard && address) && <LeaderboardRow _account={{address: address?.toLowerCase(), totalPoints: user?.totalPoints, totalVolumeUSD: user?.totalVolumeUSD}} index={'...'} />}
-    </Tbody>
-  </Table>
-</TableContainer>
+              <Th isNumeric>Multiplier</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+          {epoches[epochIndex]?.users?.map((_account: any, index: number): any => {
+          return <>
+            <LeaderboardRow _account={_account} index={index + 1} />
+          </>
+          })}
+          {(!isAddressInLeaderboard && address) && <LeaderboardRow _account={{address: address?.toLowerCase(), totalPoints: user?.totalPoints, totalVolumeUSD: user?.totalVolumeUSD}} index={'...'} />}
+      </Tbody>
+    </Table>
+  </TableContainer>
 
-</Box>
-    <Box mt={4}>
-        <PointBox title='* To be updated' value={""} tbd={true} />
     </Box>
-</Box>
+      <Box mt={4}>
+        <PointBox title='* To be updated' value={""} tbd={true} />
+      </Box>
+    </Box>
     </>
   )
 }
