@@ -28,7 +28,7 @@ import { getContract, send } from '../../src/contract';
 export default function Leaderboard({epochIndex}: any) {
   const { epoches } = useDexData();
   const { address } = useAccount();
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
 
   const rank = epoches[epochIndex]?.users?.findIndex((user: any) => user.address.toLowerCase() === address?.toLowerCase()) + 1;
   const isAddressInLeaderboard = rank > 0;
