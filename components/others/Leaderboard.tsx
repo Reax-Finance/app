@@ -17,6 +17,13 @@ import { useDexData } from '../context/DexDataProvider';
 import LeaderboardRow from '../others/LeaderboardRow';
 import { VARIANT } from '../../styles/theme';
 import { useCountdown } from '../context/useCountdown';
+import axios from 'axios';
+import {
+  ROUTER_ENDPOINT,
+  query_claim_rewards,
+  query_leaderboard,
+} from "../../src/queries/dex";
+import { getContract, send } from '../../src/contract';
 
 export default function Leaderboard({epochIndex}: any) {
   const { epoches } = useDexData();
@@ -46,6 +53,68 @@ export default function Leaderboard({epochIndex}: any) {
         }
     }
 
+    const claimRewards = async () => {
+      if (!address) {
+        return;
+      }
+      const chainId: number = Number(process.env.NEXT_PUBLIC_CHAIN_ID as string);
+  
+      let _getDataForProof = fetch(
+        `https://rewards-testnet-api.reax.one/epoch/user/${
+          epochIndex - 1
+        }/${address?.toLowerCase()}`
+      );
+  
+      let _getEpochData = axios.post(ROUTER_ENDPOINT(chainId), {
+        query: query_claim_rewards(
+          address.toLowerCase(),
+          (epochIndex - 1).toString()
+        ),
+        variables: {},
+      });
+  
+      const data = await Promise.all([_getDataForProof, _getEpochData]);
+      console.log("data", data);
+      const getDataForProof = data[0];
+      const getEpochData = data[1];
+  
+      if (getDataForProof.status !== 200) {
+        console.log("EPOCH_PROOF_API_DATA_NOT_FOUND");
+        return;
+      }
+  
+      if (getEpochData.status !== 200) {
+        console.log("EPOCH_GRAPH_DATA_NOT_FOUND");
+        return;
+      }
+  
+      const claimRewardsContractAddress =
+        getEpochData.data.data.epoch.rewardsContract;
+      const isClaim = getEpochData.data.data.epoch.users[0].claim;
+      if (!claimRewardsContractAddress) {
+        console.log("CLAIM_REWARDS_ADDRESS_NOT_FOUND");
+        return;
+      }
+      if (isClaim) {
+        console.log("REWARDS_ALREADY_CLAIMED");
+        return;
+      }
+  
+      const getProofAndAmount = (await getDataForProof.json()).data;
+      const { proof, userData } = getProofAndAmount;
+      const { rewardTokenAlloted } = userData;
+  
+      const claimRewardsContract = await getContract(
+        "ClaimRewards",
+        chainId,
+        claimRewardsContractAddress
+      );
+      await send(claimRewardsContract, "claimReward", [
+        rewardTokenAlloted,
+        proof,
+      ]);
+    };
+
   return (
     <>
     <Box>
@@ -61,16 +130,7 @@ export default function Leaderboard({epochIndex}: any) {
           <PointBox title={ending().title == "Ended" ? "Your Rewards" : 'Your Estimated Rewards'} value={tokenFormatter.format(
             epoches[epochIndex]?.totalPoints > 0 ? (EPOCH_REWARDS[Number(epoches[epochIndex]?.id) + 1] ?? 0) * ((user?.totalPoints ?? 0) / epoches[epochIndex]?.totalPoints) : 0
           ) + ' ' + process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL + (ending().title !== "Ended" ? "*" : '')} tbd={true} />
-          {ending().title == "Ended" && <Tooltip label="Reward distribution will start soon" placement="top">
-          <Button colorScheme='primary' size='sm' variant='outline' rounded={0} isDisabled={true}>Claim Rewards</Button>
-          </Tooltip>}
-          {/* <PointDivider /> */}
-          {/* <PointBox title='Weightage' value={<Box fontSize={'sm'}>
-            <Flex gap={1}><Text color={'whiteAlpha.700'}>Synth Swap: </Text>1 point / $1</Flex>
-            <Flex gap={1}><Text color={'whiteAlpha.700'}>AMM Swap: </Text>0.5 point / $1</Flex>
-            </Box>
-          } /> */}
-          {/* <PointDivider /> */}
+          {ending().title == "Ended" && <Button colorScheme='primary' size='sm' variant='outline' rounded={0} onClick={claimRewards}>Claim Rewards</Button>}
         </Flex>
 
       </Box>
