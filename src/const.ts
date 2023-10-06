@@ -58,6 +58,7 @@ export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (proc
 
 export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://xc-testnet.pyth.network' : 'https://xc-mainnet.pyth.network';
 export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://routes-api.reax.one' : 'https://mainnet.router-api.reax.one';
+export const EPOCH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://rewards-testnet-api.reax.one' : 'https://rewards-mainnet-api.reax.one';
 
 export const REPLACED_FEEDS: any = {
 	"0x0e9ec6a3f2fba0a3df73db71c84d736b8fc1970577639c9456a2fee0c8f66d93": "0xd45b6d47bf43faa700e6f6fec4f8989fcc80eabb2f2eff862d7258d60026d1b5"
