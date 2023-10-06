@@ -10,7 +10,7 @@ import {
   Text,
   Image
 } from '@chakra-ui/react'
-import { EPOCH_REWARDS, dollarFormatter, tokenFormatter } from '../../src/const';
+import { EPOCH_ENDPOINT, EPOCH_REWARDS, dollarFormatter, tokenFormatter } from '../../src/const';
 import Head from 'next/head';
 import { useAccount } from 'wagmi';
 import { useDexData } from '../context/DexDataProvider';
@@ -62,7 +62,7 @@ export default function Leaderboard({epochIndex}: any) {
     const chainId: number = Number(process.env.NEXT_PUBLIC_CHAIN_ID as string);
 
     let _getDataForProof = fetch(
-      `https://rewards-testnet-api.reax.one/epoch/user/${
+      `${EPOCH_ENDPOINT}/epoch/user/${
         epoches[epochIndex].id
       }/${address?.toLowerCase()}`
     );
@@ -82,7 +82,7 @@ export default function Leaderboard({epochIndex}: any) {
 
       if (getDataForProof.status !== 200) {
         setClaimData({...claimData, [epochIndex]: {
-          message: "EPOCH_PROOF_API_DATA_NOT_FOUND",
+          message: "Claiming not enabled yet",
           canClaim: false,
         }})
         return;
@@ -90,7 +90,7 @@ export default function Leaderboard({epochIndex}: any) {
 
       if (getEpochData.status !== 200) {
         setClaimData({...claimData, [epochIndex]: {
-          message: "EPOCH_GRAPH_DATA_NOT_FOUND",
+          message: "Claiming not enabled yet",
           canClaim: false,
         }})
         return;
@@ -101,7 +101,7 @@ export default function Leaderboard({epochIndex}: any) {
       const isClaim = getEpochData.data.data.epoch.users[0].claim;
       if (!claimRewardsContractAddress) {
         setClaimData({...claimData, [epochIndex]: {
-          message: "CLAIM_REWARDS_CONTRACT_NOT_FOUND",
+          message: "Claiming not enabled yet",
           canClaim: false,
         }})
         return;
@@ -125,12 +125,15 @@ export default function Leaderboard({epochIndex}: any) {
         claimRewardsContractAddress
       }});
     })
-  }, [address, epochIndex, epoches])
+  }, [address, epochIndex, epoches]);
+
+  console.log(claimData);
 
   const claimRewards = async () => {
     if (!address || !claimData[epochIndex]?.canClaim) {
       return;
     }
+    setLoading(true);
 
     const chainId: number = Number(process.env.NEXT_PUBLIC_CHAIN_ID as string);
 
@@ -145,10 +148,17 @@ export default function Leaderboard({epochIndex}: any) {
       claimData[epochIndex].proof,
     ])
       .then((res: any) => {
-        console.log("res", res);
+        setLoading(false);
+        setClaimData({
+          ...claimData,
+          [epochIndex]: {
+            message: "ALREADY_CLAIMED",
+            canClaim: false,
+          }
+        })
       })
       .catch((err: any) => {
-        console.log("err", err);
+        setLoading(false);
       });
   };
 
@@ -168,14 +178,12 @@ export default function Leaderboard({epochIndex}: any) {
             epoches[epochIndex]?.totalPoints > 0 ? (EPOCH_REWARDS[Number(epoches[epochIndex]?.id) + 1] ?? 0) * ((user?.totalPoints ?? 0) / epoches[epochIndex]?.totalPoints) : 0
           ) + ' ' + process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL + (ending().title !== "Ended" ? "*" : '')} tbd={true} />
           {ending().title == "Ended" && <Tooltip label={claimData[epochIndex]?.message || ''}> 
-            <Button colorScheme='primary' size='sm' variant='outline' rounded={0} onClick={claimRewards} isDisabled={!claimData[epochIndex]?.canClaim}>Claim Rewards</Button>
+            <Button colorScheme='primary' isLoading={loading} size='sm' variant='outline' rounded={0} onClick={claimRewards} isDisabled={!claimData[epochIndex]?.canClaim}>Claim Rewards</Button>
           </Tooltip>}
         </Flex>
-
       </Box>
       <Box mb={10} mt={4}>
       <Box pt={1} pb={5} borderColor='whiteAlpha.50' className={`${VARIANT}-${colorMode}-containerBody`}>
-
       <TableContainer >
         <Table variant='simple'>
           <Thead>
