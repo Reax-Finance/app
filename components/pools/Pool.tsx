@@ -6,6 +6,7 @@ import {
 	Tr,
 	useDisclosure,
 	Box,
+	useColorMode,
 } from "@chakra-ui/react";
 import React from "react";
 import TdBox from "../dashboard/TdBox";
@@ -15,6 +16,7 @@ import Details from "./actions/Details";
 import { usePriceData } from "../context/PriceContext";
 import Big from "big.js";
 import { useDexData } from "../context/DexDataProvider";
+import { VARIANT } from "../../styles/theme";
 
 export default function Pool({ pool, index }: any) {
 	const { isOpen: isDepositOpen, onOpen: onDepositOpen, onClose: onDepositClose } = useDisclosure();
@@ -24,7 +26,7 @@ export default function Pool({ pool, index }: any) {
 	const calcApy = () => {
 		let totalFees = 0;
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
+			totalFees = (Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[pool.snapshots.length-1].swapFees)) / 2;
 		}
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return 0;
@@ -38,14 +40,16 @@ export default function Pool({ pool, index }: any) {
 		return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
 	}, 0);
 
-	const rewardsApy = liquidity > 0 ? Big(pool.allocPoint ?? 0)
-			.div(dex.totalAllocPoint ?? 1)
+	const rewardsApy = (liquidity > 0 && dex.totalAllocPoint > 0) ? Big(pool.allocPoint ?? 0)
+			.div(dex.totalAllocPoint)
 			.mul(dex.sushiPerSecond)
 			.div(1e18)
 			.mul(365 * 24 * 60 * 60 * ESYX_PRICE)
 			.div(liquidity ?? 1)
 			.mul(100)
 			.toFixed(2) : 0;
+
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
@@ -79,7 +83,7 @@ export default function Pool({ pool, index }: any) {
 							return (
 								pool.address !== token.token.id && (
 									<Flex
-										className="outlinedBox"
+										className={`${VARIANT}-${colorMode}-outlinedBox`}
 										p={2}
 										key={index}
 										align="center"
@@ -110,17 +114,17 @@ export default function Pool({ pool, index }: any) {
 
 				<TdBox isFirst={index == 0} alignBox="center">
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text color={'primary.200'}>{calcApy().toFixed(2)}%</Text>
+						<Text color={'primary.400'}>{calcApy().toFixed(2)}%</Text>
 						{Number(rewardsApy) > 0 && <Flex gap={1.5} mt={1} align={'center'}>
-						<Text color={'whiteAlpha.600'} fontSize={'xs'}>+{rewardsApy}%</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'xs'}>+{rewardsApy}%</Text>
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>
 
 				<TdBox isNumeric>
 					<Flex gap={2}>
-						<Box className="primaryButton">
+						<Box className={`${VARIANT}-${colorMode}-primaryButton`}>
 							<Button
 								onClick={onDepositOpen}
 								color={"white"}
@@ -131,7 +135,7 @@ export default function Pool({ pool, index }: any) {
 								Deposit
 							</Button>
 						</Box>
-						<Box className="outlinedButton">
+						<Box className={`${VARIANT}-${colorMode}-outlinedButton`}>
 							<Button onClick={onDetailsOpen} size={"md"} bg={'transparent'} _hover={{bg: 'transparent'}}>
 								View Details
 							</Button>

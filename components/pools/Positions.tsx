@@ -9,27 +9,53 @@ import {
     Box,
     Heading,
     Text,
-    Flex
+    Flex,
+    useColorMode
   } from '@chakra-ui/react'
 import ThBox from '../dashboard/ThBox';
 import { useBalanceData } from '../context/BalanceProvider';
 import YourPoolPosition from './YourPoolPosition';
 import Big from 'big.js';
+import { VARIANT } from '../../styles/theme';
+import { usePriceData } from '../context/PriceContext';
+import { DOLLAR_PRECISION } from '../../src/const';
 
 export default function Positions() {
     const {walletBalances} = useBalanceData();
     const { pools: dexPools } = useDexData();
+    const { prices } = usePriceData();
+
+    const yourBalance = (pool: any) => {
+      const totalShares = pool.totalShares;
+      const yourShares = walletBalances[pool.address];
+      const liquidity = pool.tokens.reduce((acc: any, token: any) => {
+        return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
+      }, 0);
+      return (yourShares / totalShares) * liquidity / 1e18;
+    }
+  
+    const stakedBalance = (pool: any) => {
+      const totalShares = pool.totalShares;
+      const yourShares = pool.stakedBalance;
+      const liquidity = pool.tokens.reduce((acc: any, token: any) => {
+        return acc + (token.balance ?? 0) * (prices[token.token.id] ?? 0);
+      }, 0);
+      return (yourShares / totalShares) * liquidity / 1e18;
+    }
     
     const yourPositions = dexPools.filter((pool: any) => {
-      return (walletBalances[pool.address] > 0 || Big(pool.stakedBalance ?? 0).gt(0));
+      return (yourBalance(pool) + stakedBalance(pool)) > DOLLAR_PRECISION;
     });
 
     if(yourPositions.length == 0) return <></>;
     
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const {colorMode} = useColorMode();
+
     return (
     <>
-    <Box className='containerBody'>
-      <Box className='containerHeader'>
+    <Box className={`${VARIANT}-${colorMode}-containerBody`}>
+      <Box className={`${VARIANT}-${colorMode}-containerHeader`}>
         <Flex align={'center'} p={4} px={5} gap={4}>
           <Heading fontSize={'18px'} color={'primary.400'}>Your Balances</Heading>
         </Flex>
@@ -50,7 +76,7 @@ export default function Positions() {
                   Staked
                 </Flex>
               </ThBox>
-              <ThBox isNumeric>.</ThBox>
+              <ThBox isNumeric></ThBox>
             </Tr>
           </Thead>
           <Tbody>
@@ -61,7 +87,7 @@ export default function Positions() {
           })}
           </Tbody>
         </Table>
-        </TableContainer> : <><Text color={'whiteAlpha.600'} p={6}>No Active Positions</Text></>}
+        </TableContainer> : <><Text color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} p={6}>No Active Positions</Text></>}
     </Box>
     </>
   )

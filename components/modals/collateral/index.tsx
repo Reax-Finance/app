@@ -20,8 +20,9 @@ import {
 	NumberInput,
 	NumberInputField,
 	Divider,
+	useColorMode,
 } from "@chakra-ui/react";
-import { ADDRESS_ZERO, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, NATIVE, W_NATIVE, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
@@ -36,6 +37,7 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { usePriceData } from "../../context/PriceContext";
 import TokenInfo from "../_utils/TokenInfo";
+import { VARIANT } from "../../../styles/theme";
 
 export default function CollateralModal({ collateral, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -89,18 +91,20 @@ export default function CollateralModal({ collateral, index }: any) {
 
 	const { walletBalances, allowances, nonces } = useBalanceData();
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ borderColor: "primary.400", bg: "bg.400" }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<TokenInfo token={collateral.token} />
+					<TokenInfo token={collateral.token} color={colorMode == 'dark' ? "primary.200" : "primary.600"} />
 				</TdBox>
 				<TdBox
 					isFirst={index == 0}
@@ -109,21 +113,20 @@ export default function CollateralModal({ collateral, index }: any) {
 				>
 					<Box color={
 						Big(collateral.balance ?? 0).gt(0)
-							? "primary.200"
-							: "whiteAlpha.500"
+							? colorMode == 'dark' ? "primary.200" : "primary.600"
+							: colorMode == 'dark' ? "whiteAlpha.500" : "blackAlpha.500"
 					}>
 
 					<Text fontSize={'md'}>
-
-					{tokenFormatter.format(
-						Big(collateral.balance ?? 0)
-							.div(10 ** (collateral.token.decimals ?? 18))
-							.toNumber()
-					)}
-					{Big(collateral.balance ?? 0).gt(0) ? "" : ".00"}
+						{tokenFormatter.format(
+							Big(collateral.balance ?? 0)
+								.div(10 ** (collateral.token.decimals ?? 18))
+								.toNumber()
+						)}
+						{Big(collateral.balance ?? 0).gt(0) ? "" : ".00"}
 					</Text>
 
-					{Big(collateral.balance ?? 0).gt(0) && <Text fontSize={'xs'} color={'whiteAlpha.600'}>
+					{Big(collateral.balance ?? 0).gt(0) && <Text fontSize={'xs'} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>
 						{dollarFormatter.format(
 							Big(collateral.balance ?? 0)
 								.div(10 ** (collateral.token.decimals ?? 18))
@@ -132,7 +135,6 @@ export default function CollateralModal({ collateral, index }: any) {
 						)}
 					</Text>}
 					</Box>
-
 				</TdBox>
 			</Tr>
 
@@ -144,7 +146,7 @@ export default function CollateralModal({ collateral, index }: any) {
 					rounded={0}
 					mx={2}
 				>
-					<Box className="containerBody2">
+					<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 					<ModalCloseButton rounded={"full"} mt={1} />
 					<ModalHeader>
 						<Flex
@@ -167,8 +169,8 @@ export default function CollateralModal({ collateral, index }: any) {
 						</Flex>
 					</ModalHeader>
 					<ModalBody m={0} p={0}>
-						<Divider />
-						<Box bg={'bg.600'} pb={12} pt={4} px={8}>
+						<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.200'}/>
+						<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} pb={12} pt={4} px={8}>
 							{collateral.token.id ==
 								WETH_ADDRESS(chain?.id!)?.toLowerCase() && (
 								<>
@@ -184,14 +186,14 @@ export default function CollateralModal({ collateral, index }: any) {
 										size="sm"
 									>
 										<TabList>
-											<Box className={isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeftSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabLeft`)}>
 											<Tab>
-												MNT
+												{NATIVE}
 											</Tab>
 											</Box>
-											<Box className={!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`}>
+											<Box className={VARIANT + '-' + colorMode + '-' + (!isNative ? `${tabSelected == 0 ? 'secondary' : 'primary'}TabRightSelected` : `${tabSelected == 0 ? 'secondary' : 'primary'}TabRight`)}>
 											<Tab>
-												WMNT
+												{W_NATIVE}
 											</Tab>
 											</Box>
 										</TabList>
@@ -226,7 +228,7 @@ export default function CollateralModal({ collateral, index }: any) {
 												<Text
 													fontSize="sm"
 													textAlign={"center"}
-													color={"whiteAlpha.600"}
+													color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 												>
 													{dollarFormatter.format(
 														prices[collateral.token.id] *
@@ -266,30 +268,30 @@ export default function CollateralModal({ collateral, index }: any) {
 									</InputGroup>
 							
 						</Box>
-						<Divider />
-						<Box className="containerFooter">
+						<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+						<Box className={`${VARIANT}-${colorMode}-containerFooter`}>
 						<Tabs variant={'enclosed'} onChange={selectTab}>
 							<TabList>
 								<Tab
 									w={"50%"}
+									borderX={0}
+									borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 									_selected={{
 										color: "primary.400",
-										borderColor: "primary.400",
 									}}
 									rounded={0}
-									border={0}
 								>
 									Deposit
 								</Tab>
-								<Divider orientation="vertical" h={'40px'} />
+								<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'} orientation="vertical" h={'44px'} />
 								<Tab
 									w={"50%"}
+									borderX={0}
+									borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 									_selected={{
-										color: "secondary.400",
-										borderColor: "secondary.400",
+										color: "primary.400",
 									}}
 									rounded={0}
-									border={0}
 								>
 									Withdraw
 								</Tab>
@@ -302,6 +304,7 @@ export default function CollateralModal({ collateral, index }: any) {
 										amount={amount}
 										setAmount={_setAmount}
 										isNative={isNative}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 								<TabPanel m={0} p={0}>
@@ -310,6 +313,7 @@ export default function CollateralModal({ collateral, index }: any) {
 										amount={amount}
 										setAmount={_setAmount}
 										isNative={isNative}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 							</TabPanels>

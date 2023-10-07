@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { usePriceData } from "../../../context/PriceContext";
-import {
-    useToast,
-} from "@chakra-ui/react";
 import { WETH_ADDRESS, defaultChain } from "../../../../src/const";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { call, getAddress, getArtifact, getContract, send } from "../../../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
 import { useDexData } from "../../../context/DexDataProvider";
@@ -15,7 +12,7 @@ import ProportionalWithdrawLayout from "./layouts/ProportionalWithdrawLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
-export default function ProportionalWithdraw({ pool }: any) {
+export default function ProportionalWithdraw({ pool, onClose }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
 	const [amounts, setAmounts] = React.useState(
 		poolTokens.map((token: any) => "")
@@ -59,6 +56,7 @@ export default function ProportionalWithdraw({ pool }: any) {
             updateFromTx(response);
 			setLoading(false);
 			setAmounts(poolTokens.map((token: any) => ""));
+			onClose();
 		})
 		.catch((err: any) => {
 			handleBalError(err);
@@ -148,6 +146,49 @@ export default function ProportionalWithdraw({ pool }: any) {
 		})
 	}
 
+	const queryAmountOutWithSwap = (_bptIn = bptIn) => {
+		return new Promise((resolve, reject) => {
+			const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+			const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"), provider);
+			const totalBalance = poolTokens.reduce((a: any, b: any) => {
+				return a.add(Big(b.balance));
+			}, Big(0)).toString();
+			let args = [
+				0,
+				poolTokens.map((token: any, index: number) => {
+					return {
+						poolId: pool.id,
+						assetInIndex: pool.tokens.findIndex((t: any) => t.token.id == pool.address),
+						assetOutIndex: token.index,
+						amount: Big(_bptIn).mul(10**18).mul(token.balance).div(totalBalance).toFixed(0),
+						userData: '0x'
+					}
+				}),
+				pool.tokens.map((token: any, index: number) => token.token.id),
+				{
+					sender: address,
+					fromInternalBalance: false,
+					recipient: address,
+					toInternalBalance: false
+				}
+			];
+
+			vaultContract.callStatic.queryBatchSwap(...args)
+			.then((res: any) => {
+				resolve(res.map((amount: BigNumber) => amount.toString()));
+				setLoading(false);
+			})
+			.catch((err: any) => {
+				if(formatBalError(err)){
+					reject(formatBalError(err));
+				} else {
+					reject(JSON.stringify(err));
+				}
+				setLoading(false);
+			})
+		})
+	}
+
 	const queryBptInWithExit = (_amounts = amounts) => {
 		return new Promise((resolve, reject) => {
 			const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
@@ -193,7 +234,6 @@ export default function ProportionalWithdraw({ pool }: any) {
 		setLoading(true);
 		queryBptIn(_amounts)
 		.then((res: any) => {
-			console.log(res);
 			setBptIn(res);
 			setLoading(false);
 			setError('');
@@ -210,20 +250,41 @@ export default function ProportionalWithdraw({ pool }: any) {
 		setAmount(amounts[0], 0)
 	}, [pool])
 
-	const setMax = (multiplier = 1) => {
-		const totalShares = pool.totalShares;
-		const yourShares = walletBalances[pool.address];
+	const max = () => {
+		const totalShares = pool?.totalShares ?? 0;
+		const yourShares = walletBalances[pool.address] ?? 0;
 
-		const _amounts = poolTokens.map((token: any) => {
-			return Big(token.balance).mul(Big(yourShares).div(Big(totalShares))).mul(multiplier).div(10**18).toString();
+		return poolTokens.map((token: any) => {
+			return Big(token.balance ?? 0).mul(Big(yourShares).div(Big(totalShares))).div(10**18).toString();
 		})
-		setAmounts(_amounts);
-		_setBptIn(_amounts);
+	}
+
+	const setMax = (multiplier = 1) => {
+		// let _amounts = max().map((amount: any) => Big(amount).mul(multiplier).toString());
+		// setAmounts(_amounts);
+		// _setBptIn(_amounts);
+		setLoading(true);
+        let _bptIn = Big(walletBalances[pool.address]).div(10**18).mul(multiplier).toFixed(18);
+        queryAmountOutWithSwap(_bptIn)
+        .then((res: any) => {
+			// filter only positive
+			res = res.filter((amount: any) => Big(amount).lt(0));
+			res = res.map((amount: any, index: number) => Big(amount).div(10**poolTokens[index].token.decimals).abs().toString());
+			setAmounts(res);
+			setBptIn(Big(walletBalances[pool.address]).mul(multiplier).toString());
+            setLoading(false)
+		})
+		.catch((err) => {
+            console.log(err);
+            setLoading(false)
+        })
 	}
 
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Connect wallet"};
 		if(chain?.unsupported) return {valid: false, message: "Unsupported network"};
+		if(loading) return {valid: false, message: "Loading..."}
+
 		// check balances
 		for(let i = 0; i < poolTokens.length; i++) {
 			if(isNaN(Number(amounts[i])) || Number(amounts[i]) == 0) {
@@ -233,12 +294,12 @@ export default function ProportionalWithdraw({ pool }: any) {
 				};
 			}
 		}
-		// if(tokenToApprove() !== -1) {
-		// 	return {
-		// 		valid: true,
-		// 		message: `Approve ${poolTokens[tokenToApprove()].token.symbol} for use`
-		// 	}
-		// }
+		if(Big(bptIn).gt(walletBalances[pool.address])) {
+			return {
+				valid: false,
+				message: "Insufficient balance"
+			};
+		}
 		if(error && error.length > 0) {
 			return {
 				valid: false,
@@ -264,7 +325,11 @@ export default function ProportionalWithdraw({ pool }: any) {
 					isValid = false;
 					continue;
 				}
+				// if(pool.poolType == "ComposableStable"){
+				// 	_amounts[i] = _amount;
+				// } else {
 				_amounts[i] = Big(Number(_amount) ?? 0).mul(poolTokens[i].balance).div(poolTokens[index].balance).toString();
+				// }
 			}
 		}
 		setAmounts(_amounts);
@@ -274,7 +339,10 @@ export default function ProportionalWithdraw({ pool }: any) {
 	}
 
     const values = () => {
-        if(!validate().valid) return null;
+        for(let i in amounts){
+			let amount = amounts[i];
+			if(isNaN(Number(amount)) || Number(amount) == 0) return null;
+		}
         if(!bptIn) return null;
 		// if(loading) return null;
 

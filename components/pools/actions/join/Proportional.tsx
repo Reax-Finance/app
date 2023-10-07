@@ -11,7 +11,7 @@ import ProportionalDepositLayout from "./layouts/ProportionalDepositLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
-export default function ProportionalDeposit({ pool }: any) {
+export default function ProportionalDeposit({ pool, onClose }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
 	const [amounts, setAmounts] = React.useState(
 		poolTokens.map((token: any) => "")
@@ -31,6 +31,7 @@ export default function ProportionalDeposit({ pool }: any) {
 
 	const deposit = async () => {
 		setLoading(true);
+		if(!address) return;
 		const vaultContract = new ethers.Contract(vault.address, getArtifact("Vault"));
 		let _amounts = amounts.map((amount: any, i: number) => Big(amount).mul(10**poolTokens[i].token.decimals).toFixed(0));
         let _minBptOut = Big(bptOut ?? 0).mul(100).div(100+Number(maxSlippage)).toFixed(0)
@@ -78,6 +79,7 @@ export default function ProportionalDeposit({ pool }: any) {
 			updateFromTx(response);
 			setLoading(false);
 			setAmounts(poolTokens.map((token: any) => ""));
+			onClose();
 		})
 		.catch((err: any) => {
 			handleBalError(err);
@@ -159,6 +161,7 @@ export default function ProportionalDeposit({ pool }: any) {
 				message: `Approve ${poolTokens[tokenToApprove()].token.symbol} for use`
 			}
 		}
+		if(loading) return {valid: false, message: "Loading..."}
 		return {
 			valid: true,
 			message: "Deposit"
@@ -226,7 +229,10 @@ export default function ProportionalDeposit({ pool }: any) {
 	}
 
     const values = () => {
-        if(!validate().valid) return null;
+        for(let i in amounts){
+			let amount = amounts[i];
+			if(isNaN(Number(amount)) || Number(amount) == 0) return null;
+		}
         if(!bptOut) return null;
 		// if(loading) return null;
 		let poolValue = poolTokens.reduce((a: any, b: any) => {

@@ -22,6 +22,7 @@ import {
 	Link,
 	Divider,
 	Tooltip,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
 	dollarFormatter,
@@ -38,6 +39,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { formatInput, parseInput } from "../../utils/number";
 import TokenInfo from "../_utils/TokenInfo";
+import { VARIANT } from "../../../styles/theme";
 
 export default function Debt({ synth, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -45,17 +47,6 @@ export default function Debt({ synth, index }: any) {
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [tabSelected, setTabSelected] = useState(0);
-	const [isSuccess, setIsSuccess] = useState(false);
-	const [successData, setSuccessData] = useState({});
-
-	const onSuccess = (hash: string, type: 'MINT'|'BURN', successAmount: string) => {
-		setIsSuccess(true);
-		setSuccessData({
-			hash,
-			type,
-			amount: successAmount
-		})
-	}
 
 	const { address } = useAccount();
 
@@ -63,7 +54,7 @@ export default function Debt({ synth, index }: any) {
 
 	const { prices } = usePriceData();
 	const { position } = useSyntheticsData();
-	const pos = position();
+	const pos = position(0);
 
 	const _onClose = () => {
 		setAmount("");
@@ -98,7 +89,7 @@ export default function Debt({ synth, index }: any) {
 		} else {
 			const v1 = Big(pos.debt ?? 0).div(prices[synth.token.id] ?? 0);
 			const v2 = Big(walletBalances[synth.token.id] ?? 0).div(10 ** 18);
-			return (v1.gt(v2) ? v2 : v1).toString();
+			return (v1.gt(v2) ? v2 : v1).toFixed(18);
 		}
 	};
 
@@ -117,29 +108,32 @@ export default function Debt({ synth, index }: any) {
         });
     }
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				_hover={{ bg: 'bg.400' }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<TokenInfo token={synth.token} color='secondary.200' />
+					<TokenInfo token={synth.token} color={colorMode == 'dark' ? "secondary.200" : "secondary.600"} />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					$ {tokenFormatter.format(prices[synth.token.id] ?? 0)}
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
+					
 					{dollarFormatter.format(
-						Big(synth.synthDayData[0]?.dailyMinted ?? 0).add(synth.synthDayData[0]?.dailyBurned ?? 0)
+						Number(synth.synthDayData[0].dayId) == Math.floor(Date.now() / (1000 * 3600 * 24)) ? Big(synth.synthDayData[0]?.dailyMinted ?? 0).add(synth.synthDayData[0]?.dailyBurned ?? 0)
 							.mul(prices[synth.token.id] ?? 0)
                             .div(10**18)
-							.toNumber()
+							.toNumber() : 0
 					)}
 				</TdBox>
 				<TdBox isNumeric isFirst={index == 0} alignBox='right'>
-					<Text>
+					<Text color={colorMode == 'dark' ? "secondary.200" : "secondary.600"}>
 					{dollarFormatter.format(
 						Big(synth.totalSupply)
 						.mul(prices[synth.token.id] ?? 0)
@@ -153,7 +147,7 @@ export default function Debt({ synth, index }: any) {
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
 				<ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
-					<Box className="containerBody2">
+					<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 					<ModalCloseButton rounded={"full"} mt={1} />
 					<ModalHeader>
 						<Flex
@@ -189,8 +183,8 @@ export default function Debt({ synth, index }: any) {
 					<ModalBody m={0} p={0}>
 
 						{<>
-							<Divider />
-							<Box bg={'bg.600'} pb={12} pt={6} px={8}>
+							<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.200'}/>
+							<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} pb={12} pt={6} px={8}>
 								<Flex justify={"center"} mb={2}>
 									<Flex
 										justify={"center"}
@@ -227,7 +221,7 @@ export default function Debt({ synth, index }: any) {
 											<Text
 												fontSize="sm"
 												textAlign={"center"}
-												color={"whiteAlpha.600"}
+												color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 											>
 												{dollarFormatter.format(
 													((prices[synth.token.id] ?? 0) *
@@ -240,7 +234,7 @@ export default function Debt({ synth, index }: any) {
 											variant={"unstyled"}
 											fontSize="sm"
 											fontWeight={"bold"}
-											onClick={() => _setAmount(Big(max()).div(2).toString())}
+											onClick={() => _setAmount(Big(max()).div(2).toFixed(18))}
 											py={-2}
 										>
 											50%
@@ -249,7 +243,7 @@ export default function Debt({ synth, index }: any) {
 											variant={"unstyled"}
 											fontSize="sm"
 											fontWeight={"bold"}
-											onClick={() => _setAmount(Big(max()).mul(0.99).toString())}
+											onClick={() => _setAmount(Big(max()).toFixed(18))}
 										>
 											MAX
 										</Button>
@@ -258,30 +252,30 @@ export default function Debt({ synth, index }: any) {
 									</NumberInput>
 								</InputGroup>
 							</Box>
-							<Divider />
-							<Box className="containerFooter">
+							<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+							<Box className={`${VARIANT}-${colorMode}-containerFooter`}>
 						<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 							<TabList>
 								<Tab
 									w={"50%"}
+									borderX={0}
+									borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 									_selected={{
 										color: "primary.400",
-										borderColor: "primary.400",
 									}}
 									rounded={0}
-									border={0}
 								>
 									Mint
 								</Tab>
-								<Divider orientation="vertical" h={'40px'} />
+								<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'} orientation="vertical" h={'44px'} />
 								<Tab
 									w={"50%"}
+									borderX={0}
+									borderColor={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.200'}
 									_selected={{
-										color: "secondary.400",
-										borderColor: "secondary.400",
+										color: "primary.400",
 									}}
 									rounded={0}
-									border={0}
 								>
 									Burn
 								</Tab>
@@ -293,7 +287,7 @@ export default function Debt({ synth, index }: any) {
 										amount={amount}
 										amountNumber={amountNumber}
 										setAmount={_setAmount}
-										onSuccess={onSuccess}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 								<TabPanel m={0} p={0}>
@@ -302,6 +296,7 @@ export default function Debt({ synth, index }: any) {
 										amount={amount}
 										amountNumber={amountNumber}
 										setAmount={_setAmount}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 							</TabPanels>

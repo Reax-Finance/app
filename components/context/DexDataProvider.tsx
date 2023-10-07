@@ -5,6 +5,7 @@ import { useNetwork } from "wagmi";
 import { Status } from "../utils/status";
 import { DEX_ENDPOINT, MINICHEF_ENDPOINT, ROUTER_ENDPOINT, query_dex, query_leaderboard, query_minichef } from "../../src/queries/dex";
 import Big from "big.js";
+import { ethers } from "ethers";
 
 interface DEXDataValue {
 	status: Status;
@@ -14,6 +15,7 @@ interface DEXDataValue {
 	fetchData: (address?: string) => Promise<number>;
 	dex: any;
 	updateStakeBalance: (poolAddress: string, value: string, isMinus: boolean) => void;
+	epoches: any[];
 }
 
 const DEXDataContext = React.createContext<DEXDataValue>({} as DEXDataValue);
@@ -24,6 +26,7 @@ function DEXDataProvider({ children }: any) {
 	const { chain } = useNetwork();
 	const [pools, setPools] = React.useState<any[]>([]);
 	const [vault, setVault] = React.useState<any>({});
+	const [epoches, setEpoches] = React.useState<any[]>([]);
 	const [dex, setDex] = React.useState<any>({});
 
 	const fetchData = (_address?: string): Promise<number> => {
@@ -48,28 +51,36 @@ function DEXDataProvider({ children }: any) {
 				})
 			])
 			.then(async (res) => {
-				if (res[0].data.errors) {
+				if (res[0].data.errors || res[1].data.errors || res[2].data.errors) {
 					setStatus(Status.ERROR);
 					setMessage("Network Error. Please refresh the page or try again later.");
-					reject(res[0].data.errors);
+					reject(res[0].data.errors ?? res[1].data.errors ?? res[2].data.errors);
 				} else {
 					let _dex: any = {};
-					_dex.leaderboard = res[2].data.data?.users;
-					_dex.yourPoints = res[2].data.data?.user;
+					let _epoches = res[2].data.data?.epoches;
+					for(let i in res[2].data.data?.epochUsers){
+						for(let j in _epoches){
+							if(_epoches[j].id == res[2].data.data?.epochUsers[i].epoch.id){
+								_epoches[j].user = res[2].data.data?.epochUsers[i];
+							}
+						}
+					}
+					// reverse epoches
+					setEpoches(_epoches.reverse());
 					_dex.totalLiquidity = res[0].data.data.balancers[0].totalLiquidity;
 					_dex.totalSwapVolume = res[0].data.data.balancers[0].totalSwapVolume;
 					_dex.totalSwapFee = res[0].data.data.balancers[0].totalSwapFee;
 
 					const _pools = res[0].data.data.balancers[0].pools;
 
-					const miniChef = res[1].data.data.miniChefs[0];
-					_dex.totalAllocPoint = miniChef.totalAllocPoint;
-					_dex.sushiPerSecond = miniChef.sushiPerSecond;
-					_dex.miniChef = miniChef.id;
+					const miniChef = res[1].data.data.miniChefs[0] ?? {};
+					_dex.totalAllocPoint = miniChef?.totalAllocPoint ?? '0';
+					_dex.sushiPerSecond = miniChef?.sushiPerSecond ?? '0';
+					_dex.miniChef = miniChef?.id ?? ethers.constants.AddressZero;
 
 					const positions = res[1].data.data.users;
 					for(let i in positions){
-						for(let j in miniChef.pools){
+						for(let j in miniChef?.pools ?? []){
 							if(Number(miniChef.pools[j].id) == Number(positions[i].id.split('-')[0])){
 								miniChef.pools[j].stakedBalance = positions[i].amount;
 							}
@@ -77,7 +88,7 @@ function DEXDataProvider({ children }: any) {
 					}
 
 					for(let i in _pools){
-						let mPool = miniChef.pools.find((mpool: any) => mpool.pair == _pools[i].address);
+						let mPool = (miniChef?.pools ?? []).find((mpool: any) => mpool.pair == _pools[i].address);
 						if(!mPool) continue;
 						_pools[i].pid = mPool.id ?? -1;
 						_pools[i].allocPoint = mPool.allocPoint ?? 0;
@@ -94,6 +105,7 @@ function DEXDataProvider({ children }: any) {
 				}
 			})
 			.catch((err) => {
+				console.log(err);
 				setStatus(Status.ERROR);
 				setMessage(
 					"Failed to fetch data. Please refresh the page and try again later."
@@ -120,7 +132,8 @@ function DEXDataProvider({ children }: any) {
 		vault,
 		fetchData,
 		dex,
-		updateStakeBalance
+		updateStakeBalance,
+		epoches
 	};
 
 	return (

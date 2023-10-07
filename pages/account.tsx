@@ -10,8 +10,8 @@ export default function Account() {
 	return (
 		<>
 			<Head>
-				<title>Account | REAX</title>
-				<link rel="icon" type="image/x-icon" href="/REAX.svg"></link>
+				<title>Account | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
+				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
 
 			{address ? <>

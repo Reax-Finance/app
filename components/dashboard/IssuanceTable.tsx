@@ -12,7 +12,8 @@ import {
 	Box,
 	Heading,
 	Text,
-	Tfoot
+	Tfoot,
+	useColorMode
 } from "@chakra-ui/react";
 import { AppDataContext } from "../context/AppDataProvider";
 import {
@@ -29,6 +30,7 @@ import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Skeleton } from "@chakra-ui/react";
 import Debt from "../modals/debt";
 import ThBox from "./ThBox";
+import { VARIANT } from "../../styles/theme";
 
 const pageSize = 5;
 
@@ -46,11 +48,11 @@ export default function CollateralTable() {
 	pools[tradingPool]?.synths.sort((a: any, b: any) => {
 		return (b.totalSupply * b.priceUSD) - (a.totalSupply * a.priceUSD);
 	});
-
+	const { colorMode } = useColorMode();
 
 	return (
 		<Box>
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'secondary.300'}>Mint Synthetic Assets</Heading>			
 			</Box>
 			{pools[tradingPool]?.synths.length > 0 ? (
@@ -106,9 +108,9 @@ export default function CollateralTable() {
 									bgColor={"transparent"
 									}
 									color={
-										page === currentPage ? 'primary.400' : 'white'
+										page === currentPage ? 'primary.400' : colorMode == 'dark' ? 'white' : 'blackAlpha.600'
 									}
-									_hover={{ bgColor: "whiteAlpha.200" }}
+									_hover={{ bgColor: colorMode == 'dark' ? "whiteAlpha.200" : "blackAlpha.200" }}
 								/>
 							))}
 						</PaginationPageGroup>

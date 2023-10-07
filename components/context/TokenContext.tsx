@@ -52,7 +52,7 @@ function TokenContextProvider({ children }: any) {
 		return;
 		// token unlocks
 		const essyx = await getContract(
-			"VestedREAX",
+			process.env.NEXT_PUBLIC_VESTED_TOKEN_NAME!,
 			chain?.id ?? defaultChain.id
 		);
 		const tokenUnlocks = BigNumber.from(
@@ -97,7 +97,7 @@ function TokenContextProvider({ children }: any) {
 			await essyx.balanceOf(address)
 		).toString();
 
-		const syn = await getContract("ReaxToken", chain?.id ?? defaultChain.id);
+		const syn = await getContract(process.env.NEXT_PUBLIC_TOKEN_NAME!, chain?.id ?? defaultChain.id);
 		const synBalance = BigNumber.from(
 			await syn.balanceOf(address)
 		).toString();

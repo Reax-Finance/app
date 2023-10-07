@@ -18,6 +18,12 @@ const baseStyleTrack = defineStyle((props) => {
         bg: `secondary.400`,
       }
     },
+    _light: {
+      bg: `gray.600`,
+      _checked: {
+        bg: `secondary.400`,
+      }
+    },
   }
 })
 

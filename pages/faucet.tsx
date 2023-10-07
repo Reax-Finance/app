@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, IconButton, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, IconButton, useColorMode, useDisclosure, useToast } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
 import {
@@ -48,6 +48,7 @@ import { useBalanceData } from "../components/context/BalanceProvider";
 import Big from "big.js";
 import ThBox from "../components/dashboard/ThBox";
 import TdBox from "../components/dashboard/TdBox";
+import { VARIANT } from "../styles/theme";
 
 export default function Faucet() {
 	const { pools } = useContext(AppDataContext);
@@ -64,6 +65,13 @@ export default function Faucet() {
     const _onOpen = (collateral: any) => {
         setOpenedCollateral(collateral);
         onOpen();
+    }
+
+    const _onClose = () => {
+        setOpenedCollateral(null);
+        setLoading(false);
+
+        onClose();
     }
 
     const toast = useToast();
@@ -115,24 +123,26 @@ export default function Faucet() {
         else return {valid: true, message: "Mint"}
     }
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
         <Head>
-				<title>Test Faucet | REAX</title>
-				<link rel="icon" type="image/x-icon" href="/veREAX.png"></link>
+				<title>Test Faucet | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
+				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
 			<Heading mt={'80px'} fontSize={"3xl"}>Faucet</Heading>
-            <Text color={'gray.400'} mb={10}>
+            <Text color={colorMode == 'dark' ? 'whiteAlpha.500' : 'blackAlpha.500'} mt={2} mb={10}>
                 Note: This is a testnet faucet. These tokens are not real and have no value.
             </Text>
 
-			<TableContainer px={4} pb={4} className="containerBody" rounded={0}>
+			<TableContainer px={4} pb={4} className={`${VARIANT}-${colorMode}-containerBody`} rounded={0}>
 				<Table variant="simple">
 					<Thead>
 						<Tr>
 							<ThBox>Asset</ThBox>
 							<ThBox>Mint Amount</ThBox>
-							<ThBox isNumeric>.</ThBox>
+							<ThBox isNumeric></ThBox>
 						</Tr>
 					</Thead>
 					<Tbody>
@@ -168,7 +178,7 @@ export default function Faucet() {
                                 <TdBox style={index == tokens.length - 1 ? {border: 0} : {}}>{mintAmounts[token.symbol]}</TdBox>
                                 <TdBox style={index == tokens.length - 1 ? {border: 0} : {}} isNumeric>
                                 <Flex justify={'end'}>
-                                    <Box className="primaryButton">
+                                    <Box className={`${VARIANT}-${colorMode}-primaryButton`}>
                                         <Button
                                             onClick={() => _onOpen(token)}
                                             color={"white"}
@@ -187,10 +197,10 @@ export default function Faucet() {
 				</Table>
 			</TableContainer>
 
-            {openedCollateral && <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            {openedCollateral && <Modal isOpen={isOpen} onClose={_onClose} isCentered>
             <ModalOverlay />
             <ModalContent rounded={0} bg={'transparent'} shadow={0} width={'400px'}>
-                <Box className="containerBody2">
+                <Box className={`${VARIANT}-${colorMode}-containerBody2`}>
             <ModalHeader>{openedCollateral.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody >
@@ -208,7 +218,7 @@ export default function Faucet() {
             </ModalBody>
 
             <ModalFooter justifyContent={'center'}>
-            <Box w={'100%'} className="primaryButton">
+            <Box w={'100%'} className={`${VARIANT}-${colorMode}-primaryButton`}>
 
                 <Button w={'100%'} isDisabled={!validate().valid} color={"white"}
 								size={"lg"} 

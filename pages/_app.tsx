@@ -1,4 +1,9 @@
 import "../styles/globals.css";
+import "../styles/edgy-dark.css";
+import "../styles/edgy-light.css";
+import "../styles/rounded-dark.css";
+import "../styles/rounded-light.css";
+
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import {
@@ -24,7 +29,7 @@ import { theme } from "../styles/theme";
 import rainbowTheme from "../styles/rainbowTheme";
 import { TokenContextProvider } from "../components/context/TokenContext";
 import { rabbyWallet } from "@rainbow-me/rainbowkit/wallets";
-import { PROJECT_ID, APP_NAME } from '../src/const';
+import { PROJECT_ID, APP_NAME, defaultChain } from '../src/const';
 import { LendingDataProvider } from "../components/context/LendingDataProvider";
 import { BalanceContext, BalanceContextProvider } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
@@ -33,13 +38,9 @@ import { DEXDataProvider } from "../components/context/DexDataProvider";
 import { mantleMainnet, mantleTestnet } from "../src/chains";
 import { PerpsDataProvider } from "../components/context/PerpsDataProvider";
 
-const _chains = []
 
-if(process.env.NEXT_PUBLIC_NETWORK == 'testnet'){
-	_chains.push({...mantleTestnet, iconUrl: '/icons/mantle-logo.png'});
-} else {
-	_chains.push({...mantleMainnet, iconUrl: '/icons/mantle-logo.png'});
-}
+const _chains = []
+_chains.push(defaultChain);
 
 export const __chains: Chain[] = _chains;
 
@@ -65,7 +66,7 @@ const connectors = connectorsForWallets([
 			rainbowWallet({ projectId: PROJECT_ID, chains }),
 			trustWallet({ projectId: PROJECT_ID, chains }),
 			phantomWallet({ chains }),
-			coinbaseWallet({ appName: APP_NAME, chains }),
+			coinbaseWallet({ appName: APP_NAME ?? 'Synth', chains }),
 			rabbyWallet({ chains }),
 		],
 	},

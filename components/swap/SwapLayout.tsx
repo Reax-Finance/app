@@ -11,13 +11,15 @@ import {
 	Heading,
     NumberInput,
     NumberInputField,
+    useColorMode,
+    Tooltip,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
-import { RiArrowDropDownLine, RiArrowDropUpLine, RiArrowUpFill } from "react-icons/ri";
-import { ADDRESS_ZERO, NATIVE, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
-import { InfoOutlineIcon, SettingsIcon, WarningIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
+import { ADDRESS_ZERO, NATIVE, SUPPORTS_ROLLUP_GASFEES, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
+import { InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 import SelectBody from "./SelectBody";
 import { useBalanceData } from "../context/BalanceProvider";
@@ -29,6 +31,7 @@ import { useAccount, useFeeData, useNetwork } from "wagmi";
 import Settings from "./Settings";
 import { BigNumber, ethers } from "ethers";
 import RouteDetails from "./RouteDetails";
+import { VARIANT } from "../../styles/theme";
 
 const inputStyle = {
 	variant: "unstyled",
@@ -71,10 +74,19 @@ export default function SwapLayout({
     const [gasPrice, setGasPrice] = useState(0);
     useEffect(() => {
         let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-        provider.send('rollup_gasPrices', [])
+        if(SUPPORTS_ROLLUP_GASFEES){ 
+            provider.send('rollup_gasPrices', [])
             .then((res: any) => {
                 setGasPrice(BigNumber.from(res.l1GasPrice).toNumber() / 1e18);
             })
+        }
+        else {
+            provider.getGasPrice()
+                .then((res: any) => {
+                    let gas = res.toNumber() / 1e18;
+                    setGasPrice(gas);
+                })
+        }
     }, [])
     const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
@@ -88,26 +100,29 @@ export default function SwapLayout({
     const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
 	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
     const valid = inputAmount > 0 && outputAmount > 0 && !isWrap;
+	const { colorMode } = useColorMode();
 
   return (
     <>
-        <Box>
-            <Box className="containerHeader" p={5}>
+        <Box className={`${VARIANT}-${colorMode}-containerBody`}>
+            <Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={4}>
                 <Flex align={'center'} justify={'space-between'}>
-                    <Box>
-                        <Heading size={'md'}>Trade</Heading>
-                        <Text color={'whiteAlpha.500'} mt={1} fontSize={'sm'}>
-                            With lowest slippage and fees
-                        </Text>
-                    </Box>
+                    <Flex align={'center'} gap={4}>
+                        <Heading size={'sm'}>Spot</Heading>
+                        <Tooltip label={'Coming Soon'} placement={'top'}>
+                        <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>Margin [10x]</Heading>
+                        </Tooltip>
+                    </Flex>
                     <Flex>
                         <Settings maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} deadline={deadline} setDeadline={setDeadline} />
                     </Flex>
                 </Flex>
             </Box>
 
+            <Divider />
+
             {/* Input */}
-            <Box px="5" bg={'bg.600'} pb={12} pt={10}>
+            <Box px="5" bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} pb={12} pt={10}>
                 <Flex align="center" justify={"space-between"}>
                     <InputGroup width={"70%"}>
                         <NumberInput
@@ -135,7 +150,7 @@ export default function SwapLayout({
 
                 <Flex
                     fontSize={"sm"}
-                    color="whiteAlpha.700"
+                    color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                     justify={"space-between"}
                     align="center"
                     mt={4}
@@ -168,9 +183,9 @@ export default function SwapLayout({
 
             {/* Switch */}
             <Flex px="5" my={-4} align='center'>
-                <Divider w={'10px'} border='1px' borderColor={'bg.200'} />
+                {/* <Divider w={'10px'} border='1px' borderColor={colorMode == 'dark' ? 'darkBg.200' : 'blackAlpha.200'} /> */}
                 <Button
-                    _hover={{ bg: "whiteAlpha.50" }}
+                    _hover={{ bg: colorMode == 'dark' ? "whiteAlpha.50" : 'blackAlpha.100' }}
                     rounded={'0'}
                     onClick={switchTokens}
                     variant="unstyled"
@@ -178,7 +193,7 @@ export default function SwapLayout({
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    bg={'bg.200'}
+                    bg={colorMode == 'dark' ? 'darkBg.200' : 'blackAlpha.200'}
                     transform={"rotate(45deg)"}
                     mx={1.5}
                 >
@@ -186,11 +201,11 @@ export default function SwapLayout({
                     <MdOutlineSwapVert size={"20px"} />
                     </Box>
                 </Button>
-                <Divider border='1px' borderColor={'bg.200'} />
+                {/* <Divider border='1px' borderColor={colorMode == 'dark' ? 'darkBg.200' : 'blackAlpha.200'} /> */}
             </Flex>
 
             {/* Output */}
-            <Box px="5" pt={10} pb={14} bg={'bg.600'}>
+            <Box px="5" pt={10} pb={14} bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'}>
                 <Flex align="center" justify={"space-between"}>
                     <InputGroup width={"70%"}>
                         <NumberInput
@@ -218,7 +233,7 @@ export default function SwapLayout({
 
                 <Flex
                     fontSize={"sm"}
-                    color="whiteAlpha.700"
+                    color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                     justify={"space-between"}
                     align="center"
                     mt={4}
@@ -245,27 +260,25 @@ export default function SwapLayout({
                 </Flex>
             </Box>
 
-            <Box px="5" pb={'1px'} pt={'1px'} className="containerFooter">
 
+            <Box px="5" pb={'1px'} pt={'1px'} >
 
-            {valid && <Box pb={7} mt={5}>
-                {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} bg={'whiteAlpha.50'} color={'orange'}>
+            {valid && <Box>
+                {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} my={2} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} color={'orange'}>
                     <WarningTwoIcon/>
                     <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
                     </Flex>}
                 <Flex
                     justify="space-between"
                     align={"center"}
-                    mt={2}
-                    mb={!isOpen ? !account ? '-4' : '-6' : '0'}
-                    bg="whiteAlpha.50"
-                    color="whiteAlpha.800"
-                    // rounded={16}
+                    // mb={!isOpen ? !account ? '-4' : '-6' : '0'}
+                    bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'}
+                    color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                     px={4}
                     py={2}
                     cursor="pointer"
                     {...getButtonProps()}
-                    _hover={{ bg: "whiteAlpha.100" }}
+                    _hover={{ bg: colorMode == 'dark' ? "whiteAlpha.100" : "blackAlpha.100" }}
                 >
                     <Flex align={"center"} gap={2} fontSize="md">
                         <InfoOutlineIcon />
@@ -295,15 +308,14 @@ export default function SwapLayout({
                         initial={false}
                         onAnimationStart={() => setHidden(false)}
                         onAnimationComplete={() => setHidden(!isOpen)}
-                        animate={{ height: isOpen ? 150 : 0 }}
+                        animate={{ height: isOpen ? '144px' : 0 }}
                         style={{
-                            height: 150,
                             width: '100%'
                         }}
                     >
                     {isOpen && 	<>
-                        <Divider />
-                        <Flex bg={'whiteAlpha.50'} flexDir={'column'} gap={1} mt={0} px={3} py={2} fontSize='sm' color={'whiteAlpha.800'}>
+                        <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+                        <Flex bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} flexDir={'column'} gap={1} px={3} py={2} fontSize='sm' color={colorMode == 'dark' ? 'whiteAlpha.800' : 'blackAlpha.800'}>
                             <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'whiteAlpha.800'} justify={'space-between'}>
                             <Text>{priceImpact > 0 ? 'Bonus' : 'Price Impact'}</Text>
                             <Text>{(priceImpact).toFixed(2)}%</Text>
@@ -328,12 +340,11 @@ export default function SwapLayout({
                     </motion.div>
                 </Box>
                 </Box>}
-                <Box mt={(isOpen && valid) ? -4 : valid ? 3 : 5} mb={5} className={validate().valid ? "primaryButton" : "disabledPrimaryButton"}>
+                <Box mt={3} mb={5} className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`}>
                 <Button
                     size="lg"
                     fontSize={"xl"}
                     width={"100%"}
-                    rounded={0}
                     onClick={exchange}
                     bg={'transparent'}
                     isDisabled={!validate().valid}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useContext } from "react";
 
 import {
@@ -15,10 +15,9 @@ import {
 	Heading,
 	Divider,
 	Flex,
-	Text
+	Text,
+	useColorMode
 } from "@chakra-ui/react";
-import { AppDataContext } from "../../context/AppDataProvider";
-
 import SupplyModal from "../../modals/supply";
 import ThBox from "./../ThBox";
 import { useLendingData } from "../../context/LendingDataProvider";
@@ -33,10 +32,15 @@ import {
 	PaginationPageGroup,
 } from "@ajna/pagination";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
+import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 const pageSize = 9;
 
 export default function CollateralTable() {
-	const { markets } = useLendingData();
+	const { pools } = useLendingData();
+
+	const router = useRouter();
+	const markets = pools[Number(router.query.market) ?? 0] ?? [];
 
 	const { currentPage, setCurrentPage, pagesCount, pages } =
 		usePagination({
@@ -45,9 +49,11 @@ export default function CollateralTable() {
 		}
 	);
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box >
-			<Box className="containerHeader" px={5} py={5}>
+			<Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={5}>
 				<Heading fontSize={'18px'} color={'primary.400'}>Assets to Supply</Heading>
 			</Box>
 
@@ -90,7 +96,6 @@ export default function CollateralTable() {
 			) : (
 				<Box pt={0.5}>
 					<Skeleton height="50px" m={6} mt={8} rounded={12} />
-					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />
 					<Skeleton height="50px" rounded={12} m={6} />

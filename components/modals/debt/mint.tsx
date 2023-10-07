@@ -8,6 +8,7 @@ import {
 	Tooltip,
 	useToast,
 	Link,
+	useColorMode,
 } from "@chakra-ui/react";
 import { getContract, send } from "../../../src/contract";
 import { useContext, useEffect } from "react";
@@ -24,14 +25,10 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { VARIANT } from "../../../styles/theme";
 
-const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
-	const router = useRouter();
+const Issue = ({ asset, amount, setAmount, onClose }: any) => {
 	const [loading, setLoading] = useState(false);
-	const [response, setResponse] = useState<string | null>(null);
-	const [hash, setHash] = useState(null);
-	const [confirmed, setConfirmed] = useState(false);
-	const [message, setMessage] = useState("");
 
 	const { isConnected, address } = useAccount();
 	const { chain } = useNetwork();
@@ -68,10 +65,6 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 	const mint = async () => {
 		if (!amount) return;
 		setLoading(true);
-		setConfirmed(false);
-		setHash(null);
-		setResponse("");
-		setMessage("");
 
 		let pool = await getContract("Pool", chain?.id!, pools[tradingPool].id);
 		let value = Big(amount).times(10 ** 18).toFixed(0);
@@ -88,6 +81,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 			updateFromSynthTx(response);
 			setAmount("0");
 			setLoading(false);
+			onClose();
 			toast({
 				title: "Mint Successful",
 				description: <Box>
@@ -106,7 +100,6 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 				isClosable: true,
 				position: "top-right",
 			})
-			onSuccess(response.hash, 'MINT', tokenFormatter.format(Number(amount)));
 		})
 		.catch((err: any) => {
 			handleError(err);
@@ -143,38 +136,15 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box px={5} pb={5} pt={0.5} bg="transparent">
-			<Box
-				mt={6}
-				rounded={8}
-			>
-				<Tooltip label={`Fee for Minting and Burning ${asset.token.symbol}`}>
-				<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-							Mint / Burn Fee
-						</Text>
-
-						<Text fontSize={"md"}>
-							{tokenFormatter.format(
-								Number(
-									asset.mintFee / 100
-								) 
-							)} {'%'} / {tokenFormatter.format(
-								Number(
-									asset.burnFee / 100
-								) 
-							)} {'%'}
-						</Text>
-					</Flex> 
-					</Tooltip>
-			</Box>
-
 			<Box>
 				<Text
 					mt={6}
 					fontSize={"sm"}
-					color="whiteAlpha.600"
+					color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 					fontWeight={"bold"}
 				>
 					Transaction Overview
@@ -184,7 +154,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 					rounded={8}
 				>
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Health Factor
 						</Text>
 						<Text fontSize={"md"}>
@@ -201,7 +171,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 					</Flex>
 					<Divider my={2} />
 					<Flex justify="space-between">
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Available to issue
 						</Text>
 						<Text fontSize={"md"}>
@@ -217,7 +187,7 @@ const Issue = ({ asset, amount, setAmount, amountNumber, onSuccess }: any) => {
 				</Box>
 			</Box>
 
-			<Box mt={6} className={!validate().valid ? "disabledSecondaryButton" : "secondaryButton"}>
+			<Box mt={6} className={!validate().valid ? `${VARIANT}-${colorMode}-disabledSecondaryButton` : `${VARIANT}-${colorMode}-secondaryButton`}>
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}

@@ -8,6 +8,7 @@ import {
 	Divider,
 	Tooltip,
 	Switch,
+	useColorMode,
 } from "@chakra-ui/react";
 import { ADDRESS_ZERO, EIP712_VERSION, defaultChain, dollarFormatter, numOrZero } from '../../../src/const';
 import Big from "big.js";
@@ -27,8 +28,9 @@ import { PARTNER_ASSETS, PARTNER_WARNINGS } from "../../../src/partner";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { VARIANT } from "../../../styles/theme";
 
-export default function Deposit({ collateral, amount, setAmount, isNative }: any) {
+export default function Deposit({ collateral, amount, setAmount, isNative, onClose }: any) {
 
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -92,7 +94,7 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 		}
 		else if (loading || !collateral || !allowances[collateral.token.id]?.[pools[tradingPool].id]) {
 			return {
-				stage: 0,
+				stage: 3,
 				message: "Loading..."
 			}
 		}
@@ -192,7 +194,7 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 			setAmount('0');
 			setApproveMax(false);
 			setApprovedAmount('0');
-			
+			onClose();
 			setLoading(false);
 			toast({
 				title: "Deposit Successful",
@@ -319,6 +321,7 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 	const { prices } = usePriceData();
 
 	const partner = Object.keys(PARTNER_ASSETS).map((key: string) => PARTNER_ASSETS[key].includes(collateral.token.symbol) ? key : null).filter((key: string | null) => key != null)[0];
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
@@ -326,7 +329,7 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 				<Box>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Capacity
 						</Text>
 						</Tooltip>
@@ -358,16 +361,16 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 						<Flex gap={1}>
 							<Tooltip label='Minimum Loan to Value Ratio'>
 
-							<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 								Base LTV
 							</Text>
 							</Tooltip>
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							/ 
 							</Text>
 							<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
 
-							<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 								Liq Threshold
 							</Text>
 							</Tooltip>
@@ -379,41 +382,41 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 					</Flex>
 				</Box>
 
-					<Box>
-						<Text mt={8} fontSize={"sm"} color="whiteAlpha.600" fontWeight={'bold'}>
-							Transaction Overview
-						</Text>
-						<Box
-							my={4}
-							rounded={8}
-						>
-							<Flex justify="space-between">
-								<Text fontSize={"md"} color="whiteAlpha.600">
-									Health Factor
-								</Text>
-								<Text fontSize={"md"}>{(Number(pos.debtLimit) ?? 0).toFixed(2)} % {"->"} {numOrZero((Number(pos.debt) ?? 0) /((Number(pos.collateral) ?? 0) + (amount*prices[collateral.token.id])) * 100).toFixed(2)}%</Text>
-							</Flex>
-							<Divider my={2} />
-							<Flex justify="space-between">
-								<Text fontSize={"md"} color="whiteAlpha.600">
-									Available to issue
-								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue) ?? 0)} {"->"} {dollarFormatter.format((Number(pos.adjustedCollateral) ?? 0) + (amount*(prices[collateral.token.id] ?? 0)*collateral.baseLTV/10000) - (Number(pos.debt) ?? 0))}</Text>
-							</Flex>
-						</Box>
+				<Box>
+					<Text mt={8} fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'}>
+						Transaction Overview
+					</Text>
+					<Box
+						my={4}
+						rounded={8}
+					>
+						<Flex justify="space-between">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
+								Health Factor
+							</Text>
+							<Text fontSize={"md"}>{(Number(pos.debtLimit) ?? 0).toFixed(2)} % {"->"} {numOrZero((Number(pos.debt) ?? 0) /((Number(pos.collateral) ?? 0) + (amount*prices[collateral.token.id])) * 100).toFixed(2)}%</Text>
+						</Flex>
+						<Divider my={2} />
+						<Flex justify="space-between">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
+								Available to issue
+							</Text>
+							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue) ?? 0)} {"->"} {dollarFormatter.format((Number(pos.adjustedCollateral) ?? 0) + (amount*(prices[collateral.token.id] ?? 0)*collateral.baseLTV/10000) - (Number(pos.debt) ?? 0))}</Text>
+						</Flex>
 					</Box>
-					{collateral.token.isPermit && (validate().stage == 1 && <Tooltip label='Approve Max will approve unlimited amount. This will save gas fees in the future.'>
-					<Flex align={'center'} mb={2} mt={6} color="whiteAlpha.600" gap={2}>
-						<Text fontSize={"sm"} color="whiteAlpha.600" fontWeight={'bold'} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
-							Approve Max
-						</Text>
-						<Switch size={'sm'} colorScheme='primary' onChange={() => setApproveMax(!approveMax)} isChecked={approveMax} />
-					</Flex>
-					</Tooltip>)
-					}
+				</Box>
+				{collateral.token.isPermit && (validate().stage == 1 && <Tooltip label='Approve Max will approve unlimited amount. This will save gas fees in the future.'>
+				<Flex align={'center'} mb={2} mt={6} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} gap={2}>
+					<Text fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						Approve Max
+					</Text>
+					<Switch size={'sm'} colorScheme='primary' onChange={() => setApproveMax(!approveMax)} isChecked={approveMax} />
+				</Flex>
+				</Tooltip>)
+				}
 
 				<Box mt={6}>
-					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? "secondaryButton":'disabledSecondaryButton'}><Button
+					{validate().stage <= 2 && <Box mt={2} className={!(validate().stage != 1) ? `${VARIANT}-${colorMode}-secondaryButton` : `${VARIANT}-${colorMode}-disabledSecondaryButton`}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
@@ -429,8 +432,10 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 					</Button>
 					</Box>
 					}
+
 						
-					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2) ? "secondaryButton":'disabledSecondaryButton'}><Button
+					{validate().stage > 0 && <Box mt={2} className={!(validate().stage < 2 || loading) ? `${VARIANT}-${colorMode}-secondaryButton` : `${VARIANT}-${colorMode}-disabledSecondaryButton`}>
+					<Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"
@@ -453,10 +458,9 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 							<>Please connect your wallet</>
 						)}
 					</Button></Box>}
-					</Box>
+				</Box>
 
-
-					{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
+				{partner && PARTNER_WARNINGS[partner] && <InfoFooter message={PARTNER_WARNINGS[partner]} />}
 
 				<Response
 					response={response}

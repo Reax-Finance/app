@@ -24,6 +24,7 @@ function Swap() {
 	const [inputAmount, setInputAmount] = useState('');
 	const [outputAmount, setOutputAmount] = useState('');
 	const [gas, setGas] = useState(0);
+	const [error, setError] = useState('');
 	
 	const { chain } = useNetwork();
 	const { prices } = usePriceData();
@@ -68,7 +69,7 @@ function Swap() {
 					amount: inputAmount,
 					kind: 0,
 					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? ADDRESS_ZERO,
+					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
 					slipage: maxSlippage
 				}
@@ -91,7 +92,7 @@ function Swap() {
 					amount: outputAmount,
 					kind: 1,
 					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? ADDRESS_ZERO,
+					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
 					slipage: maxSlippage
 				}
@@ -122,10 +123,11 @@ function Swap() {
 				setOutputAmount(Big(res.fData.estimatedOut).div(10**tokens[outputAssetIndex]?.decimals).toString());
 				setSwapData(res);
 				setLoading(false);
+				setError('');
 			})
 			.catch((err) => {
-				console.log(err);
 				setLoading(false);
+				setError('Insufficient liquidity')
 				// If estimation failed, set output to its perivous value
 				setInputAmount(inputAmount)
 			})
@@ -145,6 +147,8 @@ function Swap() {
 				setLoading(false);
 				let inputValue = Big(res.fData.estimatedIn).div(10**tokens[inputAssetIndex]?.decimals).toString();
 				setInputAmount(inputValue);
+				setError('');
+
 				calculateOutputAmount(inputValue)
 				.then((res: any) => {
 					setSwapData(res);
@@ -153,6 +157,7 @@ function Swap() {
 			.catch((err) => {
 				console.log(err);
 				setLoading(false);
+				setError('Insufficient liquidity')
 				// If estimation failed, set output amount to its previous value
 				setOutputAmount(outputAmount);
 			})
@@ -206,6 +211,11 @@ function Swap() {
 
 	const exchange = async () => {
 		const token = tokens[inputAssetIndex];
+		if(!address) return;
+		if(swapData?.recipient == "XYZ") {
+			updateInputAmount(inputAmount)
+			return;
+		};
 		if(shouldApprove()){
 			const routerAddress = getAddress("Router", chain?.id!);
 			if(token.isPermit) approve(token, routerAddress)
@@ -232,11 +242,10 @@ function Swap() {
 					tx = send(router, "swap", [_swapData, pythData], ethAmount)
 				} else {
 					let calls = [];
-					if(Number(approvedAmount) > 0){
-						const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
+					if(Big(approvedAmount ?? 0).gt(0)){
 						const {v, r, s} = ethers.utils.splitSignature(data!);
 						calls.push(
-							router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
+							router.interface.encodeFunctionData("permit", [approvedAmount, deadline, token.id, v, r, s])
 						)
 					}
 					calls.push(
@@ -271,7 +280,7 @@ function Swap() {
 				setInputAmount('');
 				setOutputAmount('0');
 				setSwapData(null);
-				if(Number(approvedAmount) > 0){
+				if(Big(approvedAmount ?? 0).gt(0)){
 					addNonce(token.id, '1')
 					setApprovedAmount('0');
 					setDeadline('0');
@@ -284,39 +293,6 @@ function Swap() {
 			})
 		}
 	};
-
-	// const querySwap = async () => {
-	// 	const token = tokens[inputAssetIndex];
-	// 	const router = await getContract("Router", chain?.id!);
-	// 	let tx;
-	// 	if(isWrap || isUnwrap){
-	// 		let weth = await getContract("WETH9", chain?.id!, WETH_ADDRESS(chain?.id!));
-	// 		if(isWrap) tx = send(weth, "deposit", [], Big(inputAmount).mul(10**token.decimals).toFixed(0));
-	// 		else tx = send(weth, "withdraw", [Big(outputAmount).mul(10**token.decimals).toFixed(0)]);
-	// 	} else {
-	// 		const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
-	// 		const pythData = await getUpdateData(tokenPricesToUpdate);
-	// 		// concat swap assets[]
-	// 		let _swapData = {...swapData};
-	// 		if(token.id == ADDRESS_ZERO){
-	// 			let ethAmount = Big(inputAmount).mul(10**token.decimals).toFixed(0);
-	// 			tx = router.estimateGas.swap(_swapData, pythData)
-	// 		} else {
-	// 			let calls = [];
-	// 			if(Number(approvedAmount) > 0){
-	// 				const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
-	// 				const {v, r, s} = ethers.utils.splitSignature(data!);
-	// 				calls.push(
-	// 					router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s])
-	// 				)
-	// 			}
-	// 			calls.push(
-	// 				router.interface.encodeFunctionData("swap", [_swapData, pythData])
-	// 			);
-	// 			tx = router.estimateGas.multicall(...calls)
-	// 		}
-	// 	}
-	// }
 
 	const approveTx = async (token: any, routerAddress: string) => {
 		setLoading(true);
@@ -360,8 +336,8 @@ function Swap() {
 	const approve = async (token: any, routerAddress: string) => {
 		setLoading(true);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * deadline_m).toFixed(0);
-		const _amount = Big(inputAmount).toFixed(token.decimals, 0);
-		const value = BigNumber.from(Big(_amount).mul(10**token.decimals).toFixed(0));
+		// const _amount = Big(inputAmount).toFixed(token.decimals, 0);
+		const value = ethers.constants.MaxUint256;
 		signTypedDataAsync({
 			domain: {
 				name: token.name,
@@ -389,16 +365,13 @@ function Swap() {
 			.then(async (res: any) => {
 				setData(res);
 				setDeadline(_deadline);
-				setApprovedAmount(_amount);
+				setApprovedAmount(ethers.constants.MaxUint256.toString());
 				setLoading(false);
 				toast({
 					title: "Approval Signed",
 					description: <Box>
 						<Text>
-							{`for ${_amount} ${token.symbol}`}
-						</Text>
-						<Text>
-							Please continue
+							{`For use of ${token.symbol}`}
 						</Text>
 					</Box>,
 					status: "info",
@@ -439,6 +412,8 @@ function Swap() {
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
 		else if (chain?.unsupported) return {valid: false, message: "Unsupported Chain"}
+		if(loading) return {valid: false, message: "Loading..."}
+		if(error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
 		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
 		else if (swapInputExceedsBalance()) return {valid: false, message: "Insufficient Balance"}
@@ -465,10 +440,9 @@ function Swap() {
 			tx = new Promise((resolve, reject) => resolve(100000));
 		} else {
 			let calls = [];
-			if(Number(approvedAmount) > 0){
-				const amount = Big(approvedAmount).mul(10**token.decimals).toFixed(0);
+			if(Big(approvedAmount ?? 0).gt(0)){
 				const {v, r, s} = ethers.utils.splitSignature(data!);
-				calls.push(router.interface.encodeFunctionData("permit", [amount, deadline, token.id, v, r, s]))
+				calls.push(router.interface.encodeFunctionData("permit", [approvedAmount, deadline, token.id, v, r, s]))
 			}
 			calls.push(
 				router.interface.encodeFunctionData("swap", [_swapData, pythData])
@@ -498,9 +472,9 @@ function Swap() {
 					{tokenFormatter.format(
 						(prices[tokens[inputAssetIndex]?.id] / prices[tokens[outputAssetIndex]?.id]) || 0
 					)}{" "}
-					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | REAX
+					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
 				</title>
-				<link rel="icon" type="image/x-icon" href="/veREAX.svg"></link>
+				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
 			{tokens.length > 1 ? (
 				<SwapLayout

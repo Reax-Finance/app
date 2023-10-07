@@ -9,7 +9,8 @@ import {
 	useDisclosure,
 	Select,
 	useToast,
-	Image
+	Image,
+	useColorMode
 } from "@chakra-ui/react";
 import {
     ESYX_PRICE,
@@ -29,14 +30,12 @@ import useHandleError, { PlatformType } from "../../utils/useHandleError";
 export default function YourBorrow({ market, index, type }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [amount, setAmount] = React.useState("");
-	const [amountNumber, setAmountNumber] = useState(0);
-	const { walletBalances } = useBalanceData();
+	const { walletBalances, updateFromTx } = useBalanceData();
 	const { prices } = usePriceData();
 	const [loading, setLoading] = useState(false);
 
 	const _onClose = () => {
 		setAmount("");
-		setAmountNumber(0);
 		onClose();
 	};
 
@@ -57,7 +56,7 @@ export default function YourBorrow({ market, index, type }: any) {
 		const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
 		send(pool, "swapBorrowRateMode", [market.inputToken.id, type == 'VARIABLE' ? '2' : '1'])
 		.then(async (res: any) => {
-			await res.wait();
+			updateFromTx(await res.wait(2));
 			toast({
 				title: `Switched ${type} to ${
 					type == "VARIABLE" ? "STABLE" : "VARIABLE"
@@ -89,12 +88,14 @@ export default function YourBorrow({ market, index, type }: any) {
 			.toFixed(2);
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ bg: 'bg.400' }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
 					<MarketInfo token={market.inputToken} color='secondary.200' />
@@ -110,7 +111,7 @@ export default function YourBorrow({ market, index, type }: any) {
 						<Text fontSize={'xs'}>
 							+{rewardAPY()} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} alt={process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</Text>
@@ -145,7 +146,7 @@ export default function YourBorrow({ market, index, type }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<BorrowModal market={market} amount={amount} setAmount={setAmount} amountNumber={amountNumber} setAmountNumber={setAmountNumber} />
+				<BorrowModal market={market} amount={amount} setAmount={setAmount} onClose={_onClose} />
 			</Modal>
 		</>
 	);

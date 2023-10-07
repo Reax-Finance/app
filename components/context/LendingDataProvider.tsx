@@ -1,12 +1,13 @@
 import * as React from "react";
 import axios from "axios";
 import { getAddress, getABI, getContract } from "../../src/contract";
-import { ADDRESS_ZERO, defaultChain } from '../../src/const';
+import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from '../../src/const';
 import { ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from "wagmi";
 import { Status, SubStatus } from "../utils/status";
-import { LendingEndpoint, LendingEndpoint2, query_lending } from "../../src/queries/lending";
+import { LendingEndpoints, query_lending } from "../../src/queries/lending";
+import useUpdateData from "../utils/useUpdateData";
 
 interface LendingDataValue {
 	status: Status;
@@ -19,6 +20,9 @@ interface LendingDataValue {
 	selectedPool: number, 
 	setSelectedPool: (index: number) => void;
 	protocols: any[],
+	positions: any[],
+	updatePositions: () => void;
+	setUserEMode: (eMode: string) => void;
 }
 
 const LendingDataContext = React.createContext<LendingDataValue>({} as LendingDataValue);
@@ -27,11 +31,13 @@ function LendingDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<Status>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<LendingDataValue['message']>("");
 	const { chain } = useNetwork();
-	const [pools, setPools] = React.useState<any[]>([[], []]);
-	const [protocols, setProtocols] = React.useState<any[]>([[], []]);
+	const { address } = useAccount();
+	const [pools, setPools] = React.useState<any[]>([[]]);
+	const [protocols, setProtocols] = React.useState<any[]>([{}]);
 	const [selectedPool, setSelectedPool] = React.useState<any>(0);
 	const markets = pools[selectedPool];
 	const protocol = protocols[selectedPool];
+	const [positions, setPositions] = React.useState<any[]>([[]]);
 
 	useEffect(() => {
 		if(localStorage){
@@ -49,33 +55,43 @@ function LendingDataProvider({ children }: any) {
 		return new Promise((resolve, reject) => {
 			setStatus(Status.FETCHING);
 			if(!_address) _address = ADDRESS_ZERO;
-			Promise.all([
-				axios.post(LendingEndpoint2(chainId), {
-					query: query_lending(_address.toLowerCase()),
-					variables: {},
-				}),
-				axios.post(LendingEndpoint(chainId), {
-					query: query_lending(_address.toLowerCase()),
-					variables: {},
-				})
-			])
+			Promise.all(
+				LendingEndpoints(chainId).map((endpoint) => {
+					return axios.post(endpoint, {
+						query: query_lending(_address!.toLowerCase()),
+						variables: {},
+					})
+				}))
 			.then(async (res) => {
-				if (res[0].data.errors || res[1].data.errors) {
+				if (res[0].data.errors || res[1]?.data?.errors) {
 					setStatus(Status.ERROR);
 					setMessage("Network Error. Please refresh the page or try again later.");
 					reject(res[0].data.errors || res[1].data.errors);
 				} else {
-					const _protocols = res.map((r: any) => r.data.data.lendingProtocols[0]);
-					setProtocols(res.map((r: any) => r.data.data.lendingProtocols[0]));
-					const _pools = res.map((r: any) => r.data.data.markets);
-					for(let i in _pools){
-						if(_address && (res[i].data.data.account)){
+					let _protocols = [];
+					let _pools = [];
+
+					for(let i in res){
+						let data = res[i].data.data;
+						_protocols.push(data.lendingProtocols[0]);
+						_pools.push(data.markets);
+						let emodes = [];
+						for(let j in data.emodeCategories){
+							let emode = data.emodeCategories[j];
+							emode.assets = data.markets.filter((market: any) => market.eModeCategory?.id == emode.id);
+							emodes.push(emode);
+						}
+						_protocols[i].eModes = emodes;
+						if(_address && (data.account)){
 							const _enabledCollaterals = res[i].data.data.account._enabledCollaterals.map((c: any) => c.id);
 							_pools[i].forEach((market: any) => {
 								market.isCollateral = _enabledCollaterals.includes(market.id);
 							})
+							_protocols[i].eModeCategory = _protocols[i].eModes.find((emode: any) => emode.id == data.account.eModeCategory?.id);
 						}
 					}
+					console.log("Fetched lending data", _protocols, _pools);
+					setProtocols(_protocols);
 					_setMarketsPriceFeeds(_pools, _protocols)
 					.then((_marketsWithFeeds) => {
 						setStatus(Status.SUCCESS);
@@ -84,6 +100,7 @@ function LendingDataProvider({ children }: any) {
 				}
 			})
 			.catch((err) => {
+				console.log(err);
 				setStatus(Status.ERROR);
 				setMessage(
 					"Failed to fetch data. Please refresh the page and try again later."
@@ -91,6 +108,57 @@ function LendingDataProvider({ children }: any) {
 			});
 		});
 	};
+
+	const {getUpdateData} = useUpdateData();
+
+	React.useEffect(() => {
+        if(subStatus == SubStatus.NOT_SUBSCRIBED && pools[0].length > 1 && protocols[0]?.id && address) {
+			setSubStatus(SubStatus.SUBSCRIBED);
+			console.log("Subscribed to lending data");
+			updatePositions(address);
+			setInterval(updatePositions, 30000);
+        }
+    }, [pools, address, subStatus, protocols]);
+
+	const updatePositions = async (_address = address) => {
+		if(!_address) return;
+		const chainId = defaultChain.id;
+		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
+		const helper = new ethers.Contract(
+			getAddress("Multicall2", chainId),
+			getABI("Multicall2", chainId),
+			provider
+		);
+		let calls = [];
+		for(let i in pools){
+			if(!protocols[i]._lendingPoolAddress) continue;
+			const _pool = await getContract("LendingPool", chainId, protocols[i]._lendingPoolAddress);
+			const pythData = await getUpdateData();
+			calls.push([_pool.address, _pool.interface.encodeFunctionData("getUserAccountData((address,bytes[]))", [{user: _address, pythUpdateData: pythData}]), 0]);
+		}
+		helper.callStatic.aggregate(calls)
+		.then(async (res: any) => {
+			let resultData = res[1];
+			let _positions = [];
+			for(let i = 0; i < resultData.length; i++){
+				const _pool = await getContract("LendingPool", chainId, protocols[i]._lendingPoolAddress);
+				const _marketDataDecoded = _pool.interface.decodeFunctionResult("getUserAccountData((address,bytes[]))", resultData[i]);
+				_positions.push({
+					totalCollateralBase: _marketDataDecoded[0].toString(),
+					totalDebtBase: _marketDataDecoded[1].toString(),
+					availableBorrowsBase: _marketDataDecoded[2].toString(),
+					currentLiquidationThreshold: _marketDataDecoded[3].toString(),
+					ltv: _marketDataDecoded[4].toString(),
+					healthFactor: _marketDataDecoded[5].toString(),
+				});
+			}
+			setPositions(_positions);
+		})
+		.catch((err: any) => {
+			console.log("Failed to get lending positions", err);
+			setPositions([[]])
+		})
+	}
 
 	/**
 	 * Set Price Feeds
@@ -174,6 +242,14 @@ function LendingDataProvider({ children }: any) {
 		setPools(_pools);
 	}
 
+	const setUserEMode = (emode: string) => {
+		let newProtocol = {...protocol};
+		newProtocol.eModeCategory = newProtocol.eModes.find((eMode: any) => eMode.id == emode);
+		let newProtocols = [...protocols];
+		newProtocols[selectedPool] = newProtocol;
+		setProtocols(newProtocols);
+	}
+
 	const value: LendingDataValue = {
 		status,
 		message,
@@ -184,7 +260,10 @@ function LendingDataProvider({ children }: any) {
 		selectedPool,
 		setSelectedPool,
 		pools,
-		protocols
+		protocols,
+		positions,
+		updatePositions,
+		setUserEMode
 	};
 
 	return (

@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, Divider, Flex, Text, Image, Tooltip } from "@chakra-ui/react";
+import { Box, Divider, Flex, Text, Image, Tooltip, useColorMode } from "@chakra-ui/react";
 import {useState} from 'react';
+import { VARIANT } from "../../styles/theme";
 
 export default function Info({ title, message, children }: any) {
 		const [isLabelOpen, setIsLabelOpen] = useState(false);
@@ -26,25 +27,24 @@ export default function Info({ title, message, children }: any) {
 }
 
 function InfoBox({ title, message }: any) {
+	const { colorMode } = useColorMode();
 	return (
 		<>
 			<Box
-				rounded={0}
-				className="containerBody"
-				color={'white'}
+				className={`${VARIANT}-${colorMode}-containerBody`}
 				shadow={'2xl'}
 			>
-				<Box px={3} py={2} className="containerHeader">
-					<Text fontSize={"lg"} >
+				<Box px={3} py={2} className={`${VARIANT}-${colorMode}-containerHeader`}>
+					<Text fontSize={"lg"} color={colorMode == 'dark' ? "white" : "black"}>
 						{title}
 					</Text>
 				</Box>
 
-				<Divider />
-				<Box px={3} py={1} >
-					<Flex align={"center"} gap={2} mb={2} mt={2} color="white">
+				{VARIANT == 'edgy' && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> }
+				<Box px={3} py={1}>
+					<Flex align={"center"} gap={2} mb={2} mt={2}>
 						<Flex gap={2}>
-							<Text color={"whiteAlpha.700"}>{message}</Text>
+							<Text color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>{message}</Text>
 						</Flex>
 					</Flex>
 				</Box>

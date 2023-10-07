@@ -3,13 +3,11 @@ import {
 	Modal,
 	ModalOverlay,
 	Tr,
-	Th,
-	Td,
 	Flex,
 	Image,
 	Text,
-	Box,
 	useDisclosure,
+	useColorMode,
 } from "@chakra-ui/react";
 import {
 	ESYX_PRICE,
@@ -21,6 +19,7 @@ import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import BorrowModal from "./BorrowModal";
 import MarketInfo from "../_utils/TokenInfo";
+import { useRouter } from "next/router";
 
 export default function Debt({ market, index }: any) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,7 +27,8 @@ export default function Debt({ market, index }: any) {
 	const [amount, setAmount] = React.useState("");
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const _onClose = () => {
 		setAmount("");
@@ -56,15 +56,17 @@ export default function Debt({ market, index }: any) {
 		return min;
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={onOpen}
-				_hover={{ bg: 'bg.400' }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox isFirst={index == 0} alignBox='left'>
-					<MarketInfo token={market.inputToken} color='secondary.200' />
+					<MarketInfo token={market.inputToken} color={colorMode == 'dark' ? "secondary.200" : "secondary.600"} />
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 					<Text textAlign={'center'} w={'100%'}>
@@ -73,27 +75,27 @@ export default function Debt({ market, index }: any) {
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='center'>
 				<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text color='secondary.200'>
-							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
+						<Text color={colorMode == 'dark' ? "secondary.200" : "secondary.600"}>
+							-{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'STABLE')[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY("STABLE")) > 0 && <Flex gap={1} mt={0} align={'center'}>
 						<Text fontSize={'xs'}>
 							+{rewardAPY("STABLE")} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>
 				<TdBox isFirst={index == 0} alignBox='right' isNumeric>
 					<Flex flexDir={'column'} align={'right'} w={'100%'} textAlign={'right'}>
-						<Text color='secondary.200'>
-							{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
+						<Text color={colorMode == 'dark' ? "secondary.200" : "secondary.600"}>
+							-{Number(market.rates.filter((rate: any) => rate.side == "BORROWER" && rate.type == 'VARIABLE')[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY("VARIABLE")) > 0 && <Flex gap={1} mt={0} justify={'end'} align={'center'}>
 						<Text fontSize={'xs'}>
 							+{rewardAPY("VARIABLE")} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>
@@ -101,7 +103,7 @@ export default function Debt({ market, index }: any) {
 
 			<Modal isCentered isOpen={isOpen} onClose={_onClose}>
 				<ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
-				<BorrowModal market={market} amount={amount} setAmount={setAmount}/>
+				<BorrowModal market={market} amount={amount} setAmount={setAmount} onClose={_onClose} />
 			</Modal>
 		</>
 	);
