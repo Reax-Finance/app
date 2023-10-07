@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, useToast, Text, Tooltip, IconButton, Image } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, useToast, Text, Tooltip, IconButton, Image, useColorMode } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useLendingData } from '../../context/LendingDataProvider'
 import { defaultChain, dollarFormatter } from '../../../src/const';
@@ -8,9 +8,14 @@ import { useAccount, useNetwork } from 'wagmi';
 import { getABI, getAddress, getContract, send } from '../../../src/contract';
 import Big from 'big.js';
 import { ethers } from 'ethers';
+import { HEADING_FONT, VARIANT } from '../../../styles/theme';
+import { useRouter } from 'next/router';
 
 export default function LendingMarket() {
-    const {protocol, markets, pools, selectedPool} = useLendingData();
+    const {markets, pools, protocols} = useLendingData();
+	const {query} = useRouter();
+	const selectedPool = Number(query.market);
+	const protocol = protocols[selectedPool];
 
 	const [synAccrued, setSynAccrued] = useState<any>(null);
 	const [claiming, setClaiming] = useState(false);
@@ -31,7 +36,7 @@ export default function LendingMarket() {
 				let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 				let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
 				let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
-				controller.getUserRewards(assets, address, getAddress("VestedREAX", defaultChain.id))
+				controller.getUserRewards(assets, address, getAddress(process.env.NEXT_PUBLIC_VESTED_TOKEN_NAME!, defaultChain.id))
 						.then((result: any) => {
 							setSynAccrued(result.toString());
 						})
@@ -88,14 +93,16 @@ export default function LendingMarket() {
             params: {
               type: 'ERC20', // Initially only supports ERC20, but eventually more!
               options: {
-                address: getAddress("VestedREAX", defaultChain.id), // The address that the token is at.
-                symbol: "veREAX", // A ticker symbol or shorthand, up to 5 chars.
+                address: getAddress(process.env.NEXT_PUBLIC_VESTED_TOKEN_NAME!, defaultChain.id), // The address that the token is at.
+                symbol: process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL!, // A ticker symbol or shorthand, up to 5 chars.
                 decimals: 18, // The number of decimals in the token
-                image: process.env.NEXT_PUBLIC_VERCEL_URL + '/veREAX.svg', // A string url of the token logo
+                image: process.env.NEXT_PUBLIC_VERCEL_URL + `/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL!}.svg`, // A string url of the token logo
               },
             }
         });
     }
+
+	const { colorMode } = useColorMode();
 
   return (
     <>
@@ -104,11 +111,9 @@ export default function LendingMarket() {
             display={{ sm: "block", md: "flex" }}
             justifyContent={"space-between"}
             alignContent={"start"}
-            mt={10}
-            mb={6}
         >
             <Box>
-					<PoolSelector />
+					{pools.length > 1 ? <PoolSelector /> : <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={{sm: '3xl', md: "3xl", lg: '32px'}}>{protocol?.name}</Heading>}
 					<Flex mt={7} mb={4} gap={10}>
 						<Flex gap={2}>
 							<Heading size={"sm"} color={"primary.400"}>
@@ -131,14 +136,14 @@ export default function LendingMarket() {
 					&&
 					<Box textAlign={"right"}>
 					<Flex justify={'end'} align={'center'} gap={1}>
-						<Heading size={"sm"} color={"whiteAlpha.600"}>
+						<Heading size={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 							Rewards
 						</Heading>
 						<Tooltip label='Add to Metamask'>
 						<IconButton
 							icon={
 								<Image
-									src="https://cdn.consensys.net/uploads/metamask-1.svg"
+									src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png"
 									w={"20px"}
 									alt=""
 								/>
@@ -153,11 +158,11 @@ export default function LendingMarket() {
 					<Box gap={20} mt={2}>
 						<Flex justify={"end"} align={"center"} gap={2}>
 							<Text fontSize={"2xl"}>{synAccrued ? Big(synAccrued).div(10**18).toFixed(2) : '-'} </Text>
-							<Text fontSize={"2xl"} color={"whiteAlpha.400"}>
-								veREAX
+							<Text fontSize={"2xl"} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
+								{process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}
 							</Text>
 						</Flex>
-						<Box mt={2} w={'100%'} className="outlinedButton">
+						<Box mt={2} w={'100%'} className={`${VARIANT}-${colorMode}-outlinedButton`}>
 						<Button
 							onClick={claim}
 							bg={'transparent'}

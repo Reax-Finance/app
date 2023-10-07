@@ -1,4 +1,5 @@
 import { RainbowKitProvider, Theme } from '@rainbow-me/rainbowkit';
+import { VARIANT } from './theme';
 
 const myCustomTheme: Theme = {
   blurs: {
@@ -40,11 +41,17 @@ const myCustomTheme: Theme = {
   fonts: {
     body: '12px',
   },
-  radii: {
+  radii: VARIANT == 'edgy' ? {
     actionButton: '0px',
     connectButton: '0px',
     menuButton: '0px',
     modal: '0px',
+    modalMobile: '0px',
+  }: {
+    actionButton: '10px',
+    connectButton: '10px',
+    menuButton: '10px',
+    modal: '20px',
     modalMobile: '0px',
   },
   shadows: {

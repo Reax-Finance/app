@@ -10,7 +10,8 @@ import {
 	useDisclosure,
 	Switch,
 	useToast,
-	Image
+	Image,
+	useColorMode
 } from "@chakra-ui/react";
 import { ESYX_PRICE, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Big from "big.js";
@@ -18,10 +19,8 @@ import { useNetwork } from 'wagmi';
 import TdBox from "../../dashboard/TdBox";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
-import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { getContract, send } from "../../../src/contract";
 import { useLendingData } from "../../context/LendingDataProvider";
-import { formatLendingError } from "../../../src/errors";
 import SupplyModal from "./SupplyModal";
 import MarketInfo from "../_utils/TokenInfo";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
@@ -90,32 +89,34 @@ export default function YourSupply({ market, index }: any) {
 			.toFixed(2);
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tr
 				cursor="pointer"
 				onClick={_onOpen}
-				_hover={{ borderColor: "primary.400", bg: "bg.400" }}
+				_hover={{ bg: colorMode == 'dark' ? "darkBg.400" : "whiteAlpha.600" }}
 			>
 				<TdBox
 					isFirst={index == 0}
 					alignBox='left'
 				>
-					<MarketInfo token={market.inputToken} color='primary.200' />
+					<MarketInfo token={market.inputToken} color={colorMode == 'dark' ? "primary.200" : "primary.600"} />
 				</TdBox>
 				<TdBox
 					isFirst={index == 0}
 					alignBox='center'
 				>
 					<Flex flexDir={'column'} align={'center'} w={'100%'} textAlign={'center'}>
-						<Text color='primary.200'>
+						<Text color={colorMode == 'dark' ? "primary.200" : "primary.600"}>
 						{Number(market.rates.filter((rate: any) => rate.side == "LENDER")[0]?.rate ?? 0).toFixed(2)} %
 						</Text>
 						{Number(rewardAPY()) > 0 && <Flex gap={1} mt={0} align={'center'}>
 						<Text fontSize={'xs'}>
 							+{rewardAPY()} %
 						</Text>
-						<Image src="/veREAX.svg" rounded={'full'} w={'15px'} h={'15px'} />
+						<Image src={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`} rounded={'full'} w={'15px'} h={'15px'} />
 						</Flex>}
 					</Flex>
 				</TdBox>
@@ -150,6 +151,7 @@ export default function YourSupply({ market, index }: any) {
 					setAmountNumber={setAmountNumber}
 					amount={amount}
 					setAmount={setAmount}
+					onClose={_onClose}
 				/>
 			</Modal>
 		</>

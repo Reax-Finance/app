@@ -10,11 +10,14 @@ import {
 	Text,
 	Tag,
 	ModalOverlay,
+	useColorMode,
 } from "@chakra-ui/react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { BsStars } from "react-icons/bs";
 import { motion, Variants } from "framer-motion";
 import { useLendingData } from "../../context/LendingDataProvider";
+import { HEADING_FONT, VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 const itemVariants: Variants = {
 	open: {
@@ -26,8 +29,11 @@ const itemVariants: Variants = {
 };
 
 export default function PoolSelector() {
-	const { pools, protocols, setSelectedPool, selectedPool } = useLendingData();
+	const { pools, protocols } = useLendingData();
 	const [searchedPools, setSearchedPools] = React.useState<any[]>([]);
+
+	const router = useRouter();
+	const selectedPool = Number(router.query.market);
 
 	React.useEffect(() => {
 		setSearchedPools(pools);
@@ -55,6 +61,8 @@ export default function PoolSelector() {
 		setSearchedPools(newPools);
 	};
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box>
 			<Box id="menu-list-123" h='40px'>
@@ -73,13 +81,13 @@ export default function PoolSelector() {
 									<Flex>
 										<Box textAlign={'left'}>
 										<Flex gap={4}>
-										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '32px'}} fontWeight='bold'>
+										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '32px'}} fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'}>
 											{protocols[selectedPool].name}
 										</Heading>
 										</Flex>
 										</Box>
 									</Flex>
-									<Flex align={'center'} color={'whiteAlpha.700'} >
+									<Flex align={'center'} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'} >
 									<Text fontSize={'sm'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'All Pools' : 'Tap To Close'}</Text>
 									<motion.div
 										variants={{
@@ -128,16 +136,16 @@ export default function PoolSelector() {
 							position: "relative",
 							width: "450px",
 							zIndex: '100',
-							borderRadius: '0px',
+							borderRadius: VARIANT == 'rounded' ? '16px' : '0px',
 							// background: "linear-gradient(45deg, transparent 10px, #1D1F24 0) bottom left, linear-gradient(-135deg, transparent 10px, #1D1F24 0) top right",
 							// backgroundRepeat: 'no-repeat',
 							// backgroundSize: '100% 50%',
-							boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
+							// boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
 						}}
 						
 					>
-						<Box shadow={'2xl'} className="containerBody">
-							<Box className="containerHeader">
+						<Box className={`${VARIANT}-${colorMode}-containerBody`}>
+							<Box className={`${VARIANT}-${colorMode}-containerHeader`}>
 								<motion.div
 									variants={{
 										open: {
@@ -174,15 +182,14 @@ export default function PoolSelector() {
 								</motion.div>
 							</Box>
 
-						<Divider />
+						{VARIANT == 'edgy' && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> }
 
 						{searchedPools.map((pool, index) => {
 							return (
 								<motion.li
 									variants={itemVariants}
 									onClick={() => {
-										localStorage.setItem("lendingPool", index.toString());
-										setSelectedPool(index);
+										router.push(`/lend/${index}`);
 										setIsOpen(false);
 									}}
 									key={index}

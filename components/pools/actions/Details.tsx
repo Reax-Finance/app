@@ -1,8 +1,10 @@
-import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider, IconButton } from '@chakra-ui/react'
+import { Flex, Text, Image, ModalOverlay, ModalCloseButton, Modal, ModalBody, ModalContent, ModalHeader, Box, Heading, Divider, IconButton, useColorMode } from '@chakra-ui/react'
 import React from 'react'
-import { dollarFormatter, tokenFormatter } from '../../../src/const';
+import { defaultChain, dollarFormatter, tokenFormatter } from '../../../src/const';
 import Big from 'big.js';
 import { usePriceData } from '../../context/PriceContext';
+import { VARIANT } from '../../../styles/theme';
+import { MdOpenInNew } from 'react-icons/md';
 
 export default function Details({pool, isOpen, onClose}: any) {
 	
@@ -13,10 +15,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 	}, 0)
 
 	const calcApy = () => {
-		let totalFees = 0;
-		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
-		}
+		let totalFees = fees7Days() / 2;
 		const dailyFee = totalFees / pool.snapshots.length;
 		if(liquidity == 0) return (dailyFee * 365);
 		const dailyApy = ((1 + dailyFee / liquidity) ** 365) - 1;
@@ -26,7 +25,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 	const fees7Days = () => {
 		let totalFees = 0;
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[0].swapFees);
+			totalFees = Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[pool.snapshots.length-1].swapFees);
 		}
 		return totalFees;
 	}
@@ -35,10 +34,12 @@ export default function Details({pool, isOpen, onClose}: any) {
 		let totalFees = 0;
 		// pool.snapshots[-1].swapFees - pool.snapshots[-2].swapFees
 		if(pool.snapshots.length > 1){
-			totalFees = Number(pool.snapshots[pool.snapshots.length-1].swapFees) - Number(pool.snapshots[pool.snapshots.length-2].swapFees);
+			totalFees = Number(pool.snapshots[0].swapFees) - Number(pool.snapshots[1].swapFees);
 		}
 		return totalFees;
 	}
+
+    const {colorMode} = useColorMode();
 
   	return (<>
     <Modal
@@ -49,7 +50,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 		<ModalOverlay bg='blackAlpha.800' backdropFilter='blur(10px)' />
 		<ModalContent width={"30rem"} bgColor="transparent" shadow={0} rounded={0} mx={2}>
 			<ModalCloseButton variant={'ghost'} rounded={"0"} mt={1} />
-			<Box className='containerBody2'>
+			<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
 			<ModalHeader>
 				<Flex justify={'space-between'}>
 				<Flex
@@ -87,8 +88,14 @@ export default function Details({pool, isOpen, onClose}: any) {
 				</Flex>
 			</ModalHeader>
 			<ModalBody p={0}>
-				<Divider />
-				<Box bg={'bg.600'}>
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+				<Flex bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'} px={4} py={3} align={'center'} gap={1} _hover={{cursor: 'pointer'}} onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + pool.address)}>
+					<Text fontSize={'sm'}>{pool.address}</Text>
+					<MdOpenInNew size={'14px'}/>
+				</Flex>
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+
+				<Box bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'}>
 				<Flex>
 				<Box mx={4} my={4}>
 					<Text mt={2} mb={2}>Total Value Locked</Text>
@@ -112,7 +119,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 
 				</Flex>
 
-				<Divider />
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
 
 				<Flex>
 				<Box mx={4} my={4}>
@@ -154,7 +161,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 				</Box>
 				</Flex>
 
-				<Divider />
+				<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
 
 				<Box mx={4} my={0}>
 					<Heading size={'md'} mt={2} mb={4}>Pool Composition</Heading>
@@ -178,7 +185,7 @@ export default function Details({pool, isOpen, onClose}: any) {
 					</Flex>
 				</Box>
 				</Box>
-				<Box className='containerFooter2' h={6}></Box>
+				<Box className={`${VARIANT}-${colorMode}-containerFooter2`} h={6}></Box>
 			</ModalBody>
 		</Box>
 		</ModalContent>

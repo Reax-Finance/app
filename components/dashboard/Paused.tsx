@@ -1,9 +1,12 @@
-import { Flex, Heading, Text } from "@chakra-ui/react";
+import { Flex, Heading, Text, useColorMode } from "@chakra-ui/react";
 import React from "react";
 import { useAppData } from "../context/AppDataProvider";
+import { VARIANT } from "../../styles/theme";
 
 export default function Paused() {
 	const { pools, tradingPool } = useAppData();
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Flex
@@ -14,12 +17,12 @@ export default function Paused() {
 				w={"100%"}
 				align="center"
 				justify={"center"}
-				className="cutoutcornersbox"
+				className={`${VARIANT}-${colorMode}-containerBody`}
 			>
 				<Heading fontSize={"24px"}>Market Paused</Heading>
 				<Text
 					textAlign={"center"}
-					color="whiteAlpha.700"
+					color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
 					maxW={"500px"}
 					my={4}
 				>
@@ -29,7 +32,7 @@ export default function Paused() {
 
 				{/* <Text
 					textAlign={"center"}
-					color="whiteAlpha.700"
+					color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
 					maxW={"500px"}
 					mt={0}
 				>

@@ -1,6 +1,6 @@
 import React from 'react'
 import Info from '../../infos/Info'
-import { Flex, Text, Box, Heading, Grid, GridItem, Button } from '@chakra-ui/react'
+import { Flex, Text, Box, Heading, Grid, GridItem, Button, useColorMode } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { IoMdCash } from 'react-icons/io'
 import IconBox from './../IconBox'
@@ -14,6 +14,7 @@ import { FaPercentage } from 'react-icons/fa'
 import { useLendingData } from '../../context/LendingDataProvider'
 import { AiOutlineArrowRight } from 'react-icons/ai'
 import { useRouter } from 'next/router'
+import { VARIANT } from '../../../styles/theme'
 
 export default function MinimalLendingPosition({poolIndex}: any) {
     const {pools, protocols, setSelectedPool} = useLendingData();
@@ -28,19 +29,21 @@ export default function MinimalLendingPosition({poolIndex}: any) {
 		router.push('/lend')
 	}
 
+    const { colorMode } = useColorMode();
+
     return (
     <>
         <Box
             display={{ sm: "block", md: "block" }}
-            className='containerBody'
+            className={`${VARIANT}-${colorMode}-containerBody`}
         >
-            <Flex align={'center'} justify={'space-between'} px={5} py={2} className='containerHeader'>
+            <Flex align={'center'} justify={'space-between'} px={5} py={2} className={`${VARIANT}-${colorMode}-containerHeader`}>
                 <Heading fontSize={'18px'}>
                     {protocols[poolIndex].name}
                 </Heading>
 
                 <Button variant={'unstyled'} onClick={view}>
-                    <Flex align={'center'} gap={2} color={'whiteAlpha.600'}>
+                    <Flex align={'center'} gap={2} color={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}>
                         <Text fontSize={'sm'} fontWeight={'normal'}>
                     View Position
                         </Text>
@@ -75,7 +78,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                 <Box cursor={'help'}>
                                     <Heading
                                         size={"xs"}
-                                        color="whiteAlpha.700"
+                                        color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         mb={0.5}
                                     >
                                         Collateral
@@ -84,7 +87,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                         fontWeight={"semibold"}
                                         fontSize={"lg"}
                                         gap={1}
-                                        color={"whiteAlpha.800"}
+                                        color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                                     >
                                         <Text
                                             fontWeight={"normal"}
@@ -112,7 +115,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                         <Heading
                                             mb={0.5}
                                             size={"xs"}
-                                            color="whiteAlpha.700"
+                                            color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         >
                                             Debt
                                         </Heading>
@@ -121,7 +124,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={"whiteAlpha.800"}
+                                                color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                                             >
                                                 <Text fontWeight={"normal"}>
                                                     $
@@ -147,7 +150,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                         <Heading
                                             mb={0.5}
                                             size={"xs"}
-                                            color="whiteAlpha.700"
+                                            color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         >
                                             Net APY
                                         </Heading>
@@ -178,7 +181,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                         <Heading
                                             mb={0.5}
                                             size={"xs"}
-                                            color="whiteAlpha.700"
+                                            color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         >
                                             Available to Borrow
                                         </Heading>
@@ -187,7 +190,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={"whiteAlpha.800"}
+                                                color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                                             >
                                                 <Text fontWeight={"normal"}>
                                                     $
@@ -212,7 +215,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                         <Heading
                                             mb={0.5}
                                             size={"xs"}
-                                            color="whiteAlpha.700"
+                                            color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}
                                         >
                                             Borrow Limit
                                         </Heading>
@@ -221,7 +224,7 @@ export default function MinimalLendingPosition({poolIndex}: any) {
                                                 fontWeight={"semibold"}
                                                 fontSize={"lg"}
                                                 gap={1}
-                                                color={"whiteAlpha.800"}
+                                                color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                                             >
                                                 <Text
                                                     fontWeight={"semibold"}

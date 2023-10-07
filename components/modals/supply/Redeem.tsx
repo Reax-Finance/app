@@ -8,12 +8,13 @@ import {
 	Divider,
     Tooltip,
 	useToast,
+	useColorMode,
 } from "@chakra-ui/react";
 import Big from "big.js";
 import Response from "../_utils/Response";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import { getABI, getAddress, getContract, send } from "../../../src/contract";
-import { EIP712_VERSION, defaultChain, dollarFormatter } from "../../../src/const";
+import { EIP712_VERSION, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import Link from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import useUpdateData from "../../utils/useUpdateData";
@@ -23,14 +24,17 @@ import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
+import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
-export default function Redeem({ market, amount, setAmount, isNative, max }: any) {
+export default function Redeem({ market, amount, setAmount, isNative, max, isMax, onClose }: any) {
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
 
 	const {prices} = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const {getUpdateData} = useUpdateData();
 	const handleError = useHandleError(PlatformType.LENDING);
@@ -43,19 +47,26 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const { nonces, allowances, updateFromTx } = useBalanceData();
-	const { markets, protocol } = useLendingData();
+	const { markets, protocol, updatePositions } = useLendingData();
 
 	const withdraw = async () => {
 		setLoading(true);
 		const priceFeedUpdateData = await getUpdateData(markets.map((m: any) => m.inputToken.id));
-		const _amount = Big(amount).mul(10**market.inputToken.decimals).toFixed(0);
+		const _amount = isMax ? ethers.constants.MaxUint256.toString() : Big(amount).mul(10**market.inputToken.decimals).toFixed(0);
 
 		let tx: any;
 		if(isNative){
-			const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
-			const {v, r, s} = ethers.utils.splitSignature(data!);
-			let args = [market.inputToken.id, _amount, address, deadline, v, r, s, priceFeedUpdateData];
-			tx = send(wrapper, "withdrawETHWithPermit", args);
+			if(Big(approvedAmount).gt(0)){
+				const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
+				const {v, r, s} = ethers.utils.splitSignature(data!);
+				let args = [market.inputToken.id, _amount, address, deadline, v, r, s, priceFeedUpdateData];
+				console.log(args);
+				tx = send(wrapper, "withdrawETHWithPermit", args);
+			} else {
+				const wrapper = new ethers.Contract(protocol._wrapper, getABI("WrappedTokenGateway", chain?.id!))
+				let args = [market.inputToken.id, _amount, address, priceFeedUpdateData];
+				tx = send(wrapper, "withdrawETH", args);
+			}
 		} else {
 			const pool = await getContract("LendingPool", chain?.id!, market.protocol._lendingPoolAddress);
 			let args = [
@@ -64,7 +75,6 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				address,
 				priceFeedUpdateData
 			];
-			
 			tx = send(pool, "withdraw", args)
 		}
 		tx.then(async (res: any) => {
@@ -73,11 +83,13 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 			setAmount('0');
 			setApprovedAmount('0')
 			setLoading(false);
+			updatePositions();
+			onClose();
 			toast({
 				title: "Withdrawal Successful",
 				description: <Box>
 					<Text>
-						{`You have withdrawn ${amount} ${market.inputToken.symbol}`}
+						{`You have withdrawn ${tokenFormatter.format(amount)} ${market.inputToken.symbol}`}
 					</Text>
 					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 						<Flex align={'center'} gap={2}>
@@ -101,7 +113,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		setApproveLoading(true);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
 		const _amount = Big(amount).toFixed(market.inputToken.decimals, 0);
-		const value = ethers.utils.parseUnits(_amount, market.inputToken.decimals);
+		const value = isMax ? ethers.constants.MaxUint256 : ethers.utils.parseUnits(_amount, market.inputToken.decimals);
 		const wrapperAddress = protocol._wrapper;
 
 		signTypedDataAsync({
@@ -131,7 +143,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 			.then(async (res: any) => {
 				setData(res);
 				setDeadline(_deadline);
-				setApprovedAmount(_amount);
+				setApprovedAmount(isMax ? ethers.constants.MaxUint256.toString() : _amount);
 				setApproveLoading(false);
 				toast({
 					title: "Approval Signed",
@@ -159,13 +171,13 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		if(!isNative) return false;
 		const wrapperAddress = protocol._wrapper;
 		const _allowance = allowances[market.outputToken.id]?.[wrapperAddress] ?? 0;
-		if (Big(_allowance).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).eq(0)){
-			return true
-		} else if(Big(_allowance).add(Number(approvedAmount) * 10 ** (market.inputToken.decimals ?? 18)).lt(
-			parseFloat(amount) * 10 ** (market.inputToken.decimals ?? 18) || 1
+		if(Big(_allowance).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).lte(
+			Big(amount).mul(10 ** (market.inputToken.decimals))
 		)) {
+			return true;
+		} else if(!isMax && Number(approvedAmount) > 0 && !Big(approvedAmount).eq(amount)){ 
 			return true
-		} else if(Number(approvedAmount) > 0 && !Big(approvedAmount).eq(amount)){ return true }
+		}
 		return false;
 	}
 
@@ -180,13 +192,13 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				stage: 0,
 				message: "Unsupported Network"
 			}
-		}
+		} else if(loading) {return {stage: 0, message: "Loading..."}}
 		else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
 			}
-		} else if (Big(amount).gt(max)) {
+		} else if (Big(amount).gt(Big(max).toFixed(market.inputToken.decimals))) {
 			return {
 				stage: 0,
 				message: "Amount Exceeds Balance"
@@ -204,6 +216,8 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Box px={5} py={5}>
@@ -212,16 +226,16 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 							<Flex gap={1}>
 						<Tooltip label='Minimum Loan to Value Ratio'>
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Base LTV
 						</Text>
 						</Tooltip>
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 						/ 
 						</Text>
 						<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Liq Threshold
 						</Text>
 						</Tooltip>
@@ -235,7 +249,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 				</Box>
 				
                 <Box mt={6} mb={6}>
-					<Text fontSize={"sm"} color='whiteAlpha.600' fontWeight={'bold'}>
+					<Text fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'}>
 						Transaction Overview
 					</Text>
 					<Box
@@ -243,7 +257,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 						rounded={8}
 					>
 						<Flex justify="space-between">
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Health Factor
 							</Text>
 							<Text fontSize={"md"}>
@@ -252,7 +266,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 						</Flex>
 						<Divider my={2} />
 						<Flex justify="space-between">
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Available to issue
 							</Text>
 							<Text fontSize={"md"}>
@@ -262,79 +276,8 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 					</Box>
 				</Box>
 
-				{/* <Box mt={6}>
-				{shouldApprove() ? <Button
-                    isDisabled={
-                        loading ||
-                        !isConnected ||
-                        chain?.unsupported ||
-                        !amount ||
-                        amountNumber == 0 ||
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) 
-                    }
-                    isLoading={loading}
-                    loadingText="Please sign the transaction"
-                    bgColor="secondary.400"
-                    width="100%"
-                    color="white"
-                    mt={2}
-                    onClick={approve}
-                    size="lg"
-                    rounded={0}
-                    _hover={{
-                        opacity: "0.5",
-                    }}
-                >
-                    {isConnected && !chain?.unsupported ? (
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
-                            <>Insufficient Collateral</>
-                        ) : !amount || amountNumber == 0 ? (
-                            <>Enter Amount</>
-                        ) : (
-                            <>Approve aWMNT</>
-                        )
-                    ) : (
-                        <>Please connect your wallet</>
-                    )}
-                </Button> :
-                <Button
-                    isDisabled={
-                        loading ||
-                        !isConnected ||
-                        chain?.unsupported ||
-                        !amount ||
-                        amountNumber == 0 ||
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) 
-                    }
-                    isLoading={loading}
-                    loadingText="Please sign the transaction"
-                    bgColor="transparent"
-                    width="100%"
-                    color="white"
-                    mt={2}
-                    onClick={withdraw}
-                    size="lg"
-                    rounded={0}
-                    _hover={{
-                        bg: "transparent",
-                    }}
-                >
-                    {isConnected && !chain?.unsupported ? (
-                        Big(amountNumber > 0 ? amount : amountNumber).gt(max) ? (
-                            <>Insufficient Collateral</>
-                        ) : !amount || amountNumber == 0 ? (
-                            <>Enter Amount</>
-                        ) : (
-                            <>Withdraw</>
-                        )
-                    ) : (
-                        <>Please connect your wallet</>
-                    )}
-                </Button>}
-				</Box> */}
-
 				<Box mt={6}>
-					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? "disabledPrimaryButton" : 'primaryButton'}><Button
+					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`}><Button
 						isDisabled={validate().stage != 1}
 						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
@@ -350,7 +293,7 @@ export default function Redeem({ market, amount, setAmount, isNative, max }: any
 					</Button>
 					</Box>}
 						
-					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? "disabledPrimaryButton":'primaryButton'} > <Button
+					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`} > <Button
 						isDisabled={validate().stage < 2}
 						isLoading={loading}
 						loadingText="Please sign the transaction"

@@ -2,34 +2,31 @@ import React, { useState } from "react";
 
 import {
 	Flex,
-	Image,
 	Text,
 	Box,
-	useDisclosure,
 	Button,
 	Divider,
     Tooltip,
 	useToast,
+	useColorMode,
 } from "@chakra-ui/react";
 import Big from "big.js";
-import InfoFooter from "../_utils/InfoFooter";
 import Response from "../_utils/Response";
 import { useAccount, useBalance, useNetwork } from "wagmi";
 import { ethers } from "ethers";
 import { getContract, send } from "../../../src/contract";
-import { useContext } from "react";
 import { AppDataContext, useAppData } from "../../context/AppDataProvider";
 import { PYTH_ENDPOINT, compactTokenFormatter, dollarFormatter, numOrZero } from "../../../src/const";
 import Link from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import useUpdateData from "../../utils/useUpdateData";
 import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { VARIANT } from "../../../styles/theme";
 
-export default function Withdraw({ collateral, amount, setAmount, isNative }: any) {
+export default function Withdraw({ collateral, amount, setAmount, isNative, onClose }: any) {
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
 	const [hash, setHash] = useState(null);
@@ -82,6 +79,7 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 			updateFromSynthTx(response);
 			setAmount('0');
 			setLoading(false);
+			onClose();
 			toast({
 				title: "Withdrawal Successful",
 				description: <Box>
@@ -120,13 +118,15 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Box px={5} py={5}>
 				<Box>
 					<Flex justify="space-between">
 						<Tooltip label='Max capacity to have this asset as collateral'>
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Capacity
 						</Text>
 						</Tooltip>
@@ -157,16 +157,16 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 							<Flex gap={1}>
 						<Tooltip label='Minimum Loan to Value Ratio'>
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Base LTV
 						</Text>
 						</Tooltip>
-						<Text fontSize={"md"} color="whiteAlpha.600">
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 						/ 
 						</Text>
 						<Tooltip label='Account would be liquidated if LTV reaches this threshold' >
 
-						<Text fontSize={"md"} color="whiteAlpha.600" textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
+						<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} textDecor={'underline'} cursor={'help'} style={{textUnderlineOffset: '2px', textDecorationStyle: 'dotted'}}>
 							Liq Threshold
 						</Text>
 						</Tooltip>
@@ -181,7 +181,7 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 
 				
                 <Box>
-						<Text mt={8} fontSize={"sm"} color='whiteAlpha.600' fontWeight={'bold'}>
+						<Text mt={8} fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'}>
 							Transaction Overview
 						</Text>
 						<Box
@@ -189,7 +189,7 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 							rounded={8}
 						>
 							<Flex justify="space-between">
-								<Text fontSize={"md"} color="whiteAlpha.600">
+								<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 									Health Factor
 								</Text>
 								<Text fontSize={"md"}>
@@ -198,7 +198,7 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 							</Flex>
 							<Divider my={2} />
 							<Flex justify="space-between">
-								<Text fontSize={"md"} color="whiteAlpha.600">
+								<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 									Available to issue
 								</Text>
 								<Text fontSize={"md"}>
@@ -208,7 +208,7 @@ export default function Withdraw({ collateral, amount, setAmount, isNative }: an
 						</Box>
 					</Box>
             
-				<Box mt={6} className={!validate().valid ? "disabledPrimaryButton" : "primaryButton"}>
+				<Box mt={6} className={!validate().valid ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`}>
                 <Button
                     isDisabled={!validate().valid}
                     isLoading={loading}

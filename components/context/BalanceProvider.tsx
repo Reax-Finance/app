@@ -22,6 +22,7 @@ interface BalanceValue {
     addAllowance: (asset: string, spender: string, value: string) => void;
     addNonce: (asset: string, value: string) => void;
     updateFromTx: (tx: any) => void;
+    setBalance: (asset: string, value: string) => void;
 }
 
 function BalanceContextProvider({ children }: any) {
@@ -47,8 +48,9 @@ function BalanceContextProvider({ children }: any) {
     const fetchBalances = async (_address?: string) => {
         // _address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
         console.log("Fetching balances for:", _address);
+        // _address = "0xC841f46D199f4DC14FC62881E18c56d1Dc1d2D69".toLowerCase();
         setStatus(Status.FETCHING);
-        const chainId = chain?.id ?? defaultChain.id;
+        const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),
@@ -166,7 +168,7 @@ function BalanceContextProvider({ children }: any) {
                 // if aweth, check allowance for wrapper
                 if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
                     calls.push([
-                        market.inputToken.id,
+                        market.outputToken.id,
                         itf.encodeFunctionData("allowance", [
                             _address,
                             wrapperAddress
@@ -314,7 +316,8 @@ function BalanceContextProvider({ children }: any) {
                     newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
                     index++;
                     if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
-                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        if(!newAllowances[market.outputToken.id]) newAllowances[market.outputToken.id] = {};
+                        newAllowances[market.outputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
                         index++;
                         if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
                         newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
@@ -379,6 +382,7 @@ function BalanceContextProvider({ children }: any) {
             setNonces(newNonces);
         })
         .catch((err: any) => {
+            console.log("Failed to fetch balances", err);
             setStatus(Status.ERROR);
         })
 	};
@@ -399,7 +403,9 @@ function BalanceContextProvider({ children }: any) {
             let isOut = decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase();
             let isIn = decodedEvents[i].args[1].toLowerCase() == address?.toLowerCase();
             if(isIn || isOut){
+                console.log("Updating balance from", newBalances[decodedEvents[i].token], isOut ? '-' : '+', decodedEvents[i].args[2].toString());
                 newBalances[decodedEvents[i].token] = Big(walletBalances[decodedEvents[i].token] ?? 0)[isOut ? 'minus' : 'add'](decodedEvents[i].args[2].toString()).toFixed(0);
+                if(Big(newBalances[decodedEvents[i].token]).lt(0)) newBalances[decodedEvents[i].token] = "0";
             }
         }
         // Wrap and Unwrap Events from WETH
@@ -443,7 +449,7 @@ function BalanceContextProvider({ children }: any) {
             newAllowances[decodedEvents[i].token.toLowerCase()][decodedEvents[i].args[1].toLowerCase()] = decodedEvents[i].args[3].toString();
         }
         setAllowances(newAllowances);
-        updateETHBalance(newBalances);
+        fetchBalances(address);
     }
 
     const updateETHBalance = async (_walletBalances = walletBalances) => {
@@ -460,6 +466,12 @@ function BalanceContextProvider({ children }: any) {
         } else {
             newBalances[asset] = Big(walletBalances[asset] ?? 0).plus(value).toFixed(0);
         }
+        setWalletBalances(newBalances);
+    }
+
+    const setBalance = async (asset: string, value: string) => {
+        const newBalances = {...walletBalances};
+        newBalances[asset] = value;
         setWalletBalances(newBalances);
     }
 
@@ -487,7 +499,8 @@ function BalanceContextProvider({ children }: any) {
         addAllowance,
         addNonce,
         tokens,
-        updateFromTx
+        updateFromTx,
+        setBalance
 	};
 
 	return (

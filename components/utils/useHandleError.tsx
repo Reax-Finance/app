@@ -60,7 +60,7 @@ export default function useHandleError(type: PlatformType) {
             } else {
                 toast({
                     title: "Transaction Failed",
-                    description: err?.data?.message || JSON.stringify(err).slice(0, 100),
+                    description: err?.data?.message || JSON.stringify(err?.message).slice(0, 150),
                     status: "error",
                     duration: 5000,
                     isClosable: true,

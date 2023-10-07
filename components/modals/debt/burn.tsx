@@ -7,6 +7,7 @@ import {
 	Divider,
 	Link,
 	Tooltip,
+	useColorMode,
 } from "@chakra-ui/react";
 import { getContract, send } from "../../../src/contract";
 import { useAppData } from "../../context/AppDataProvider";
@@ -24,8 +25,9 @@ import { useBalanceData } from "../../context/BalanceProvider";
 import { usePriceData } from "../../context/PriceContext";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
+import { VARIANT } from "../../../styles/theme";
 
-const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
+const Burn = ({ asset, amount, setAmount, amountNumber, onClose }: any) => {
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
 	const [hash, setHash] = useState(null);
@@ -77,6 +79,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 			setAmount("0");
 			setConfirmed(true);
 			setLoading(false);
+			onClose();
 			toast({
 				title: "Burn Successful!",
 				description: (
@@ -142,16 +145,18 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<Box px={5} pb={5} pt={0.5}>
-			<Box mt={6} rounded={8}>
+			{/* <Box mt={6} rounded={8}>
 				<Tooltip
 					label={`Fee for Minting and Burning ${asset.token.symbol}`}
 				>
 					<Flex justify="space-between">
 						<Text
 							fontSize={"md"}
-							color="whiteAlpha.600"
+							color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 							textDecor={"underline"}
 							cursor={"help"}
 							style={{
@@ -170,20 +175,20 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 						</Text>
 					</Flex>
 				</Tooltip>
-			</Box>
+			</Box> */}
 			<Box>
 				<Box>
 					<Text
 						mt={6}
 						fontSize={"sm"}
-						color="whiteAlpha.600"
+						color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}
 						fontWeight={"bold"}
 					>
 						Transaction Overview
 					</Text>
 					<Box my={4} rounded={8}>
 						<Flex justify="space-between">
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Health Factor
 							</Text>
 							{Number(pos.collateral) > 0 ? (
@@ -206,7 +211,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 						</Flex>
 						<Divider my={2} />
 						<Flex justify="space-between">
-							<Text fontSize={"md"} color="whiteAlpha.600">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
 								Available to issue
 							</Text>
 							<Text fontSize={"md"}>
@@ -225,7 +230,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 					</Box>
 				</Box>
 
-				<Box mt={6} className={!validate().valid? "disabledPrimaryButton" : "primaryButton"}>
+				<Box mt={6} className={!validate().valid? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`}>
 				<Button
 					isDisabled={!validate().valid}
 					isLoading={loading}
