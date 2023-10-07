@@ -23,7 +23,6 @@ export default function SelectBody({ asset, onOpen }: any) {
 					width={26}
 					alt={asset?.symbol}
 				/>
-
 				<Text fontSize="lg" color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}>
 					{asset?.symbol}
 				</Text>

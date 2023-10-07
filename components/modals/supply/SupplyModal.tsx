@@ -95,6 +95,7 @@ export default function SupplyModal({
 			if(!market.isCollateral){
 				return v2.toString();
 			}
+
 			// find minimum of (v1, v2, v3)
 			let min = v1;
 			if(v2.lt(min)) min = v2;

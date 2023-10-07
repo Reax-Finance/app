@@ -31,8 +31,8 @@ function NavBar() {
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
 	const { fetchData: fetchLendingData } = useLendingData()
+	const { fetchData: fetchPerpsData } = usePerpsData();
 	const { fetchData: fetchDexData, dex } = useDexData();
-
 
 	const { chain, chains } = useNetwork();
 	const [init, setInit] = useState(false);
@@ -47,12 +47,14 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
+			// address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
 			fetchData(address!);
 			fetchLendingData(address!);
 			fetchDexData(address!);
 			fetchTokenData(address!);
+			// fetchPerpsData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
@@ -128,7 +130,7 @@ function NavBar() {
 							align="center"
 							display={{ sm: "none", md: "flex" }}
 						>
-							<NavLocalLink
+							{/* <NavLocalLink
 								path={"/"}
 								title="Trade"
 							></NavLocalLink>

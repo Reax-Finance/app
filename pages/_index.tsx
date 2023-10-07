@@ -119,8 +119,6 @@ export default function Index({ children }: any) {
 				</Text>
 			)}
 			</Box>
-
-			
 			{/* <Box bgGradient={'linear(to-b, #090B0F, #090B0F)'} zIndex={0}> */}
 			<Box bgGradient={colorMode == 'dark' ? 'linear(to-b, blackAlpha.500, blackAlpha.800)' : 'linear(to-b, blackAlpha.200, blackAlpha.400)'} zIndex={0}>
 				<Flex
