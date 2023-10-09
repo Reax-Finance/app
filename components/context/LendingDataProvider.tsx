@@ -29,6 +29,7 @@ const LendingDataContext = React.createContext<LendingDataValue>({} as LendingDa
 
 function LendingDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<Status>(Status.NOT_FETCHING);
+	const [subStatus, setSubStatus] = React.useState<SubStatus>(SubStatus.NOT_SUBSCRIBED);
 	const [message, setMessage] = React.useState<LendingDataValue['message']>("");
 	const { chain } = useNetwork();
 	const { address } = useAccount();
@@ -203,6 +204,7 @@ function LendingDataProvider({ children }: any) {
 					}
 					_pools[i] = _markets;
 				}
+				console.log("Setting pools", _pools);
 				setPools(_pools);
 				resolve(_pools);
 			})

@@ -7,7 +7,8 @@ import {
 	Image,
 	Button,
 	Tooltip,
-	Heading
+	Heading,
+	useColorMode
 } from "@chakra-ui/react";
 
 import { useContext, useState, useEffect } from "react";
@@ -28,6 +29,7 @@ import { ethers } from "ethers";
 import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
+import { VARIANT } from "../../styles/theme";
 
 const POPULAR_TOKENS = ['WETH', 'MNT', 'USDT', 'cUSD']
 
@@ -80,6 +82,8 @@ function TokenSelector({
 		onClose();
 	}
 
+	const { colorMode } = useColorMode();
+
 	if(tokens.length <= 1) return <></>
 
 	return (
@@ -92,14 +96,13 @@ function TokenSelector({
 			>
 				<ModalOverlay bg="blackAlpha.800" backdropFilter="blur(30px)" />
 				<ModalContent bg={'transparent'} shadow={'none'} rounded={0} maxH={"800px"} mx={2}>
-					<Box className="containerBody">
-						<Box className="containerHeader">
-					<ModalHeader>Select a Token </ModalHeader>
-					<Box mx={5} mb={0}>
-						<Input bg={'bg.600'} size={'lg'} _focus={{border: 0, outline: 0}} focusBorderColor='secondary.100' rounded={0} placeholder="Search by Token Name or Address" onChange={(e) => searchToken(e.target.value)} />
-					</Box>
-					<Box mx={5} mt={2} mb={4}>
-
+					<Box className={`${VARIANT}-${colorMode}-containerBody`}>
+						<Box className={`${VARIANT}-${colorMode}-containerHeader`}>
+						<ModalHeader>Select a Token </ModalHeader>
+						<Box mx={5} mb={0}>
+							<Input bg={'bg.600'} size={'lg'} _focus={{border: 0, outline: 0}} focusBorderColor='secondary.100' rounded={0} placeholder="Search by Token Name or Address" onChange={(e) => searchToken(e.target.value)} />
+						</Box>
+						<Box mx={5} mt={2} mb={4}>
 						<Flex align={'center'} >
 						{/* <Text mr={2} fontSize={'sm'} color={'whiteAlpha.700'}>Trending </Text> */}
 						<Box p={'3'} border={'1px'} borderColor={'whiteAlpha.300'}>

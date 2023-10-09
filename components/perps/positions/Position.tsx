@@ -57,7 +57,7 @@ export default function Position({position, index}: any) {
                 let outputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i].outputToken.id, position.id]));
                 let vTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i]._vToken.id, position.id]));
                 let sTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i]._sToken.id, position.id]));
-    
+
                 if(!walletBalances[outputTokenHash] || !prices[markets[i].inputToken.id]) continue;
                 let collateralValue = Big(walletBalances[outputTokenHash]).div(10**markets[i].outputToken.decimals);
                 let variableDebt = Big(walletBalances[vTokenHash]).div(10**markets[i]._vToken.decimals);
@@ -115,7 +115,7 @@ export default function Position({position, index}: any) {
         }
 
         setDetails(_setDetails());
-    }, [lendingProtocols, pools, position, prices, walletBalances])
+    }, [lendingProtocols, pools, position, prices, walletBalances]);
 
     const close = async (percent: number) => {
         let positionContract = new ethers.Contract(position.id, getABI("PerpPosition", chain?.id!));

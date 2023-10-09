@@ -22,42 +22,36 @@ export default function TitleBar() {
                 if(markets[j].inputToken.id == PERP_PAIRS[pair].base){
                     setBaseFundingRate([
                         Number(markets[j].rates.find((rate: any) => rate.side == "LENDER").rate).toFixed(2),
-                        Number(markets[j].rates.find((rate: any) => rate.side == "BORROWER" && rate.type == "VARIABLE").rate).toFixed(2),
+                        (Number(markets[j].rates.find((rate: any) => rate.side == "BORROWER" && rate.type == "VARIABLE").rate) * -1).toFixed(2),
                     ])
                 } else if(markets[j].inputToken.id == PERP_PAIRS[pair].quote){
                     setQuoteFundingRate([
                         Number(markets[j].rates.find((rate: any) => rate.side == "LENDER").rate).toFixed(2),
-                        Number(markets[j].rates.find((rate: any) => rate.side == "BORROWER" && rate.type == "VARIABLE").rate).toFixed(2),
+                        (Number(markets[j].rates.find((rate: any) => rate.side == "BORROWER" && rate.type == "VARIABLE").rate) * -1).toFixed(2),
                     ])
                 }
             }
         }
-    }, [pair])
+    }, [pair]);
 
     return (
         <>
-        <Flex minH={'100px'} align={'center'}>
+        <Flex minH={'80px'} align={'center'}>
             <Box>
             <PairSelector />
             </Box>
-            <Divider orientation="vertical" h={'100px'} />
+            <Divider orientation="vertical" h={'80px'} />
             <Box px={10}>
                 <Text color={'whiteAlpha.600'} fontSize={'sm'}>Index Price</Text>
                 <Heading size={'md'}>
-                    {prices[PERP_PAIRS[pair as string]?.base]}
+                    {(Number(prices[PERP_PAIRS[pair as string]?.base] ?? 0) / Number(prices[PERP_PAIRS[pair as string]?.quote] ?? 0)).toFixed(4)}
                 </Heading>
             </Box>
-            <Divider orientation="vertical" h={'100px'} />
+            <Divider orientation="vertical" h={'80px'} />
             <Box px={6}>
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}>{pair.split('-')[0]} Rate</Text>
+                <Text color={'whiteAlpha.600'} fontSize={'sm'}>Rate</Text>
                 <Heading size={'sm'}>
-                    {baseFundingRate[0]}% / -{baseFundingRate[1]}%
-                </Heading>
-            </Box>
-            <Box px={4}>
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}>{pair.split('-')[1]} Rate</Text>
-                <Heading size={'sm'}>
-                    {quoteFundingRate[0]}% / -{quoteFundingRate[1]}%
+                    {((Number(baseFundingRate[0]) ?? 0) + (Number(quoteFundingRate[1]) ?? 0)).toFixed(4)}% / {((Number(baseFundingRate[1]) ?? 0) + (Number(quoteFundingRate[0]) ?? 0)).toFixed(4)}%
                 </Heading>
             </Box>
         </Flex>

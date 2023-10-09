@@ -8,8 +8,10 @@ let tvScriptLoadingPromise: Promise<any>;
 export default function TradingViewWidget() {
   const {pair} = router.query;
   if(!pair) return <></>;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const onLoadScriptRef = useRef<any>();
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     onLoadScriptRef.current = createWidget;
 

@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { AppDataContext } from "../context/AppDataProvider";
 import {
 	Box,
 	Flex,
@@ -11,12 +10,15 @@ import {
 	Text,
 	Tag,
 	ModalOverlay,
+	useColorMode,
 } from "@chakra-ui/react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { motion, Variants } from "framer-motion";
 import { query } from '../../src/queries/synthetic';
 import router from "next/router";
 import { PERP_PAIRS } from "../../src/const";
+import { VARIANT } from "../../styles/theme";
+import { usePriceData } from "../context/PriceContext";
 
 const itemVariants: Variants = {
 	open: {
@@ -30,7 +32,9 @@ const itemVariants: Variants = {
 export default function PairSelector() {
 
 	const [isOpen, setIsOpen] = React.useState(false);
-	const {pair} = router.query;
+	const {pair}: any = router.query;
+	const { colorMode } = useColorMode();
+	const { prices } = usePriceData();
 
 	window.addEventListener("click", function (e) {
 		if (
@@ -58,7 +62,7 @@ export default function PairSelector() {
 									<Flex>
 										<Box textAlign={'left'}>
 										<Flex gap={4}>
-										<Image src={`/icons/${pair.split('-')[0]}.svg`} w={'30px'}  />
+										<Image src={`/icons/${pair?.split('-')[0]}.svg`} w={'30px'}  />
 										<Heading fontSize={{sm: '3xl', md: "3xl", lg: '30px'}} fontWeight='bold'>
 											{pair}
 										</Heading>
@@ -120,9 +124,8 @@ export default function PairSelector() {
 							// backgroundSize: '100% 50%',
 							boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
 						}}
-						
 					>
-						<Box shadow={'2xl'} className="containerBody2">
+						<Box shadow={'2xl'} className={`${VARIANT}-${colorMode}-containerBody2`}>
 
 						{/* <Divider /> */}
 
@@ -154,7 +157,11 @@ export default function PairSelector() {
 													{pair}
 												</Heading>
 											</Flex>
-											
+											<Flex>
+												<Text>{
+													(Number(prices[PERP_PAIRS[pair as string]?.base] ?? 0) / Number(prices[PERP_PAIRS[pair as string]?.quote] ?? 0)).toFixed(4)
+												}</Text>
+											</Flex>
 										</Flex>
 									</Box>
 									{index !== Object.keys(PERP_PAIRS).length -1 && <Divider />}

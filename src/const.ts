@@ -67,7 +67,7 @@ const PERP_PAIR: any = {
 export const PERP_PAIRS = PERP_PAIR[defaultChain.id];
 
 const FACTORIES = {
-	[mantleTestnet.id]: '0x19c789B36F430602Df34f8acE0D41391F302dE05',
+	[mantleTestnet.id]: '0x2C7D30E5a371c642E67e9F0FbD6a0C6E049dCfB1',
 	[mantleMainnet.id]: '0x19c789B36F430602Df34f8acE0D41391F302dE05',
 };
 

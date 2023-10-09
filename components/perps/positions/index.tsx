@@ -1,4 +1,4 @@
-import { Box, Flex, Heading } from '@chakra-ui/react'
+import { Box, Flex, Heading, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 import {
     Table,
@@ -15,13 +15,15 @@ import {
 import { usePerpsData } from '../../context/PerpsDataProvider'
 import { MdOpenInNew } from 'react-icons/md';
 import Position from './Position';
+import { VARIANT } from '../../../styles/theme';
 
 export default function Positions() {
     const {positions} = usePerpsData();
+    const { colorMode } = useColorMode();
 
-  return (
-    <Box className='containerBody' mt={4} pb={8} mb={10}>
-        <Box className='containerHeader' p={4}>
+    return (   
+    <Box className={`${VARIANT}-${colorMode}-containerBody`} mt={4} pb={8} mb={10}>
+        <Box className={`${VARIANT}-${colorMode}-containerHeader`} p={4}>
         <Heading size='md'>Positions</Heading>
         </Box>
         <TableContainer>
@@ -34,7 +36,7 @@ export default function Positions() {
             </Tr>
             </Thead>
             <Tbody>
-                {positions.length > 1 ? positions.map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} my={4}>No Positions Found</Text></>}
+                {positions.length > 1 ? positions.map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
             </Tbody>
         </Table>
         </TableContainer>

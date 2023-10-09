@@ -74,7 +74,9 @@ function PerpsDataProvider({ children }: any) {
 						lendingPool: POOL
 					}
 				})
+				console.log("_positions", _positions);
 				setPositions(_positions);
+				setStatus(Status.SUCCESS);
 			})
 			.catch((err: any) => {
 				console.log(err);

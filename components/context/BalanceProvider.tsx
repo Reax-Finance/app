@@ -33,22 +33,20 @@ function BalanceContextProvider({ children }: any) {
     const [tokens, setTokens] = React.useState<any>([]);
 	const { chain } = useNetwork();
 
-    const { pools: lendingPools, markets: selectedLendingMarket, protocols: lendingProtocols } = useLendingData();
+    const { pools: lendingPools, protocols: lendingProtocols } = useLendingData();
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault, dex } = useDexData();
-    const { positions } = usePerpsData();
+    const { positions, status: perpStatus } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 && positions.length > 0) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && positions.length > 0) {
             fetchBalances(address);
         }
-    }, [(selectedLendingMarket ?? []).length, pools.length, (dexPools ?? []).length, address, status])
+    }, [pools, address, status, positions, dexPools.length, lendingPools])
 
     const fetchBalances = async (_address?: string) => {
         // _address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
-        console.log("Fetching balances for:", _address);
-        // _address = "0xC841f46D199f4DC14FC62881E18c56d1Dc1d2D69".toLowerCase();
         setStatus(Status.FETCHING);
         const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
@@ -145,6 +143,7 @@ function BalanceContextProvider({ children }: any) {
                 ]);
             }
         }
+
         // For lending input tokens, get allowance to lending protocol
         // If wrapped token, get allowance to wrapper and borrow allowace
         // Get balance and totalSupplies of output token, debt tokens
@@ -169,6 +168,13 @@ function BalanceContextProvider({ children }: any) {
                 if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
                     calls.push([
                         market.outputToken.id,
+                        itf.encodeFunctionData("allowance", [
+                            _address,
+                            wrapperAddress
+                        ]),
+                    ]);
+                    calls.push([
+                        market.inputToken.id,
                         itf.encodeFunctionData("allowance", [
                             _address,
                             wrapperAddress
@@ -378,7 +384,10 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                     if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
                         if(!newAllowances[market.outputToken.id]) newAllowances[market.outputToken.id] = {};
-                        newAllowances[market.outputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        newAllowances[market.outputToken.id][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
+                        index++;
+                        if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
+                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
                         index++;
                         if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
                         newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
@@ -467,7 +476,6 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                 }
             }
-            console.log(calls.length, index)
             setStatus(Status.SUCCESS);
             setWalletBalances(newBalances);
             setAllowances(newAllowances);

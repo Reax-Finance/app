@@ -26,6 +26,7 @@ import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
+import { usePerpsData } from "../context/PerpsDataProvider";
 
 function NavBar() {
 	const { status, account, fetchData } = useContext(AppDataContext);
@@ -131,7 +132,7 @@ function NavBar() {
 							align="center"
 							display={{ sm: "none", md: "flex" }}
 						>
-							{/* <NavLocalLink
+							<NavLocalLink
 								path={"/"}
 								title="Trade"
 							></NavLocalLink>

@@ -15,6 +15,7 @@ import {
     Select,
     useToast,
     Link,
+	useColorMode,
 } from "@chakra-ui/react";
 
 import {
@@ -36,7 +37,7 @@ import {
 	SliderMark,
 } from "@chakra-ui/react";
 import { usePriceData } from "../../context/PriceContext";
-import { ESYX_PRICE, FACTORY, PERP_PAIRS, POOL, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { EIP712_VERSION, ESYX_PRICE, FACTORY, PERP_PAIRS, POOL, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import { usePerpsData } from "../../context/PerpsDataProvider";
 import { getABI, getContract, send } from "../../../src/contract";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
@@ -45,6 +46,7 @@ import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import useUpdateData from "../../utils/useUpdateData";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { formatInput, parseInput } from "../../utils/number";
+import { VARIANT } from "../../../styles/theme";
 
 const labelStyles = {
 	mt: "2",
@@ -173,8 +175,8 @@ export default function Trade() {
 		signTypedDataAsync({
 			domain: {
 				name: tokens[inAssetIndex].name,
-				version: "1",
-				chainId: chain?.id ?? defaultChain.id,
+				version: EIP712_VERSION(tokens[inAssetIndex].id),
+				chainId: defaultChain.id,
 				verifyingContract: tokens[inAssetIndex].id,
 			},
 			types: {
@@ -198,6 +200,7 @@ export default function Trade() {
 				setData(res);
 				setDeadline(_deadline);
 				setApproveLoading(false);
+				setApprovedAmount(value.toString());
 				toast({
 					title: "Approval Signed",
 					description: <Box>
@@ -205,7 +208,7 @@ export default function Trade() {
 							{`for ${tokens[inAssetIndex].symbol}`}
 						</Text>
 						<Text>
-							Please deposit to continue
+							{/* Please deposit to continue */}
 						</Text>
 					</Box>,
 					status: "info",
@@ -405,6 +408,8 @@ export default function Trade() {
 		}
 	}
 
+	const { colorMode } = useColorMode();
+
 	return (
 		<>
 			<Tabs variant={"enclosed"}>
@@ -493,7 +498,7 @@ export default function Trade() {
 										p={2}
 									/>
 									<Flex
-										bg={"bg.200"}
+										bg={`${colorMode}Bg.200`}
 										align={"center"}
 										justify={"center"}
 										w={"50%"}
@@ -569,7 +574,7 @@ export default function Trade() {
 
 							{/* Long */}
 							<Box mt={4}>
-                                {validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? "disabledSecondaryButton" : 'secondaryButton'}><Button
+                                {validate().stage <= 2 && <Box mt={2} className={VARIANT + "-" + colorMode + "-" + ((validate().stage != 1 || approveLoading) ? "disabledSecondaryButton" : 'secondaryButton')}><Button
                                     isDisabled={validate().stage != 1}
                                     isLoading={approveLoading}
                                     loadingText="Please sign the transaction"
@@ -585,7 +590,7 @@ export default function Trade() {
                                 </Button>
                                 </Box>}
                                     
-                                {validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? "disabledSecondaryButton" : 'secondaryButton'} > <Button
+                                {validate().stage > 0 && <Box mt={2} className={VARIANT + "-" + colorMode + "-" + ((validate().stage < 2 || loading) ? "disabledSecondaryButton" : 'secondaryButton')} > <Button
                                     isDisabled={validate().stage < 2}
                                     isLoading={loading}
                                     loadingText="Please sign the transaction"

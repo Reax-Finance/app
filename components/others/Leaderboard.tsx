@@ -127,8 +127,6 @@ export default function Leaderboard({epochIndex}: any) {
     })
   }, [address, epochIndex, epoches]);
 
-  console.log(claimData);
-
   const claimRewards = async () => {
     if (!address || !claimData[epochIndex]?.canClaim) {
       return;

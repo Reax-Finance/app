@@ -8,6 +8,7 @@ import {
     ModalBody,
     ModalCloseButton,
     Select,
+    useColorMode,
 } from '@chakra-ui/react'
 import { Flex, Text, Box, Image, Divider, IconButton, Tr, Button, Heading, useDisclosure, NumberInput, NumberInputField,  } from '@chakra-ui/react';
 import { RiArrowDropDownLine } from 'react-icons/ri';
@@ -18,6 +19,7 @@ import { ethers } from 'ethers';
 import { usePriceData } from '../../context/PriceContext';
 import { useNetwork } from 'wagmi';
 import Big from 'big.js';
+import { VARIANT } from '../../../styles/theme';
 
 export default function CloseModal({details}: any) {
     const [inAmount, setInputAmount] = React.useState("");
@@ -63,13 +65,15 @@ export default function CloseModal({details}: any) {
         _setInputAmount(Big(details?.collaterals?.[selectedIndex]?.collateral).mul(multiplier).toString());
     };
 
+    const { colorMode } = useColorMode();
+
     return (
     <>
     <Button rounded={0} size={'sm'} onClick={onOpen}>Close</Button>
       <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay bg="blackAlpha.400" backdropFilter="blur(30px)" />
         <ModalContent width={"30rem"} bgColor="transparent" shadow={'none'} rounded={0} mx={2}>
-			<Box className="containerBody2">
+			<Box className={`${VARIANT}-${colorMode}-containerBody2`}>
           <ModalHeader>Close Position</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
