@@ -20,6 +20,9 @@ import { usePriceData } from '../../context/PriceContext';
 import { useNetwork } from 'wagmi';
 import Big from 'big.js';
 import { VARIANT } from '../../../styles/theme';
+import { usePerpsData } from '../../context/PerpsDataProvider';
+import { getABI, send } from '../../../src/contract';
+import useUpdateData from '../../utils/useUpdateData';
 
 export default function CloseModal({details}: any) {
     const [inAmount, setInputAmount] = React.useState("");
@@ -29,16 +32,14 @@ export default function CloseModal({details}: any) {
     const [outAssetIndex, setOutAssetIndex] = React.useState(0);
 	const { prices } = usePriceData();
     const { chain } = useNetwork();
+    const { positions, addPosition } = usePerpsData();
 
     const {
 		walletBalances,
-		updateFromTx,
 		tokens: _tokens,
-		allowances,
-		nonces,
-		addNonce,
 	} = useBalanceData();
 
+    const { getUpdateData } = useUpdateData();
     const tokens: any[] = [
 		{
 			id: ethers.constants.AddressZero,
@@ -49,10 +50,39 @@ export default function CloseModal({details}: any) {
 		},
 	].concat(_tokens);
 
+    const close = async () => {
+        let calls = [];
+
+        let position = new ethers.Contract(details?.position?.id, getABI("PerpPosition", chain?.id!));
+        let supplied = new ethers.Contract(details?.collaterals?.[selectedIndex]?.market?.inputToken?.id, getABI("MockToken", chain?.id!));
+        let borrowed = new ethers.Contract(details?.debts?.[outAssetIndex]?.market?.inputToken?.id, getABI("MockToken", chain?.id!));
+
+        const priceFeedUpdateData = await getUpdateData();
+        calls.push(position.interface.encodeFunctionData("updatePythData", [priceFeedUpdateData]));
+        calls.push(position.interface.encodeFunctionData("call", [borrowed.address, borrowed.interface.encodeFunctionData("approve", [details?.position?.factory?.lendingPool, ethers.constants.MaxUint256]), 0]));
+        calls.push(position.interface.encodeFunctionData("closePosition", [borrowed.address, Big(outAmount).mul(10**details?.debts?.[outAssetIndex]?.market?.inputToken?.decimals).toFixed(0), supplied.address]));
+        
+        send(position, "multicall", [calls])
+        .then((res: any) => {
+            console.log(res);
+            onClose();
+        })
+        .catch((err: any) => {
+            console.log(err);
+        })
+    }
+
     const _setInputAmount = (e: string) => {
         e = parseInput(e);
         setInputAmount(e);
-        setOutputAmount(Big(e).mul(prices[details.collaterals[selectedIndex].market.inputToken.id]).div(prices[details.debts[outAssetIndex].market.inputToken.id]).toString());
+        const inToken = details.collaterals[selectedIndex].market.inputToken.id;
+        const outToken = details.debts[outAssetIndex].market.inputToken.id;
+        const _outAmount = Big(e).mul(prices[inToken]).div(prices[outToken]);
+        setOutputAmount(_outAmount.toString());
+        if(_outAmount.gt(details.debts[outAssetIndex].debt)){
+            setInputAmount(Big(details.debts[outAssetIndex].debt).mul(prices[outToken]).div(prices[inToken]).toString());
+            setOutputAmount(details.debts[outAssetIndex].debt);
+        }
     }
 
     const _setOutputAmount = (e: string) => {
@@ -78,7 +108,7 @@ export default function CloseModal({details}: any) {
           <ModalCloseButton />
           <ModalBody>
             {/* In asset */}
-            <Text fontSize={'sm'} color={'whiteAlpha.600'}>Position</Text>
+            <Text fontSize={'sm'} color={'whiteAlpha.600'}>Closing Position</Text>
             <NumberInput
                 size={"xl"}
                 onChange={_setInputAmount}
@@ -187,8 +217,8 @@ export default function CloseModal({details}: any) {
           </ModalBody>
 
           <ModalFooter pb={6}>
-            <Box w={'100%'} className='primaryButton'>
-            <Button bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} size={'lg'} onClick={onClose}>
+            <Box w={'100%'} className={`${VARIANT}-${colorMode}-primaryButton`}>
+            <Button bg={'transparent'} _hover={{bg: 'transparent'}} rounded={0} w={'100%'} size={'lg'} onClick={close}>
               Confirm
             </Button>
             </Box>

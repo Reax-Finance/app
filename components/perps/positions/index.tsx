@@ -13,7 +13,6 @@ import {
     Text
 } from '@chakra-ui/react'
 import { usePerpsData } from '../../context/PerpsDataProvider'
-import { MdOpenInNew } from 'react-icons/md';
 import Position from './Position';
 import { VARIANT } from '../../../styles/theme';
 
@@ -22,24 +21,24 @@ export default function Positions() {
     const { colorMode } = useColorMode();
 
     return (   
-    <Box className={`${VARIANT}-${colorMode}-containerBody`} mt={4} pb={8} mb={10}>
-        <Box className={`${VARIANT}-${colorMode}-containerHeader`} p={4}>
-        <Heading size='md'>Positions</Heading>
+        <Box className={`${VARIANT}-${colorMode}-containerBody`} mt={4} pb={8} mb={10}>
+            <Box className={`${VARIANT}-${colorMode}-containerHeader`} p={4}>
+            <Heading size='md'>Positions</Heading>
+            </Box>
+            <TableContainer>
+            <Table variant='simple'>
+                <Thead>
+                <Tr>
+                    <Th>ID</Th>
+                    <Th>Assets</Th>
+                    <Th isNumeric>PnL</Th>
+                </Tr>
+                </Thead>
+                <Tbody>
+                    {positions.length > 1 ? positions.map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
+                </Tbody>
+            </Table>
+            </TableContainer>
         </Box>
-        <TableContainer>
-        <Table variant='simple'>
-            <Thead>
-            <Tr>
-                <Th>ID</Th>
-                <Th>Assets</Th>
-                <Th isNumeric>PnL</Th>
-            </Tr>
-            </Thead>
-            <Tbody>
-                {positions.length > 1 ? positions.map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
-            </Tbody>
-        </Table>
-        </TableContainer>
-    </Box>
-  )
+    )
 }

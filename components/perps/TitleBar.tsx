@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, Text } from '@chakra-ui/react'
+import { Box, Divider, Flex, Heading, Text, Tooltip } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import PairSelector from './PairSelector'
 import { usePriceData } from '../context/PriceContext';
@@ -49,10 +49,19 @@ export default function TitleBar() {
             </Box>
             <Divider orientation="vertical" h={'80px'} />
             <Box px={6}>
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}>Rate</Text>
-                <Heading size={'sm'}>
-                    {((Number(baseFundingRate[0]) ?? 0) + (Number(quoteFundingRate[1]) ?? 0)).toFixed(4)}% / {((Number(baseFundingRate[1]) ?? 0) + (Number(quoteFundingRate[0]) ?? 0)).toFixed(4)}%
-                </Heading>
+                <Text color={'whiteAlpha.600'} fontSize={'sm'}>Funding Rate</Text>
+                <Flex>
+                    <Tooltip label="LONG" aria-label="LONG">
+                        <Heading size={'sm'}>
+                            {((Number(baseFundingRate[0]) ?? 0) + (Number(quoteFundingRate[1]) ?? 0)).toFixed(4)}%
+                        </Heading>
+                    </Tooltip>
+                    <Tooltip label="SHORT" aria-label="SHORT">
+                        <Heading size={'sm'}>
+                            / {((Number(baseFundingRate[1]) ?? 0) + (Number(quoteFundingRate[0]) ?? 0)).toFixed(4)}%
+                        </Heading>
+                    </Tooltip>
+                </Flex>
             </Box>
         </Flex>
         </>
