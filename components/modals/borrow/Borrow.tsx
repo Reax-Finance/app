@@ -34,9 +34,11 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
     const router = useRouter();
-	const pos = lendingPosition(Number(router.query.market) || 0);
+	const selectedMarket = Number(router.query.market) || 0;
+	const pos = lendingPosition(selectedMarket);
 
-	const {markets, protocol, updatePositions} = useLendingData();
+
+	const {pools, protocol, updatePositions} = useLendingData();
 	const toast = useToast();
 	const handleError = useHandleError(PlatformType.LENDING);
 	const [approveLoading, setApproveLoading] = useState(false);
@@ -49,7 +51,7 @@ const Borrow = ({ market, amount, setAmount, isNative, debtType, setDebtType, ma
 			.times(10 ** market.inputToken.decimals)
 			.toFixed(0);
 		
-		const priceFeedUpdateData = await getUpdateData(markets.map((m: any) => m.inputToken.id));
+		const priceFeedUpdateData = await getUpdateData(pools[selectedMarket].map((m: any) => m.inputToken.id));
 
 		let tx;
 		if(isNative){

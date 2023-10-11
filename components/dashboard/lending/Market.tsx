@@ -12,7 +12,7 @@ import { HEADING_FONT, VARIANT } from '../../../styles/theme';
 import { useRouter } from 'next/router';
 
 export default function LendingMarket() {
-    const {markets, pools, protocols} = useLendingData();
+    const {pools, protocols} = useLendingData();
 	const {query} = useRouter();
 	const selectedPool = Number(query.market);
 	const protocol = protocols[selectedPool];
@@ -35,9 +35,10 @@ export default function LendingMarket() {
 			) {
 				let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 				let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
-				let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
+				let assets: string[] = pools[selectedPool].map((market: any) => market.outputToken.id).concat(pools[selectedPool].map((market: any) => market._vToken.id));
 				controller.getUserRewards(assets, address, getAddress(process.env.NEXT_PUBLIC_VESTED_TOKEN_NAME!, defaultChain.id))
 						.then((result: any) => {
+							console.log(result.toString());
 							setSynAccrued(result.toString());
 						})
 						.catch((err: any) => {
@@ -53,7 +54,7 @@ export default function LendingMarket() {
 		setClaiming(true);
 		let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		let controller = new ethers.Contract(protocol._rewardsController, getABI("RewardsController", defaultChain.id), provider);
-		let assets: string[] = markets.map((market: any) => market.outputToken.id).concat(markets.map((market: any) => market._vToken.id));
+		let assets: string[] = pools[selectedPool].map((market: any) => market.outputToken.id).concat(pools[selectedPool].map((market: any) => market._vToken.id));
 		send(controller, "claimAllRewards", [
 				assets,
 				address

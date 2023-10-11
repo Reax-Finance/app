@@ -34,7 +34,8 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 	const {prices} = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
 	const router = useRouter();
-	const pos = lendingPosition(Number(router.query.market) || 0);
+	const selectedMarket = Number(router.query.market) || 0;
+	const pos = lendingPosition(selectedMarket);
 
 	const {getUpdateData} = useUpdateData();
 	const handleError = useHandleError(PlatformType.LENDING);
@@ -47,11 +48,11 @@ export default function Redeem({ market, amount, setAmount, isNative, max, isMax
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const { nonces, allowances, updateFromTx } = useBalanceData();
-	const { markets, protocol, updatePositions } = useLendingData();
+	const { pools, protocol, updatePositions } = useLendingData();
 
 	const withdraw = async () => {
 		setLoading(true);
-		const priceFeedUpdateData = await getUpdateData(markets.map((m: any) => m.inputToken.id));
+		const priceFeedUpdateData = await getUpdateData(pools[selectedMarket].map((m: any) => m.inputToken.id));
 		const _amount = isMax ? ethers.constants.MaxUint256.toString() : Big(amount).mul(10**market.inputToken.decimals).toFixed(0);
 
 		let tx: any;
