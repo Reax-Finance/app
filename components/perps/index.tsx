@@ -20,7 +20,7 @@ export default function Perps({pair}: any) {
 
     return (
         <>
-            <Box className={`${VARIANT}-${colorMode}-containerBody`} my={5} px={5}>
+            <Box className={`${VARIANT}-${colorMode}-containerBody2`} my={5} px={5}>
                 <TitleBar />
             </Box>
             <Flex gap={2}>

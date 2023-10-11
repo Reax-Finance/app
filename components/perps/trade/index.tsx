@@ -413,7 +413,7 @@ export default function Trade() {
 	return (
 		<>
 			<Tabs variant={"enclosed"}>
-				<TabList>
+				<TabList className={VARIANT + "-" + colorMode + "-" + "containerHeader"}>
 					<Tab
 						w={"50%"}
 						_selected={{
@@ -421,7 +421,8 @@ export default function Trade() {
 							borderColor: "primary.400",
 						}}
 						rounded={0}
-						border={0}
+						borderTop={0}
+						borderX={0}
 					>
 						Long
 					</Tab>
@@ -433,7 +434,8 @@ export default function Trade() {
 							borderColor: "primary.400",
 						}}
 						rounded={0}
-						border={0}
+						borderTop={0}
+						borderX={0}
 					>
 						Short
 					</Tab>
