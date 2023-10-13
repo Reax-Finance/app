@@ -57,8 +57,7 @@ export default function Supply({ market, amount, setAmount, isNative, max, onClo
 				stage: 0,
 				message: "Unsupported Network"
 			}
-		}
-		else if(Number(amount) == 0 || isNaN(Number(amount))){
+		} else if(Number(amount) == 0 || isNaN(Number(amount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"

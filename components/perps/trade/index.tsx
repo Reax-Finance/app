@@ -451,7 +451,7 @@ export default function Trade() {
 								value={formatInput(inAmount)}
 							>
 								<Flex>
-									<NumberInputField rounded={0} p={2} />
+									<NumberInputField rounded={0} p={2} placeholder="0" />
 									<Box w="50%" mr={1}>
 										<SelectBody
 											asset={tokens[inAssetIndex]}
@@ -498,6 +498,7 @@ export default function Trade() {
 										h={"50px"}
 										rounded={0}
 										p={2}
+										placeholder="0"
 									/>
 									<Flex
 										bg={`${colorMode}Bg.200`}
@@ -544,18 +545,18 @@ export default function Trade() {
 								</Flex>
 								<Slider
 									aria-label="slider-ex-6"
-									onChange={(val) => _setLeverage(val)}
-									value={leverage}
+									onChange={(val) => _setLeverage(val/10)}
+									value={leverage * 10}
 									colorScheme="primary"
 								>
 									<SliderMark value={25} {...labelStyles}>
-										25x
+										2.5x
 									</SliderMark>
 									<SliderMark value={50} {...labelStyles}>
-										50x
+										5x
 									</SliderMark>
 									<SliderMark value={75} {...labelStyles}>
-										75x
+										7.5x
 									</SliderMark>
 									<SliderTrack>
 										<SliderFilledTrack />
@@ -565,13 +566,12 @@ export default function Trade() {
 							</Box>
 
                             <Divider my={4} mt={8} />
-
                             {/* Select position */}
                             <Flex mt={2} align={'center'} gap={2}>
 								<Text fontSize={'sm'}>Select Position: </Text>
-							{positions.length > 1 && <Select rounded={0} placeholder='Select position' value={selectedPosition} onChange={(e) => setSelectedPosition(Number(e.target.value))}>
-                                {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'Create New Position'}</option>)}
-                            </Select>}
+								{positions.length > 0 && <Select rounded={0} placeholder='Select position' value={selectedPosition} onChange={(e) => setSelectedPosition(Number(e.target.value))}>
+									{positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'Create New Position'}</option>)}
+								</Select>}
                             </Flex>
 
 							{/* Long */}

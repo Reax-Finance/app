@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Modal,
     ModalOverlay,
@@ -17,7 +17,7 @@ import { formatInput, parseInput } from '../../utils/number';
 import { useBalanceData } from '../../context/BalanceProvider';
 import { ethers } from 'ethers';
 import { usePriceData } from '../../context/PriceContext';
-import { useNetwork } from 'wagmi';
+import { useAccount, useNetwork } from 'wagmi';
 import Big from 'big.js';
 import { VARIANT } from '../../../styles/theme';
 import { usePerpsData } from '../../context/PerpsDataProvider';
@@ -33,6 +33,8 @@ export default function CloseModal({details}: any) {
 	const { prices } = usePriceData();
     const { chain } = useNetwork();
     const { positions, addPosition } = usePerpsData();
+	const [isMax, setIsMax] = useState(false);
+    const {address} = useAccount();
 
     const {
 		walletBalances,
@@ -40,27 +42,27 @@ export default function CloseModal({details}: any) {
 	} = useBalanceData();
 
     const { getUpdateData } = useUpdateData();
-    const tokens: any[] = [
-		{
-			id: ethers.constants.AddressZero,
-			symbol: chain?.nativeCurrency.symbol ?? "MNT",
-			name: chain?.nativeCurrency.name ?? "Mantle",
-			decimals: chain?.nativeCurrency.decimals ?? 18,
-			balance: walletBalances[ethers.constants.AddressZero],
-		},
-	].concat(_tokens);
-
     const close = async () => {
         let calls = [];
 
         let position = new ethers.Contract(details?.position?.id, getABI("PerpPosition", chain?.id!));
+        let pool = new ethers.Contract(details?.position?.factory?.lendingPool, getABI("LendingPool", chain?.id!));
         let supplied = new ethers.Contract(details?.collaterals?.[selectedIndex]?.market?.inputToken?.id, getABI("MockToken", chain?.id!));
         let borrowed = new ethers.Contract(details?.debts?.[outAssetIndex]?.market?.inputToken?.id, getABI("MockToken", chain?.id!));
 
         const priceFeedUpdateData = await getUpdateData();
         calls.push(position.interface.encodeFunctionData("updatePythData", [priceFeedUpdateData]));
         calls.push(position.interface.encodeFunctionData("call", [borrowed.address, borrowed.interface.encodeFunctionData("approve", [details?.position?.factory?.lendingPool, ethers.constants.MaxUint256]), 0]));
-        calls.push(position.interface.encodeFunctionData("closePosition", [borrowed.address, Big(outAmount).mul(10**details?.debts?.[outAssetIndex]?.market?.inputToken?.decimals).toFixed(0), supplied.address]));
+        calls.push(position.interface.encodeFunctionData("closePosition", [borrowed.address, Big(outAmount).mul(isMax ? 10 : 1).mul(10**details?.debts?.[outAssetIndex]?.market?.inputToken?.decimals).toFixed(0), supplied.address]));
+
+        if(isMax && details?.debts.length == 1){
+            // withdraw all collaterals
+            for(let i = 0; i < details?.collaterals.length; i++){
+                calls.push(position.interface.encodeFunctionData("call", [pool.address, pool.interface.encodeFunctionData("withdraw", [details?.collaterals[i].market.inputToken.id, ethers.constants.MaxUint256, address, []]), 0]));
+            }
+        }
+
+        console.log(calls);
         
         send(position, "multicall", [calls])
         .then((res: any) => {
@@ -79,9 +81,11 @@ export default function CloseModal({details}: any) {
         const outToken = details.debts[outAssetIndex].market.inputToken.id;
         const _outAmount = Big(e).mul(prices[inToken]).div(prices[outToken]);
         setOutputAmount(_outAmount.toString());
+        setIsMax(false);
         if(_outAmount.gt(details.debts[outAssetIndex].debt)){
             setInputAmount(Big(details.debts[outAssetIndex].debt).mul(prices[outToken]).div(prices[inToken]).toString());
             setOutputAmount(details.debts[outAssetIndex].debt);
+            setIsMax(true);
         }
     }
 
@@ -167,8 +171,10 @@ export default function CloseModal({details}: any) {
                         variant={"ghost"}
                         size={"xs"}
                         onClick={() => setMax(1)}
+                        bg={isMax ? "secondary.400" : "transparent"}
+                        _hover={{ bg: isMax && "secondary.400" }}
                     >
-                        100%
+                        {isMax ? "Close" : "100%"}
                     </Button>
                 </Flex>
             </Flex>
