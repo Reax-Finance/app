@@ -115,6 +115,7 @@ export default function Trade() {
 
 	const _setLeverage = (e: number) => {
 		setLeverage(e);
+		if(!Number(inAmount)) return;
 		setOutAmount(Big(e).mul(inAmount).mul(prices[tokens[inAssetIndex].id]).div(prices[PERP_PAIRS[pair as string].base]).toString());
 	}
 

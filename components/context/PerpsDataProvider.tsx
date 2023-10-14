@@ -49,6 +49,7 @@ function PerpsDataProvider({ children }: any) {
 						reject(res[0].data.errors);
 					} else {
 						let _positions = res[0].data.data.user?.positions ?? [];
+						console.log("positions", _positions);
 						getAndSetPositionData(_positions, _address!)
 					}
 				})
