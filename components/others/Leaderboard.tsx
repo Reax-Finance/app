@@ -156,6 +156,7 @@ export default function Leaderboard({epochIndex}: any) {
         })
       })
       .catch((err: any) => {
+        console.log(err);
         setLoading(false);
       });
   };
