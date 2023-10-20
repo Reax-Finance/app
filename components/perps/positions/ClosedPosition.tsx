@@ -13,7 +13,7 @@ import { useNetwork } from 'wagmi';
 import CloseModal from './CloseModal';
 
 
-export default function Position({position, index}: any) {
+export default function ClosedPosition({position, index}: any) {
     const {protocols: lendingProtocols, pools} = useLendingData();
     const {positions } = usePerpsData();
     const {prices} = usePriceData();
@@ -125,7 +125,7 @@ export default function Position({position, index}: any) {
                 <Box>
                     <Flex align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
                         {position.data.map((token: any) => (<>
-                            <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />
+                            {token.tokenSymbol && <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />}
                         </>))}
                     </Flex>
                     <Flex align={'center'} gap={1} mt={1}>
@@ -139,17 +139,6 @@ export default function Position({position, index}: any) {
                     <Flex fontSize={'md'}>
                         <Text>{position.leverage}x</Text>
                     </Flex>
-                    <Box fontSize={'xs'} ml={2} color={'whiteAlpha.600'}>
-                        <Text> / Liq {position.liqLeverage}x</Text>
-                    </Box>
-                </Flex>
-            </Td>
-
-            <Td>
-                <Text fontSize={'sm'}>{(leverage * details?.apy).toFixed(2)} %</Text>
-                <Flex gap={1} align={'center'}>
-                    <Text color={'whiteAlpha.700'} fontSize={'sm'}>{(leverage * details?.rewardAPY).toFixed(2)} %</Text>
-                    <Image src='/veREAX.svg' boxSize={'16px'} rounded={'full'} alt='veREAX' />
                 </Flex>
             </Td>
 
@@ -193,9 +182,8 @@ export default function Position({position, index}: any) {
             </Td>
 
             <Td isNumeric>
-                <Flex justify={'end'} align={'center'} gap={2}>
-                    <CloseModal details={details} />
-                </Flex>
+                    <Text fontSize={'sm'}>{(new Date(position.timestampOpened * 1000)).toLocaleString()}</Text>
+                    <Text fontSize={'sm'}>{(new Date(position.timestampClosed * 1000)).toLocaleString()}</Text>
             </Td>
         </Tr>    
     </>

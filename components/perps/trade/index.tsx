@@ -32,7 +32,7 @@ export default function Trade() {
 					>
 						Long
 					</Tab>
-                    <Divider orientation="vertical" h={'40px'} />
+                    <Divider orientation="vertical" h={'50px'} />
 					<Tab
 						w={"50%"}
 						_selected={{

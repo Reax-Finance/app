@@ -18,6 +18,7 @@ interface PerpsDataValue {
 	) => Promise<number>;
 	addPosition: (address: any) => void;
 	pairs: any;
+	closedPositions: any[];
 }
 
 const PerpsDataContext = React.createContext<PerpsDataValue>({} as PerpsDataValue);
@@ -102,7 +103,6 @@ function PerpsDataProvider({ children }: any) {
 						}
 					}
 				}
-				console.log("Positions", openPositions, closedPositions);
 				setPositions(openPositions);
 				setClosedPositions(closedPositions)
 				setStatus(Status.SUCCESS);
@@ -124,7 +124,8 @@ function PerpsDataProvider({ children }: any) {
         message,
         addPosition,
         fetchData,
-		pairs
+		pairs,
+		closedPositions
     };
 
 	return (

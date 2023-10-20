@@ -40,7 +40,7 @@ function BalanceContextProvider({ children }: any) {
     const { positions, status: perpStatus, pairs: perpPairs } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && positions.length > 0 && Object.keys(perpPairs).length > 0) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && perpStatus == Status.SUCCESS && Object.keys(perpPairs).length > 0) {
             fetchBalances(address);
         }
     }, [pools, address, status, positions, dexPools.length, lendingPools])
