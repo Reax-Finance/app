@@ -23,15 +23,19 @@ export default function Positions() {
     return (   
         <Box className={`${VARIANT}-${colorMode}-containerBody`} mt={4} pb={8} mb={10}>
             <Box className={`${VARIANT}-${colorMode}-containerHeader`} p={4}>
-            <Heading size='md'>Positions</Heading>
+            <Heading size='sm'>Open Positions</Heading>
             </Box>
             <TableContainer>
             <Table variant='simple'>
                 <Thead>
                 <Tr>
-                    <Th>ID</Th>
-                    <Th>Assets</Th>
-                    <Th isNumeric>PnL</Th>
+                    <Th>Vault</Th>
+                    <Th>Leverage</Th>
+                    <Th>Net APY</Th>
+                    <Th>Position</Th>
+                    <Th>Borrowed</Th>
+                    <Th>PnL</Th>
+                    <Th isNumeric>Close</Th>
                 </Tr>
                 </Thead>
                 <Tbody>

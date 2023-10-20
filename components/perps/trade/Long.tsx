@@ -506,7 +506,6 @@ export default function Long() {
                   value={leverage * 10}
                   colorScheme="primary"
                   mb={"-1px"}
-                  max={pairs[pair]?.long?.maxLeverage * 10}
                 >
                   <SliderMark value={25} {...labelStyles}>
                     <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 2.5 ? 'primary.200' : 'whiteAlpha.200'}></Box>

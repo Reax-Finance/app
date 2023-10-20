@@ -135,76 +135,66 @@ export default function Position({position, index}: any) {
                 </Box>
             </Td>
             <Td>
-                <Flex align={'center'}>
-                    <Flex flexDir={'column'} gap={'2px'}>
-
-                        <Flex flexDir={'row'} gap={1}>
-                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Leverage: </Text>
-                            <Flex fontSize={'sm'} gap={1}>
-                                <Text>{(leverage).toFixed(2)}x</Text>
-                            </Flex>
-                        </Flex>
-
-                        <Flex flexDir={'row'} gap={1}>
-                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Max Leverage: </Text>
-                            <Flex fontSize={'sm'} gap={1}>
-                                <Text>{position.maxLeverage}x</Text>
-                            </Flex>
-                        </Flex>
-
-                        <Flex gap={1} align={'center'}>
-                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Net APY: </Text>
-                            <Text fontSize={'sm'}>{(leverage * details?.apy).toFixed(2)} %</Text>
-                            <Text color={'whiteAlpha.700'} fontSize={'sm'}> + {(leverage * details?.rewardAPY).toFixed(2)} %</Text>
-                            <Image src='/veREAX.svg' boxSize={'16px'} rounded={'full'} alt='veREAX' />
-
-                        </Flex>
+                <Flex flexDir={'row'} align={'center'}>
+                    <Flex fontSize={'lg'}>
+                        <Text>{position.leverage}x</Text>
                     </Flex>
-
-                    <Divider orientation='vertical' mx={6} h={'60px'} />
-
-                    <Box>
-                        <Flex gap={1} align={'center'}>
-                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Position:</Text>
-                            <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.collateral) || 0)}</Text>
-                            {/* <IconButton variant={'ghost'} size={'xs'} icon={<PlusSquareIcon />} aria-label={''}/>
-                            <IconButton variant={'ghost'} size={'xs'} ml={-2} icon={<TbSquareMinus />} aria-label={''}/> */}
-                        </Flex>
-                        {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
-                            <Flex align={'center'} key={index} my={2} gap={1.5}>
-                                <Image alt={pos.market.inputToken.symbol} src={`/icons/${pos.market.inputToken.symbol}.svg`} boxSize={'20px'}/>
-                                <Text fontSize={'sm'}>{tokenFormatter.format(pos.collateral)} </Text>
-                                <Text fontSize={'sm'} color={'whiteAlpha.600'}> {pos.market.inputToken.symbol} ({dollarFormatter.format(pos.collateral * prices[pos.market.inputToken.id])})</Text>
-                            </Flex>
-                            </>
-                        ))}
-                    </Box>
-                    <Divider orientation='vertical' mx={6} h={'60px'} />
-                    <Box>
-                        <Flex gap={1}>
-                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Borrow:</Text>
-                            <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.debt) || 0)}</Text>
-                        </Flex>
-                        {(details?.debts ?? []).map((pos: any, index: number) => ( <>
-                            <Flex align={'center'} key={index} my={2} gap={2}>
-                                <Image alt={pos.market.inputToken.symbol} src={`/icons/${pos.market.inputToken.symbol}.svg`} boxSize={'20px'}/>
-                                <Text fontSize={'sm'}>{tokenFormatter.format(pos.debt)} </Text>
-                                <Text fontSize={'sm'} color={'whiteAlpha.600'}> {pos.market.inputToken.symbol} ({dollarFormatter.format(pos.debt * prices[pos.market.inputToken.id])})</Text>
-                            </Flex>
-                            </>
-                        ))}
+                    <Box fontSize={'xs'} ml={2} color={'whiteAlpha.600'}>
+                        <Text> / Liq {position.liqLeverage}x</Text>
                     </Box>
                 </Flex>
             </Td>
-            <Td isNumeric>
-                <Flex justify={'end'} align={'center'} gap={2}>
-                <Flex gap={0} flexDir={'column'} textAlign={'right'}> 
-                    <Text fontSize={'xs'} color={'whiteAlpha.700'}>PnL</Text>
+
+            <Td>
+                <Text fontSize={'sm'}>{(leverage * details?.apy).toFixed(2)} %</Text>
+                <Flex gap={1} align={'center'}>
+                    <Text color={'whiteAlpha.700'} fontSize={'sm'}>{(leverage * details?.rewardAPY).toFixed(2)} %</Text>
+                    <Image src='/veREAX.svg' boxSize={'16px'} rounded={'full'} alt='veREAX' />
+                </Flex>
+            </Td>
+
+            <Td>
+                <Box>
+                    <Flex gap={1} mb={1} align={'center'}>
+                        <Text color={'whiteAlpha.600'} fontSize={'sm'}>Total</Text>
+                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.collateral) || 0)}</Text>
+                    </Flex>
+                    {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
+                        <Flex align={'center'} color={'whiteAlpha.600'} key={index} my={0} gap={1.5}>
+                            <Text fontSize={'sm'}>{tokenFormatter.format(pos.collateral)} </Text>
+                            <Text fontSize={'sm'} > {pos.market.inputToken.symbol} ({dollarFormatter.format(pos.collateral * prices[pos.market.inputToken.id])})</Text>
+                        </Flex>
+                        </>
+                    ))}
+                </Box>
+            </Td>
+
+            <Td>
+                <Box>
+                    <Flex gap={1} mb={1}>
+                        <Text color={'whiteAlpha.600'} fontSize={'sm'}>Total:</Text>
+                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.debt) || 0)}</Text>
+                    </Flex>
+
+                    {(details?.debts ?? []).map((pos: any, index: number) => ( <>
+                        <Flex align={'center'} key={index} my={0} gap={1}>
+                            <Text fontSize={'sm'} color={'whiteAlpha.600'}>{tokenFormatter.format(pos.debt)} </Text>
+                            <Text fontSize={'sm'} color={'whiteAlpha.600'}> {pos.market.inputToken.symbol} ({dollarFormatter.format(pos.debt * prices[pos.market.inputToken.id])})</Text>
+                        </Flex>
+                        </>
+                    ))}
+                </Box>
+            </Td>
+
+            <Td>
+                <Flex gap={0} flexDir={'column'}> 
                     <Heading mt={-1} fontSize={'md'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>{dollarFormatter.format(Number(position?.profitLoss))}</Heading>
                 </Flex>
-                <Flex gap={2} justify={'end'}>
+            </Td>
+
+            <Td isNumeric>
+                <Flex justify={'end'} align={'center'} gap={2}>
                     <CloseModal details={details} />
-                </Flex>
                 </Flex>
             </Td>
         </Tr>    

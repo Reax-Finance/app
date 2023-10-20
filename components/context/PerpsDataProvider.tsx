@@ -73,7 +73,7 @@ function PerpsDataProvider({ children }: any) {
 		calls.push([factory.address, factory.interface.encodeFunctionData("getPositionAddress", [_address, _positions.length])]);
 
 		let requests = _positions.map(
-			(position: any) => axios.get(`https://perps-position-testnet.reax.one/positions?userId=${position.id}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
+			(position: any) => axios.get(`https://perps-position-testnet.reax.one/positions?position=${position.id}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
 		).concat(multicall.callStatic.aggregate(calls));
 		
 		
