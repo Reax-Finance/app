@@ -117,31 +117,39 @@ export default function Position({position, index}: any) {
         setDetails(_setDetails());
     }, [lendingProtocols, pools, position, prices, walletBalances]);
 
-    if(index == positions.length - 1) return <></>
-
     const leverage = (Number(details?.collateral) / (Number(details?.collateral) - Number(details?.debt)) || 0);
 
     return (<>
         <Tr>
             <Td>
-                <Flex gap={2} align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
-                    <Text color={'whiteAlpha.600'} fontSize={'sm'}>
-                        {position.id.slice(0, 5) + '...' + position.id.slice(-4)}
-                    </Text>
-                    <MdOpenInNew size={'14px'}/>
-                </Flex>
+                <Box>
+                    <Flex align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
+                        {position.data.map((token: any) => (<>
+                            <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />
+                        </>))}
+                    </Flex>
+                    <Flex align={'center'} gap={1} mt={1}>
+                        <Text fontSize={'sm'}>{position.id.slice(0, 6)}...{position.id.slice(-4)}</Text>
+                        <MdOpenInNew size={'14px'}/>
+                    </Flex>
+                </Box>
             </Td>
             <Td>
                 <Flex align={'center'}>
                     <Flex flexDir={'column'} gap={'2px'}>
-                        <Flex flexDir={'row'} gap={1}>
-                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Borrow Limit: </Text>
-                            <Text fontSize={'sm'}>{Number(details?.debtLimit).toFixed(1)} %</Text>
-                        </Flex>
 
                         <Flex flexDir={'row'} gap={1}>
                             <Text color={'whiteAlpha.600'} fontSize={'sm'}>Leverage: </Text>
-                            <Text fontSize={'sm'}>{(leverage).toFixed(2)} x</Text>
+                            <Flex fontSize={'sm'} gap={1}>
+                                <Text>{(leverage).toFixed(2)}x</Text>
+                            </Flex>
+                        </Flex>
+
+                        <Flex flexDir={'row'} gap={1}>
+                            <Text color={'whiteAlpha.600'} fontSize={'sm'}>Max Leverage: </Text>
+                            <Flex fontSize={'sm'} gap={1}>
+                                <Text>{position.maxLeverage}x</Text>
+                            </Flex>
                         </Flex>
 
                         <Flex gap={1} align={'center'}>
@@ -164,7 +172,7 @@ export default function Position({position, index}: any) {
                         </Flex>
                         {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
                             <Flex align={'center'} key={index} my={2} gap={1.5}>
-                                <Image alt={pos.market.inputToken.symbol} src={`/icons/${pos.market.inputToken.symbol}.svg`} boxSize={'24px'}/>
+                                <Image alt={pos.market.inputToken.symbol} src={`/icons/${pos.market.inputToken.symbol}.svg`} boxSize={'20px'}/>
                                 <Text fontSize={'sm'}>{tokenFormatter.format(pos.collateral)} </Text>
                                 <Text fontSize={'sm'} color={'whiteAlpha.600'}> {pos.market.inputToken.symbol} ({dollarFormatter.format(pos.collateral * prices[pos.market.inputToken.id])})</Text>
                             </Flex>
@@ -179,7 +187,7 @@ export default function Position({position, index}: any) {
                         </Flex>
                         {(details?.debts ?? []).map((pos: any, index: number) => ( <>
                             <Flex align={'center'} key={index} my={2} gap={2}>
-                                <Image alt={pos.market.inputToken.symbol} src={`/icons/${pos.market.inputToken.symbol}.svg`} boxSize={'24px'}/>
+                                <Image alt={pos.market.inputToken.symbol} src={`/icons/${pos.market.inputToken.symbol}.svg`} boxSize={'20px'}/>
                                 <Text fontSize={'sm'}>{tokenFormatter.format(pos.debt)} </Text>
                                 <Text fontSize={'sm'} color={'whiteAlpha.600'}> {pos.market.inputToken.symbol} ({dollarFormatter.format(pos.debt * prices[pos.market.inputToken.id])})</Text>
                             </Flex>
@@ -189,12 +197,14 @@ export default function Position({position, index}: any) {
                 </Flex>
             </Td>
             <Td isNumeric>
-                <Flex gap={1} align={'center'} justify={'end'} textAlign={'right'} mb={2}> 
-                    <Text fontSize={'sm'} color={'whiteAlpha.700'}>PnL: </Text>
-                    <Heading fontSize={'md'}>{dollarFormatter.format(Number(details?.collateral) * 0.1)} (10%)</Heading>
+                <Flex justify={'end'} align={'center'} gap={2}>
+                <Flex gap={0} flexDir={'column'} textAlign={'right'}> 
+                    <Text fontSize={'xs'} color={'whiteAlpha.700'}>PnL</Text>
+                    <Heading mt={-1} fontSize={'md'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>{dollarFormatter.format(Number(position?.profitLoss))}</Heading>
                 </Flex>
                 <Flex gap={2} justify={'end'}>
                     <CloseModal details={details} />
+                </Flex>
                 </Flex>
             </Td>
         </Tr>    

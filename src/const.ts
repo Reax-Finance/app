@@ -33,46 +33,6 @@ const _WETH_ADDRESS: any = {
 	[lineaTestnet.id]: "0x2c1b868d6596a18e32e61b901e4060c872647b6c".toLowerCase(),
 };
 
-const PERP_PAIR: any = {
-	[mantleTestnet.id]: {
-		'ETH-USD': {
-			base: '0xc5463c3e462e730a7bf625569e96dd275d136d2d',   // cETH
-			quote: '0x10736f742c810be853ff30d8a0a238112875f23b'  // cUSD
-		},
-		'BTC-USD': {
-			base: '0x71020714cb8f12d20266371f741cd467f5a8f1eb',   // cBTC
-			quote: '0x10736f742c810be853ff30d8a0a238112875f23b'  // cUSD
-		},
-		'ETH-BTC': {
-			base: '0xc5463c3e462e730a7bf625569e96dd275d136d2d',   // cETH
-			quote: '0x71020714cb8f12d20266371f741cd467f5a8f1eb'  // cBTC
-		},
-	},
-	[mantleMainnet.id]: {
-		'ETH-USD': {
-			base: '0xc5463c3e462e730a7bf625569e96dd275d136d2d',   // cETH
-			quote: '0x10736f742c810be853ff30d8a0a238112875f23b'   // cUSD
-		},
-		'BTC-USD': {
-			base: '0x71020714cb8f12d20266371f741cd467f5a8f1eb',   // cBTC
-			quote: '0x10736f742c810be853ff30d8a0a238112875f23b'   // cUSD
-		},
-		'ETH-BTC': {
-			base: '0xc5463c3e462e730a7bf625569e96dd275d136d2d',   // cETH
-			quote: '0x71020714cb8f12d20266371f741cd467f5a8f1eb'   // cBTC
-		},
-	}
-};
-
-export const PERP_PAIRS = PERP_PAIR[defaultChain.id];
-
-const FACTORIES = {
-	[mantleTestnet.id]: '0xd78e7bDc5Be5148FCca6Bc311a65deA5e5B95AAD',
-	[mantleMainnet.id]: '0xd78e7bDc5Be5148FCca6Bc311a65deA5e5B95AAD',
-};
-
-export const FACTORY = FACTORIES[defaultChain.id];
-
 const POOLS = {
 	[mantleTestnet.id]: '0x2b254761b439d3A5300BE16D13aa5aaC07354D0f',
 	[mantleMainnet.id]: '0x2b254761b439d3A5300BE16D13aa5aaC07354D0f',

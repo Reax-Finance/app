@@ -16,9 +16,9 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { motion, Variants } from "framer-motion";
 import { query } from '../../src/queries/synthetic';
 import router from "next/router";
-import { PERP_PAIRS } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
 import { usePriceData } from "../context/PriceContext";
+import { usePerpsData } from "../context/PerpsDataProvider";
 
 const itemVariants: Variants = {
 	open: {
@@ -35,6 +35,7 @@ export default function PairSelector() {
 	const {pair}: any = router.query;
 	const { colorMode } = useColorMode();
 	const { prices } = usePriceData();
+	const { pairs } = usePerpsData();
 
 	window.addEventListener("click", function (e) {
 		if (
@@ -129,7 +130,7 @@ export default function PairSelector() {
 
 						{/* <Divider /> */}
 
-						{Object.keys(PERP_PAIRS).map((pair, index) => {
+						{Object.keys(pairs).map((pair, index) => {
 							return (
 								<motion.li
 									variants={itemVariants}
@@ -152,19 +153,19 @@ export default function PairSelector() {
 											py="20px"
 										>
 											<Flex align={'center'} gap={2}>
-												<Image src={`/icons/${pair.split('-')[0]}.svg`} boxSize="30px" />
+												<Image src={`/icons/${pairs[pair]?.token0?.symbol}.svg`} boxSize="30px" alt="pair" />
 												<Heading fontSize={"xl"}>
 													{pair}
 												</Heading>
 											</Flex>
 											<Flex>
 												<Text>{
-													(Number(prices[PERP_PAIRS[pair as string]?.base] ?? 0) / Number(prices[PERP_PAIRS[pair as string]?.quote] ?? 0)).toFixed(4)
+													(Number(prices[pairs[pair]?.token0?.id] ?? 0) / Number(prices[pairs[pair]?.token1?.id] ?? 0)).toFixed(4)
 												}</Text>
 											</Flex>
 										</Flex>
 									</Box>
-									{index !== Object.keys(PERP_PAIRS).length -1 && <Divider />}
+									{index !== Object.keys(pairs).length -1 && <Divider />}
 								</motion.li>
 							);
 						})}

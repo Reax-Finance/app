@@ -37,7 +37,7 @@ export default function TradingViewWidget() {
       if (document.getElementById("tradingview") && "TradingView" in window) {
         new (window as any).TradingView.widget({
           autosize: true,
-          symbol: `PYTH:${(pair as string)?.split('-').join('')}`,
+          symbol: `PYTH:${(pair as string)?.split('-').join('').split("c").join("")}`,
           interval: "D",
           theme: "dark",
           style: "1",
@@ -52,7 +52,7 @@ export default function TradingViewWidget() {
         });
       }
     }
-  }, []);
+  }, [pair]);
 
   return (
     <div className="tradingview-widget-container">

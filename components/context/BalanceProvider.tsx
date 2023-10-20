@@ -3,7 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
-import { ADDRESS_ZERO, PERP_PAIRS, POOL, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, POOL, WETH_ADDRESS, defaultChain } from "../../src/const";
 import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
@@ -37,16 +37,16 @@ function BalanceContextProvider({ children }: any) {
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault, dex } = useDexData();
-    const { positions, status: perpStatus } = usePerpsData();
+    const { positions, status: perpStatus, pairs: perpPairs } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && positions.length > 0) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && positions.length > 0 && Object.keys(perpPairs).length > 0) {
             fetchBalances(address);
         }
     }, [pools, address, status, positions, dexPools.length, lendingPools])
 
     const fetchBalances = async (_address?: string) => {
-        // _address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
+        console.log("Fetching balances...");
         setStatus(Status.FETCHING);
         const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
@@ -263,12 +263,12 @@ function BalanceContextProvider({ children }: any) {
                 ]);
             }
             // (Position -> Token -> LendingPool) & (Position -> Token -> Token) Allowances
-            for(let i in Object.keys(PERP_PAIRS)){
-                const pair = Object.keys(PERP_PAIRS)[i];
-                const perp = PERP_PAIRS[pair];
+            for(let i in Object.keys(perpPairs)){
+                const pair = Object.keys(perpPairs)[i];
+                const perp = perpPairs[pair];
                 // Base Token -> Lending Pool
                 calls.push([
-                    perp.base,
+                    perp.token0.id,
                     itf.encodeFunctionData("allowance", [
                         positions[j].id,
                         POOL
@@ -276,7 +276,7 @@ function BalanceContextProvider({ children }: any) {
                 ]);
                 // Quote Token -> Lending Pool
                 calls.push([
-                    perp.quote,
+                    perp.token1.id,
                     itf.encodeFunctionData("allowance", [
                         positions[j].id,
                         POOL
@@ -284,18 +284,18 @@ function BalanceContextProvider({ children }: any) {
                 ]);
                 // Base Token -> Base Token
                 calls.push([
-                    perp.base,
+                    perp.token0.id,
                     itf.encodeFunctionData("allowance", [
                         positions[j].id,
-                        perp.base
+                        perp.token0.id
                     ]),
                 ]);
                 // Quote Token -> Quote Token
                 calls.push([
-                    perp.quote,
+                    perp.token1.id,
                     itf.encodeFunctionData("allowance", [
                         positions[j].id,
-                        perp.quote
+                        perp.token1.id
                     ]),
                 ]);
             }
@@ -441,11 +441,11 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                 }
                 // (Position -> Token -> LendingPool) & (Position -> Token -> Token) Allowances
-                for(let i in Object.keys(PERP_PAIRS)){
-                    const pair = Object.keys(PERP_PAIRS)[i];
-                    const perp = PERP_PAIRS[pair];
-                    let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [perp.base, positions[j].id]));
-                    let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [perp.quote, positions[j].id]));
+                for(let i in Object.keys(perpPairs)){
+                    const pair = Object.keys(perpPairs)[i];
+                    const perp = perpPairs[pair];
+                    let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [perp.token0.id, positions[j].id]));
+                    let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [perp.token1.id, positions[j].id]));
                     if(!newAllowances[baseHash]) newAllowances[baseHash] = {};
                     newAllowances[baseHash][POOL] = BigNumber.from(getReturnData(index)).toString();
                     index++;
@@ -453,10 +453,10 @@ function BalanceContextProvider({ children }: any) {
                     newAllowances[quoteHash][POOL] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                     if(!newAllowances[baseHash]) newAllowances[baseHash] = {};
-                    newAllowances[baseHash][perp.base] = BigNumber.from(getReturnData(index)).toString();
+                    newAllowances[baseHash][perp.token0.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                     if(!newAllowances[quoteHash]) newAllowances[quoteHash] = {};
-                    newAllowances[quoteHash][perp.quote] = BigNumber.from(getReturnData(index)).toString();
+                    newAllowances[quoteHash][perp.token1.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                 }
             }

@@ -3,13 +3,14 @@ import React, { useEffect } from 'react'
 import PairSelector from './PairSelector'
 import { usePriceData } from '../context/PriceContext';
 import router from 'next/router';
-import { PERP_PAIRS } from '../../src/const';
 import { useLendingData } from '../context/LendingDataProvider';
+import { usePerpsData } from '../context/PerpsDataProvider';
 
 export default function TitleBar() {
     
     const { prices } = usePriceData();
     const { pair }: any = router.query;
+    const {pairs } = usePerpsData();
 
     const [baseFundingRate, setBaseFundingRate] = React.useState(['0', '0']);
     const [quoteFundingRate, setQuoteFundingRate] = React.useState(['0', '0']);
@@ -19,12 +20,12 @@ export default function TitleBar() {
         for(let i in pools){
             let markets = pools[i];
             for(let j in markets){
-                if(markets[j].inputToken.id == PERP_PAIRS[pair].base){
+                if(markets[j].inputToken.id == pairs[pair].token0.id){
                     setBaseFundingRate([
                         Number(markets[j].rates.find((rate: any) => rate.side == "LENDER").rate).toFixed(2),
                         (Number(markets[j].rates.find((rate: any) => rate.side == "BORROWER" && rate.type == "VARIABLE").rate) * -1).toFixed(2),
                     ])
-                } else if(markets[j].inputToken.id == PERP_PAIRS[pair].quote){
+                } else if(markets[j].inputToken.id == pairs[pair].token1.id){
                     setQuoteFundingRate([
                         Number(markets[j].rates.find((rate: any) => rate.side == "LENDER").rate).toFixed(2),
                         (Number(markets[j].rates.find((rate: any) => rate.side == "BORROWER" && rate.type == "VARIABLE").rate) * -1).toFixed(2),
@@ -44,7 +45,7 @@ export default function TitleBar() {
             <Box px={10}>
                 <Text color={'whiteAlpha.600'} fontSize={'sm'}>Index Price</Text>
                 <Heading size={'md'}>
-                    {(Number(prices[PERP_PAIRS[pair as string]?.base] ?? 0) / Number(prices[PERP_PAIRS[pair as string]?.quote] ?? 0)).toFixed(4)}
+                    {(Number(prices[pairs[pair as string]?.token0?.id] ?? 0) / Number(prices[pairs[pair as string]?.token1?.id] ?? 0)).toFixed(4)}
                 </Heading>
             </Box>
             <Divider orientation="vertical" h={'80px'} />

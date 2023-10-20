@@ -31,7 +31,7 @@ import {
 	SliderMark,
 } from "@chakra-ui/react";
 import { usePriceData } from "../../context/PriceContext";
-import { EIP712_VERSION, ESYX_PRICE, FACTORY, PERP_PAIRS, POOL, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { EIP712_VERSION, ESYX_PRICE, POOL, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import { usePerpsData } from "../../context/PerpsDataProvider";
 import { getABI, getContract, send } from "../../../src/contract";
 import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
@@ -44,6 +44,7 @@ import { VARIANT } from "../../../styles/theme";
 import SelectBody2 from "./SelectBody2";
 import TokenSelector from "../TokenSelector";
 import { BsArrowDown } from "react-icons/bs";
+import { AiOutlineDown } from "react-icons/ai";
 
 const labelStyles = {
 	mt: "-5px",
@@ -60,7 +61,7 @@ export default function Short() {
 	const { pair }: any = router.query;
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedPosition, setSelectedPosition] = React.useState(0);
-	const { positions, addPosition } = usePerpsData();
+	const { positions, addPosition, pairs } = usePerpsData();
 	const { pools } = useLendingData();
 
 	const {
@@ -90,7 +91,7 @@ export default function Short() {
 	const setOutputAmount = (e: any) => {
 		e = parseInput(e);
 		setOutAmount(e);
-		setLeverage(Big(e).mul(prices[PERP_PAIRS[pair].base]).div(Big(inAmount).mul(prices[tokens[inAssetIndex].id])).toNumber());
+		setLeverage(Big(e).mul(prices[pairs[pair].token0.id]).div(Big(inAmount).mul(prices[tokens[inAssetIndex].id])).toNumber());
 	};
 
 	const setMax = (multiplier: number) => {
@@ -105,14 +106,14 @@ export default function Short() {
 		e = parseInput(e);
 		setInAmount(e);
 		setOutAmount(
-			Big(Number(e)).mul(leverage).mul(prices[tokens[inAssetIndex].id]).div(prices[PERP_PAIRS[pair].base]).toString()
+			Big(Number(e)).mul(leverage).mul(prices[tokens[inAssetIndex].id]).div(prices[pairs[pair].token0.id]).toString()
 		);
 	};
 
 	const _setLeverage = (e: number) => {
 		setLeverage(e);
 		if(!Number(inAmount)) return;
-		setOutAmount(Big(e).mul(inAmount).mul(prices[tokens[inAssetIndex].id]).div(prices[PERP_PAIRS[pair as string].base]).toString());
+		setOutAmount(Big(e).mul(inAmount).mul(prices[tokens[inAssetIndex].id]).div(prices[pairs[pair].token0.id]).toString());
 	}
 
 	const { signTypedDataAsync } = useSignTypedData();
@@ -243,7 +244,7 @@ export default function Short() {
 			message: "Amount Exceeds Balance"
 			}
 		} 
-		else if (Big(outAmount).mul(prices[PERP_PAIRS[pair].base]).gt(availableLiquidity())) {
+		else if (Big(outAmount).mul(prices[pairs[pair].token0.id]).gt(availableLiquidity())) {
 			return {
 			stage: 0,
 			message: "Insufficient Liquidity"
@@ -290,9 +291,9 @@ export default function Short() {
 		setLoading(true);
 		let position = new ethers.Contract(positions[selectedPosition]?.id, getABI("PerpPosition", chain?.id!));
 		let erc20 = new ethers.Contract(tokens[inAssetIndex].id, getABI("MockToken", chain?.id!));
-		let factory = new ethers.Contract(FACTORY, getABI("PerpFactory", chain?.id!));
+		let factory = new ethers.Contract(pairs[pair].perpFactory, getABI("PerpFactory", chain?.id!));
 		let _amount = ethers.utils.parseUnits(Big(inAmount).toFixed(tokens[inAssetIndex].decimals, 0), tokens[inAssetIndex].decimals);
-		let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(leverage - 1).div(prices[PERP_PAIRS[pair].quote]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
+		let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(leverage - 1).div(prices[pairs[pair].token1.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
 
 		// 1. Transfer inAsset to position if doesn't have enough quote asset balance
 		if(data){
@@ -303,31 +304,31 @@ export default function Short() {
 		calls.push(position.interface.encodeFunctionData("call", [tokens[inAssetIndex].id, erc20.interface.encodeFunctionData("transferFrom", [address, position.address, _amount]), 0]));
 
 		// 2. Update pyth data
-		const pythUpdateData = await getUpdateData([PERP_PAIRS[pair].quote, PERP_PAIRS[pair].base]);
+		const pythUpdateData = await getUpdateData([pairs[pair].token1.id, pairs[pair].token0.id]);
 		calls.push(position.interface.encodeFunctionData("updatePythData", [pythUpdateData]));
 
 		// 3. Swap
 		// Check if swap is needed
-		if(tokens[inAssetIndex].id !== PERP_PAIRS[pair].quote){
+		if(tokens[inAssetIndex].id !== pairs[pair].token1.id){
 			// Fetch route
-			calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, PERP_PAIRS[pair].quote]));
+			calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, pairs[pair].token1.id]));
 		}
 		// 4. Approvals
-		let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [PERP_PAIRS[pair].base, positions[selectedPosition].id]));
-		let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [PERP_PAIRS[pair].quote, positions[selectedPosition].id]));
+		let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token0.id, positions[selectedPosition].id]));
+		let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token1.id, positions[selectedPosition].id]));
 		if(Big(allowances[quoteHash][POOL]).lt(ethers.constants.MaxUint256.div(2).toString())){
 			// Position approves to supply cusd pool
-			calls.push(position.interface.encodeFunctionData("call", [PERP_PAIRS[pair].quote, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
+			calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token1.id, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
 		}
 		if(Big(allowances[quoteHash][POOL]).lt(ethers.constants.MaxUint256.div(2).toString())){
 			// For repayment of flashloan
-			calls.push(position.interface.encodeFunctionData("call", [PERP_PAIRS[pair].quote, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
+			calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token1.id, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
 		}
 		
 		// now we have eth in position contract; supply that to pool
-		calls.push(position.interface.encodeFunctionData("supply", [PERP_PAIRS[pair].quote, ethers.constants.MaxUint256]));
+		calls.push(position.interface.encodeFunctionData("supply", [pairs[pair].token1.id, ethers.constants.MaxUint256]));
 		// now open position
-		calls.push(position.interface.encodeFunctionData("openPosition", [PERP_PAIRS[pair].quote, _leveragedAmount, PERP_PAIRS[pair].base]));
+		calls.push(position.interface.encodeFunctionData("openPosition", [pairs[pair].token1.id, _leveragedAmount, pairs[pair].token0.id]));
 
 		let tx;
 		if(selectedPosition == positions.length - 1){
@@ -350,7 +351,7 @@ export default function Short() {
 	const availableLiquidity = () => {
 		for(let i in pools){
 			if(!pools[i] || !pools[i].length) continue;
-			let market = pools[i].find((m: any) => m.inputToken.id == PERP_PAIRS[pair].quote);
+			let market = pools[i].find((m: any) => m.inputToken.id == pairs[pair].token1.id);
 			if(market){
 				return Number(((Number(market.totalDepositBalanceUSD) - Number(market.totalBorrowBalanceUSD)) * 0.99).toFixed(2));
 			}
@@ -380,14 +381,14 @@ export default function Short() {
 			let markets = pools[i];
 			for(let j in markets){
 				let market = markets[j];
-				if(market.inputToken.id == PERP_PAIRS[pair].base){
-					let amount = Big(Number(outAmount)).mul(prices[PERP_PAIRS[pair].base] ?? 0);
+				if(market.inputToken.id == pairs[pair].token0.id){
+					let amount = Big(Number(outAmount)).mul(prices[pairs[pair].token0.id] ?? 0);
 					// supplying base for long
 					apy = apy.plus(Big(market.rates.find((rate: any) => rate.side == 'LENDER').rate).mul(amount));
 					rewardsApy = rewardsApy.add(amount.mul(rewardAPY(markets[i], 'DEPOSIT')));
 					total = total.plus(amount);
-				} else if(market.inputToken.id == PERP_PAIRS[pair].quote){
-					let amount = Big(Number(inAmount)).mul(leverage - 1).mul(prices[PERP_PAIRS[pair].quote] ?? 0);
+				} else if(market.inputToken.id == pairs[pair].token1.id){
+					let amount = Big(Number(inAmount)).mul(leverage - 1).mul(prices[pairs[pair].token1.id] ?? 0);
 					// borrowing quote for long
 					apy = apy.plus(Big(market.rates.find((rate: any) => rate.side == 'BORROWER' && rate.type == 'VARIABLE').rate).mul(amount).neg());
 					rewardsApy = rewardsApy.add(amount.mul(rewardAPY(markets[i], 'BORROW')));
@@ -438,8 +439,8 @@ export default function Short() {
           </Box>
 
           {/* Divider */}
-          <Box my={2} p={'8px'} bg={'darkBg.400'} w={'34px'} border={'1px'} borderColor={'whiteAlpha.200'}>
-            <BsArrowDown color="darkBg.600" />
+		  <Box my={2} p={'5px'} bg={'darkBg.600'} w={'22px'} border={'1px'} borderColor={'whiteAlpha.200'}>
+            <AiOutlineDown color="darkBg.400" size={'10px'} />
           </Box>
 
           {/* Output */}
@@ -537,12 +538,12 @@ export default function Short() {
 
           <Divider my={4} mt={4} />
           {/* Select position */}
-          <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
+          {positions.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Position</Text>
             {positions.length > 0 && <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={(e) => setSelectedPosition(Number(e.target.value))}>
               {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
             </Select>}
-          </Flex>
+          </Flex>}
 
           {/* Long */}
           <Box mt={4}>
@@ -579,8 +580,8 @@ export default function Short() {
         </Box>
 
           {/* Fees and Liquidity */}
-          <Divider mt={6} />
-          <Flex mt={5} mb={1} flexDir={'column'} gap={0.5}>
+          <Divider mt={4} />
+          <Flex mt={5} flexDir={'column'} gap={0.5}>
             <Flex justify={'space-between'} fontSize={'sm'}>
               <Text >Available Liquidity</Text>
               <Text ml={"auto"}>{dollarFormatter.format(availableLiquidity())}</Text>
@@ -601,7 +602,7 @@ export default function Short() {
               <Text>Fees</Text>
               <Flex gap={1}>
                 {/* <Text ml={"auto"}>{(0.25).toFixed(2)} %</Text> */}
-                <Text ml={"auto"} color={'whiteAlpha.700'}>{dollarFormatter.format(Number(outAmount) * prices[PERP_PAIRS[pair].base] * 0.25 / (leverage * 100))}</Text>
+                <Text ml={"auto"} color={'whiteAlpha.700'}>{dollarFormatter.format(Number(outAmount) * prices[pairs[pair].token0.id] * 0.25 / (leverage * 100))}</Text>
               </Flex>
             </Flex>
           </Flex>
