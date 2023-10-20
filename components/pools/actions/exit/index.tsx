@@ -65,10 +65,10 @@ export default function Withdraw({ pool, isOpen, onClose }: any) {
 
 						<TabPanels>
 							<TabPanel p={0}>
-								<SingleTokenWithdraw pool={pool} />
+								<SingleTokenWithdraw pool={pool} onClose={onClose} />
 							</TabPanel>
 							<TabPanel p={0}>
-								<ProportionalWithdraw pool={pool} />
+								<ProportionalWithdraw pool={pool} onClose={onClose} />
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

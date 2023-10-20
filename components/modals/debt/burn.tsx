@@ -27,7 +27,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { VARIANT } from "../../../styles/theme";
 
-const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
+const Burn = ({ asset, amount, setAmount, amountNumber, onClose }: any) => {
 	const [loading, setLoading] = useState(false);
 	const [response, setResponse] = useState<string | null>(null);
 	const [hash, setHash] = useState(null);
@@ -79,6 +79,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber }: any) => {
 			setAmount("0");
 			setConfirmed(true);
 			setLoading(false);
+			onClose();
 			toast({
 				title: "Burn Successful!",
 				description: (

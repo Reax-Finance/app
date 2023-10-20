@@ -33,12 +33,10 @@ import Repay from "./Repay";
 import Borrow from "./Borrow";
 import { formatInput, parseInput } from "../../utils/number";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
-export default function BorrowModal({
-	market,
-	amount,
-	setAmount
-}: any) {
+export default function BorrowModal(props: any) {
+	const {market, amount, setAmount, onClose} = props;
 	const { chain } = useNetwork();
 	const [tabSelected, setTabSelected] = useState(0);
 	let [debtType, setDebtType] = useState("2");
@@ -49,7 +47,8 @@ export default function BorrowModal({
 	const { walletBalances } = useBalanceData();
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
@@ -82,7 +81,7 @@ export default function BorrowModal({
 		if (!address) return "0";
 		if (tabSelected == 0) {
 			if (!prices[market.inputToken.id] || prices[market.inputToken.id] == 0){return "0"}
-			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).div(prices[market.inputToken.id]);
+			let v1 = Big(pos.adjustedCollateral).sub(pos.debt).div(prices[market.inputToken.id]).mul(0.999);
             let v2 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]).mul(0.99);
             let min = v1.lt(v2) ? v1 : v2;
 			if(min.lt(0)) min = Big(0);
@@ -212,19 +211,11 @@ export default function BorrowModal({
 										fontSize="xs"
 										fontWeight={"bold"}
 										onClick={() =>
-											_setAmount(
-												Big(max())
-													.mul(
-														tabSelected == 0
-															? 0.99
-															: 1
-													)
-													.toFixed(market.inputToken.decimals)
-											)
+											_setAmount(Big(max()).mul(0.9999).toFixed(market.inputToken.decimals))
 										}
 										my={-1}
 									>
-										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
+										{tabSelected == 1 && isMax ? 'CLOSE' : 'MAX'}
 									</Button>
 									</Box>
 								</Flex>
@@ -232,6 +223,7 @@ export default function BorrowModal({
 						</InputGroup>
 					</Box>
 					</Box>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'}/>
 					<Tabs variant={'enclosed'} onChange={selectTab} index={tabSelected}>
 						<TabList>
 							<Tab
@@ -269,6 +261,7 @@ export default function BorrowModal({
 									debtType={debtType}
 									setDebtType={setDebtType}
 									max={max()}
+									onClose={onClose}
 								/>
 							</TabPanel>
 							<TabPanel m={0} p={0}>
@@ -281,6 +274,7 @@ export default function BorrowModal({
 									setDebtType={setDebtType}
 									max={max()}
 									isMax={isMax}
+									onClose={onClose}
 								/>
 							</TabPanel>
 						</TabPanels>

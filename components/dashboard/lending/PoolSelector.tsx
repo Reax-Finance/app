@@ -17,6 +17,7 @@ import { BsStars } from "react-icons/bs";
 import { motion, Variants } from "framer-motion";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { HEADING_FONT, VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 const itemVariants: Variants = {
 	open: {
@@ -28,8 +29,11 @@ const itemVariants: Variants = {
 };
 
 export default function PoolSelector() {
-	const { pools, protocols, setSelectedPool, selectedPool } = useLendingData();
+	const { pools, protocols } = useLendingData();
 	const [searchedPools, setSearchedPools] = React.useState<any[]>([]);
+
+	const router = useRouter();
+	const selectedPool = Number(router.query.market);
 
 	React.useEffect(() => {
 		setSearchedPools(pools);
@@ -185,8 +189,7 @@ export default function PoolSelector() {
 								<motion.li
 									variants={itemVariants}
 									onClick={() => {
-										localStorage.setItem("lendingPool", index.toString());
-										setSelectedPool(index);
+										router.push(`/lend/${index}`);
 										setIsOpen(false);
 									}}
 									key={index}

@@ -304,6 +304,7 @@ export default function CollateralModal({ collateral, index }: any) {
 										amount={amount}
 										setAmount={_setAmount}
 										isNative={isNative}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 								<TabPanel m={0} p={0}>
@@ -312,6 +313,7 @@ export default function CollateralModal({ collateral, index }: any) {
 										amount={amount}
 										setAmount={_setAmount}
 										isNative={isNative}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 							</TabPanels>

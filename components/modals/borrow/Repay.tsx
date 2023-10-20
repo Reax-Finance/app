@@ -9,12 +9,11 @@ import {
 	Select,
 	useColorMode
 } from "@chakra-ui/react";
-
 import { getABI, getContract, send } from "../../../src/contract";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
-import { ADDRESS_ZERO, EIP712_VERSION, PYTH_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { EIP712_VERSION, defaultChain, dollarFormatter } from "../../../src/const";
 import Big from "big.js";
-import { ExternalLinkIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useToast } from '@chakra-ui/react';
 import { BigNumber, ethers } from "ethers";
 import { useBalanceData } from "../../context/BalanceProvider";
@@ -23,8 +22,9 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { useLendingData } from "../../context/LendingDataProvider";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
-const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max, isMax }: any) => {
+const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max, isMax, onClose }: any) => {
 	const [loading, setLoading] = useState(false);
 	const { address } = useAccount();
 	const { chain } = useNetwork();
@@ -38,7 +38,10 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
+
 	const {nonces, allowances, updateFromTx, setBalance} = useBalanceData();
 
 	const { protocol, updatePositions } = useLendingData();
@@ -77,7 +80,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 
 		let _amount = Big(amount).mul(10 ** (market.inputToken.decimals ?? 18)).toFixed(0);
 		
-		// check allowance if not native
+		// Check allowance if not native
 		if (!isNative) {
 			if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).add(Big(approvedAmount).mul(10 ** (market.inputToken.decimals ?? 18))).lt(
 				_amount
@@ -99,19 +102,10 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 			}
 		}
 
-		// if(Big(allowances[market.inputToken.id]?.[market.protocol._lendingPoolAddress]).lte(
-		// 	_amount
-		// )) {
-			return {
-				stage: 3,
-				message: ""
-			}
-		// }
-
-		// return {
-		// 	stage: 2,
-		// 	message: `Approved ${market.inputToken.symbol} For Use`
-		// }
+		return {
+			stage: 3,
+			message: ""
+		}
 	}
 
 	const repay = async () => {
@@ -147,6 +141,8 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 			setAmount('0');
 			setLoading(false);
 			updatePositions();
+			console.log(onClose);
+			onClose();
 			toast({
 				title: "Repayment Successful!",
 				description: <Box>
@@ -214,9 +210,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 	const approve = async () => {
 		setApproveLoading(true);
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0);
-		const value = isMax ? ethers.constants.MaxUint256.toString() : Big(amount)
-		.times(10 ** market.inputToken.decimals)
-		.toFixed(0);
+		const value = isMax ? ethers.constants.MaxUint256.toString() : Big(amount).times(10 ** market.inputToken.decimals).toFixed(0);
 		signTypedDataAsync({
 			domain: {
 				name: market.inputToken.name,
@@ -244,7 +238,7 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 			.then(async (res: any) => {
 				setData(res);
 				setDeadline(_deadline);
-				setApprovedAmount(isMax ? ethers.constants.MaxUint256.toString() : Big(value).div(10 ** market.inputToken.decimals).toFixed(0));
+				setApprovedAmount(isMax ? ethers.constants.MaxUint256.toString() : Big(value).div(10 ** market.inputToken.decimals).toFixed(market.inputToken.decimals));
 				setApproveLoading(false);
 				toast({
 					title: "Approval Signed",
@@ -279,71 +273,71 @@ const Repay = ({ market, amount, setAmount, isNative, debtType, setDebtType, max
 					</Select>
 				</Flex>
 			</Box>
-				<Box  >
-						<Box>
-						<Text mt={6} fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'}>
-							Transaction Overview
-						</Text>
-						<Box
-							my={4}
-							rounded={8}
-						>
-							<Flex justify="space-between">
-								<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
-									Health Factor
-								</Text>
-								<Text fontSize={"md"}>{Number(pos.debtLimit).toFixed(1)} % {"->"} {((Number(pos.debt) - (amount*prices[market.inputToken.id])) / Number(pos.collateral) * 100).toFixed(1)}%</Text>
-							</Flex>
-							<Divider my={2} />
-							<Flex justify="space-between">
-								<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
-									Available to issue
-								</Text>
-								<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount*prices[market.inputToken.id] ?? 0) - Number(pos.debt))}</Text>
-							</Flex>
-						</Box>
+				<Box>
+					<Box>
+					<Text mt={6} fontSize={"sm"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"} fontWeight={'bold'}>
+						Transaction Overview
+					</Text>
+					<Box
+						my={4}
+						rounded={8}
+					>
+						<Flex justify="space-between">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
+								Health Factor
+							</Text>
+							<Text fontSize={"md"}>{Number(pos.debtLimit).toFixed(1)} % {"->"} {((Number(pos.debt) - (amount*prices[market.inputToken.id])) / Number(pos.collateral) * 100).toFixed(1)}%</Text>
+						</Flex>
+						<Divider my={2} />
+						<Flex justify="space-between">
+							<Text fontSize={"md"} color={colorMode == 'dark' ? "whiteAlpha.600" : "blackAlpha.600"}>
+								Available to issue
+							</Text>
+							<Text fontSize={"md"}>{dollarFormatter.format(Number(pos.availableToIssue))} {"->"} {dollarFormatter.format(Number(pos.adjustedCollateral) + Number(amount*prices[market.inputToken.id] ?? 0) - Number(pos.debt))}</Text>
+						</Flex>
 					</Box>
+				</Box>
 
-					<Box mt={6}>
-						{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton`:`${VARIANT}-${colorMode}-primaryButton`}><Button
-							isDisabled={validate().stage != 1}
-							isLoading={approveLoading}
-							loadingText="Please sign the transaction"
-							color='white'
-							width="100%"
-							onClick={market.inputToken.isPermit ? approve : approveTx}
-							size="lg"
-							rounded={0}
-							bg={'transparent'}
-							_hover={{ bg: "transparent" }}
-						>
-							{validate().message}
-						</Button>
-					</Box>}
-						
-					{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`} > <Button
-						isDisabled={validate().stage < 2}
-						isLoading={loading}
+				<Box mt={6}>
+					{validate().stage <= 2 && <Box mt={2} className={(validate().stage != 1 || approveLoading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton`:`${VARIANT}-${colorMode}-primaryButton`}><Button
+						isDisabled={validate().stage != 1}
+						isLoading={approveLoading}
 						loadingText="Please sign the transaction"
+						color='white'
 						width="100%"
-						color="white"
+						onClick={market.inputToken.isPermit ? approve : approveTx}
+						size="lg"
 						rounded={0}
 						bg={'transparent'}
-						onClick={repay}
-						size="lg"
 						_hover={{ bg: "transparent" }}
 					>
-						{isConnected && !chain?.unsupported ? (
-							Big(amount).gt(max) ? (
-								<>Insufficient Wallet Balance</>
-							) : (
-								<>Repay</>
-							)
+						{validate().message}
+					</Button>
+				</Box>}
+					
+				{validate().stage > 0 && <Box mt={2} className={(validate().stage < 2 || loading) ? `${VARIANT}-${colorMode}-disabledPrimaryButton` : `${VARIANT}-${colorMode}-primaryButton`} > <Button
+					isDisabled={validate().stage < 2}
+					isLoading={loading}
+					loadingText="Please sign the transaction"
+					width="100%"
+					color="white"
+					rounded={0}
+					bg={'transparent'}
+					onClick={repay}
+					size="lg"
+					_hover={{ bg: "transparent" }}
+				>
+					{isConnected && !chain?.unsupported ? (
+						Big(amount).gt(max) ? (
+							<>Insufficient Wallet Balance</>
 						) : (
-							<>Please connect your wallet</>
-						)}
-					</Button></Box>}
-				</Box>
+							<>Repay</>
+						)
+					) : (
+						<>Please connect your wallet</>
+					)}
+				</Button></Box>}
+			</Box>
 		</Box>
 		</Box>
 	);

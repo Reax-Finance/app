@@ -8,35 +8,32 @@ import {
 	Heading,
 	Divider,
 	Text,
-	useColorMode
+	useColorMode,
+	Button
 } from "@chakra-ui/react";
-import AccountButton from '../ConnectButton'; 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import "../../styles/Home.module.css";
 import { useAccount, useNetwork } from "wagmi";
 import { useContext } from "react";
 import { AppDataContext } from "../context/AppDataProvider";
 import { TokenContext } from "../context/TokenContext";
-import { motion } from "framer-motion";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Status } from "../utils/status";
 import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
+import { usePerpsData } from "../context/PerpsDataProvider";
 
 function NavBar() {
-	const router = useRouter();
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
 	const { fetchData: fetchLendingData } = useLendingData()
+	const { fetchData: fetchPerpsData } = usePerpsData();
 	const { fetchData: fetchDexData, dex } = useDexData();
-
 
 	const { chain, chains } = useNetwork();
 	const [init, setInit] = useState(false);
@@ -51,12 +48,14 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
+			// address = '0x1321BC6FFa79aB03ed1F773504340428f660025c'.toLowerCase();
 			// if(!chain) return;
 			// if ((chain as any).unsupported) return;
 			fetchData(address!);
 			fetchLendingData(address!);
 			fetchDexData(address!);
 			fetchTokenData(address!);
+			fetchPerpsData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
@@ -97,6 +96,7 @@ function NavBar() {
 			fetchData();
 			fetchLendingData();
 			fetchDexData();
+			fetchPerpsData();
 			fetchTokenData();
 		}
 	}, [activeConnector, address, chain?.unsupported, chains, fetchData, init, isConnected, isConnecting, isSubscribed, status]);
@@ -114,24 +114,23 @@ function NavBar() {
 	});
 
 	const {colorMode} = useColorMode();
+	const router = useRouter();
 
 	return (
 		<>
-		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={4} align='center' >
+		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={8} align='center' >
 			<Box minW='0' w={'100%'} maxW='1250px'>
 			<Flex align={"center"} justify="space-between" >
 				<Flex justify="space-between" align={"center"} w='100%'>
 					<Flex gap={10} align='center'>
 						<Image
 							src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo-${colorMode}.svg`}
-							alt=""
-							width="30px"
-							mb={0.5}
+							alt="reax logo"
+							height="16px"
 						/>
 						<Flex
 							align="center"
 							display={{ sm: "none", md: "flex" }}
-							// gap={2}
 						>
 							<NavLocalLink
 								path={"/"}
@@ -145,12 +144,12 @@ function NavBar() {
 
 							<NavLocalLink
 								path={"/lend"}
-								title="Lending"
+								title="Markets"
 							></NavLocalLink>
 							
 							<NavLocalLink
 								path={"/pools"}
-								title="Pools"
+								title="Liquidity"
 							></NavLocalLink>
 						</Flex>
 					</Flex>
@@ -180,28 +179,39 @@ function NavBar() {
 					// gap={2}
 					w='100%'
 				>
+					{/* <Button mr={4} size={'sm'} bg={'secondary.600'} _hover={{bg: 'secondary.800'}} px={3} py={1} rounded={'full'} onClick={() => router.push('/synthetics')}>
+						<Flex ml={-1.5} mr={1.5}>
+							<Box border={'0px white solid'} rounded={'full'}>
+								<Image src={'/icons/cBTC.svg'} w={'25px'} />
+							</Box>
+							<Box border={'0px white solid'} rounded={'full'} ml={-2}>
+								<Image src={'/icons/cETH.svg'} w={'25px'}  />
+							</Box>
+							<Box border={'0px white solid'} rounded={'full'} ml={-2}>
+								<Image src={'/icons/cSOL.svg'} w={'25px'} />
+							</Box>
+						</Flex>
+						Mint Synths & Earn {"20"}% APY
+					</Button> */}
 					<NavLocalLink
 						path={"/leaderboard"}
 						title={<Flex gap={2} align={'center'}>
-						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> Points
+						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> <Text color={colorMode == 'dark' ? 'white' : 'black'}>Points</Text>
 						</Flex>}></NavLocalLink>
 						{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
 							<NavLocalLink
 							path={"/faucet"}
 							title="Faucet"></NavLocalLink>
 						</>}
-					<Box>
+					{/* <Box>
 						<AccountButton />
-					</Box>
+					</Box> */}
 					<Box ml={2}>
 						<CustomConnectButton />
 					</Box>
 				</Flex>
 			</Flex>
-			{/* {VARIANT == "edgy" && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400': 'blackAlpha.400'}/>} */}
 			</Box>
-
-
 		</Flex>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
@@ -214,18 +224,18 @@ const MobileNav = ({}: any) => {
 	const router = useRouter();
 	const { dex } = useDexData();
 	return (
-		<Flex flexDir={"row"} wrap={'wrap'} gap={2}>
+		<Flex flexDir={"row"} wrap={'wrap'} gap={0}>
 			<NavLocalLink
 				path={"/"}
 				title={"Trade"}
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/lend"}
-				title="Lend"
+				path={"/synthetics"}
+				title="Synths"
 			></NavLocalLink>
 			<NavLocalLink
-				path={"/synthetics"}
-				title="Synthetics"
+				path={"/lend"}
+				title="Lending"
 			></NavLocalLink>
 			<NavLocalLink
 				path={"/pools"}

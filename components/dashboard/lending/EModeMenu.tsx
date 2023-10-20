@@ -29,11 +29,12 @@ import { useNetwork } from 'wagmi';
 import useHandleError, { PlatformType } from '../../utils/useHandleError';
 import useUpdateData from '../../utils/useUpdateData';
 import { useSyntheticsData } from '../../context/SyntheticsPosition';
+import { useRouter } from 'next/router';
 
 
 export default function EModeMenu({}: any) {
 	const { colorMode } = useColorMode();
-  const { protocol, updatePositions, markets, setUserEMode } = useLendingData();
+  const { protocols, updatePositions, pools, setUserEMode } = useLendingData();
   const [loading, setLoading] = React.useState(false);
   const { chain } = useNetwork();
   const { lendingPosition } = useSyntheticsData();
@@ -41,20 +42,22 @@ export default function EModeMenu({}: any) {
   const handleError = useHandleError(PlatformType.LENDING);
   const {getUpdateData} = useUpdateData();
 
+  const router = useRouter();
+
+  const protocol = protocols[Number(router.query.market) || 0] ?? [];
+  const markets = pools[Number(router.query.market) || 0] ?? [];
 
   const setEMode = async (eMode: any) => {
     if(eMode === protocol.eModeCategory?.id) return;
     setLoading(true);
     let pool = await getContract('LendingPool', chain?.id!, protocol._lendingPoolAddress);
     let tx;
-    let position = lendingPosition();
+    let position = lendingPosition(Number(router.query.market));
+    let data: string[] = [] 
     if(Number(position.debt) > 0){
-      const data = await getUpdateData(markets.map((m: any) => m.inputToken.id));
-      tx = send(pool, "setUserEMode(uint8,bytes[])", [eMode, data])
-    } else {
-      tx = send(pool, "setUserEMode(uint8)", [eMode])
+      data = await getUpdateData(markets.map((m: any) => m.inputToken.id));
     }
-    tx.then(async (res: any) => {
+    send(pool, "setUserEMode(uint8,bytes[])", [eMode, data]).then(async (res: any) => {
       res = await res.wait();
       setUserEMode(eMode);
       updatePositions();
@@ -80,12 +83,12 @@ export default function EModeMenu({}: any) {
               className={`${VARIANT}-${colorMode}-outlinedBox`}
             >
                 <MdBolt color='orange' />
-                <Text fontSize={'sm'}>E-Mode: </Text>
-                {loading ? <CircularProgress isIndeterminate size={'16px'} color='secondary.400' /> : <Heading size={'xs'} color={'secondary.300'}>{protocol.eModeCategory ? protocol.eModeCategory.label : "Disabled"}</Heading>}
+                <Text color={colorMode == 'dark' ? 'white' : 'black'} fontSize={'sm'}>E-Mode: </Text>
+                {loading ? <CircularProgress isIndeterminate size={'16px'} color='secondary.400' /> : protocol.eModeCategory ? <Heading size={'xs'} color={'secondary.300'}>{protocol.eModeCategory.label}</Heading> : <Heading size={'xs'} color={colorMode == 'dark' ? 'white' : 'black'}>Disabled</Heading>}
             </Flex>
             </Box>
             <MenuList p={0} m={0} border={0} rounded={0} bg={'transparent'} shadow={'none'}>
-                <Box className={`${VARIANT}-${colorMode}-containerBody2`} pt={4} pb={2}>
+                <Box className={`${VARIANT}-${colorMode}-outlinedBox`} pt={4} pb={2}>
                 {protocol.eModes.map((eMode: any, index: number) => <>
                   <MenuDivider m={0} borderColor={'whiteAlpha.400'} />
                   <Box>

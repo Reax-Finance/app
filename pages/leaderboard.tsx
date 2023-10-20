@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Heading, IconButton, useColorMode } from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, Heading, IconButton, Tag, useColorMode } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import {
   Table,
@@ -16,12 +16,12 @@ import { useAccount } from 'wagmi';
 import { useDexData } from '../components/context/DexDataProvider';
 import LeaderboardRow from '../components/others/LeaderboardRow';
 import { VARIANT } from '../styles/theme';
+import Leaderboard from '../components/others/Leaderboard';
 
-export default function Leaderboard() {
-  const { dex } = useDexData();
-  const {address} = useAccount();
-
-  const isAddressInLeaderboard = dex?.leaderboard?.some((account: any) => account.id.toLowerCase() === address?.toLowerCase());
+export default function LeaderboardPage({}: any) {
+  const { epoches } = useDexData();
+  const { address } = useAccount();
+  const [selectedEpoch, setSelectedEpoch] = React.useState<Number|null>(0);
 
   const {colorMode} = useColorMode();
 
@@ -36,73 +36,23 @@ export default function Leaderboard() {
       <Box>
       <Heading size={"lg"}>Trading Rewards</Heading>
       <Text mt={2} pb={5} color={colorMode == 'dark' ? "whiteAlpha.700" : "blackAlpha.700"}>
-        Get rewarded for trading on {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}. Build for traders, to be owned by traders.
+        Earn protocol ownership by trading on {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}. Build for traders, to be owned by traders.
       </Text>
       </Box>
-
-      <Image mb={-8} src='/rewards-illustration.svg' w='300px' />
-      </Flex>
-      <Flex align='end' justify='start' my={4}>
-        <Box className={`${VARIANT}-${colorMode}-halfContainerBody2`}>
-        <Button bg={'transparent'} _hover={{bg: 'transparent'}}>Epoch 1</Button>
-        </Box>
-        {/* <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} />  */}
-      </Flex>
-      <Flex gap={6} className={`${VARIANT}-${colorMode}-halfContainerBody2`} my={4} p={4} align={'center'}>
-          <PointBox title='Ending On' value={
-            // Time for 4 weeks from now
-            new Date('31 Aug 2023').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
-          } tbd={true} />
-          <PointDivider />
-          <PointBox title='Total Rewards' value={tokenFormatter.format(1000000) + ' ' + process.env.NEXT_PUBLIC_TOKEN_SYMBOL} tbd={true} />
-          <PointDivider />
-          <PointBox title='Your Points' value={tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)} />
-          <PointDivider />
-          <PointBox title='Your Volume' value={dollarFormatter.format(dex?.yourPoints?.totalVolumeUSD ?? 0)} />
-        </Flex>
-
+      <Box>
+      <Image mb={-8} src='/rewards-illustration.svg' w='300px' alt='rewards' />
       </Box>
-      <Box mt={4} pt={1} mb={20} pb={5} borderColor='whiteAlpha.50' className={`${VARIANT}-${colorMode}-containerBody`}>
-
-      <TableContainer >
-      <Table variant='simple'>
-        <Thead>
-          <Tr>
-            <Th>
-              <Flex>
-              Rank
-              </Flex>
-              </Th>
-            <Th>Account</Th>
-            <Th>Total Points</Th>
-            <Th>Total Volume (USD)</Th>
-
-            <Th isNumeric>Multiplier</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-        {dex.leaderboard?.map((_account: any, index: number): any => {
-        return <>
-          <LeaderboardRow _account={_account} index={index + 1} />
-        </>
-        })}
-        {(!isAddressInLeaderboard && address) && <LeaderboardRow _account={{id: address?.toLowerCase(), totalPoints: dex?.yourPoints?.totalPoints, totalVolumeUSD: dex?.yourPoints?.totalVolumeUSD}} index={'...'} />}
-    </Tbody>
-  </Table>
-</TableContainer>
-</Box>
+      </Flex>
+      <Flex align='end' justify='start' my={4} gap={2}>
+        {epoches.map((epoch: any, index: number) => (<>
+          <Flex align={'center'} p={2} gap={1} px={4} cursor={'pointer'} className={selectedEpoch == index ? `${VARIANT}-${colorMode}-halfButtonSelected` : `${VARIANT}-${colorMode}-halfButton`} color={selectedEpoch == index ? 'primary.400' : 'whiteAlpha.600'} onClick={()=>setSelectedEpoch(index)}>
+            <Heading fontSize={'md'}>Epoch {Number(epoch.id) + 1}</Heading>
+            {Number(epoch.id) + 1 == epoches.length && <Tag ml={2} size={'sm'} colorScheme={'green'}><Box w={1} h={1} bg={'green.400'} rounded={'full'} mr={1}/> Live</Tag>}
+          </Flex>
+        </>))}
+      </Flex>
+      <Leaderboard epochIndex={selectedEpoch} />
+      </Box>
     </>
-  )
-}
-
-const PointDivider = () => (<><Divider orientation='vertical' mt={0} h='40px' /></>)
-
-const PointBox = ({title, value, tbd = false}: any) => {
-  const { colorMode } = useColorMode();
-  return (
-    <Box>
-      <Text fontSize={'sm'} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'}>{title}</Text>
-      <Text fontSize={'lg'} color={tbd ? `${colorMode == 'dark' ? 'white' : 'black'}Alpha.500` : `${colorMode == 'dark' ? 'white' : 'black'}`}>{value}</Text>
-    </Box>
   )
 }

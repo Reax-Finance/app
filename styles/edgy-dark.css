@@ -20,6 +20,41 @@
 	background-size: 100% 51%;
 }
 
+.edgy-dark-halfButton2 {
+	background: linear-gradient(45deg, transparent 0px, #191e25 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #191e25 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-halfButton2:hover {
+	background: linear-gradient(45deg, transparent 0px, rgb(29, 34, 43) 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, rgb(29, 34, 43) 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-halfButton {
+	background: linear-gradient(45deg, transparent 0px, #191e25 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #191e25 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-halfButton:hover {
+	background: linear-gradient(45deg, transparent 0px, #343d4d 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #343d4d 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-dark-halfButtonSelected {
+	background: linear-gradient(45deg, transparent 0px, #252b36 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #252b36 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
 .edgy-dark-containerBody2 {
 	background: linear-gradient(45deg, transparent 10px, #252b36 0) bottom left,
 		linear-gradient(-135deg, transparent 10px, #252b36 0) top right;
@@ -190,15 +225,15 @@
 }
 
 .edgy-dark-iconButton {
-	background: linear-gradient(45deg, transparent 6px, #343b48 0) bottom left,
-		linear-gradient(-135deg, transparent 6px, #343b48 0) top right;
+	background: linear-gradient(45deg, transparent 4px, #343b48 0) bottom left,
+		linear-gradient(-135deg, transparent 4px, #343b48 0) top right;
 	background-repeat: no-repeat;
 	background-size: 100% 51%;
 }
 
 .edgy-dark-iconButton:hover {
-	background: linear-gradient(45deg, transparent 6px, #343b48bf 0) bottom left,
-		linear-gradient(-135deg, transparent 6px, #343b48bf 0) top right;
+	background: linear-gradient(45deg, transparent 4px, #343b48bf 0) bottom left,
+		linear-gradient(-135deg, transparent 4px, #343b48bf 0) top right;
 	background-repeat: no-repeat;
 	background-size: 100% 51%;
 }
@@ -212,13 +247,14 @@
 }
 
 .edgy-dark-selectButton {
-  background: linear-gradient(45deg, transparent 10px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 0px, #343B48 0) top right;
+  background: linear-gradient(45deg, transparent 6px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 0px, #343B48 0) top right;
   background-repeat: no-repeat;
 	background-size: 100% 51%;
 }
 
 .edgy-dark-selectButton:hover {
-  background: linear-gradient(45deg, transparent 10px, #252B36 0) bottom left, linear-gradient(-135deg, transparent 0px, #252B36 0) top right;
-  background-repeat: no-repeat;
-	background-size: 100% 51%;
+	background: linear-gradient(45deg, transparent 6px, #343B48 0) bottom left, linear-gradient(-135deg, transparent 0px, #343B48 0) top right;
+	background-repeat: no-repeat;
+	  background-size: 100% 51%;
+	  opacity: 0.6;
 }

@@ -3,11 +3,12 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
-import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, POOL, WETH_ADDRESS, defaultChain } from "../../src/const";
 import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
 import { useDexData } from "./DexDataProvider";
+import { usePerpsData } from "./PerpsDataProvider";
 
 const BalanceContext = React.createContext<BalanceValue>({} as BalanceValue);
 
@@ -32,21 +33,22 @@ function BalanceContextProvider({ children }: any) {
     const [tokens, setTokens] = React.useState<any>([]);
 	const { chain } = useNetwork();
 
-    const { pools: lendingPools, markets: selectedLendingMarket, protocols: lendingProtocols } = useLendingData();
+    const { pools: lendingPools, protocols: lendingProtocols } = useLendingData();
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault, dex } = useDexData();
+    const { positions, status: perpStatus, pairs: perpPairs } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && selectedLendingMarket.length > 0 && dexPools.length > 0 ) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && positions.length > 0 && Object.keys(perpPairs).length > 0) {
             fetchBalances(address);
         }
-    }, [(selectedLendingMarket ?? []).length, pools.length, (dexPools ?? []).length, address, status])
+    }, [pools, address, status, positions, dexPools.length, lendingPools])
 
-	const fetchBalances = async (_address?: string) => {
-        console.log("Fetching balances for:", _address);
+    const fetchBalances = async (_address?: string) => {
+        console.log("Fetching balances...");
         setStatus(Status.FETCHING);
-        const chainId = chain?.id ?? defaultChain.id;
+        const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		const helper = new ethers.Contract(
 			getAddress("Multicall2", chainId),
@@ -69,7 +71,7 @@ function BalanceContextProvider({ children }: any) {
             for(let j = 0; j < pools[i].synths.length; j++) {
                 const synth = pools[i].synths[j];
                 if(!_tokens.find((token: any) => token.id == synth.token.id)) {
-                    _tokens.push(synth.token);
+                    _tokens.push({...synth.token, synthPool: pools[i].id});
                 }
             }
         }
@@ -141,6 +143,7 @@ function BalanceContextProvider({ children }: any) {
                 ]);
             }
         }
+
         // For lending input tokens, get allowance to lending protocol
         // If wrapped token, get allowance to wrapper and borrow allowace
         // Get balance and totalSupplies of output token, debt tokens
@@ -163,6 +166,13 @@ function BalanceContextProvider({ children }: any) {
                 ]);
                 // if aweth, check allowance for wrapper
                 if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                    calls.push([
+                        market.outputToken.id,
+                        itf.encodeFunctionData("allowance", [
+                            _address,
+                            wrapperAddress
+                        ]),
+                    ]);
                     calls.push([
                         market.inputToken.id,
                         itf.encodeFunctionData("allowance", [
@@ -190,6 +200,105 @@ function BalanceContextProvider({ children }: any) {
                     itf.encodeFunctionData("balanceOf", [_address]),
                 ]);
             };
+        }
+
+        for(let j = 0; j < positions.length; j++){
+            // Lending Data
+            const marketsIndex = lendingProtocols.map((protocol: any) => protocol._lendingPoolAddress == positions[j].factory.lendingPool.toLowerCase() ? '1' : '0').indexOf('1');
+            const wrapperAddress = lendingProtocols[marketsIndex]._wrapper;
+            let markets = lendingPools[marketsIndex];
+            for(let i = 0; i < markets.length; i++) {
+                const market = markets[i];
+                // allowance to market
+                calls.push([
+                    market.inputToken.id,
+                    itf.encodeFunctionData("allowance", [
+                        positions[j].id,
+                        market.protocol._lendingPoolAddress
+                    ]),
+                ]);
+                // if aweth, check allowance for wrapper
+                if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                    calls.push([
+                        market.inputToken.id,
+                        itf.encodeFunctionData("allowance", [
+                            positions[j].id,
+                            wrapperAddress
+                        ]),
+                    ]);
+                    calls.push([
+                        market._vToken.id,
+                        vTokenInterface.encodeFunctionData("borrowAllowance", [positions[j].id, wrapperAddress]),
+                    ])
+                };
+
+                calls.push([
+                    market.outputToken.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+                // debt
+                calls.push([
+                    market._vToken.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+                calls.push([
+                    market._sToken.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+            };
+
+            // Tokens Data: Balances and User->Position Allowances
+            for(let i = 0; i < _tokens.length; i++) {
+                const token = _tokens[i];
+                calls.push([
+                    token.id,
+                    itf.encodeFunctionData("balanceOf", [positions[j].id]),
+                ]);
+                calls.push([
+                    token.id,
+                    itf.encodeFunctionData("allowance", [
+                        _address,
+                        positions[j].id,
+                    ]),
+                ]);
+            }
+            // (Position -> Token -> LendingPool) & (Position -> Token -> Token) Allowances
+            for(let i in Object.keys(perpPairs)){
+                const pair = Object.keys(perpPairs)[i];
+                const perp = perpPairs[pair];
+                // Base Token -> Lending Pool
+                calls.push([
+                    perp.token0.id,
+                    itf.encodeFunctionData("allowance", [
+                        positions[j].id,
+                        POOL
+                    ]),
+                ]);
+                // Quote Token -> Lending Pool
+                calls.push([
+                    perp.token1.id,
+                    itf.encodeFunctionData("allowance", [
+                        positions[j].id,
+                        POOL
+                    ]),
+                ]);
+                // Base Token -> Base Token
+                calls.push([
+                    perp.token0.id,
+                    itf.encodeFunctionData("allowance", [
+                        positions[j].id,
+                        perp.token0.id
+                    ]),
+                ]);
+                // Quote Token -> Quote Token
+                calls.push([
+                    perp.token1.id,
+                    itf.encodeFunctionData("allowance", [
+                        positions[j].id,
+                        perp.token1.id
+                    ]),
+                ]);
+            }
         }
 
         // check balance for lp tokens and allowance to vault
@@ -224,26 +333,34 @@ function BalanceContextProvider({ children }: any) {
             }
         }
 
-        helper.callStatic.aggregate(calls).then(async (res: any) => {
+        // split calls array in arrays of max 250 length
+        const MAX = 200;
+        let callsArray = [];
+        for (let i = 0; i < calls.length; i += MAX) {
+            callsArray.push(calls.slice(i, i + MAX));
+        }
+
+        Promise.all(callsArray.map((ar: any[]) => helper.callStatic.aggregate(ar)))
+        .then(async (res: any) => {
             const newBalances: any = {};
             const newAllowances: any = {};
             const newNonces: any = {};
             // const newTotalSupplies: any = {};
-            res = res.returnData;
             let index = 0;
+            const getReturnData = (_index: number) => res[Math.floor(_index / MAX)].returnData[_index%MAX];
             // update eth balance
-            newBalances[ADDRESS_ZERO] = BigNumber.from(res[index]).toString();
+            newBalances[ADDRESS_ZERO] = BigNumber.from(getReturnData(index)).toString();
             index++;
             // update tokens
             for(let i = 0; i < _tokens.length; i++) {
                 const token = _tokens[i];
-                newBalances[token.id] = BigNumber.from(res[index]).toString();
+                newBalances[token.id] = BigNumber.from(getReturnData(index)).toString();
                 index++;
                 if(!newAllowances[token.id]) newAllowances[token.id] = {};
-                newAllowances[token.id][routerAddress] = BigNumber.from(res[index]).toString();
+                newAllowances[token.id][routerAddress] = BigNumber.from(getReturnData(index)).toString();
                 index++;
                 if(token.isPermit){
-                    newNonces[token.id] = BigNumber.from(res[index]).toString();
+                    newNonces[token.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                 }
             }
@@ -251,7 +368,7 @@ function BalanceContextProvider({ children }: any) {
                 for(let j = 0; j < pools[i].collaterals.length; j++) {
                     const collateral = pools[i].collaterals[j];
                     if(!newAllowances[collateral.token.id]) newAllowances[collateral.token.id] = {};
-                    newAllowances[collateral.token.id][pools[i].id] = BigNumber.from(res[index]).toString();
+                    newAllowances[collateral.token.id][pools[i].id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                 }
             }
@@ -261,38 +378,101 @@ function BalanceContextProvider({ children }: any) {
                 for(let i = 0; i < markets.length; i++) {
                     const market = markets[i];
                     if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
-                    newAllowances[market.inputToken.id][market.protocol._lendingPoolAddress] = BigNumber.from(res[index]).toString();
+                    newAllowances[market.inputToken.id][market.protocol._lendingPoolAddress] = BigNumber.from(getReturnData(index)).toString();
                     index++;
-                    newNonces[market.outputToken.id] = BigNumber.from(res[index]).toString();
+                    newNonces[market.outputToken.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                     if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
-                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        if(!newAllowances[market.outputToken.id]) newAllowances[market.outputToken.id] = {};
+                        newAllowances[market.outputToken.id][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
+                        index++;
+                        if(!newAllowances[market.inputToken.id]) newAllowances[market.inputToken.id] = {};
+                        newAllowances[market.inputToken.id][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
                         index++;
                         if(!newAllowances[market._vToken.id]) newAllowances[market._vToken.id] = {};
-                        newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(res[index]).toString();
+                        newAllowances[market._vToken.id][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
                         index++;
                     }
-                    newBalances[market.outputToken.id] = BigNumber.from(res[index]).toString();
+                    newBalances[market.outputToken.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
-                    newBalances[market._vToken.id] = BigNumber.from(res[index]).toString();
+                    newBalances[market._vToken.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
-                    newBalances[market._sToken.id] = BigNumber.from(res[index]).toString();
+                    newBalances[market._sToken.id] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                }
+            }
+            for(let j = 0; j < positions.length; j++){
+                const marketsIndex = lendingProtocols.map((protocol: any) => protocol._lendingPoolAddress == positions[j].factory.lendingPool.toLowerCase() ? '1' : '0').indexOf('1');
+                const wrapperAddress = lendingProtocols[marketsIndex]._wrapper;
+                let markets = lendingPools[marketsIndex];
+                for(let i = 0; i < markets.length; i++) {
+                    const market = markets[i];
+                    let inputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market.inputToken.id, positions[j].id]));
+                    let outputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market.outputToken.id, positions[j].id]));
+                    let vTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market._vToken.id, positions[j].id]));
+                    let sTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [market._sToken.id, positions[j].id]));
+
+                    if(!newAllowances[inputTokenHash]) newAllowances[inputTokenHash] = {};
+                    newAllowances[inputTokenHash][market.protocol._lendingPoolAddress] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    if(market.inputToken.id == WETH_ADDRESS(chainId)?.toLowerCase()) {
+                        newAllowances[inputTokenHash][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
+                        index++;
+                        if(!newAllowances[vTokenHash]) newAllowances[vTokenHash] = {};
+                        newAllowances[vTokenHash][wrapperAddress] = BigNumber.from(getReturnData(index)).toString();
+                        index++;
+                    }
+                    newBalances[outputTokenHash] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    newBalances[vTokenHash] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    newBalances[sTokenHash] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                }
+
+                // Tokens Data: Balances and User->Position Allowances
+                for(let i = 0; i < _tokens.length; i++) {
+                    const token = _tokens[i];
+                    let tokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [token.id, positions[j].id]));
+                    newBalances[tokenHash] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    if(!newAllowances[token.id]) newAllowances[token.id] = {};
+                    newAllowances[token.id][positions[j].id] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                }
+                // (Position -> Token -> LendingPool) & (Position -> Token -> Token) Allowances
+                for(let i in Object.keys(perpPairs)){
+                    const pair = Object.keys(perpPairs)[i];
+                    const perp = perpPairs[pair];
+                    let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [perp.token0.id, positions[j].id]));
+                    let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [perp.token1.id, positions[j].id]));
+                    if(!newAllowances[baseHash]) newAllowances[baseHash] = {};
+                    newAllowances[baseHash][POOL] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    if(!newAllowances[quoteHash]) newAllowances[quoteHash] = {};
+                    newAllowances[quoteHash][POOL] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    if(!newAllowances[baseHash]) newAllowances[baseHash] = {};
+                    newAllowances[baseHash][perp.token0.id] = BigNumber.from(getReturnData(index)).toString();
+                    index++;
+                    if(!newAllowances[quoteHash]) newAllowances[quoteHash] = {};
+                    newAllowances[quoteHash][perp.token1.id] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                 }
             }
             for(let i = 0; i < dexPools.length; i++) {
                 const dexPool = dexPools[i];
-                newBalances[dexPool.address] = BigNumber.from(res[index]).toString();
+                newBalances[dexPool.address] = BigNumber.from(getReturnData(index)).toString();
                 index++;
                 if(!newAllowances[dexPool.address]) newAllowances[dexPool.address] = {};
-                newAllowances[dexPool.address][dex.miniChef] = BigNumber.from(res[index]).toString();
+                newAllowances[dexPool.address][dex.miniChef] = BigNumber.from(getReturnData(index)).toString();
                 index++;
-                newNonces[dexPool.address] = BigNumber.from(res[index]).toString();
+                newNonces[dexPool.address] = BigNumber.from(getReturnData(index)).toString();
                 index++;
                 for(let j = 0; j < dexPool.tokens.length; j++) {
                     const token = dexPool.tokens[j].token;
                     if(!newAllowances[token.id]) newAllowances[token.id] = {};
-                    newAllowances[token.id][vault.address] = BigNumber.from(res[index]).toString();
+                    newAllowances[token.id][vault.address] = BigNumber.from(getReturnData(index)).toString();
                     index++;
                 }
             }
@@ -302,6 +482,7 @@ function BalanceContextProvider({ children }: any) {
             setNonces(newNonces);
         })
         .catch((err: any) => {
+            console.log("Failed to fetch balances", err);
             setStatus(Status.ERROR);
         })
 	};
@@ -316,7 +497,7 @@ function BalanceContextProvider({ children }: any) {
         let events = tx.events.filter((event: any) => event.topics[0] == tokenItf.getEventTopic("Transfer"));
         // Decode events
         let decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Transfer", event.data, event.topics)}});
-        console.log("transfers", decodedEvents);
+        console.log("Transfers:", decodedEvents);
         const newBalances = {...walletBalances};
         for(let i in decodedEvents){
             let isOut = decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase();
@@ -351,7 +532,7 @@ function BalanceContextProvider({ children }: any) {
         // Decode events
         decodedEvents = events.map((event: any) => {return {token: event.address.toLowerCase(), args: tokenItf.decodeEventLog("Approval", event.data, event.topics)}});
         let newAllowances = {...allowances};
-        console.log("approvals", decodedEvents);
+        console.log("Approvals:", decodedEvents);
         for(let i in decodedEvents){
             if(decodedEvents[i].args[0].toLowerCase() == address?.toLowerCase()){
                 if(!newAllowances[decodedEvents[i].token]) newAllowances[decodedEvents[i].token] = {};

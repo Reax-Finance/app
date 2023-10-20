@@ -22,10 +22,10 @@ export default function Position({ poolIndex }: any) {
 	return (
 		<>
 			{Big(pos?.collateral).gt(0) ? (
-				<Box
-					mb={-5}
+				<Flex
+					flexDir={'column'}
+					wrap={"wrap"}
 					w="100%"
-					display={{ sm: "block", md: "block" }}
 					className={`${VARIANT}-${colorMode}-halfContainerBody`}
 				>
 					<Flex
@@ -227,8 +227,7 @@ export default function Position({ poolIndex }: any) {
 							</Box>
 						</motion.div>
 					</Flex>
-					
-				</Box>
+				</Flex>
 			) : (
 				<></>
 			)}

@@ -30,7 +30,7 @@ import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import { VARIANT } from "../../../styles/theme";
 
-export default function Deposit({ collateral, amount, setAmount, isNative }: any) {
+export default function Deposit({ collateral, amount, setAmount, isNative, onClose }: any) {
 
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -194,7 +194,7 @@ export default function Deposit({ collateral, amount, setAmount, isNative }: any
 			setAmount('0');
 			setApproveMax(false);
 			setApprovedAmount('0');
-			
+			onClose();
 			setLoading(false);
 			toast({
 				title: "Deposit Successful",

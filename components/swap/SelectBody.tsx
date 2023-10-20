@@ -13,9 +13,8 @@ export default function SelectBody({ asset, onOpen }: any) {
 				align={"center"}
 				px={2}
 				py={2}
-				pr={2}
+				pr={1}
 				gap={1.5}
-				mr={-1}
 			>
 				<Image
 					src={"/icons/" + asset?.symbol + ".svg"}
@@ -24,7 +23,6 @@ export default function SelectBody({ asset, onOpen }: any) {
 					width={26}
 					alt={asset?.symbol}
 				/>
-
 				<Text fontSize="lg" color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}>
 					{asset?.symbol}
 				</Text>

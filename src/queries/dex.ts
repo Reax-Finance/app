@@ -57,7 +57,7 @@ export const query_dex = (address: string) => (`
             }
             tokensList
             totalShares
-            snapshots(first:7){
+            snapshots(first:7, orderBy: timestamp, orderDirection: desc){
               swapVolume
               swapFees
               timestamp
@@ -70,16 +70,55 @@ export const query_dex = (address: string) => (`
 
 export const query_leaderboard = (address: string) => (`
 {
-    users(first: 49, orderBy: totalPoints, orderDirection: desc){
+    epoches{
+      id
+      totalVolumeUSD
+      userCount
+      totalPoints
+      merkleRoot
+      rewardsContract
+      users(first: 49, orderBy: totalPoints, orderDirection: desc){
+          id
+          address
+          totalPoints
+          totalVolumeUSD
+      }
+      startAt
+      endAt
+    }
+    epochUsers(where: {address_in: ["${address}"]}) {
+      epoch{
         id
-        totalPoints
-        totalVolumeUSD
+      }
+      claim
+      claimAmount
+      address
+      totalPoints
+      totalVolumeUSD
     }
-    user(id: "${address}") {
-        totalPoints
-        totalVolumeUSD
-    }
-}`)
+  }`)
+
+  export const query_claim_rewards = (address: string, epoch: string) =>(
+   `{
+         epoch(id: "${epoch}") {
+          rewardsContract
+          users(where: {address: "${address}"}) {
+            claim
+            claimAmount
+          }
+        }
+    }`
+  )
+
+//   {
+//     epoch(id: "0") {
+//       rewardsContract
+//       users(where: {address: "0xbf59b84c9a7ad688d87abe3357f70039c1540006"}) {
+//         claim
+//         claimAmount
+//       }
+//     }
+//   }
 
 
 export const query_minichef = (address: string) => (`

@@ -4,16 +4,16 @@ import {
 	useColorMode,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
-import { AppDataContext } from "../components/context/AppDataProvider";
-import SupplyTable from "../components/dashboard/lending/SupplyTable";
-import BorrowTable from "../components/dashboard/lending/BorrowTable";
+import { AppDataContext } from "../../components/context/AppDataProvider";
+import SupplyTable from "../../components/dashboard/lending/SupplyTable";
+import BorrowTable from "../../components/dashboard/lending/BorrowTable";
 import { motion } from "framer-motion";
 import Head from "next/head";
-import YourSupplies from "../components/dashboard/lending/YourSupplies";
-import YourBorrows from "../components/dashboard/lending/YourBorrows";
-import LendingMarket from "../components/dashboard/lending/Market";
-import LendingPosition from "../components/dashboard/lending/Position";
-import { VARIANT } from "../styles/theme";
+import YourSupplies from "../../components/dashboard/lending/YourSupplies";
+import YourBorrows from "../../components/dashboard/lending/YourBorrows";
+import LendingMarket from "../../components/dashboard/lending/Market";
+import LendingPosition from "../../components/dashboard/lending/Position";
+import { VARIANT } from "../../styles/theme";
 
 export default function Lend() {
 	const { pools, tradingPool, account } = useContext(AppDataContext);
@@ -36,24 +36,23 @@ export default function Lend() {
 			</Head>
 				<Box w={'100%'}>
 				
-				<Box mt={20} mb={2}>
+				<Box pt={20} pb={4} my={2}>
 					<LendingMarket />
 				</Box>
 
-				<Box>
+				<Box my={2}>
 					<LendingPosition />
 				</Box>
 
-				<Box mt={5} w='100%'>
+				<Box w='100%' my={4}>
 					<Flex
 						flexDir={{ sm: "column", md: "row" }}
 						align={"stretch"}
-						gap={"2%"}
 						zIndex={1}
+						gap={4}
 					>
 						<Box
 							w={{ sm: "100%", md: "49%" }}
-							
 						>
 							<motion.div
 								initial={{ opacity: 0, y: 15 }}
@@ -87,13 +86,12 @@ export default function Lend() {
 					</Flex>
 				</Box>
 
-				<Box pb={"70px"} w='100%'>
+				<Box pb={"70px"} w='100%' my={2}>
 					<Flex
 						flexDir={{ sm: "column", md: "row" }}
 						align={"stretch"}
-						gap={"2%"}
 						zIndex={1}
-						mt={5}
+						gap={4}
 					>
 						<Box
 							w={{ sm: "100%", md: "49%" }}

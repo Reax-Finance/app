@@ -36,6 +36,7 @@ import Redeem from "./Redeem";
 import Supply from "./Supply";
 import { useSyntheticsData } from "../../context/SyntheticsPosition";
 import { VARIANT } from "../../../styles/theme";
+import { useRouter } from "next/router";
 
 export default function SupplyModal({
 	market,
@@ -51,7 +52,9 @@ export default function SupplyModal({
 
 	const { prices } = usePriceData();
 	const { lendingPosition } = useSyntheticsData();
-	const pos = lendingPosition();
+	
+	const router = useRouter();
+	const pos = lendingPosition(Number(router.query.market) || 0);
 
 	const _setAmount = (e: string) => {
 		e = parseInput(e);
@@ -81,16 +84,22 @@ export default function SupplyModal({
 				.toFixed(market.inputToken.decimals);
 		} else {
             if(!prices[market.inputToken.id]) return "0";
+			
 			// values in market.inputToken
 			const v1 = Big(pos.availableToIssue).div(prices[market.inputToken.id]).mul(100).div(market.maximumLTV);
 			const v2 = Big(walletBalances[market.outputToken.id] ?? 0).div(10 ** market.outputToken.decimals);
 			// Available to withdraw from pool
-			const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
-			
+			// const v3 = Big(market.totalDepositBalanceUSD).sub(market.totalBorrowBalanceUSD).div(prices[market.inputToken.id]);
+
+			// If not collateral, return all balance
+			if(!market.isCollateral){
+				return v2.toString();
+			}
+
 			// find minimum of (v1, v2, v3)
 			let min = v1;
 			if(v2.lt(min)) min = v2;
-			if(v3.lt(min)) min = v3;
+			// if(v3.lt(min)) min = v3;
 			if(min.lt(0)) min = Big(0);
 
 			return min.toString();
@@ -205,7 +214,7 @@ export default function SupplyModal({
 										onClick={() => _setAmount(Big(max()).toFixed(market.inputToken.decimals))}
 										my={-1}
 									>
-										{tabSelected == 1 ? 'CLOSE' : 'MAX'}
+										{tabSelected == 1 && isMax ? 'CLOSE' : 'MAX'}
 									</Button>
 									</Box>
 								</Flex>
@@ -213,6 +222,7 @@ export default function SupplyModal({
 						</InputGroup>
 					</Box>
 					<Box className={`${VARIANT}-${colorMode}-containerFooter`}>
+					<Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.300'}/>
 					<Tabs variant={'enclosed'} onChange={selectTab}>
 						<TabList>
 							<Tab

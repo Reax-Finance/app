@@ -13,7 +13,7 @@ import StableDepositLayout from "./layouts/StableDepositLayout";
 import { parseInput } from "../../../utils/number";
 import useHandleError, { PlatformType } from "../../../utils/useHandleError";
 
-export default function SingleTokenDeposit({ pool }: any) {
+export default function SingleTokenDeposit({ pool, onClose }: any) {
     const poolTokens = pool.tokens.filter((token: any) => token.token.id != pool.address);
     const indexOfPoolToken = pool.tokens.findIndex((token: any) => token.token.id == pool.address);
 
@@ -61,6 +61,7 @@ export default function SingleTokenDeposit({ pool }: any) {
 			setLoading(false);
 			setAmount('0');
             setIsNative(false);
+            onClose();
 		})
 		.catch((err: any) => {
 			handleBalError(err);

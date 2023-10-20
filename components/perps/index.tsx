@@ -1,30 +1,34 @@
 import React from 'react'
 import TradingViewWidget from './TradingViewWidget'
-import { useRouter } from 'next/router';
-import { useLendingData } from '../context/LendingDataProvider';
-import { Heading } from '@chakra-ui/react';
-import { PERP_CATEGORIES } from '../../src/const';
+import { Box, Divider, Flex, Heading, useColorMode } from '@chakra-ui/react';
+import { useBalanceData } from '../context/BalanceProvider';
+import TitleBar from './TitleBar';
+import Trade from './trade';
+import Positions from './positions';
+import { VARIANT } from '../../styles/theme';
 
-export default function Perps({category}: any) {
-    const router = useRouter();
-    const { asset } = router.query;
-    const { markets } = useLendingData();
-    
-    if(!PERP_CATEGORIES[category]) router.push(`/perps/${Object.keys(PERP_CATEGORIES)[0]}`)
+export default function Perps({pair}: any) {
+    const { tokens : allTokens } = useBalanceData();
+    const {colorMode} = useColorMode();
 
-    const categoryMarkets = markets.filter((market: any) => market.eModeCategory?.id == category);
-    if(categoryMarkets.length == 0) return <></> 
-    if(!asset) {
-        router.push(`/perps/${category}?asset=${categoryMarkets[0].inputToken.symbol}`);
-        return <></>
-    }
-
-    // remove lowercase chars from asset
-    let parsedAsset = (asset as string).replace(/[^A-Z]/g, '');
+    if(allTokens.length == 0) return <></>;
 
     return (
         <>
-            {asset && <TradingViewWidget asset={parsedAsset}/>}
+            <Box className={`${VARIANT}-${colorMode}-containerBody2`} mb={4} mt={10} px={5}>
+                <TitleBar />
+            </Box>
+            <Flex gap={2}>
+                <Box w={'65%'}>
+                    {pair && <TradingViewWidget/>}
+                </Box>
+                <Divider orientation="vertical" h={'100%'} />
+                <Box w={'35%'} className={`${VARIANT}-${colorMode}-containerBody`}>
+                    <Trade />
+                </Box>
+            </Flex>
+            <Positions />
+
         </>
     )
 }

@@ -35,6 +35,9 @@ import { BalanceContext, BalanceContextProvider } from "../components/context/Ba
 import { PriceContextProvider } from "../components/context/PriceContext";
 import { SyntheticsPositionProvider } from "../components/context/SyntheticsPosition";
 import { DEXDataProvider } from "../components/context/DexDataProvider";
+import { mantleMainnet, mantleTestnet } from "../src/chains";
+import { PerpsDataProvider } from "../components/context/PerpsDataProvider";
+
 
 const _chains = []
 _chains.push(defaultChain);
@@ -83,6 +86,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 				<RainbowKitProvider chains={chains} modalSize="compact" theme={rainbowTheme}>
 					<AppDataProvider>
 						<LendingDataProvider>
+							<PerpsDataProvider>
+								
 							<DEXDataProvider>
 							<BalanceContextProvider>
 								<PriceContextProvider>
@@ -96,6 +101,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 								</PriceContextProvider>
 							</BalanceContextProvider>
 							</DEXDataProvider>
+							</PerpsDataProvider>
+
 						</LendingDataProvider>
 					</AppDataProvider>
 				</RainbowKitProvider>

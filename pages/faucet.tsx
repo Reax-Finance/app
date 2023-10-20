@@ -142,7 +142,7 @@ export default function Faucet() {
 						<Tr>
 							<ThBox>Asset</ThBox>
 							<ThBox>Mint Amount</ThBox>
-							<ThBox isNumeric>.</ThBox>
+							<ThBox isNumeric></ThBox>
 						</Tr>
 					</Thead>
 					<Tbody>

@@ -15,6 +15,7 @@ interface DEXDataValue {
 	fetchData: (address?: string) => Promise<number>;
 	dex: any;
 	updateStakeBalance: (poolAddress: string, value: string, isMinus: boolean) => void;
+	epoches: any[];
 }
 
 const DEXDataContext = React.createContext<DEXDataValue>({} as DEXDataValue);
@@ -25,6 +26,7 @@ function DEXDataProvider({ children }: any) {
 	const { chain } = useNetwork();
 	const [pools, setPools] = React.useState<any[]>([]);
 	const [vault, setVault] = React.useState<any>({});
+	const [epoches, setEpoches] = React.useState<any[]>([]);
 	const [dex, setDex] = React.useState<any>({});
 
 	const fetchData = (_address?: string): Promise<number> => {
@@ -55,8 +57,16 @@ function DEXDataProvider({ children }: any) {
 					reject(res[0].data.errors ?? res[1].data.errors ?? res[2].data.errors);
 				} else {
 					let _dex: any = {};
-					_dex.leaderboard = res[2].data.data?.users;
-					_dex.yourPoints = res[2].data.data?.user;
+					let _epoches = res[2].data.data?.epoches;
+					for(let i in res[2].data.data?.epochUsers){
+						for(let j in _epoches){
+							if(_epoches[j].id == res[2].data.data?.epochUsers[i].epoch.id){
+								_epoches[j].user = res[2].data.data?.epochUsers[i];
+							}
+						}
+					}
+					// reverse epoches
+					setEpoches(_epoches.reverse());
 					_dex.totalLiquidity = res[0].data.data.balancers[0].totalLiquidity;
 					_dex.totalSwapVolume = res[0].data.data.balancers[0].totalSwapVolume;
 					_dex.totalSwapFee = res[0].data.data.balancers[0].totalSwapFee;
@@ -122,7 +132,8 @@ function DEXDataProvider({ children }: any) {
 		vault,
 		fetchData,
 		dex,
-		updateStakeBalance
+		updateStakeBalance,
+		epoches
 	};
 
 	return (

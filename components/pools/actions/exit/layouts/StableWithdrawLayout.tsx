@@ -116,7 +116,7 @@ export default function StableWithdrawLayout({
                                 fontWeight={"normal"}
                                 textDecor={'underline'}
                                 textDecorationStyle="dashed"
-                                onClick={() => setMax(0.999)}
+                                onClick={() => setMax(1)}
                             >
                                 MAX
                             </Button>

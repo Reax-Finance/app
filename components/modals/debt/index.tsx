@@ -47,17 +47,6 @@ export default function Debt({ synth, index }: any) {
 	const [amount, setAmount] = React.useState("");
 	const [amountNumber, setAmountNumber] = useState(0);
 	const [tabSelected, setTabSelected] = useState(0);
-	const [isSuccess, setIsSuccess] = useState(false);
-	const [successData, setSuccessData] = useState({});
-
-	const onSuccess = (hash: string, type: 'MINT'|'BURN', successAmount: string) => {
-		setIsSuccess(true);
-		setSuccessData({
-			hash,
-			type,
-			amount: successAmount
-		})
-	}
 
 	const { address } = useAccount();
 
@@ -65,7 +54,7 @@ export default function Debt({ synth, index }: any) {
 
 	const { prices } = usePriceData();
 	const { position } = useSyntheticsData();
-	const pos = position();
+	const pos = position(0);
 
 	const _onClose = () => {
 		setAmount("");
@@ -100,7 +89,7 @@ export default function Debt({ synth, index }: any) {
 		} else {
 			const v1 = Big(pos.debt ?? 0).div(prices[synth.token.id] ?? 0);
 			const v2 = Big(walletBalances[synth.token.id] ?? 0).div(10 ** 18);
-			return (v1.gt(v2) ? v2 : v1).toString();
+			return (v1.gt(v2) ? v2 : v1).toFixed(18);
 		}
 	};
 
@@ -245,7 +234,7 @@ export default function Debt({ synth, index }: any) {
 											variant={"unstyled"}
 											fontSize="sm"
 											fontWeight={"bold"}
-											onClick={() => _setAmount(Big(max()).div(2).toString())}
+											onClick={() => _setAmount(Big(max()).div(2).toFixed(18))}
 											py={-2}
 										>
 											50%
@@ -254,7 +243,7 @@ export default function Debt({ synth, index }: any) {
 											variant={"unstyled"}
 											fontSize="sm"
 											fontWeight={"bold"}
-											onClick={() => _setAmount(Big(max()).mul(0.99).toString())}
+											onClick={() => _setAmount(Big(max()).toFixed(18))}
 										>
 											MAX
 										</Button>
@@ -298,7 +287,7 @@ export default function Debt({ synth, index }: any) {
 										amount={amount}
 										amountNumber={amountNumber}
 										setAmount={_setAmount}
-										onSuccess={onSuccess}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 								<TabPanel m={0} p={0}>
@@ -307,6 +296,7 @@ export default function Debt({ synth, index }: any) {
 										amount={amount}
 										amountNumber={amountNumber}
 										setAmount={_setAmount}
+										onClose={_onClose}
 									/>
 								</TabPanel>
 							</TabPanels>

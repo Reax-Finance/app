@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/NavBar/Navbar';
@@ -10,6 +10,8 @@ import { useRouter } from 'next/router';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 import { Status } from '../components/utils/status';
 import { defaultChain } from '../src/const';
+import { usePriceData } from '../components/context/PriceContext';
+import Success from '../components/modals/debt/Success';
 
 export default function Index({ children }: any) {
 	const router = useRouter();
@@ -39,6 +41,8 @@ export default function Index({ children }: any) {
 
 	const [hydrated, setHydrated] = useState(false);
 	const { status, message } = useContext(AppDataContext);
+	const { status: priceStatus } = usePriceData();
+
 	const { chain } = useNetwork();
 
 	useEffect(() => {
@@ -101,7 +105,7 @@ export default function Index({ children }: any) {
 					Switch to {defaultChain.name}
 				</Button>
 			</Flex>}
-			{(status == Status.FETCHING || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
+			{(status == Status.FETCHING || priceStatus !== Status.SUCCESS || loading) && <Progress bg={'blackAlpha.200'} colorScheme='primary' size='xs' isIndeterminate />}
 
 			<Box bgColor="gray.800" color={'gray.400'}>
 			{status == Status.ERROR && (
@@ -115,8 +119,6 @@ export default function Index({ children }: any) {
 				</Text>
 			)}
 			</Box>
-
-			
 			{/* <Box bgGradient={'linear(to-b, #090B0F, #090B0F)'} zIndex={0}> */}
 			<Box bgGradient={colorMode == 'dark' ? 'linear(to-b, blackAlpha.500, blackAlpha.800)' : 'linear(to-b, blackAlpha.200, blackAlpha.400)'} zIndex={0}>
 				<Flex
@@ -127,7 +129,6 @@ export default function Index({ children }: any) {
 					>
 					<Box zIndex={2} minW={{sm: '0', md: '0', lg: '1200px'}} w={'100%'} px={{sm: '4', md: '0'}}>
 						<Flex justify='center'>
-						
 							<Box minW={'0'} w='100%' maxW={'1200px'}>
 						<Navbar />
 						<motion.div 
@@ -137,8 +138,12 @@ export default function Index({ children }: any) {
 							transition={{duration: 0.25}}
 						>
 							<Box zIndex={1}>
-							
-							{children}
+								{process.env.NEXT_PUBLIC_UNDER_MAINTAINANCE == "true" ? <Flex h={'80vh'} align={'center'} justify={'center'}>
+									<Box textAlign={'center'}>
+									<Heading>App in under maintainance</Heading>
+									<Text color={'whiteAlpha.600'}>Please Check Back Again in a moment</Text>
+									</Box>
+								</Flex>:<>{children}</>}
 							</Box>
 						</motion.div>
 						</Box>

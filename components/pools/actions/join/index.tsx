@@ -65,10 +65,10 @@ export default function Join({ pool, isOpen, onClose }: any) {
 
 						<TabPanels>
 							<TabPanel p={0}>
-								<SingleTokenJoin pool={pool} />
+								<SingleTokenJoin pool={pool} onClose={onClose} />
 							</TabPanel>
 							<TabPanel p={0}>
-								<ProportionalJoin pool={pool} />
+								<ProportionalJoin pool={pool} onClose={onClose} />
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

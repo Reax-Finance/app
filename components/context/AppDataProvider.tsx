@@ -52,13 +52,12 @@ function AppDataProvider({ children }: any) {
 	const [block, setBlock] = React.useState(0);
 
 	const fetchData = (_address?: string): Promise<number> => {
-		let chainId = chain?.id ?? defaultChain.id;
-		if(chain?.unsupported) chainId = defaultChain.id;
-		console.log("fetching for chain", chainId);
+		let chainId = defaultChain.id;
+		console.log("Fetching data for chain", chainId);
 		return new Promise((resolve, reject) => {
 			setStatus(Status.FETCHING);
 			const endpoint = Endpoints(chainId)
-			console.log("endpoint", endpoint);
+			console.log("Endpoint", endpoint);
 			if(!_address) _address = ADDRESS_ZERO;
 			Promise.all([
 				axios.post(endpoint, {
