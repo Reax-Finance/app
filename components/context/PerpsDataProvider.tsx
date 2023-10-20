@@ -49,7 +49,8 @@ function PerpsDataProvider({ children }: any) {
 						reject(res[0].data.errors);
 					} else {
 						let _positions = res[0].data.data.user?.positions ?? [];
-						console.log("positions", _positions);
+						const requestPositionData = [];
+						https://perps-position-testnet.reax.one/positions?userId=0xb2e2436a6d705d469cc45cadb77cb56032849299&lendingPool=reaxCryptoLending
 						getAndSetPositionData(_positions, _address!)
 					}
 				})
@@ -75,7 +76,6 @@ function PerpsDataProvider({ children }: any) {
 						lendingPool: POOL
 					}
 				})
-				console.log("_positions", _positions);
 				setPositions(_positions);
 				setStatus(Status.SUCCESS);
 			})
