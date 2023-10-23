@@ -126,7 +126,7 @@ export default function PairSelector() {
 							boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
 						}}
 					>
-						<Box shadow={'2xl'} className={`${VARIANT}-${colorMode}-containerBody2`}>
+						<Box shadow={'2xl'} mt={5} bg={'darkBg.200'} >
 
 						{/* <Divider /> */}
 
@@ -141,7 +141,7 @@ export default function PairSelector() {
 									key={index}
 								>
 									<Box
-										_hover={{ bg: "bg.200" }}
+										_hover={{ bg: "darkBg.400" }}
 										cursor="pointer"
 										px={4}
 										my={0}
@@ -158,11 +158,12 @@ export default function PairSelector() {
 													{pair}
 												</Heading>
 											</Flex>
-											<Flex>
+											<Box textAlign={'end'}>
+												<Text fontSize={'xs'} mb={-1} color={'whiteAlpha.600'}>Price</Text>
 												<Text>{
 													(Number(prices[pairs[pair]?.token0?.id] ?? 0) / Number(prices[pairs[pair]?.token1?.id] ?? 0)).toFixed(4)
 												}</Text>
-											</Flex>
+											</Box>
 										</Flex>
 									</Box>
 									{index !== Object.keys(pairs).length -1 && <Divider />}
