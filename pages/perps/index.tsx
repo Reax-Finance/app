@@ -6,7 +6,9 @@ import { usePerpsData } from '../../components/context/PerpsDataProvider';
 export default function Perps() {
   const router = useRouter();
   const {pairs} = usePerpsData();
-  router.push(`/perps/${Object.keys(pairs)[0]}`)
+
+  if(Object.keys(pairs).length > 0) router.push(`/perps/${Object.keys(pairs)[0]}`);
+
   return (
     <Flex opacity={'0.8'} flexDir={'column'} align={'center'}>
         <Box mt={'22vh'} className='comingSoonText'>

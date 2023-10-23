@@ -471,8 +471,8 @@ export default function Long() {
                     src={`/icons/${
                       (pair as string).split("-")[0]
                     }.svg`}
-                    w={"26"}
-                    h={"26"}
+                    w={30}
+                    h={30}
                     alt={(pair as string).split("-")[0]}
                   />
                   <Text

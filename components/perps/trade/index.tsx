@@ -17,7 +17,7 @@ export default function Trade() {
 	return (
 		<>
 			<Tabs variant={"enclosed"}>
-				<TabList className={VARIANT + "-" + colorMode + "-" + "containerHeader"}>
+				<TabList bg={colorMode + 'Bg.400'}>
 					<Tab
 						w={"50%"}
 						_selected={{
@@ -27,12 +27,12 @@ export default function Trade() {
 						rounded={0}
 						borderTop={0}
 						borderX={0}
-						p={3}
+						p={2}
 						fontWeight={'medium'}
 					>
 						Long
 					</Tab>
-                    <Divider orientation="vertical" h={'50px'} />
+                    <Divider orientation="vertical" h={'40px'} />
 					<Tab
 						w={"50%"}
 						_selected={{

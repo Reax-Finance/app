@@ -18,9 +18,9 @@ export default function SelectBody2({ asset, onOpen }: any) {
 			>
 				<Image
 					src={"/icons/" + asset?.symbol + ".svg"}
-					height={26}
+					height={30}
 					style={{margin: "4px"}}
-					width={26}
+					width={30}
 					alt={asset?.symbol}
 				/>
 				

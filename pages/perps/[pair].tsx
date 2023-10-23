@@ -11,10 +11,12 @@ export default function PerpsPair() {
 
   if(!pair) return <></>;
 
-  const selectedCategory = Object.keys(pairs).filter((i: any) => i == pair);
-  if(selectedCategory.length == 0) {
-    router.push(`/perps/${Object.keys(pairs)[0]}`)
-    return <></>
+  if(Object.keys(pairs).length > 0){ 
+    const selectedCategory = Object.keys(pairs).filter((i: any) => i == pair);
+    if(selectedCategory.length == 0) {
+      router.push(`/perps/${Object.keys(pairs)[0]}`)
+      return <></>
+    }
   }
 
   return (

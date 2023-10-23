@@ -15,7 +15,7 @@ export default function Perps({pair}: any) {
 
     return (
         <>
-            <Box className={`${VARIANT}-${colorMode}-containerBody2`} mb={4} mt={10} px={5}>
+            <Box className={`${VARIANT}-${colorMode}-containerHeader`} mb={4} mt={10} px={5}>
                 <TitleBar />
             </Box>
             <Flex gap={2} align={'stretch'}>
@@ -23,7 +23,7 @@ export default function Perps({pair}: any) {
                     {pair && <TradingViewWidget pair={pair}/>}
                 </Box>
                 <Divider orientation="vertical" h={'100%'} />
-                <Box w={'35%'} className={`${VARIANT}-${colorMode}-containerBody`}>
+                <Box w={'35%'} bg={colorMode + 'Bg.600'}>
                     <Trade />
                 </Box>
             </Flex>
