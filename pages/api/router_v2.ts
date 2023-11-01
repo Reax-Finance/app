@@ -42,6 +42,7 @@ export default async function handler(
   }
   catch (error) {
     console.log("Error @ getPath", error)
+    return res.status(500).send({ status: false, error: ERROR.INTERNAL_SERVER_ERROR })
   }
 }
 
