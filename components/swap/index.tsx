@@ -52,8 +52,7 @@ function Swap() {
 	const { signTypedDataAsync } = useSignTypedData();
 	const [deadline, setDeadline] = useState('0');
 
-	const { walletBalances, updateFromTx, tokens: _tokens, allowances, nonces, addNonce } = useBalanceData();
-    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
+	const { walletBalances, updateFromTx, liquidTokens: tokens, allowances, nonces, addNonce } = useBalanceData();
 
 	const handleError = useHandleError(PlatformType.DEX);
 

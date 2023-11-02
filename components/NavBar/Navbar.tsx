@@ -134,12 +134,17 @@ function NavBar() {
 						>
 							<NavLocalLink
 								path={"/"}
-								title="Trade"
+								title="Swap"
+							></NavLocalLink>
+
+							<NavLocalLink
+								path={"/margin"}
+								title="Margin"
 							></NavLocalLink>
 
 							<NavLocalLink
 								path={"/synthetics"}
-								title={"Synths"}
+								title={"Synthetics"}
 							></NavLocalLink>
 
 							<NavLocalLink

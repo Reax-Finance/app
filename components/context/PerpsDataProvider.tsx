@@ -18,6 +18,7 @@ interface PerpsDataValue {
 	) => Promise<number>;
 	addPosition: (address: any) => void;
 	pairs: any;
+	closedPositions: any[];
 }
 
 const PerpsDataContext = React.createContext<PerpsDataValue>({} as PerpsDataValue);
@@ -55,6 +56,7 @@ function PerpsDataProvider({ children }: any) {
 					} else {
 						setPairs(res[1].data.data);
 						let _positions = res[0].data.data.user?.positions ?? [];
+						console.log(_positions);
 						getAndSetPositionData(_positions, _address!, res[1].data.data[Object.keys(res[1].data.data)[0]].perpFactory);
 					}
 				})
@@ -66,6 +68,7 @@ function PerpsDataProvider({ children }: any) {
 	};
 
 	const getAndSetPositionData = async (_positions: any[], _address: string, FACTORY: string) => {
+		console.log("Getting position data");
 		let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		let multicall = new ethers.Contract(getAddress("Multicall2", defaultChain.id), getABI("Multicall2", defaultChain.id), provider);
 		let factory = new ethers.Contract(FACTORY, getABI('PerpFactory', defaultChain.id), provider);
@@ -79,6 +82,7 @@ function PerpsDataProvider({ children }: any) {
 		
 		Promise.all(requests)
 			.then((results: any) => {
+				console.log("Got position data", results);
 				// results.returnData[0]: bytes to address
 				_positions.push({
 					id: results[results.length - 1].returnData[0].toLowerCase().replace("0x000000000000000000000000", "0x"),
@@ -87,6 +91,8 @@ function PerpsDataProvider({ children }: any) {
 						lendingPool: POOL
 					}
 				});
+
+				console.log("Positions", _positions);
 
 				let openPositions = [];
 				let closedPositions = [];
@@ -102,13 +108,18 @@ function PerpsDataProvider({ children }: any) {
 						}
 					}
 				}
-				console.log("Positions", openPositions, closedPositions);
+
+				openPositions.push(_positions[_positions.length - 1])
+
+
+				console.log("Open positions", openPositions);
+				console.log("Closed positions", closedPositions);
 				setPositions(openPositions);
 				setClosedPositions(closedPositions)
 				setStatus(Status.SUCCESS);
 			})
 			.catch((err: any) => {
-				console.log(err);
+				console.log("Failed to fetch position data", err);
 			})
 	}
 
@@ -124,7 +135,8 @@ function PerpsDataProvider({ children }: any) {
         message,
         addPosition,
         fetchData,
-		pairs
+		pairs,
+		closedPositions
     };
 
 	return (

@@ -3,7 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import * as React from "react";
 import { getABI, getAddress, getContract } from "../../src/contract";
 import { useAccount, useNetwork } from "wagmi";
-import { ADDRESS_ZERO, POOL, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, ILLIQUID_ASSETS, POOL, WETH_ADDRESS, defaultChain } from "../../src/const";
 import { useLendingData } from "./LendingDataProvider";
 import { useAppData } from "./AppDataProvider";
 import { Status } from "../utils/status";
@@ -23,6 +23,7 @@ interface BalanceValue {
     addNonce: (asset: string, value: string) => void;
     updateFromTx: (tx: any) => void;
     setBalance: (asset: string, value: string) => void;
+    liquidTokens: any[];
 }
 
 function BalanceContextProvider({ children }: any) {
@@ -40,7 +41,7 @@ function BalanceContextProvider({ children }: any) {
     const { positions, status: perpStatus, pairs: perpPairs } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && positions.length > 0 && Object.keys(perpPairs).length > 0) {
+        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && perpStatus == Status.SUCCESS && Object.keys(perpPairs).length > 0) {
             fetchBalances(address);
         }
     }, [pools, address, status, positions, dexPools.length, lendingPools])
@@ -590,6 +591,20 @@ function BalanceContextProvider({ children }: any) {
         setNonces(newNonces);
     }
 
+    const getLiquidTokens = () => {
+        const _tokens = [
+            {
+                id: ethers.constants.AddressZero,
+                symbol: chain?.nativeCurrency.symbol ?? "MNT",
+                name: chain?.nativeCurrency.name ?? "Mantle",
+                decimals: chain?.nativeCurrency.decimals ?? 18,
+                balance: walletBalances[ethers.constants.AddressZero],
+            },
+        ].concat(tokens);
+        // fillter out ILLIQUID_ASSETS
+        return _tokens.filter((token: any) => !ILLIQUID_ASSETS.includes(token.id));
+    }
+
     const value: BalanceValue = {
 		walletBalances,
         allowances,
@@ -600,8 +615,10 @@ function BalanceContextProvider({ children }: any) {
         addNonce,
         tokens,
         updateFromTx,
-        setBalance
+        setBalance,
+        liquidTokens: getLiquidTokens(),
 	};
+
 
 	return (
 		<BalanceContext.Provider value={value}>{children}</BalanceContext.Provider>

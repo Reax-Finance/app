@@ -67,7 +67,7 @@ export default function SwapLayout({
     setDeadline,
     swapData
 }: any) {
-    const { walletBalances, tokens: _tokens } = useBalanceData();
+    const { walletBalances, liquidTokens: tokens } = useBalanceData();
     const { prices } = usePriceData();
     const { account } = useAppData();
     const { chain } = useNetwork();
@@ -88,7 +88,6 @@ export default function SwapLayout({
                 })
         }
     }, [])
-    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
 	const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure()
 	const [hidden, setHidden] = useState(!isOpen);
@@ -109,9 +108,9 @@ export default function SwapLayout({
                 <Flex align={'center'} justify={'space-between'}>
                     <Flex align={'center'} gap={4}>
                         <Heading size={'sm'}>Spot</Heading>
-                        <Tooltip label={'Coming Soon'} placement={'top'}>
+                        {/* <Tooltip label={'Coming Soon'} placement={'top'}>
                         <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>Margin [10x]</Heading>
-                        </Tooltip>
+                        </Tooltip> */}
                     </Flex>
                     <Flex>
                         <Settings maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} deadline={deadline} setDeadline={setDeadline} />
