@@ -28,7 +28,6 @@ export default function Perps({pair}: any) {
                 </Box>
             </Flex>
             <Positions />
-
         </>
     )
 }

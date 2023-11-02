@@ -41,10 +41,9 @@ function TokenSelector({
 	onClose,
 }: any) {
 	const [searchedTokens, setSearchedTokens] = useState<any[]>([]);
-	const { walletBalances, tokens: _tokens } = useBalanceData();
+	const { walletBalances, liquidTokens: tokens } = useBalanceData();
 	const {chain} = useNetwork();
 	const {isConnected} = useAccount();
-    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
 	const selectToken = (tokenIndex: number) => {
 		onTokenSelected(tokenIndex);

@@ -10,7 +10,7 @@ export default function SelectBody2({ asset, onOpen }: any) {
 	const { walletBalances } = useBalanceData();
 
 	return (
-		<Flex flexDir={'column'} align={'center'} cursor="pointer" onClick={onOpen} bg={colorMode + "Bg.200"} px={2} py={'18px'} mt={"-6px"} pr={1}>
+		<Flex flexDir={'column'} align={'center'} cursor="pointer" onClick={onOpen} bg={colorMode + "Bg.200"} px={2} py={'16px'} mt={"-6px"} pr={1}>
 			<Flex
 				justify={"space-between"}
 				align={"center"}

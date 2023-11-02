@@ -26,41 +26,50 @@ export default function Positions() {
                         color={'whiteAlpha.600'}
 						_selected={{
 							color: "primary.400",
+							borderColor: "primary.400",
 						}}
 						rounded={0}
 						borderX={0}
-						p={3}
-                        pl={4}
+						borderTop={1}
+						px={5}
 						fontWeight={'medium'}
+						fontSize={'sm'}
 					>
 						Open Positions
 					</Tab>
-                    <Divider orientation="vertical" h={'50px'} mx={2} />
+                    <Divider orientation="vertical" h={'40px'} />
 					<Tab
 						color={'whiteAlpha.600'}
 						_selected={{
 							color: "primary.400",
+							borderColor: "primary.400",
 						}}
 						rounded={0}
-						border={0}
-						p={3}
+						borderX={0}
+						borderTop={1}
+						px={5}
 						fontWeight={'medium'}
+						fontSize={'sm'}
 					>
 						Closed Positions
 					</Tab>
-                    <Divider orientation="vertical" h={'50px'} mx={2} />
+                    <Divider orientation="vertical" h={'40px'} />
 					<Tab
 						color={'whiteAlpha.600'}
 						_selected={{
 							color: "primary.400",
+							borderColor: "primary.400",
 						}}
 						rounded={0}
-						border={0}
+						borderX={0}
+						borderTop={1}
+						px={5}
 						fontWeight={'medium'}
+						fontSize={'sm'}
 					>
 						History
 					</Tab>
-                    <Divider orientation="vertical" h={'50px'} mx={2} />
+                    <Divider orientation="vertical" h={'40px'} />
 				</TabList>
 
 				<TabPanels>

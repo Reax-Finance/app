@@ -131,14 +131,16 @@ function LendingDataProvider({ children }: any) {
 			provider
 		);
 		let calls = [];
+		let pythData: string[] = [];
+		if(pools.length > 0) pythData = await getUpdateData();
 		for(let i in pools){
 			if(!protocols[i]._lendingPoolAddress) continue;
 			const _pool = await getContract("LendingPool", chainId, protocols[i]._lendingPoolAddress);
-			const pythData = await getUpdateData();
 			calls.push([_pool.address, _pool.interface.encodeFunctionData("getUserAccountData((address,bytes[]))", [{user: _address, pythUpdateData: pythData}]), 0]);
 		}
 		helper.callStatic.aggregate(calls)
 		.then(async (res: any) => {
+			console.log("Got lending positions", res);
 			let resultData = res[1];
 			let _positions = [];
 			for(let i = 0; i < resultData.length; i++){
@@ -156,7 +158,7 @@ function LendingDataProvider({ children }: any) {
 			setPositions(_positions);
 		})
 		.catch((err: any) => {
-			console.log("Failed to get lending positions", err);
+			console.log("Failed to get lending positions", err, pools);
 			setPositions([[]])
 		})
 	}

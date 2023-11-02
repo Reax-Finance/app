@@ -11,8 +11,7 @@ import {
 	useColorMode
 } from "@chakra-ui/react";
 
-import { useContext, useState, useEffect } from "react";
-import { AppDataContext } from "../context/AppDataProvider";
+import { useState, useEffect } from "react";
 import { tokenFormatter } from "../../src/const";
 
 import {
@@ -25,7 +24,6 @@ import {
 	ModalCloseButton,
 } from "@chakra-ui/react";
 import { useBalanceData } from "../context/BalanceProvider";
-import { ethers } from "ethers";
 import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
@@ -39,10 +37,9 @@ function TokenSelector({
 	onClose,
 }: any) {
 	const [searchedTokens, setSearchedTokens] = useState<any[]>([]);
-	const { walletBalances, tokens: _tokens } = useBalanceData();
+	const { walletBalances, liquidTokens: tokens } = useBalanceData();
 	const {chain} = useNetwork();
 	const {isConnected} = useAccount();
-    const tokens: any[] = [{ id: ethers.constants.AddressZero, symbol: chain?.nativeCurrency.symbol ?? 'MNT', name: chain?.nativeCurrency.name ?? 'Mantle', decimals: chain?.nativeCurrency.decimals ?? 18, balance: walletBalances[ethers.constants.AddressZero] }].concat(_tokens);
 
 	const selectToken = (tokenIndex: number) => {
 		onTokenSelected(tokenIndex);

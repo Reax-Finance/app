@@ -7,7 +7,7 @@ export default function Perps() {
   const router = useRouter();
   const {pairs} = usePerpsData();
 
-  if(Object.keys(pairs).length > 0) router.push(`/perps/${Object.keys(pairs)[0]}`);
+  if(Object.keys(pairs).length > 0) router.push(`/margin/${Object.keys(pairs)[0]}`);
 
   return (
     <Flex opacity={'0.8'} flexDir={'column'} align={'center'}>

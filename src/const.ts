@@ -44,6 +44,11 @@ export const POOL_COLORS: any = {
 	0: 'linear(to-t, #002FFE, rgba(2,246,211))',
 }
 
+export const ILLIQUID_ASSETS: string[] = [
+	"0xb9821fb9e1e77ffb0f7d6b638a551d565eb882c8",
+	"0x5b156dca04f775046064032e1f5e45fd1fcca1e0"
+]
+
 export const EPOCH_REWARDS: any = {
 	1: 1_000_000,
 	2: 250_000,
@@ -58,7 +63,7 @@ export const APP_NAME = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
 
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[mantleMainnet.id]);
 
-export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://xc-testnet.pyth.network' : 'https://xc-mainnet.pyth.network';
+export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://hermes-beta.pyth.network/' : 'https://hermes.pyth.network/';
 export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://routes-api.reax.one' : 'https://mainnet.router-api.reax.one';
 export const EPOCH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://rewards-testnet-api.reax.one' : 'https://rewards-mainnet-api.reax.one';
 

@@ -11,6 +11,7 @@ import { usePerpsData } from '../../context/PerpsDataProvider';
 import { getABI } from '../../../src/contract';
 import { useNetwork } from 'wagmi';
 import CloseModal from './CloseModal';
+import CloseAllModal from './CloseAllModal';
 
 
 export default function Position({position, index}: any) {
@@ -119,12 +120,14 @@ export default function Position({position, index}: any) {
 
     const leverage = (Number(details?.collateral) / (Number(details?.collateral) - Number(details?.debt)) || 0);
 
+    if(!position.data) return <></>
+
     return (<>
         <Tr>
             <Td>
                 <Box>
                     <Flex align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
-                        {position.data.map((token: any) => (<>
+                        {position?.data?.map((token: any) => (<>
                             <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />
                         </>))}
                     </Flex>
@@ -137,10 +140,10 @@ export default function Position({position, index}: any) {
             <Td>
                 <Flex flexDir={'row'} align={'center'}>
                     <Flex fontSize={'md'}>
-                        <Text>{position.leverage}x</Text>
+                        <Text>{position?.leverage}x</Text>
                     </Flex>
                     <Box fontSize={'xs'} ml={2} color={'whiteAlpha.600'}>
-                        <Text> / Liq {position.liqLeverage}x</Text>
+                        <Text> / Liq {position?.liqLeverage}x</Text>
                     </Box>
                 </Flex>
             </Td>
@@ -188,14 +191,17 @@ export default function Position({position, index}: any) {
 
             <Td>
                 <Flex gap={0} flexDir={'column'}> 
-                    <Heading mt={-1} fontSize={'md'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>{dollarFormatter.format(Number(position?.profitLoss))}</Heading>
+                    <Heading mt={-1} fontSize={'md'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>{tokenFormatter.format(100 * position?.profitLoss / position?.netAmount)}%</Heading>
+                    <Text mt={1} fontSize={'sm'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>({dollarFormatter.format(Number(position?.profitLoss))})</Text>
                 </Flex>
             </Td>
 
             <Td isNumeric>
-                <Flex justify={'end'} align={'center'} gap={2}>
+                <Flex flexDir={'column'} justify={'end'} align={'end'} gap={1}>
                     <CloseModal details={details} />
+                    {/* <CloseAllModal details={details} /> */}
                 </Flex>
+                
             </Td>
         </Tr>    
     </>

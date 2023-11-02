@@ -31,10 +31,10 @@ import {
 	SliderMark,
 } from "@chakra-ui/react";
 import { usePriceData } from "../../context/PriceContext";
-import { EIP712_VERSION, ESYX_PRICE, POOL, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, EIP712_VERSION, ESYX_PRICE, POOL, ROUTER_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import { usePerpsData } from "../../context/PerpsDataProvider";
-import { getABI, getContract, send } from "../../../src/contract";
-import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { getABI, getAddress, getContract, send } from "../../../src/contract";
+import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import Big from "big.js";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import useUpdateData from "../../utils/useUpdateData";
@@ -45,6 +45,11 @@ import SelectBody2 from "./SelectBody2";
 import TokenSelector from "../TokenSelector";
 import { BsArrowDown } from "react-icons/bs";
 import { AiOutlineDown } from "react-icons/ai";
+import { useAppData } from "../../context/AppDataProvider";
+import axios from 'axios';
+import { motion } from "framer-motion";
+import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
+import RouteDetails from "../../swap/RouteDetails";
 
 const labelStyles = {
 	mt: "-5px",
@@ -63,26 +68,17 @@ export default function Long() {
   const [selectedPosition, setSelectedPosition] = React.useState(0);
   const { positions, addPosition, pairs } = usePerpsData();
 	const { pools } = useLendingData();
+  const [dataLoading, setDataLoading] = useState(false);
 
 	const {
 		walletBalances,
 		updateFromTx,
-		tokens: _tokens,
+		liquidTokens: tokens,
 		allowances,
 		nonces,
 	} = useBalanceData();
 
 	const { prices } = usePriceData();
-
-	const tokens: any[] = [
-		{
-			id: ethers.constants.AddressZero,
-			symbol: chain?.nativeCurrency.symbol ?? "MNT",
-			name: chain?.nativeCurrency.name ?? "Mantle",
-			decimals: chain?.nativeCurrency.decimals ?? 18,
-			balance: walletBalances[ethers.constants.AddressZero],
-		},
-	].concat(_tokens);
 
 	const onInputTokenSelected = (i: number) => {
 		setInAssetIndex(i);
@@ -102,12 +98,35 @@ export default function Long() {
 		setInputAmount(min.toString());
 	};
 
-  const setInputAmount = (e: any) => {
+  const setInputAmount = async (e: any) => {
 		e = parseInput(e);
 		setInAmount(e);
-		setOutAmount(
-			Big(Number(e)).mul(leverage).mul(prices[tokens[inAssetIndex].id]).div(prices[pairs[pair].token0.id]).toString()
-		);
+    setDataLoading(true);
+    console.log(e);
+    axios.get(ROUTER_ENDPOINT+'/getPath', {
+      params: {
+        tokenIn: tokens[inAssetIndex]?.id,
+        tokenOut: pairs[pair].token0.id,
+        amount: e,
+        kind: 0,
+        sender: ADDRESS_ZERO,
+        recipient: ADDRESS_ZERO,
+        deadline: (Date.now()/1000).toFixed(0) + 5 * 60,
+        slipage: maxSlippage
+      }
+    })
+      .then((res: any) => {
+        setDataLoading(false);
+        const swapData = res.data.data;
+        setSwapData(swapData);
+        console.log(e, swapData.fData.estimatedOut);
+        setOutAmount(
+          Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pairs[pair].token0.decimals).toString()
+        );
+      })
+      .catch((err: any) => {
+        console.log(err);
+      })
 	};
 
 	const _setLeverage = (e: number) => {
@@ -123,6 +142,7 @@ export default function Long() {
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
+  const [swapData, setSwapData] = useState<any>(null);
 
   const toast = useToast();
   const handleError = useHandleError(PlatformType.LENDING);
@@ -222,63 +242,63 @@ export default function Long() {
 	};
 
   const validate = () => {
-      if(!isConnected){
-    return {
-      stage: 0,
-      message: "Connect Wallet"
-    }
-  } else if (chain?.unsupported){
-    return {
-      stage: 0,
-      message: "Unsupported Network"
-    }
-  }
-  else if(Number(inAmount) == 0 || isNaN(Number(inAmount))){
-    return {
-      stage: 0,
-      message: "Enter Amount"
-    }
-  } else if (Big(inAmount).gt(Big(walletBalances[tokens[inAssetIndex].id]).div(10**tokens[inAssetIndex].decimals))) {
-    return {
-      stage: 0,
-      message: "Amount Exceeds Balance"
-    }
-  } 
-  else if (Big(outAmount).mul(prices[pairs[pair].token0.id]).gt(availableLiquidity())) {
-    return {
-      stage: 0,
-      message: "Insufficient Liquidity"
-    }
-  } 
-  else if (!positions[selectedPosition]?.id) {
-    return {
-      stage: 0,
-      message: "Loading..."
-    }
-  }
-  
-  // check allowance if not native
-  if (tokens[inAssetIndex].id !== ethers.constants.AddressZero && !data) {
-    // if not approved
-    if(Big(allowances[tokens[inAssetIndex].id]?.[positions[selectedPosition]?.id] ?? 0).add(Big(approvedAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18))).lt(
-      Big(inAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18))
-    )) {
+    if(!isConnected){
       return {
-        stage: 1,
-        message: "Approve Use Of" + " " + tokens[inAssetIndex].symbol
+        stage: 0,
+        message: "Connect Wallet"
       }
-    } else if(Big(approvedAmount).gt(0) && !Big(approvedAmount).eq(inAmount)){
+    } else if (chain?.unsupported){
       return {
-        stage: 1,
-        message: "Approve Use Of" + " " + tokens[inAssetIndex].symbol
+        stage: 0,
+        message: "Unsupported Network"
       }
     }
-  } else {
-    return {
-      stage: 3,
-      message: "Long"
+    else if(Number(inAmount) == 0 || isNaN(Number(inAmount))){
+      return {
+        stage: 0,
+        message: "Enter Amount"
+      }
+    } else if (Big(Number(inAmount)).gt(Big(walletBalances[tokens[inAssetIndex].id]).div(10**tokens[inAssetIndex].decimals))) {
+      return {
+        stage: 0,
+        message: "Amount Exceeds Balance"
+      }
+    } 
+    else if (Big(Number(outAmount)).mul(prices[pairs[pair].token0.id]).gt(availableLiquidity())) {
+      return {
+        stage: 0,
+        message: "Insufficient Liquidity"
+      }
+    } 
+    else if (!positions[selectedPosition]?.id) {
+      return {
+        stage: 0,
+        message: "Loading..."
+      }
     }
-  }
+    
+    // check allowance if not native
+    if (tokens[inAssetIndex].id !== ethers.constants.AddressZero && !data) {
+      // if not approved
+      if(Big(allowances[tokens[inAssetIndex].id]?.[positions[selectedPosition]?.id] ?? 0).add(Big(approvedAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18))).lt(
+        Big(inAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18))
+      )) {
+        return {
+          stage: 1,
+          message: "Approve Use Of" + " " + tokens[inAssetIndex].symbol
+        }
+      } else if(Big(approvedAmount).gt(0) && !Big(approvedAmount).eq(inAmount)){
+        return {
+          stage: 1,
+          message: "Approve Use Of" + " " + tokens[inAssetIndex].symbol
+        }
+      }
+    } else {
+      return {
+        stage: 3,
+        message: "Long"
+      }
+    }
 
   return {
     stage: 3,
@@ -287,6 +307,7 @@ export default function Long() {
   }
 
   const { getUpdateData } = useUpdateData();
+  const { isSynth } = useAppData();
 
   const open = async () => {
       let calls = [];
@@ -296,7 +317,8 @@ export default function Long() {
       let factory = new ethers.Contract(pairs[pair].perpFactory, getABI("PerpFactory", chain?.id!));
       let _amount = ethers.utils.parseUnits(Big(inAmount).toFixed(tokens[inAssetIndex].decimals, 0), tokens[inAssetIndex].decimals);
       let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(leverage - 1).div(prices[pairs[pair].token0.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
-
+      let deadline_m = 5;
+      let maxSlippage = 0.5;
       // 1. Transfer inAsset to position if doesn't have enough base asset balance
       if(data){
           // permit position to take cusd
@@ -305,39 +327,70 @@ export default function Long() {
       }
       calls.push(position.interface.encodeFunctionData("call", [tokens[inAssetIndex].id, erc20.interface.encodeFunctionData("transferFrom", [address, position.address, _amount]), 0]));
 
-  // 2. Update pyth data
+      // 2. Update pyth data
       const pythUpdateData = await getUpdateData([pairs[pair].token1.id, pairs[pair].token0.id]);
       calls.push(position.interface.encodeFunctionData("updatePythData", [pythUpdateData]));
 
-  // 3. Swap
-  // Check if swap is needed
+      // 3. Swap
+      // Check if swap is needed
       if(tokens[inAssetIndex].id !== pairs[pair].token0.id){
-    // Fetch route
+        // if synthetic swap 
+        if(isSynth(tokens[inAssetIndex].id)){
+          // swap tx
           calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, pairs[pair].token0.id]));
+        } else {
+          const router = await getContract("Router", chain?.id!);
+          // approve for router
+          calls.push(position.interface.encodeFunctionData("call", [
+            tokens[inAssetIndex].id, 
+            erc20.interface.encodeFunctionData("approve", [router.address, ethers.constants.MaxUint256]), 
+            0
+          ]));
+          // swap tx
+          let swapData = (await axios.get(ROUTER_ENDPOINT+'/getPath', {
+            params: {
+              tokenIn: tokens[inAssetIndex]?.id,
+              tokenOut: pairs[pair].token0.id,
+              amount: inAmount,
+              kind: 0,
+              sender: position.address,
+              recipient: position.address,
+              deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
+              slipage: maxSlippage
+            }
+          })).data.data;
+          const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
+          const pythData = await getUpdateData(tokenPricesToUpdate);
+          calls.push(position.interface.encodeFunctionData("call", [
+            router.address,
+            router.interface.encodeFunctionData("swap", [swapData, pythData]),
+            0
+          ]));
+        }
       }
-  // 4. Approvals
-  let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token0.id, positions[selectedPosition].id]));
+      // 4. Approvals
+      let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token0.id, positions[selectedPosition].id]));
       let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token1.id, positions[selectedPosition].id]));
-  if(Big(allowances[baseHash][POOL]).lt(ethers.constants.MaxUint256.div(2).toString())){
-    // Position approves to supply ceth pool
-    calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token0.id, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
-  }
-  if(Big(allowances[baseHash][pairs[pair].token0.id]).lt(ethers.constants.MaxUint256.div(2).toString())){
-    // For repayment of flashloan
-    calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token0.id, erc20.interface.encodeFunctionData("approve", [pairs[pair].token0.id, ethers.constants.MaxUint256]), 0]));
-  }
+      if(Big(allowances[baseHash][POOL]).lt(ethers.constants.MaxUint256.div(2).toString())){
+        // Position approves to supply ceth pool
+        calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token0.id, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
+      }
+      if(Big(allowances[baseHash][pairs[pair].token0.id]).lt(ethers.constants.MaxUint256.div(2).toString())){
+        // For repayment of flashloan
+        calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token0.id, erc20.interface.encodeFunctionData("approve", [pairs[pair].token0.id, ethers.constants.MaxUint256]), 0]));
+      }
                   
-  // now we have eth in position contract; supply that to pool
-  calls.push(position.interface.encodeFunctionData("supply", [pairs[pair].token0.id, ethers.constants.MaxUint256]));
-  // now open position
-  calls.push(position.interface.encodeFunctionData("openPosition", [pairs[pair].token0.id, _leveragedAmount, pairs[pair].token1.id]));
+      // now we have eth in position contract; supply that to pool
+      calls.push(position.interface.encodeFunctionData("supply", [pairs[pair].token0.id, ethers.constants.MaxUint256]));
+      // now open position
+      calls.push(position.interface.encodeFunctionData("openPosition", [pairs[pair].token0.id, _leveragedAmount, pairs[pair].token1.id]));
 
-  let tx;
-  if(selectedPosition == positions.length - 1){
-    tx = send(factory, "newPosition", [calls], "10000")
-  } else {
-    tx = send(position, "multicall", [calls]);
-  }
+      let tx;
+      if(selectedPosition == positions.length - 1){
+        tx = send(factory, "newPosition", [calls], "10000")
+      } else {
+        tx = send(position, "multicall", [calls]);
+      }
 
       tx.then(async (tx: any) => {
           tx = await tx.wait();
@@ -406,6 +459,14 @@ export default function Long() {
 
 	const { colorMode } = useColorMode();
 
+  const inputValue = (Number(inAmount) || 0) * prices[tokens[inAssetIndex].id];
+  const outputValue = Number(outAmount) * prices[pairs[pair]?.token0?.id]
+
+  const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
+	const { getButtonProps, getDisclosureProps, isOpen: isButtonOpen } = useDisclosure()
+	const [hidden, setHidden] = useState(!isButtonOpen);
+  const [maxSlippage, setMaxSlippage] = useState(0.5);
+
 	return (
 		<>
       <TabPanel>
@@ -419,7 +480,7 @@ export default function Long() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Margin</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Margin ({dollarFormatter.format(inputValue)})</Text>
                   <NumberInputField rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -454,7 +515,7 @@ export default function Long() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size ({dollarFormatter.format(outputValue)})</Text>
                   <NumberInputField disabled={true} _disabled={{color: "white"}} rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -546,6 +607,84 @@ export default function Long() {
               {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
             </Select>}
           </Flex>}
+
+          {swapData && <Box mt={4}>
+            {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} my={2} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} color={'orange'}>
+                <WarningTwoIcon />
+                <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
+              </Flex>}
+              <Flex
+                  justify="space-between"
+                  align={"center"}
+                  // mb={!isOpen ? !account ? '-4' : '-6' : '0'}
+                  bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'}
+                  color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
+                  px={4}
+                  py={1.5}
+                  cursor="pointer"
+                  {...getButtonProps()}
+                  _hover={{ bg: colorMode == 'dark' ? "whiteAlpha.100" : "blackAlpha.100" }}
+              >
+                  <Flex align={"center"} gap={2} fontSize="md">
+                      <InfoOutlineIcon />
+                      <Text>
+                          1 {tokens[inAssetIndex].symbol} ={" "}
+                          {tokenFormatter.format(
+                              (Number(outAmount) / (leverage * Number(inAmount))) || 0
+                          )}{" "}
+                          {pairs[pair]?.token0?.symbol}
+                      </Text>
+                      <Text fontSize={'sm'} >
+                          (
+                          {dollarFormatter.format(
+                              ((outputValue / inputValue) || 0) * prices[tokens[inAssetIndex].id]
+                          )}
+                          )
+                      </Text>
+                  </Flex>
+                  <Flex mr={-2}>
+                      {!isButtonOpen ? <RiArrowDropDownLine size={30} /> : <RiArrowDropUpLine size={30} />}
+                  </Flex>
+              </Flex>
+              <Box>
+                  <motion.div
+                      {...getDisclosureProps()}
+                      hidden={hidden}
+                      initial={false}
+                      onAnimationStart={() => setHidden(false)}
+                      onAnimationComplete={() => setHidden(!isButtonOpen)}
+                      animate={{ height: isButtonOpen ? '144px' : 0 }}
+                      style={{
+                          width: '100%'
+                      }}
+                  >
+                  {isButtonOpen && 	<>
+                      <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+                      <Flex bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} flexDir={'column'} gap={1} px={3} py={2} fontSize='sm' color={colorMode == 'dark' ? 'whiteAlpha.800' : 'blackAlpha.800'}>
+                          <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'whiteAlpha.800'} justify={'space-between'}>
+                          <Text>{priceImpact > 0 ? 'Bonus' : 'Price Impact'}</Text>
+                          <Text>{(priceImpact).toFixed(2)}%</Text>
+                          </Flex>
+                          
+                          <Flex justify={'space-between'}>
+                          <Text>Minimum Out</Text>
+                          <Text>{tokenFormatter.format(Number(outAmount) - Number(outAmount) * maxSlippage/100)} {pairs[pair]?.token0?.symbol}</Text>
+                          </Flex>
+
+                          <Flex justify={'space-between'}>
+                          <Text>Expected Out</Text>
+                          <Text>{tokenFormatter.format(Number(outAmount))} {pairs[pair]?.token0?.symbol}</Text>
+                          </Flex>
+
+                          <Flex justify={'space-between'}>
+                          <Text>Network Fee</Text>
+                          <Text>~{dollarFormatter.format((3000 * 0.5 * 0.0001))}</Text>
+                          </Flex>
+                          <RouteDetails swapData={swapData} />
+                      </Flex></>}
+                  </motion.div>
+              </Box>
+            </Box>}
 
           {/* Long */}
           <Box mt={4}>

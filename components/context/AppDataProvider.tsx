@@ -26,6 +26,7 @@ interface AppDataValue {
 	setRefresh: (_: number[]) => void; 
 	refresh: number[];
 	updateFromTx: (tx: any) => void;
+	isSynth: (tokenId: string, _poolIds?: string[]) => boolean;
 }
 
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
@@ -264,6 +265,22 @@ function AppDataProvider({ children }: any) {
 		setPools(_pools);
 	};
 
+	const isSynth = (tokenId: string, _poolIds: string[] = []) => {
+		let poolIds = _poolIds;
+		if(poolIds.length == 0){
+			poolIds = pools.map((pool) => pool.id);
+		}
+		for(let i in poolIds){
+			let pool = pools[i];
+			for(let j in pool.synths){
+				if(pool.synths[j].token.id == tokenId){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	const value: AppDataValue = {
 		account,
 		leaderboard,
@@ -277,7 +294,8 @@ function AppDataProvider({ children }: any) {
 		block,
 		setRefresh,
 		refresh,
-		updateFromTx
+		updateFromTx,
+		isSynth
 	};
 
 	return (

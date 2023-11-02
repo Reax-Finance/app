@@ -1,7 +1,5 @@
-import { Box, Flex, Text } from '@chakra-ui/react'
 import React from 'react'
 import dynamic from "next/dynamic";
-import Head from 'next/head.js';
 
 const Graph = dynamic(
 	() =>
@@ -12,7 +10,9 @@ const Graph = dynamic(
 export default function TradingViewWidget({pair}: any) {
   return (
     <>
-       {pair && <Graph symbol={pair.split("-").join("").split("c").join("")}/>}
+       {pair && <Graph symbol={pair.split("-").join("").split("c").join("")} libraryPath={
+        process.env.NEXT_PUBLIC_ENVIRONMENT == "production" ? '/static/charting_library/' : '/static/charting_library/'
+       } />}
     </>
   )
 }

@@ -14,9 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { motion, Variants } from "framer-motion";
-import { query } from '../../src/queries/synthetic';
 import router from "next/router";
-import { VARIANT } from "../../styles/theme";
 import { usePriceData } from "../context/PriceContext";
 import { usePerpsData } from "../context/PerpsDataProvider";
 
@@ -135,7 +133,7 @@ export default function PairSelector() {
 								<motion.li
 									variants={itemVariants}
 									onClick={() => {
-										router.push(`/perps/${pair}`);
+										router.push(`/margin/${pair}`);
 										setIsOpen(false);
 									}}
 									key={index}
