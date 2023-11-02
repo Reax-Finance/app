@@ -51,35 +51,16 @@ export default function ClosedPosition({position, index}: any) {
             }
     
     
-            for(let i in markets){   
-                let inputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i].inputToken.id, position.id]));
-                let outputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i].outputToken.id, position.id]));
-                let vTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i]._vToken.id, position.id]));
-                let sTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i]._sToken.id, position.id]));
-
-                if(!walletBalances[outputTokenHash] || !prices[markets[i].inputToken.id]) continue;
-                let collateralValue = Big(walletBalances[outputTokenHash]).div(10**markets[i].outputToken.decimals);
-                let variableDebt = Big(walletBalances[vTokenHash]).div(10**markets[i]._vToken.decimals);
-                let stableDebt = Big(walletBalances[sTokenHash]).div(10**markets[i]._sToken.decimals);
-                _totalCollateral = _totalCollateral.add(collateralValue.mul(prices[markets[i].inputToken.id]));
-                _adjustedCollateral = _adjustedCollateral.plus(collateralValue.mul(prices[markets[i].inputToken.id]).mul(markets[i].maximumLTV).div(100));
-                _totalDebt = _totalDebt.add(variableDebt.mul(prices[markets[i].inputToken.id]));
-                _totalStableDebt = _totalStableDebt.add(stableDebt.mul(prices[markets[i].inputToken.id]));
-    
-                netApy = netApy.add(collateralValue.mul(prices[markets[i].inputToken.id]).mul(markets[i].rates.find((rate: any) => rate.side == 'LENDER').rate));
-                rewardApy = rewardApy.add(collateralValue.mul(prices[markets[i].inputToken.id]).mul(rewardAPY(markets[i], 'DEPOSIT')));
-                totalValue = totalValue.add(collateralValue.mul(prices[markets[i].inputToken.id]));
-                netApy = netApy.add(variableDebt.mul(prices[markets[i].inputToken.id]).mul(markets[i].rates.find((rate: any) => rate.side == 'BORROWER' && rate.type == 'VARIABLE').rate).neg());
-                rewardApy = rewardApy.add(variableDebt.mul(prices[markets[i].inputToken.id]).mul(rewardAPY(markets[i], 'BORROW')));
-                totalValue = totalValue.add(variableDebt.mul(prices[markets[i].inputToken.id]));
-                netApy = netApy.add(stableDebt.mul(prices[markets[i].inputToken.id]).mul(markets[i].rates.find((rate: any) => rate.side == 'BORROWER' && rate.type == 'STABLE').rate).neg());
-                rewardApy = rewardApy.add(stableDebt.mul(prices[markets[i].inputToken.id]).mul(rewardAPY(markets[i], 'BORROW', 'STABLE')));
-                totalValue = totalValue.add(stableDebt.mul(prices[markets[i].inputToken.id]));
-    
+            for(let i in position.data){   
                 let pos = {
-                    market: markets[i],
-                    collateral: collateralValue.toString(),
-                    debt: stableDebt.add(variableDebt).toString(),
+                    market: {
+                        inputToken: {
+                            id: position.data[i].tokenAddress,
+                            symbol: position.data[i].tokenSymbol,
+                        }
+                    },
+                    collateral: position.data[i].depositAmount / prices[position.data[i].tokenAddress],
+                    debt: position.data[i].borrowAmount / prices[position.data[i].tokenAddress],
                 }
     
                 if(Number(pos.collateral) > 0){
@@ -146,7 +127,7 @@ export default function ClosedPosition({position, index}: any) {
                 <Box>
                     <Flex gap={1} mb={1} align={'center'}>
                         <Text color={'whiteAlpha.600'} fontSize={'sm'}>Total</Text>
-                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.collateral) || 0)}</Text>
+                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(position?.collateral) || 0)}</Text>
                     </Flex>
                     {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
                         <Flex align={'center'} color={'whiteAlpha.600'} key={index} my={0} gap={1.5}>
@@ -182,8 +163,7 @@ export default function ClosedPosition({position, index}: any) {
             </Td>
 
             <Td isNumeric>
-                    <Text fontSize={'sm'}>{(new Date(position.timestampOpened * 1000)).toLocaleString()}</Text>
-                    <Text fontSize={'sm'}>{(new Date(position.timestampClosed * 1000)).toLocaleString()}</Text>
+                <Text fontSize={'sm'}>{(new Date(position.timestampClosed * 1000)).toLocaleString()}</Text>
             </Td>
         </Tr>    
     </>

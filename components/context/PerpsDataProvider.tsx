@@ -92,7 +92,7 @@ function PerpsDataProvider({ children }: any) {
 					}
 				});
 
-				console.log("Positions", _positions);
+				console.log("Positions", _positions, results);
 
 				let openPositions = [];
 				let closedPositions = [];
@@ -100,7 +100,7 @@ function PerpsDataProvider({ children }: any) {
 				for(let i in _positions){
 					for(let j in results[i]?.data?.data){
 						// push last element into open
-						if(Number(j) == results[i]?.data?.data.length - 1){
+						if(results[i]?.data?.data[j].timestampClosed == null){
 							openPositions.push({...results[i]?.data?.data[j], ..._positions[i]})
 						} else {
 							// else push in closed
