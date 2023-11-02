@@ -102,8 +102,11 @@ export default function Long() {
 		e = parseInput(e);
 		setInAmount(e);
     setDataLoading(true);
-    console.log(e);
-    axios.get(ROUTER_ENDPOINT+'/getPath', {
+    if(tokens[inAssetIndex]?.id == pairs[pair].token0.id) {
+			setOutAmount(Big(e).mul(leverage).toString());
+			return;
+		}
+    axios.get(ROUTER_ENDPOINT, {
       params: {
         tokenIn: tokens[inAssetIndex]?.id,
         tokenOut: pairs[pair].token0.id,
@@ -347,7 +350,7 @@ export default function Long() {
             0
           ]));
           // swap tx
-          let swapData = (await axios.get(ROUTER_ENDPOINT+'/getPath', {
+          let swapData = (await axios.get(ROUTER_ENDPOINT, {
             params: {
               tokenIn: tokens[inAssetIndex]?.id,
               tokenOut: pairs[pair].token0.id,
@@ -460,7 +463,7 @@ export default function Long() {
 	const { colorMode } = useColorMode();
 
   const inputValue = (Number(inAmount) || 0) * prices[tokens[inAssetIndex].id];
-  const outputValue = Number(outAmount) * prices[pairs[pair]?.token0?.id]
+  const outputValue = Number(outAmount) * prices[pairs[pair]?.token0?.id] / leverage
 
   const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
 	const { getButtonProps, getDisclosureProps, isOpen: isButtonOpen } = useDisclosure()
@@ -515,7 +518,7 @@ export default function Long() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size ({dollarFormatter.format(outputValue)})</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
                   <NumberInputField disabled={true} _disabled={{color: "white"}} rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 

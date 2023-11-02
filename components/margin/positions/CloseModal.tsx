@@ -123,7 +123,6 @@ export default function CloseModal({details}: any) {
                             p={1}
                             pl={4}
                             _hover={{ cursor: "pointer" }}
-
                         >
                             <Image
                                 src={`/icons/${

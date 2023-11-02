@@ -31,10 +31,10 @@ import {
 	SliderMark,
 } from "@chakra-ui/react";
 import { usePriceData } from "../../context/PriceContext";
-import { EIP712_VERSION, ESYX_PRICE, POOL, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
+import { ADDRESS_ZERO, EIP712_VERSION, ESYX_PRICE, POOL, ROUTER_ENDPOINT, defaultChain, dollarFormatter, tokenFormatter } from "../../../src/const";
 import { usePerpsData } from "../../context/PerpsDataProvider";
 import { getABI, getContract, send } from "../../../src/contract";
-import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import Big from "big.js";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
 import useUpdateData from "../../utils/useUpdateData";
@@ -45,6 +45,12 @@ import SelectBody2 from "./SelectBody2";
 import TokenSelector from "../TokenSelector";
 import { BsArrowDown } from "react-icons/bs";
 import { AiOutlineDown } from "react-icons/ai";
+
+import axios from 'axios';
+import { motion } from "framer-motion";
+import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
+import RouteDetails from "../../swap/RouteDetails";
+import { useAppData } from "../../context/AppDataProvider";
 
 const labelStyles = {
 	mt: "-5px",
@@ -63,26 +69,17 @@ export default function Short() {
 	const [selectedPosition, setSelectedPosition] = React.useState(0);
 	const { positions, addPosition, pairs } = usePerpsData();
 	const { pools } = useLendingData();
+	const [dataLoading, setDataLoading] = useState(false);
 
 	const {
 		walletBalances,
 		updateFromTx,
-		tokens: _tokens,
+		liquidTokens: tokens,
 		allowances,
 		nonces,
 	} = useBalanceData();
 
 	const { prices } = usePriceData();
-
-	const tokens: any[] = [
-		{
-			id: ethers.constants.AddressZero,
-			symbol: chain?.nativeCurrency.symbol ?? "MNT",
-			name: chain?.nativeCurrency.name ?? "Mantle",
-			decimals: chain?.nativeCurrency.decimals ?? 18,
-			balance: walletBalances[ethers.constants.AddressZero],
-		},
-	].concat(_tokens);
 
 	const onInputTokenSelected = (i: number) => {
 		setInAssetIndex(i);
@@ -91,7 +88,7 @@ export default function Short() {
 	const setOutputAmount = (e: any) => {
 		e = parseInput(e);
 		setOutAmount(e);
-		setLeverage(Big(e).mul(prices[pairs[pair].token0.id]).div(Big(inAmount).mul(prices[tokens[inAssetIndex].id])).toNumber());
+		setLeverage(Big(e).mul(prices[pairs[pair].token1.id]).div(Big(inAmount).mul(prices[tokens[inAssetIndex].id])).toNumber());
 	};
 
 	const setMax = (multiplier: number) => {
@@ -105,15 +102,40 @@ export default function Short() {
   const setInputAmount = (e: any) => {
 		e = parseInput(e);
 		setInAmount(e);
-		setOutAmount(
-			Big(Number(e)).mul(leverage).mul(prices[tokens[inAssetIndex].id]).div(prices[pairs[pair].token0.id]).toString()
-		);
+		if(tokens[inAssetIndex]?.id == pairs[pair].token1.id) {
+			setOutAmount(Big(e).mul(leverage).toString());
+			return;
+		}
+		axios.get(ROUTER_ENDPOINT, {
+			params: {
+			  tokenIn: tokens[inAssetIndex]?.id,
+			  tokenOut: pairs[pair].token1.id,
+			  amount: e,
+			  kind: 0,
+			  sender: ADDRESS_ZERO,
+			  recipient: ADDRESS_ZERO,
+			  deadline: (Date.now()/1000).toFixed(0) + 5 * 60,
+			  slipage: maxSlippage
+			}
+		  })
+			.then((res: any) => {
+			  setDataLoading(false);
+			  const swapData = res.data.data;
+			  setSwapData(swapData);
+			  console.log(e, swapData.fData.estimatedOut);
+			  setOutAmount(
+				Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pairs[pair].token1.decimals).toString()
+			  );
+			})
+			.catch((err: any) => {
+			  console.log(err);
+			})
 	};
 
 	const _setLeverage = (e: number) => {
 		setLeverage(e);
 		if(!Number(inAmount)) return;
-		setOutAmount(Big(e).mul(inAmount).mul(prices[tokens[inAssetIndex].id]).div(prices[pairs[pair].token0.id]).toString());
+		setOutAmount(Big(e).mul(inAmount).mul(prices[tokens[inAssetIndex].id]).div(prices[pairs[pair].token1.id]).toString());
 	}
 
 	const { signTypedDataAsync } = useSignTypedData();
@@ -123,6 +145,8 @@ export default function Short() {
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const [approveLoading, setApproveLoading] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [swapData, setSwapData] = useState<any>(null);
+	const { isSynth } = useAppData();
 
 	const toast = useToast();
 	const handleError = useHandleError(PlatformType.LENDING);
@@ -224,36 +248,36 @@ export default function Short() {
 	const validate = () => {
 		if(!isConnected){
 			return {
-			stage: 0,
-			message: "Connect Wallet"
+				stage: 0,
+				message: "Connect Wallet"
 			}
 		} else if (chain?.unsupported){
 			return {
-			stage: 0,
-			message: "Unsupported Network"
+				stage: 0,
+				message: "Unsupported Network"
 			}
 		}
 		else if(Number(inAmount) == 0 || isNaN(Number(inAmount))){
 			return {
-			stage: 0,
-			message: "Enter Amount"
+				stage: 0,
+				message: "Enter Amount"
 			}
-		} else if (Big(inAmount).gt(Big(walletBalances[tokens[inAssetIndex].id]).div(10**tokens[inAssetIndex].decimals))) {
+		} else if (Big(Number(inAmount)).gt(Big(walletBalances[tokens[inAssetIndex].id]).div(10**tokens[inAssetIndex].decimals))) {
 			return {
-			stage: 0,
-			message: "Amount Exceeds Balance"
+				stage: 0,
+				message: "Amount Exceeds Balance"
 			}
 		} 
-		else if (Big(outAmount).mul(prices[pairs[pair].token0.id]).gt(availableLiquidity())) {
+		else if (Big(Number(outAmount)).mul(prices[pairs[pair].token1.id]).gt(availableLiquidity())) {
 			return {
-			stage: 0,
-			message: "Insufficient Liquidity"
+				stage: 0,
+				message: "Insufficient Liquidity"
 			}
 		} 
 		else if (!positions[selectedPosition]?.id) {
 			return {
-			stage: 0,
-			message: "Loading..."
+				stage: 0,
+				message: "Loading..."
 			}
 		}
 		
@@ -294,6 +318,7 @@ export default function Short() {
 		let factory = new ethers.Contract(pairs[pair].perpFactory, getABI("PerpFactory", chain?.id!));
 		let _amount = ethers.utils.parseUnits(Big(inAmount).toFixed(tokens[inAssetIndex].decimals, 0), tokens[inAssetIndex].decimals);
 		let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(leverage - 1).div(prices[pairs[pair].token1.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
+		let deadline_m = 5;
 
 		// 1. Transfer inAsset to position if doesn't have enough quote asset balance
 		if(data){
@@ -307,12 +332,51 @@ export default function Short() {
 		const pythUpdateData = await getUpdateData([pairs[pair].token1.id, pairs[pair].token0.id]);
 		calls.push(position.interface.encodeFunctionData("updatePythData", [pythUpdateData]));
 
+		// // 3. Swap
+		// // Check if swap is needed
+		// if(tokens[inAssetIndex].id !== pairs[pair].token1.id){
+		// 	// Fetch route
+		// 	calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, pairs[pair].token1.id]));
+		// }
+
 		// 3. Swap
 		// Check if swap is needed
 		if(tokens[inAssetIndex].id !== pairs[pair].token1.id){
-			// Fetch route
-			calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, pairs[pair].token1.id]));
+			// if synthetic swap 
+			if(isSynth(tokens[inAssetIndex].id)){
+				// swap tx
+				calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, pairs[pair].token0.id]));
+			} else {
+				const router = await getContract("Router", chain?.id!);
+				// approve for router
+				calls.push(position.interface.encodeFunctionData("call", [
+					tokens[inAssetIndex].id, 
+					erc20.interface.encodeFunctionData("approve", [router.address, ethers.constants.MaxUint256]), 
+					0
+				]));
+				// swap tx
+				let swapData = (await axios.get(ROUTER_ENDPOINT, {
+					params: {
+					tokenIn: tokens[inAssetIndex]?.id,
+					tokenOut: pairs[pair].token1.id,
+					amount: inAmount,
+					kind: 0,
+					sender: position.address,
+					recipient: position.address,
+					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
+					slipage: maxSlippage
+					}
+				})).data.data;
+				const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
+				const pythData = await getUpdateData(tokenPricesToUpdate);
+				calls.push(position.interface.encodeFunctionData("call", [
+					router.address,
+					router.interface.encodeFunctionData("swap", [swapData, pythData]),
+					0
+				]));
+			}
 		}
+
 		// 4. Approvals
 		let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token0.id, positions[selectedPosition].id]));
 		let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token1.id, positions[selectedPosition].id]));
@@ -402,6 +466,15 @@ export default function Short() {
 		}
 	}
 
+	const inputValue = (Number(inAmount) || 0) * prices[tokens[inAssetIndex].id];
+	const outputValue = Number(outAmount) * prices[pairs[pair]?.token1?.id] / leverage;
+
+	const priceImpact = (100*((outputValue - inputValue)/(inputValue)) || 0);
+	
+	const { getButtonProps, getDisclosureProps, isOpen: isButtonOpen } = useDisclosure()
+	const [hidden, setHidden] = useState(!isButtonOpen);
+	const [maxSlippage, setMaxSlippage] = useState(0.5);
+
 	const { colorMode } = useColorMode();
 
 	return (
@@ -466,18 +539,16 @@ export default function Short() {
                   mt={"-6px"}
                 >
                   <Image
-                    src={`/icons/${
-                      (pair as string).split("-")[0]
-                    }.svg`}
+                    src={`/icons/${pairs[pair]?.token1?.symbol}.svg`}
                     w={30}
                     h={30}
-                    alt={(pair as string).split("-")[0]}
+                    alt={pairs[pair]?.token1?.symbol}
                   />
                   <Text
                     fontSize="xl" fontWeight={'semibold'}
                     color="whiteAlpha.800"
                   >
-                    {(pair as string).split("-")[0]}
+                    {pairs[pair]?.token1?.symbol}
                   </Text>
                 </Flex>
                 </Box>
@@ -544,6 +615,84 @@ export default function Short() {
               {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
             </Select>}
           </Flex>}
+
+		  {swapData && <Box mt={4}>
+            {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} my={2} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} color={'orange'}>
+                <WarningTwoIcon />
+                <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
+              </Flex>}
+              <Flex
+                  justify="space-between"
+                  align={"center"}
+                  // mb={!isOpen ? !account ? '-4' : '-6' : '0'}
+                  bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'}
+                  color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
+                  px={4}
+                  py={1.5}
+                  cursor="pointer"
+                  {...getButtonProps()}
+                  _hover={{ bg: colorMode == 'dark' ? "whiteAlpha.100" : "blackAlpha.100" }}
+              >
+                  <Flex align={"center"} gap={2} fontSize="md">
+                      <InfoOutlineIcon />
+                      <Text>
+                          1 {tokens[inAssetIndex].symbol} ={" "}
+                          {tokenFormatter.format(
+                              (Number(outAmount) / (leverage * Number(inAmount))) || 0
+                          )}{" "}
+                          {pairs[pair]?.token1?.symbol}
+                      </Text>
+                      <Text fontSize={'sm'} >
+                          (
+                          {dollarFormatter.format(
+                              ((outputValue / inputValue) || 0) * prices[tokens[inAssetIndex].id]
+                          )}
+                          )
+                      </Text>
+                  </Flex>
+                  <Flex mr={-2}>
+                      {!isButtonOpen ? <RiArrowDropDownLine size={30} /> : <RiArrowDropUpLine size={30} />}
+                  </Flex>
+              </Flex>
+              <Box>
+                  <motion.div
+                      {...getDisclosureProps()}
+                      hidden={hidden}
+                      initial={false}
+                      onAnimationStart={() => setHidden(false)}
+                      onAnimationComplete={() => setHidden(!isButtonOpen)}
+                      animate={{ height: isButtonOpen ? '144px' : 0 }}
+                      style={{
+                          width: '100%'
+                      }}
+                  >
+                  {isButtonOpen && 	<>
+                      <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
+                      <Flex bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} flexDir={'column'} gap={1} px={3} py={2} fontSize='sm' color={colorMode == 'dark' ? 'whiteAlpha.800' : 'blackAlpha.800'}>
+                          <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'whiteAlpha.800'} justify={'space-between'}>
+                          <Text>{priceImpact > 0 ? 'Bonus' : 'Price Impact'}</Text>
+                          <Text>{(priceImpact).toFixed(2)}%</Text>
+                          </Flex>
+                          
+                          <Flex justify={'space-between'}>
+                          <Text>Minimum Out</Text>
+                          <Text>{tokenFormatter.format(Number(outAmount) - Number(outAmount) * maxSlippage/100)} {pairs[pair]?.token1?.symbol}</Text>
+                          </Flex>
+
+                          <Flex justify={'space-between'}>
+                          <Text>Expected Out</Text>
+                          <Text>{tokenFormatter.format(Number(outAmount))} {pairs[pair]?.token1?.symbol}</Text>
+                          </Flex>
+
+                          <Flex justify={'space-between'}>
+                          <Text>Network Fee</Text>
+                          <Text>~{dollarFormatter.format((3000 * 0.5 * 0.0001))}</Text>
+                          </Flex>
+                          <RouteDetails swapData={swapData} />
+                      </Flex></>}
+                  </motion.div>
+              </Box>
+            </Box>}
 
           {/* Long */}
           <Box mt={4}>
