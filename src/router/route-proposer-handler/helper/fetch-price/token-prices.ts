@@ -1,4 +1,5 @@
 import axios from "axios";
+import { PRICE_ENDPOINT } from "../../../../const";
 
 
 
@@ -15,7 +16,7 @@ async function updatePrice() {
     try {
         let data
         try {
-            data = await axios.get(`http://prices.mainnet.reax.one/get_all_prices`);
+            data = await axios.get(`${PRICE_ENDPOINT}/get_all_prices`);
         }
         catch (error) {
             console.log(`Error @ call axios updatePrice: ${error}`);

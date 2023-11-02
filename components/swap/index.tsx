@@ -62,7 +62,8 @@ function Swap() {
 
 	const calculateOutputAmount = (inputAmount: string) => {
 		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT+'/getPath', {
+			// console.log(ROUTER_ENDPOINT+'/getPath');
+			axios.get(ROUTER_ENDPOINT, {
 				params: {
 					tokenIn: tokens[inputAssetIndex]?.id,
 					tokenOut: tokens[outputAssetIndex]?.id,
@@ -75,9 +76,11 @@ function Swap() {
 				}
 			})
 			.then((res) => {
+				console.log(res.data.data)
 				resolve(res.data.data);
 			})
 			.catch((err) => {
+				console.log(err)
 				reject(err);
 			})
 		})
@@ -85,7 +88,8 @@ function Swap() {
 
 	const calculateInputAmount = (outputAmount: string) => {
 		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT+'/getPath', {
+			// console.log(ROUTER_ENDPOINT);
+			axios.get(ROUTER_ENDPOINT, {
 				params: {
 					tokenIn: tokens[inputAssetIndex]?.id,
 					tokenOut: tokens[outputAssetIndex]?.id,
@@ -98,6 +102,7 @@ function Swap() {
 				}
 			})
 			.then((res) => {
+				console.log(res.data.data)
 				resolve(res.data.data);
 			})
 			.catch((err) => {

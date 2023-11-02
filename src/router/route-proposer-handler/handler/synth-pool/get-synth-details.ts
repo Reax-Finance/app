@@ -7,8 +7,8 @@ import { defaultChain } from "../../../../const";
 require("dotenv").config();
 export async function setSynthsConfig() {
     try {
-        let config = JSON.parse((await (fs.readFile(path.join(__filename + "/../../../../../src/router/route-proposer-handler/handler/synth-pool/synth-pool-config.json")))).toString());
-        config = {};
+        // let config = JSON.parse((await (fs.readFile(path.join(__filename + "/../../../../../src/router/route-proposer-handler/handler/synth-pool/synth-pool-config.json")))).toString());
+        let config: any = {};
         let data = await axios({
 
             method: "post",

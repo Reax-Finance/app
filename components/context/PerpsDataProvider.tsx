@@ -44,7 +44,7 @@ function PerpsDataProvider({ children }: any) {
 					query: query_positions(_address?.toLowerCase()),
 					variables: {},
 				}),
-				axios.get("https://perps-position-testnet.reax.one/pairs?lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f")
+				axios.get("http://localhost:3000/api/margin/pairs?lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f")
 			])
 				.then(async (res) => {
 
@@ -73,7 +73,7 @@ function PerpsDataProvider({ children }: any) {
 		calls.push([factory.address, factory.interface.encodeFunctionData("getPositionAddress", [_address, _positions.length])]);
 
 		let requests = _positions.map(
-			(position: any) => axios.get(`https://perps-position-testnet.reax.one/positions?position=${position.id}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
+			(position: any) => axios.get(`http://localhost:3000/api/margin/positions?position=${position.id}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
 		).concat(multicall.callStatic.aggregate(calls));
 		
 		
