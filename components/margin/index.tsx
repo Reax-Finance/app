@@ -6,12 +6,13 @@ import TitleBar from './TitleBar';
 import Trade from './trade';
 import Positions from './positions';
 import { VARIANT } from '../../styles/theme';
+import Loading from '../utils/Loading';
 
 export default function Perps({pair}: any) {
     const { tokens : allTokens } = useBalanceData();
     const {colorMode} = useColorMode();
 
-    if(allTokens.length == 0) return <></>;
+    if(allTokens.length == 0) return <Loading />
 
     return (
         <>
