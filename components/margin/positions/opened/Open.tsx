@@ -12,9 +12,9 @@ import {
     TableContainer,
     Text
 } from '@chakra-ui/react'
-import { usePerpsData } from '../../context/PerpsDataProvider'
+import { usePerpsData } from '../../../context/PerpsDataProvider'
 import Position from './Position';
-import { VARIANT } from '../../../styles/theme';
+import { VARIANT } from '../../../../styles/theme';
 
 export default function Open() {
     const {positions} = usePerpsData();

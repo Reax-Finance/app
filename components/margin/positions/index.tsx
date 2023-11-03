@@ -8,10 +8,11 @@ import {
     Divider,
 } from "@chakra-ui/react";
 import { usePerpsData } from '../../context/PerpsDataProvider'
-import Position from './Position';
+import Position from './opened/Position';
 import { VARIANT } from '../../../styles/theme';
-import Open from './Open';
-import Closed from './Closed';
+import Open from './opened/Open';
+import Closed from './closed/Closed';
+import History from './history/History';
 
 export default function Positions() {
     const {positions} = usePerpsData();
@@ -78,6 +79,9 @@ export default function Positions() {
                     </TabPanel>
                     <TabPanel p={0}>
                         <Closed />
+                    </TabPanel>
+					<TabPanel p={0}>
+                        <History />
                     </TabPanel>
 				</TabPanels>
 			</Tabs>

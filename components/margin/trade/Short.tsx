@@ -84,6 +84,8 @@ export default function Short() {
 
 	const onInputTokenSelected = (i: number) => {
 		setInAssetIndex(i);
+		setInAmount('');
+		setOutAmount('');
 	};
 
 	const setOutputAmount = (e: any) => {
