@@ -140,7 +140,6 @@ function LendingDataProvider({ children }: any) {
 		}
 		helper.callStatic.aggregate(calls)
 		.then(async (res: any) => {
-			console.log("Got lending positions", res);
 			let resultData = res[1];
 			let _positions = [];
 			for(let i = 0; i < resultData.length; i++){

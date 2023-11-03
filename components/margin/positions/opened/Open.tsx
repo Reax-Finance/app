@@ -39,6 +39,8 @@ export default function Open() {
 	);	
     const {colorMode} = useColorMode();
 
+    console.log(positions);
+
     return (   <>
         <TableContainer>
             <Table variant='simple'>

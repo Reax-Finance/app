@@ -119,6 +119,7 @@ export default function Position({position, index}: any) {
     }, [lendingProtocols, pools, position, prices, walletBalances]);
 
     const leverage = (Number(details?.collateral) / (Number(details?.collateral) - Number(details?.debt)) || 0);
+    const totalCollateralUSD = details?.collaterals?.reduce((a: any, b: any) => a + Number(b.collateral) * prices[b.market.inputToken.id], 0) || 0;
 
     if(!position.data) return <></>
 
@@ -160,7 +161,7 @@ export default function Position({position, index}: any) {
                 <Box>
                     <Flex gap={1} mb={1} align={'center'}>
                         <Text color={'whiteAlpha.600'} fontSize={'sm'}>Total</Text>
-                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.collateral) || 0)}</Text>
+                        <Text fontSize={'sm'}>{dollarFormatter.format(totalCollateralUSD)}</Text>
                     </Flex>
                     {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
                         <Flex align={'center'} color={'whiteAlpha.600'} key={index} my={0} gap={1.5}>
