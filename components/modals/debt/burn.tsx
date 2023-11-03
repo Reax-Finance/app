@@ -69,7 +69,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber, onClose }: any) => {
 			.toFixed(0);
 
 		const priceFeedUpdateData = await getUpdateData();
-		let args = [asset.token.id, value, priceFeedUpdateData];
+		let args = [asset.token.id, value, address, priceFeedUpdateData];
 
 		send(pool, "burn", args)
 		.then(async (res: any) => {
