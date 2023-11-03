@@ -86,6 +86,8 @@ export default function Short() {
 		setInAssetIndex(i);
 		setInAmount('');
 		setOutAmount('');
+		setApprovedAmount('0');
+		setData(null);
 	};
 
 	const setOutputAmount = (e: any) => {
@@ -324,7 +326,7 @@ export default function Short() {
 	const { getUpdateData } = useUpdateData();
 
 	const open = async () => {
-		let calls = [];
+		let calls: any[] = [];
 		setLoading(true);
 		let position = new ethers.Contract(positions[selectedPosition]?.id, getABI("PerpPosition", chain?.id!));
 		let erc20 = new ethers.Contract(tokens[inAssetIndex].id, getABI("MockToken", chain?.id!));
@@ -342,9 +344,12 @@ export default function Short() {
 		calls.push(position.interface.encodeFunctionData("call", [tokens[inAssetIndex].id, erc20.interface.encodeFunctionData("transferFrom", [address, position.address, _amount]), 0]));
 
 		// 2. Update pyth data
-		const pythUpdateData = await getUpdateData([pairs[pair].token1.id, pairs[pair].token0.id]);
+		const assetPriceToUpdate = [pairs[pair].token1.id, pairs[pair].token0.id];
+		if(isSynth(tokens[inAssetIndex].id) && !assetPriceToUpdate.includes(tokens[inAssetIndex].id)){
+		  assetPriceToUpdate.push(tokens[inAssetIndex].id);
+		}
+		const pythUpdateData = await getUpdateData(assetPriceToUpdate);
 		calls.push(position.interface.encodeFunctionData("updatePythData", [pythUpdateData]));
-
 		// // 3. Swap
 		// // Check if swap is needed
 		// if(tokens[inAssetIndex].id !== pairs[pair].token1.id){

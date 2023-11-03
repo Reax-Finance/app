@@ -11,10 +11,6 @@ import {
     useColorMode,
 } from '@chakra-ui/react'
 import { Flex, Text, Box, Image, Divider, IconButton, Tr, Button, Heading, useDisclosure, NumberInput, NumberInputField,  } from '@chakra-ui/react';
-import { RiArrowDropDownLine } from 'react-icons/ri';
-import { AiOutlineDownSquare } from 'react-icons/ai';
-import { formatInput, parseInput } from '../../../utils/number';
-import { useBalanceData } from '../../../context/BalanceProvider';
 import { ethers } from 'ethers';
 import { usePriceData } from '../../../context/PriceContext';
 import { useAccount, useNetwork } from 'wagmi';
@@ -26,8 +22,6 @@ import useUpdateData from '../../../utils/useUpdateData';
 import { dollarFormatter, tokenFormatter } from '../../../../src/const';
 
 export default function CloseAllModal({details}: any) {
-    const [inAmount, setInputAmount] = React.useState("");
-    const [outAmount, setOutputAmount] = React.useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     const [outAssetIndex, setOutAssetIndex] = React.useState(0);
@@ -39,7 +33,7 @@ export default function CloseAllModal({details}: any) {
 
     const { getUpdateData } = useUpdateData();
     const close = async () => {
-        let calls = [];
+        let calls: any[] = [];
 
         let position = new ethers.Contract(details?.position?.id, getABI("PerpPosition", chain?.id!));
         let pool = new ethers.Contract(details?.position?.factory?.lendingPool, getABI("LendingPool", chain?.id!));
@@ -49,7 +43,7 @@ export default function CloseAllModal({details}: any) {
         const priceFeedUpdateData = await getUpdateData();
         calls.push(position.interface.encodeFunctionData("updatePythData", [priceFeedUpdateData]));
         calls.push(position.interface.encodeFunctionData("call", [borrowed.address, borrowed.interface.encodeFunctionData("approve", [details?.position?.factory?.lendingPool, ethers.constants.MaxUint256]), 0]));
-        const closes = calculateClose();
+        const closes: any[] = calculateClose();
         for(let i in closes){
             calls.push(position.interface.encodeFunctionData("closePosition", [closes[i].token1, closes[i].token1Amount, closes[i].token0]));
         }
@@ -73,10 +67,10 @@ export default function CloseAllModal({details}: any) {
         })
     }
 
-    const calculateClose = () => {
+    const calculateClose = () : any[] => {
         if(!details) return [];
         const detailsCopy = JSON.parse(JSON.stringify(details));
-        const actions = [];
+        const actions: any[] = [];
         // sort collaterals and debts by amount
         detailsCopy.collaterals.sort((a: any, b: any) => {
             return - (a.collateral * prices[a.market.inputToken.id]) + (b.collateral * prices[b.market.inputToken.id]);

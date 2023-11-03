@@ -38,7 +38,7 @@ export default function CloseModal({details}: any) {
 
     const { getUpdateData } = useUpdateData();
     const close = async () => {
-        let calls = [];
+        let calls: any[] = [];
 
         let position = new ethers.Contract(details?.position?.id, getABI("PerpPosition", chain?.id!));
         let pool = new ethers.Contract(details?.position?.factory?.lendingPool, getABI("LendingPool", chain?.id!));
