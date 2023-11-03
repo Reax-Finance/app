@@ -38,12 +38,16 @@ export default async function handler(
     }
 
     const promiseRes = await Promise.all(promiseReq);
-    const data: Record<string, IHistory[]>[] = [];
+    const data: IHistory[] = [];
 
     userPositions.forEach((positionId: string, index: number) => {
       // const setData: Record<string, IHistory[]> = {};
       // setData[`${positionId}`] = promiseRes[index];
-      data.push(promiseRes[index]);
+      data.push(...promiseRes[index]);
+    })
+
+    data.sort((a:IHistory ,b: IHistory)=>{
+      return Number(a.timestamp) - Number(b.timestamp) || a.logIndex - b.logIndex;
     })
 
     return res.status(200).send({ status: true, data });
