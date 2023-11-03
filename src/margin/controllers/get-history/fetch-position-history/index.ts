@@ -39,22 +39,22 @@ export async function fetchPositionHistory(positionId: string, lendingPool: stri
       const combinedPosition = position.combinedPosition;
 
       position.borrows.forEach((borrow) => {
-        history.push({ action: "borrow", tokenAddress, tokenSymbol, amountUSD: borrow.amountUSD, amount: borrow.amount, timestamp: borrow.timestamp, logIndex: borrow.logIndex, combinedPosition })
+        history.push({ action: "borrow", tokenAddress, tokenSymbol, amountUSD: borrow.amountUSD, amount: borrow.amount, timestamp: borrow.timestamp, logIndex: borrow.logIndex, combinedPosition, vault: positionId })
       })
       position.deposits.forEach((deposit) => {
-        history.push({ action: "deposit", tokenAddress, tokenSymbol, amountUSD: deposit.amountUSD, amount: deposit.amount, timestamp: deposit.timestamp, logIndex: deposit.logIndex, combinedPosition })
+        history.push({ action: "deposit", tokenAddress, tokenSymbol, amountUSD: deposit.amountUSD, amount: deposit.amount, timestamp: deposit.timestamp, logIndex: deposit.logIndex, combinedPosition, vault: positionId })
 
       })
       position.repays.forEach((repay) => {
-        history.push({ action: "repay", tokenAddress, tokenSymbol, amountUSD: repay.amountUSD, amount: repay.amount, timestamp: repay.timestamp, logIndex: repay.logIndex, combinedPosition })
+        history.push({ action: "repay", tokenAddress, tokenSymbol, amountUSD: repay.amountUSD, amount: repay.amount, timestamp: repay.timestamp, logIndex: repay.logIndex, combinedPosition, vault: positionId })
 
       })
       position.withdraws.forEach((withdraw) => {
-        history.push({ action: "withdraw", tokenAddress, tokenSymbol, amountUSD: withdraw.amountUSD, amount: withdraw.amount, timestamp: withdraw.timestamp, logIndex: withdraw.logIndex, combinedPosition })
+        history.push({ action: "withdraw", tokenAddress, tokenSymbol, amountUSD: withdraw.amountUSD, amount: withdraw.amount, timestamp: withdraw.timestamp, logIndex: withdraw.logIndex, combinedPosition, vault: positionId })
 
       })
       position.liquidations.forEach((liquidation) => {
-        history.push({ action: "liquidation", tokenAddress, tokenSymbol, amountUSD: liquidation.amountUSD, amount: liquidation.amount, timestamp: liquidation.timestamp, logIndex: liquidation.logIndex, combinedPosition })
+        history.push({ action: "liquidation", tokenAddress, tokenSymbol, amountUSD: liquidation.amountUSD, amount: liquidation.amount, timestamp: liquidation.timestamp, logIndex: liquidation.logIndex, combinedPosition, vault: positionId })
       })
 
     })

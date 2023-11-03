@@ -180,6 +180,7 @@ export interface IHistory {
   timestamp: string;
   logIndex: number;
   combinedPosition: number;
+  vault: string;
 }
 
 export interface IFetchUserPosition {

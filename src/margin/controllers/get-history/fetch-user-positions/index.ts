@@ -4,7 +4,7 @@ import { CHAIN_ID } from "../../../utils/secrets";
 import { errorResponse, errorStackTrace } from "../../../utils/util";
 import * as sentry from '@sentry/node';
 import { userPositionQuery } from "../../helper/query";
-import { IErrorResponse, IFetchUserPosition,  } from "../../../utils/types";
+import { IErrorResponse, IFetchUserPosition, } from "../../../utils/types";
 import axios, { AxiosError } from "axios";
 
 export async function fetchUserPositions(userId: string, lendingPool: string): Promise<string[] | IErrorResponse> {
@@ -26,8 +26,8 @@ export async function fetchUserPositions(userId: string, lendingPool: string): P
       return errorResponse(err.response?.data, err.response?.status);
     }
 
-    if (!positions.length) {
-      return errorResponse(ERROR.PERPS_POSITION_NOT_FOUND, 400);
+    if (!positions) {
+      positions = [];
     }
     const userPositions: string[] = [];
     positions.forEach((position: IFetchUserPosition) => {
@@ -39,10 +39,9 @@ export async function fetchUserPositions(userId: string, lendingPool: string): P
     return userPositions;
   }
   catch (error) {
+    console.log(error);
     sentry.captureException(error);
     errorStackTrace(error);
     return errorResponse(ERROR.INTERNAL_SERVER_ERROR, 500);
   }
 }
-
-// fetchUserPositions("0x95d2aefd060db5da61e31fff7a855cc4c7ef6160", "0x2b254761b439d3a5300be16d13aa5aac07354d0f")

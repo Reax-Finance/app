@@ -16,7 +16,7 @@ export default async function handler(
   try {
 
     const userId = (req.query.userId as string)?.toLowerCase();
-    const lendingPool = req.query.lendingPool as string;
+    const lendingPool = (req.query.lendingPool as string)?.toLowerCase();
 
     // data validation
     if (!userId || !isAddress(userId)) {
@@ -27,7 +27,7 @@ export default async function handler(
       return res.status(400).send({ status: false, error: ERROR.LENDING_POOL_NOT_VALID });
     }
     const userPositions = await fetchUserPositions(userId, lendingPool);
-
+    
     if ('error' in userPositions) {
       return res.status(userPositions.statusCode).send({ status: userPositions.status, error: userPositions.error });
     }
@@ -41,9 +41,9 @@ export default async function handler(
     const data: Record<string, IHistory[]>[] = [];
 
     userPositions.forEach((positionId: string, index: number) => {
-      const setData: Record<string, IHistory[]> = {};
-      setData[`${positionId}`] = promiseRes[index];
-      data.push(setData);
+      // const setData: Record<string, IHistory[]> = {};
+      // setData[`${positionId}`] = promiseRes[index];
+      data.push(promiseRes[index]);
     })
 
     return res.status(200).send({ status: true, data });
