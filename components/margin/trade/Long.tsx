@@ -79,9 +79,12 @@ export default function Long() {
 	} = useBalanceData();
 
 	const { prices } = usePriceData();
+  const [error, setError] = useState(null);
 
 	const onInputTokenSelected = (i: number) => {
 		setInAssetIndex(i);
+    setInAmount('');
+		setOutAmount('');
 	};
 
 	const setOutputAmount = (e: any) => {
@@ -99,13 +102,15 @@ export default function Long() {
 	};
 
   const setInputAmount = async (e: any) => {
+    setError(null)
 		e = parseInput(e);
 		setInAmount(e);
-    setDataLoading(true);
-    if(tokens[inAssetIndex]?.id == pairs[pair].token0.id) {
-			setOutAmount(Big(e).mul(leverage).toString());
+    if(Number(e) == 0 || tokens[inAssetIndex]?.id == pairs[pair].token0.id) {
+      setOutAmount(Big(Number(e)).mul(leverage).toString());
 			return;
 		}
+    
+    setDataLoading(true);
     axios.get(ROUTER_ENDPOINT, {
       params: {
         tokenIn: tokens[inAssetIndex]?.id,
@@ -122,13 +127,16 @@ export default function Long() {
         setDataLoading(false);
         const swapData = res.data.data;
         setSwapData(swapData);
-        console.log(e, swapData.fData.estimatedOut);
         setOutAmount(
           Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pairs[pair].token0.decimals).toString()
         );
       })
       .catch((err: any) => {
+        setDataLoading(false);
+        setOutAmount('');
+        setSwapData(null);
         console.log(err);
+        setError(err.response?.data?.message ?? "Error fetching data")
       })
 	};
 
@@ -255,6 +263,11 @@ export default function Long() {
         stage: 0,
         message: "Unsupported Network"
       }
+    } else if (error){
+      return {
+        stage: 0,
+        message: error
+      }
     }
     else if(Number(inAmount) == 0 || isNaN(Number(inAmount))){
       return {
@@ -273,12 +286,12 @@ export default function Long() {
         message: "Insufficient Liquidity"
       }
     } 
-    else if (!positions[selectedPosition]?.id) {
+    else if (!positions[selectedPosition]?.id || (!isSynth(tokens[inAssetIndex].id) && !swapData)) {
       return {
         stage: 0,
         message: "Loading..."
       }
-    }
+    } 
     
     // check allowance if not native
     if (tokens[inAssetIndex].id !== ethers.constants.AddressZero && !data) {
@@ -460,6 +473,12 @@ export default function Long() {
 		}
 	}
 
+  const switchPosition = (e: any) => {
+		setSelectedPosition(Number(e.target.value))
+		setApprovedAmount('0');
+		setData(null);
+	}
+
 	const { colorMode } = useColorMode();
 
   const inputValue = (Number(inAmount) || 0) * prices[tokens[inAssetIndex].id];
@@ -514,7 +533,7 @@ export default function Long() {
             <NumberInput
               size={"xl"}
               onChange={setOutputAmount}
-              value={formatInput(outAmount)}
+              value={dataLoading ? '...' : formatInput(outAmount)}
             >
               <Flex align={'center'}>
                 <Box>
@@ -606,7 +625,7 @@ export default function Long() {
           {/* Select position */}
           {positions.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Position</Text>
-            {positions.length > 0 && <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={(e) => setSelectedPosition(Number(e.target.value))}>
+            {positions.length > 0 && <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={switchPosition}>
               {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
             </Select>}
           </Flex>}

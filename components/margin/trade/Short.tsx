@@ -70,6 +70,7 @@ export default function Short() {
 	const { positions, addPosition, pairs } = usePerpsData();
 	const { pools } = useLendingData();
 	const [dataLoading, setDataLoading] = useState(false);
+	const [error, setError] = useState(null);
 
 	const {
 		walletBalances,
@@ -100,35 +101,41 @@ export default function Short() {
 	};
 
   const setInputAmount = (e: any) => {
+		setError(null)
 		e = parseInput(e);
 		setInAmount(e);
-		if(tokens[inAssetIndex]?.id == pairs[pair].token1.id) {
-			setOutAmount(Big(e).mul(leverage).toString());
+		if(Number(e) == 0 || tokens[inAssetIndex]?.id == pairs[pair].token1.id) {
+			setOutAmount(Big(Number(e)).mul(leverage).toString());
 			return;
 		}
+		setDataLoading(true);
 		axios.get(ROUTER_ENDPOINT, {
 			params: {
-			  tokenIn: tokens[inAssetIndex]?.id,
-			  tokenOut: pairs[pair].token1.id,
-			  amount: e,
-			  kind: 0,
-			  sender: ADDRESS_ZERO,
-			  recipient: ADDRESS_ZERO,
-			  deadline: (Date.now()/1000).toFixed(0) + 5 * 60,
-			  slipage: maxSlippage
+				tokenIn: tokens[inAssetIndex]?.id,
+				tokenOut: pairs[pair].token1.id,
+				amount: e,
+				kind: 0,
+				sender: ADDRESS_ZERO,
+				recipient: ADDRESS_ZERO,
+				deadline: (Date.now()/1000).toFixed(0) + 5 * 60,
+				slipage: maxSlippage
 			}
-		  })
+		})
 			.then((res: any) => {
-			  setDataLoading(false);
-			  const swapData = res.data.data;
-			  setSwapData(swapData);
-			  console.log(e, swapData.fData.estimatedOut);
-			  setOutAmount(
-				Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pairs[pair].token1.decimals).toString()
-			  );
+				setDataLoading(false);
+				const swapData = res.data.data;
+				setSwapData(swapData);
+				console.log(e, swapData.fData.estimatedOut);
+				setOutAmount(
+					Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pairs[pair].token1.decimals).toString()
+				);
 			})
 			.catch((err: any) => {
-			  console.log(err);
+				setDataLoading(false);
+				setOutAmount('');
+				setSwapData(null);
+				console.log(err);
+				setError(err.response?.data?.message ?? "Error fetching data")
 			})
 	};
 
@@ -256,8 +263,12 @@ export default function Short() {
 				stage: 0,
 				message: "Unsupported Network"
 			}
-		}
-		else if(Number(inAmount) == 0 || isNaN(Number(inAmount))){
+		} else if (error){
+			return {
+			  stage: 0,
+			  message: error
+			}
+		} else if(Number(inAmount) == 0 || isNaN(Number(inAmount))){
 			return {
 				stage: 0,
 				message: "Enter Amount"
@@ -274,7 +285,7 @@ export default function Short() {
 				message: "Insufficient Liquidity"
 			}
 		} 
-		else if (!positions[selectedPosition]?.id) {
+		else if (!positions[selectedPosition]?.id || (!isSynth(tokens[inAssetIndex].id) && !swapData)) {
 			return {
 				stage: 0,
 				message: "Loading..."
@@ -466,6 +477,12 @@ export default function Short() {
 		}
 	}
 
+	const switchPosition = (e: any) => {
+		setSelectedPosition(Number(e.target.value))
+		setApprovedAmount('0');
+		setData(null);
+	}
+
 	const inputValue = (Number(inAmount) || 0) * prices[tokens[inAssetIndex].id];
 	const outputValue = Number(outAmount) * prices[pairs[pair]?.token1?.id] / leverage;
 
@@ -490,7 +507,7 @@ export default function Short() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Margin</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Margin ({dollarFormatter.format(inputValue)})</Text>
                   <NumberInputField rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -521,11 +538,12 @@ export default function Short() {
             <NumberInput
               size={"xl"}
               onChange={setOutputAmount}
-              value={formatInput(outAmount)}
+              value={dataLoading ? '...' : formatInput(outAmount)}
+			  isDisabled={dataLoading}
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
                   <NumberInputField disabled={true} _disabled={{color: "white"}} rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -611,7 +629,7 @@ export default function Short() {
           {/* Select position */}
           {positions.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Position</Text>
-            {positions.length > 0 && <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={(e) => setSelectedPosition(Number(e.target.value))}>
+            {positions.length > 0 && <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={switchPosition}>
               {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
             </Select>}
           </Flex>}
