@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -13,9 +13,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/utils.mts", "scripts/getConfig.js"],
   "exclude": ["node_modules"],
-  "files": ["./src/router/route-proposer-handler/handler/synth-pool/synth-pool-config.json", "./src/perps/controllers/helper/abis/abi.json"]
+  "files": ["./src/router/route-proposer-handler/handler/synth-pool/synth-pool-config.json", "./src/margin/controllers/helper/abis/abi.json"]
 }

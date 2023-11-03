@@ -34,27 +34,27 @@ export async function fetchPositionHistory(positionId: string, lendingPool: stri
 
     positions.forEach((position: IPosition) => {
 
-      const tokenAddress = position.borrows[0]?.market.inputToken.id ?? position.deposits[0]?.market.inputToken.id;
-      const tokenSymbol = position.borrows[0]?.market.inputToken.symbol ?? position.deposits[0]?.market.inputToken.symbol;
+      const tokenAddress = position.borrows[0]?.market.inputToken.id ?? position.deposits[0]?.market.inputToken.id ?? position.withdraws[0]?.market.inputToken.id ?? position.repays[0]?.market.inputToken.id;
+      const tokenSymbol = position.borrows[0]?.market.inputToken.symbol ?? position.deposits[0]?.market.inputToken.symbol ?? position.withdraws[0]?.market.inputToken.symbol ?? position.repays[0]?.market.inputToken.symbol;
       const combinedPosition = position.combinedPosition;
 
       position.borrows.forEach((borrow) => {
-        history.push({ action: "borrow", tokenAddress, tokenSymbol, amountUSD: borrow.amountUSD, amount: borrow.amount, timestamp: borrow.timestamp, logIndex: borrow.logIndex, combinedPosition, vault: positionId })
+        history.push({ action: "borrow", tokenAddress, tokenSymbol, amountUSD: borrow.amountUSD, amount: borrow.amount, timestamp: borrow.timestamp, logIndex: borrow.logIndex, combinedPosition, vault: positionId, hash: borrow.hash })
       })
       position.deposits.forEach((deposit) => {
-        history.push({ action: "deposit", tokenAddress, tokenSymbol, amountUSD: deposit.amountUSD, amount: deposit.amount, timestamp: deposit.timestamp, logIndex: deposit.logIndex, combinedPosition, vault: positionId })
+        history.push({ action: "deposit", tokenAddress, tokenSymbol, amountUSD: deposit.amountUSD, amount: deposit.amount, timestamp: deposit.timestamp, logIndex: deposit.logIndex, combinedPosition, vault: positionId, hash: deposit.hash })
 
       })
       position.repays.forEach((repay) => {
-        history.push({ action: "repay", tokenAddress, tokenSymbol, amountUSD: repay.amountUSD, amount: repay.amount, timestamp: repay.timestamp, logIndex: repay.logIndex, combinedPosition, vault: positionId })
+        history.push({ action: "repay", tokenAddress, tokenSymbol, amountUSD: repay.amountUSD, amount: repay.amount, timestamp: repay.timestamp, logIndex: repay.logIndex, combinedPosition, vault: positionId, hash: repay.hash })
 
       })
       position.withdraws.forEach((withdraw) => {
-        history.push({ action: "withdraw", tokenAddress, tokenSymbol, amountUSD: withdraw.amountUSD, amount: withdraw.amount, timestamp: withdraw.timestamp, logIndex: withdraw.logIndex, combinedPosition, vault: positionId })
+        history.push({ action: "withdraw", tokenAddress, tokenSymbol, amountUSD: withdraw.amountUSD, amount: withdraw.amount, timestamp: withdraw.timestamp, logIndex: withdraw.logIndex, combinedPosition, vault: positionId, hash: withdraw.hash })
 
       })
       position.liquidations.forEach((liquidation) => {
-        history.push({ action: "liquidation", tokenAddress, tokenSymbol, amountUSD: liquidation.amountUSD, amount: liquidation.amount, timestamp: liquidation.timestamp, logIndex: liquidation.logIndex, combinedPosition, vault: positionId })
+        history.push({ action: "liquidation", tokenAddress, tokenSymbol, amountUSD: liquidation.amountUSD, amount: liquidation.amount, timestamp: liquidation.timestamp, logIndex: liquidation.logIndex, combinedPosition, vault: positionId , hash: liquidation.hash})
       })
 
     })

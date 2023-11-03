@@ -18,6 +18,7 @@ export const positionQuery = function (userId: string) {
           amountUSD
           logIndex
           timestamp
+          hash
           market {
             id
             liquidationThreshold
@@ -47,6 +48,7 @@ export const positionQuery = function (userId: string) {
           amountUSD
           logIndex
           timestamp
+          hash
           market {
             id
             liquidationThreshold
@@ -76,12 +78,60 @@ export const positionQuery = function (userId: string) {
           amountUSD
           logIndex
           timestamp
+          hash
+          market {
+            id
+            liquidationThreshold
+            maximumLTV
+            totalDepositBalanceUSD
+            totalBorrowBalanceUSD
+            inputTokenBalance
+            _sToken {
+              id
+            }
+            _vToken {
+              id
+            }
+            inputToken {
+              id
+              name
+              symbol
+              decimals
+            }
+            outputToken {
+              id
+            }
+          }
         }
         withdraws {
           amount
           amountUSD
           logIndex
           timestamp
+          hash
+          market {
+            id
+            liquidationThreshold
+            maximumLTV
+            totalDepositBalanceUSD
+            totalBorrowBalanceUSD
+            inputTokenBalance
+            _sToken {
+              id
+            }
+            _vToken {
+              id
+            }
+            inputToken {
+              id
+              name
+              symbol
+              decimals
+            }
+            outputToken {
+              id
+            }
+          }
         }
         liquidations {
           amount
@@ -89,6 +139,7 @@ export const positionQuery = function (userId: string) {
           profitUSD
           logIndex
           timestamp
+          hash
         }
       }
     }

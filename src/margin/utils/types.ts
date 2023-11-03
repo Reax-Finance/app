@@ -15,6 +15,7 @@ export interface IPosition {
       amountUSD: string
       logIndex: number
       timestamp: string
+      hash: string
       market: IMarket
     }
   ]
@@ -24,6 +25,7 @@ export interface IPosition {
       amountUSD: string
       logIndex: number
       timestamp: string
+      hash: string
       market: IMarket
     }
   ]
@@ -33,6 +35,8 @@ export interface IPosition {
       amountUSD: string
       logIndex: number
       timestamp: string
+      hash: string
+      market: IMarket
     }
   ]
   withdraws: [
@@ -41,6 +45,8 @@ export interface IPosition {
       amountUSD: string
       logIndex: number
       timestamp: string
+      hash: string
+      market: IMarket
     }
   ]
   liquidations: [
@@ -50,6 +56,7 @@ export interface IPosition {
       profitUSD: string
       logIndex: number
       timestamp: string
+      hash: string
     }
   ]
 }
@@ -181,6 +188,7 @@ export interface IHistory {
   logIndex: number;
   combinedPosition: number;
   vault: string;
+  hash: string;
 }
 
 export interface IFetchUserPosition {
