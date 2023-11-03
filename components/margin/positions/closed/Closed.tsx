@@ -13,16 +13,33 @@ import {
     Text
 } from '@chakra-ui/react'
 import { usePerpsData } from '../../../context/PerpsDataProvider'
-import Position from '../opened/Position';
-import { VARIANT } from '../../../../styles/theme';
 import ClosedPosition from './ClosedPosition';
+
+import {
+	Pagination,
+	usePagination,
+	PaginationNext,
+	PaginationPage,
+	PaginationPrevious,
+	PaginationContainer,
+	PaginationPageGroup,
+} from "@ajna/pagination";
+import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
+
+const pageSize = 2;
 
 export default function Closed() {
     const {positions, closedPositions} = usePerpsData();
 
-    console.log(closedPositions);
+    const { currentPage, setCurrentPage, pagesCount, pages } =
+		usePagination({
+			pagesCount: Math.ceil((positions?.length ?? 1) / pageSize) ?? 1,
+			initialState: { currentPage: 1 }
+		}
+	);	
+    const {colorMode} = useColorMode();
 
-    return (   
+    return (<>
         <TableContainer>
             <Table variant='simple'>
                 <Thead>
@@ -36,9 +53,43 @@ export default function Closed() {
                 </Tr>
                 </Thead>
                 <Tbody>
-                    {closedPositions.length > 0 ? closedPositions.map((position: any, index: number) => (<ClosedPosition key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
+                    {closedPositions.length > 0 ? [...closedPositions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<ClosedPosition key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
                 </Tbody>
             </Table>
         </TableContainer>
+        <Flex justify={"center"} mb={-8} mt={-1}>
+        <Pagination
+            pagesCount={pagesCount}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+        >
+            <PaginationContainer my={4}>
+                <PaginationPrevious variant={"none"}>
+                    <MdNavigateBefore />
+                </PaginationPrevious>
+                <PaginationPageGroup>
+                    {pages.map((page: number) => (
+                        <PaginationPage
+                            key={`pagination_page_${page}`}
+                            page={page}
+                            width={10}
+                            rounded={"full"}
+                            bgColor={"transparent"
+                            }
+                            color={
+                                page === currentPage ? 'primary.400' : colorMode == 'dark' ? 'white' : 'blackAlpha.600'
+                            }
+                            _hover={{ bgColor: colorMode == 'dark' ? "whiteAlpha.200" : "blackAlpha.200" }}
+                        />
+                    ))}
+                </PaginationPageGroup>
+                <PaginationNext variant={"none"}>
+                    {" "}
+                    <MdNavigateNext />{" "}
+                </PaginationNext>
+            </PaginationContainer>
+        </Pagination>
+        </Flex>
+    </>
     )
 }

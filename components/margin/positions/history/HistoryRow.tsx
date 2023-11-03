@@ -14,11 +14,6 @@ import CloseModal from '../opened/CloseModal';
 
 
 export default function HistoryRow({history, index}: any) {
-    const {protocols: lendingProtocols, pools} = useLendingData();
-    const {positions } = usePerpsData();
-    const {prices} = usePriceData();
-    const {walletBalances} = useBalanceData();
-
     return (<>
         <Tr>
             <Td>
@@ -40,9 +35,9 @@ export default function HistoryRow({history, index}: any) {
             </Td>
 
             <Td>
-                <Box>
+                <Text fontSize={'sm'} fontWeight={'medium'}>
                     {history.action.toUpperCase()}
-                </Box>
+                </Text>
             </Td>
 
             <Td>
@@ -54,7 +49,10 @@ export default function HistoryRow({history, index}: any) {
             </Td>
 
             <Td isNumeric>
-                <Text fontSize={'sm'}>{(new Date(history.timestamp * 1000)).toLocaleString()}</Text>
+                <Flex justify={'end'} gap={2} align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/tx/' + history.hash)}>
+                    <Text fontSize={'sm'}>{(new Date(history.timestamp * 1000)).toLocaleString()}</Text>
+                    <MdOpenInNew size={'14px'}/>
+                </Flex>
             </Td>
         </Tr>    
     </>

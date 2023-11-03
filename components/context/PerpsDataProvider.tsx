@@ -75,7 +75,7 @@ function PerpsDataProvider({ children }: any) {
 		let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
 		let multicall = new ethers.Contract(getAddress("Multicall2", defaultChain.id), getABI("Multicall2", defaultChain.id), provider);
 		let factory = new ethers.Contract(FACTORY, getABI('PerpFactory', defaultChain.id), provider);
-		let calls = [];
+		let calls: any[] = [];
 		calls.push([factory.address, factory.interface.encodeFunctionData("getPositionAddress", [_address, _positions.length])]);
 
 		let requests = _positions.map(
@@ -90,7 +90,7 @@ function PerpsDataProvider({ children }: any) {
 			.then((results: any) => {
 				console.log("Got position data", results);
 				// second last request is history
-				setHistory(results[results.length - 2].data.data);
+				setHistory(results[results.length - 2].data.data.reverse());
 				// last request is multicall
 				_positions.push({
 					id: results[results.length - 1].returnData[0].toLowerCase().replace("0x000000000000000000000000", "0x"),
@@ -102,15 +102,15 @@ function PerpsDataProvider({ children }: any) {
 
 				console.log("Positions", _positions, results);
 
-				let openPositions = [];
-				let closedPositions = [];
+				let openPositions: any[] = [];
+				let closedPositions: any[] = [];
 
 				for(let i in _positions){
 					for(let j in results[i]?.data?.data){
 						// push last element into open
-						if(results[i]?.data?.data[j].timestampClosed == null){
+						if(results[i]?.data?.data[j].timestampClosed === null){
 							openPositions.push({...results[i]?.data?.data[j], ..._positions[i]})
-						} else {
+						} else if(results[i]?.data?.data[j].timestampClosed) {
 							// else push in closed
 							closedPositions.push({...results[i]?.data?.data[j], ..._positions[i]})
 						}
