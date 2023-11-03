@@ -13,17 +13,17 @@ import {
 import { Flex, Text, Box, Image, Divider, IconButton, Tr, Button, Heading, useDisclosure, NumberInput, NumberInputField,  } from '@chakra-ui/react';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { AiOutlineDownSquare } from 'react-icons/ai';
-import { formatInput, parseInput } from '../../utils/number';
-import { useBalanceData } from '../../context/BalanceProvider';
+import { formatInput, parseInput } from '../../../utils/number';
+import { useBalanceData } from '../../../context/BalanceProvider';
 import { ethers } from 'ethers';
-import { usePriceData } from '../../context/PriceContext';
+import { usePriceData } from '../../../context/PriceContext';
 import { useAccount, useNetwork } from 'wagmi';
 import Big from 'big.js';
-import { VARIANT } from '../../../styles/theme';
-import { usePerpsData } from '../../context/PerpsDataProvider';
-import { getABI, send } from '../../../src/contract';
-import useUpdateData from '../../utils/useUpdateData';
-import { dollarFormatter, tokenFormatter } from '../../../src/const';
+import { VARIANT } from '../../../../styles/theme';
+import { usePerpsData } from '../../../context/PerpsDataProvider';
+import { getABI, send } from '../../../../src/contract';
+import useUpdateData from '../../../utils/useUpdateData';
+import { dollarFormatter, tokenFormatter } from '../../../../src/const';
 
 export default function CloseAllModal({details}: any) {
     const [inAmount, setInputAmount] = React.useState("");

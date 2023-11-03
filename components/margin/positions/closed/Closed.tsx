@@ -12,9 +12,9 @@ import {
     TableContainer,
     Text
 } from '@chakra-ui/react'
-import { usePerpsData } from '../../context/PerpsDataProvider'
-import Position from './Position';
-import { VARIANT } from '../../../styles/theme';
+import { usePerpsData } from '../../../context/PerpsDataProvider'
+import Position from '../opened/Position';
+import { VARIANT } from '../../../../styles/theme';
 import ClosedPosition from './ClosedPosition';
 
 export default function Closed() {

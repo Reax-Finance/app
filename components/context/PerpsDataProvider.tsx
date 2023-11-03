@@ -19,6 +19,7 @@ interface PerpsDataValue {
 	addPosition: (address: any) => void;
 	pairs: any;
 	closedPositions: any[];
+	history: any[];
 }
 
 const PerpsDataContext = React.createContext<PerpsDataValue>({} as PerpsDataValue);
@@ -27,10 +28,12 @@ function PerpsDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<PerpsDataValue['status']>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<PerpsDataValue['message']>("");
 	const [pairs, setPairs] = React.useState<any>({});
+	const [history, setHistory] = React.useState<any[]>([]);
 
 	const { chain } = useNetwork();
 	const [positions, setPositions] = React.useState<any[]>([]);
 	const [closedPositions, setClosedPositions] = React.useState<any[]>([]);
+
 
 	const fetchData = (_address?: string): Promise<number> => {
 		let chainId = chain?.id ?? defaultChain.id;
@@ -76,14 +79,19 @@ function PerpsDataProvider({ children }: any) {
 		calls.push([factory.address, factory.interface.encodeFunctionData("getPositionAddress", [_address, _positions.length])]);
 
 		let requests = _positions.map(
-			(position: any) => axios.get(process.env.NEXT_PUBLIC_VERCEL_URL + `/api/margin/positions?position=${position.id}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
-		).concat(multicall.callStatic.aggregate(calls));
-		
+			(position: any) => axios.get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/margin/positions?position=${position.id}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
+		).concat(
+			axios.get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/margin/history?userId=${_address.toLowerCase()}&lendingPool=0x2b254761b439d3a5300be16d13aa5aac07354d0f`)
+		).concat(
+			multicall.callStatic.aggregate(calls)
+		);
 		
 		Promise.all(requests)
 			.then((results: any) => {
 				console.log("Got position data", results);
-				// results.returnData[0]: bytes to address
+				// second last request is history
+				setHistory(results[results.length - 2].data.data);
+				// last request is multicall
 				_positions.push({
 					id: results[results.length - 1].returnData[0].toLowerCase().replace("0x000000000000000000000000", "0x"),
 					factory: {
@@ -136,7 +144,8 @@ function PerpsDataProvider({ children }: any) {
         addPosition,
         fetchData,
 		pairs,
-		closedPositions
+		closedPositions,
+		history
     };
 
 	return (

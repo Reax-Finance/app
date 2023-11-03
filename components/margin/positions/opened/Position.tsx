@@ -1,19 +1,20 @@
 import { ethers } from 'ethers';
 import React, { useEffect } from 'react'
-import { useLendingData } from '../../context/LendingDataProvider';
-import { usePriceData } from '../../context/PriceContext';
-import { useBalanceData } from '../../context/BalanceProvider';
+import { useLendingData } from '../../../context/LendingDataProvider';
+import { usePriceData } from '../../../context/PriceContext';
+import { useBalanceData } from '../../../context/BalanceProvider';
 import Big from 'big.js';
 import { Td, Flex, Text, Box, Image, Divider, IconButton, Tr, Button, Heading, useDisclosure, NumberInput, NumberInputField,  } from '@chakra-ui/react';
 import { MdOpenInNew } from 'react-icons/md';
-import { ESYX_PRICE, defaultChain, dollarFormatter, tokenFormatter } from '../../../src/const';
-import { usePerpsData } from '../../context/PerpsDataProvider';
-import { getABI } from '../../../src/contract';
+import { ESYX_PRICE, defaultChain, dollarFormatter, tokenFormatter } from '../../../../src/const';
+import { usePerpsData } from '../../../context/PerpsDataProvider';
+import { getABI } from '../../../../src/contract';
 import { useNetwork } from 'wagmi';
 import CloseModal from './CloseModal';
+import CloseAllModal from './CloseAllModal';
 
 
-export default function ClosedPosition({position, index}: any) {
+export default function Position({position, index}: any) {
     const {protocols: lendingProtocols, pools} = useLendingData();
     const {positions } = usePerpsData();
     const {prices} = usePriceData();
@@ -51,16 +52,35 @@ export default function ClosedPosition({position, index}: any) {
             }
     
     
-            for(let i in position.data){   
+            for(let i in markets){   
+                let inputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i].inputToken.id, position.id]));
+                let outputTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i].outputToken.id, position.id]));
+                let vTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i]._vToken.id, position.id]));
+                let sTokenHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [markets[i]._sToken.id, position.id]));
+
+                if(!walletBalances[outputTokenHash] || !prices[markets[i].inputToken.id]) continue;
+                let collateralValue = Big(walletBalances[outputTokenHash]).div(10**markets[i].outputToken.decimals);
+                let variableDebt = Big(walletBalances[vTokenHash]).div(10**markets[i]._vToken.decimals);
+                let stableDebt = Big(walletBalances[sTokenHash]).div(10**markets[i]._sToken.decimals);
+                _totalCollateral = _totalCollateral.add(collateralValue.mul(prices[markets[i].inputToken.id]));
+                _adjustedCollateral = _adjustedCollateral.plus(collateralValue.mul(prices[markets[i].inputToken.id]).mul(markets[i].maximumLTV).div(100));
+                _totalDebt = _totalDebt.add(variableDebt.mul(prices[markets[i].inputToken.id]));
+                _totalStableDebt = _totalStableDebt.add(stableDebt.mul(prices[markets[i].inputToken.id]));
+    
+                netApy = netApy.add(collateralValue.mul(prices[markets[i].inputToken.id]).mul(markets[i].rates.find((rate: any) => rate.side == 'LENDER').rate));
+                rewardApy = rewardApy.add(collateralValue.mul(prices[markets[i].inputToken.id]).mul(rewardAPY(markets[i], 'DEPOSIT')));
+                totalValue = totalValue.add(collateralValue.mul(prices[markets[i].inputToken.id]));
+                netApy = netApy.add(variableDebt.mul(prices[markets[i].inputToken.id]).mul(markets[i].rates.find((rate: any) => rate.side == 'BORROWER' && rate.type == 'VARIABLE').rate).neg());
+                rewardApy = rewardApy.add(variableDebt.mul(prices[markets[i].inputToken.id]).mul(rewardAPY(markets[i], 'BORROW')));
+                totalValue = totalValue.add(variableDebt.mul(prices[markets[i].inputToken.id]));
+                netApy = netApy.add(stableDebt.mul(prices[markets[i].inputToken.id]).mul(markets[i].rates.find((rate: any) => rate.side == 'BORROWER' && rate.type == 'STABLE').rate).neg());
+                rewardApy = rewardApy.add(stableDebt.mul(prices[markets[i].inputToken.id]).mul(rewardAPY(markets[i], 'BORROW', 'STABLE')));
+                totalValue = totalValue.add(stableDebt.mul(prices[markets[i].inputToken.id]));
+    
                 let pos = {
-                    market: {
-                        inputToken: {
-                            id: position.data[i].tokenAddress,
-                            symbol: position.data[i].tokenSymbol,
-                        }
-                    },
-                    collateral: position.data[i].depositAmount / prices[position.data[i].tokenAddress],
-                    debt: position.data[i].borrowAmount / prices[position.data[i].tokenAddress],
+                    market: markets[i],
+                    collateral: collateralValue.toString(),
+                    debt: stableDebt.add(variableDebt).toString(),
                 }
     
                 if(Number(pos.collateral) > 0){
@@ -100,13 +120,15 @@ export default function ClosedPosition({position, index}: any) {
 
     const leverage = (Number(details?.collateral) / (Number(details?.collateral) - Number(details?.debt)) || 0);
 
+    if(!position.data) return <></>
+
     return (<>
         <Tr>
             <Td>
                 <Box>
                     <Flex align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
-                        {position.data.map((token: any) => (<>
-                            {token.tokenSymbol && <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />}
+                        {position?.data?.map((token: any) => (<>
+                            <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />
                         </>))}
                     </Flex>
                     <Flex align={'center'} gap={1} mt={1}>
@@ -118,8 +140,19 @@ export default function ClosedPosition({position, index}: any) {
             <Td>
                 <Flex flexDir={'row'} align={'center'}>
                     <Flex fontSize={'md'}>
-                        <Text>{position.leverage}x</Text>
+                        <Text>{position?.leverage}x</Text>
                     </Flex>
+                    <Box fontSize={'xs'} ml={2} color={'whiteAlpha.600'}>
+                        <Text> / Liq {position?.liqLeverage}x</Text>
+                    </Box>
+                </Flex>
+            </Td>
+
+            <Td>
+                <Text fontSize={'sm'}>{(leverage * details?.apy).toFixed(2)} %</Text>
+                <Flex gap={1} align={'center'}>
+                    <Text color={'whiteAlpha.700'} fontSize={'sm'}>{(leverage * details?.rewardAPY).toFixed(2)} %</Text>
+                    <Image src='/veREAX.svg' boxSize={'16px'} rounded={'full'} alt='veREAX' />
                 </Flex>
             </Td>
 
@@ -127,7 +160,7 @@ export default function ClosedPosition({position, index}: any) {
                 <Box>
                     <Flex gap={1} mb={1} align={'center'}>
                         <Text color={'whiteAlpha.600'} fontSize={'sm'}>Total</Text>
-                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(position?.collateral) || 0)}</Text>
+                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.collateral) || 0)}</Text>
                     </Flex>
                     {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
                         <Flex align={'center'} color={'whiteAlpha.600'} key={index} my={0} gap={1.5}>
@@ -158,12 +191,17 @@ export default function ClosedPosition({position, index}: any) {
 
             <Td>
                 <Flex gap={0} flexDir={'column'}> 
-                    <Heading mt={-1} fontSize={'md'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>{dollarFormatter.format(Number(position?.profitLoss))}</Heading>
+                    <Heading mt={-1} fontSize={'md'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>{tokenFormatter.format(100 * position?.profitLoss / position?.netAmount)}%</Heading>
+                    <Text mt={1} fontSize={'sm'} color={Number(position?.profitLoss) > 0 ? 'green.400' : 'red.400'}>({dollarFormatter.format(Number(position?.profitLoss))})</Text>
                 </Flex>
             </Td>
 
             <Td isNumeric>
-                <Text fontSize={'sm'}>{(new Date(position.timestampClosed * 1000)).toLocaleString()}</Text>
+                <Flex flexDir={'column'} justify={'end'} align={'end'} gap={1}>
+                    <CloseModal details={details} />
+                    {/* <CloseAllModal details={details} /> */}
+                </Flex>
+                
             </Td>
         </Tr>    
     </>
