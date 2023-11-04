@@ -69,7 +69,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber, onClose }: any) => {
 			.toFixed(0);
 
 		const priceFeedUpdateData = await getUpdateData();
-		let args = [asset.token.id, value, address, priceFeedUpdateData];
+		let args = [asset.token.id, value, priceFeedUpdateData];
 
 		send(pool, "burn", args)
 		.then(async (res: any) => {
@@ -85,7 +85,7 @@ const Burn = ({ asset, amount, setAmount, amountNumber, onClose }: any) => {
 				description: (
 					<Box>
 						<Text>
-							{`You have burned ${amount} ${asset.token.symbol}`}
+							{`You have burned ${tokenFormatter.format(amount)} ${asset.token.symbol}`}
 						</Text>
 						<Link
 							href={
