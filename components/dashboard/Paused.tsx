@@ -26,7 +26,7 @@ export default function Paused() {
 					maxW={"500px"}
 					my={4}
 				>
-					Equity and ETF assets are traded only during 9:30AM to 4:00PM EDT Monday
+					Markets can be paused for maintainance/upgrades. Equity and ETF assets are traded only during 9:30AM to 4:00PM EDT Monday
 					through Friday
 				</Text>
 
