@@ -32,11 +32,12 @@ export default function CloseModal({details}: any) {
     const [outAssetIndex, setOutAssetIndex] = React.useState(0);
 	const { prices } = usePriceData();
     const { chain } = useNetwork();
-    const { positions, addPosition } = usePerpsData();
+    const { fetchBalances } = useBalanceData();
 	const [isMax, setIsMax] = useState(false);
     const {address} = useAccount();
 
     const { getUpdateData } = useUpdateData();
+
     const close = async () => {
         let calls: any[] = [];
 
@@ -50,6 +51,7 @@ export default function CloseModal({details}: any) {
         calls.push(position.interface.encodeFunctionData("call", [borrowed.address, borrowed.interface.encodeFunctionData("approve", [details?.position?.factory?.lendingPool, ethers.constants.MaxUint256]), 0]));
         calls.push(position.interface.encodeFunctionData("closePosition", [borrowed.address, Big(outAmount).mul(isMax ? 10 : 1).mul(10**details?.debts?.[outAssetIndex]?.market?.inputToken?.decimals).toFixed(0), supplied.address]));
 
+        // Final close
         if(isMax && details?.debts.length == 1){
             // Withdraw all collaterals
             for(let i = 0; i < details?.collaterals.length; i++){
@@ -57,11 +59,10 @@ export default function CloseModal({details}: any) {
             }
         }
 
-        console.log(calls);
-        
         send(position, "multicall", [calls])
-        .then((res: any) => {
-            console.log(res);
+        .then(async (res: any) => {
+            const tx = await res.wait(0);
+            fetchBalances(address!);
             onClose();
         })
         .catch((err: any) => {

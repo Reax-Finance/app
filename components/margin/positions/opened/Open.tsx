@@ -29,17 +29,15 @@ import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
 const pageSize = 2;
 
 export default function Open() {
-    const {positions} = usePerpsData();
+    const {openPositions} = usePerpsData();
 
     const { currentPage, setCurrentPage, pagesCount, pages } =
 		usePagination({
-			pagesCount: Math.ceil((positions?.length ?? 1) / pageSize) ?? 1,
+			pagesCount: Math.ceil(((openPositions?.length) ?? 1) / pageSize) ?? 1,
 			initialState: { currentPage: 1 }
 		}
-	);	
+	);
     const {colorMode} = useColorMode();
-
-    console.log(positions);
 
     return (   <>
         <TableContainer>
@@ -56,7 +54,7 @@ export default function Open() {
                 </Tr>
                 </Thead>
                 <Tbody>
-                    {positions.length > 1 ? [...positions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
+                    {openPositions.length > 0 ? [...openPositions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
                 </Tbody>
             </Table>
         </TableContainer>

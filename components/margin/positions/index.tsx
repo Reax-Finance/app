@@ -7,15 +7,12 @@ import {
 	Tab,
     Divider,
 } from "@chakra-ui/react";
-import { usePerpsData } from '../../context/PerpsDataProvider'
-import Position from './opened/Position';
 import { VARIANT } from '../../../styles/theme';
 import Open from './opened/Open';
 import Closed from './closed/Closed';
 import History from './history/History';
 
 export default function Positions() {
-    const {positions} = usePerpsData();
     const { colorMode } = useColorMode();
 
     return (   

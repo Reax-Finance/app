@@ -24,6 +24,7 @@ interface BalanceValue {
     updateFromTx: (tx: any) => void;
     setBalance: (asset: string, value: string) => void;
     liquidTokens: any[];
+    fetchBalances: (_address: string, positions?: any[]) => Promise<void>;
 }
 
 function BalanceContextProvider({ children }: any) {
@@ -38,16 +39,25 @@ function BalanceContextProvider({ children }: any) {
     const { pools } = useAppData();
     const { address } = useAccount();
     const { pools: dexPools, vault, dex } = useDexData();
-    const { positions, status: perpStatus, pairs: perpPairs } = usePerpsData();
+    const { vaults: _positions, status: perpStatus, pairs: perpPairs } = usePerpsData();
 
     React.useEffect(() => {
-        if(status == Status.NOT_FETCHING && pools.length > 0 && lendingPools.length > 0 && lendingPools?.[0]?.length > 0 && dexPools.length > 0 && perpStatus == Status.SUCCESS && Object.keys(perpPairs).length > 0) {
+        if(
+            status == Status.NOT_FETCHING && 
+            pools.length > 0 && 
+            lendingPools.length > 0 && 
+            lendingPools?.[0]?.length > 0 && 
+            dexPools.length > 0 && 
+            perpStatus == Status.SUCCESS && 
+            _positions.length > 0 && // Vaults would always have one extra (to be created) 
+            Object.keys(perpPairs).length > 0
+        ) {
             fetchBalances(address);
         }
-    }, [pools, address, status, positions, dexPools.length, lendingPools])
+    }, [pools, address, status, _positions, dexPools.length, lendingPools, perpStatus])
 
-    const fetchBalances = async (_address?: string) => {
-        console.log("Fetching balances...");
+    const fetchBalances = async (_address?: string, positions = _positions) => {
+        console.log("Fetching balances...", positions);
         setStatus(Status.FETCHING);
         const chainId = defaultChain.id;
 		const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
@@ -206,6 +216,7 @@ function BalanceContextProvider({ children }: any) {
         for(let j = 0; j < positions.length; j++){
             // Lending Data
             const marketsIndex = lendingProtocols.map((protocol: any) => protocol._lendingPoolAddress == positions[j].factory.lendingPool.toLowerCase() ? '1' : '0').indexOf('1');
+            console.log("marketsIndex", marketsIndex);
             const wrapperAddress = lendingProtocols[marketsIndex]._wrapper;
             let markets = lendingPools[marketsIndex];
             for(let i = 0; i < markets.length; i++) {
@@ -336,7 +347,7 @@ function BalanceContextProvider({ children }: any) {
 
         // split calls array in arrays of max 250 length
         const MAX = 200;
-        let callsArray = [];
+        let callsArray: any[] = [];
         for (let i = 0; i < calls.length; i += MAX) {
             callsArray.push(calls.slice(i, i + MAX));
         }
@@ -477,6 +488,7 @@ function BalanceContextProvider({ children }: any) {
                     index++;
                 }
             }
+            console.log(calls.length, index);
             setStatus(Status.SUCCESS);
             setWalletBalances(newBalances);
             setAllowances(newAllowances);
@@ -617,6 +629,7 @@ function BalanceContextProvider({ children }: any) {
         updateFromTx,
         setBalance,
         liquidTokens: getLiquidTokens(),
+        fetchBalances
 	};
 
 

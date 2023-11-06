@@ -67,7 +67,7 @@ export default function Short() {
 	const { pair }: any = router.query;
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedPosition, setSelectedPosition] = React.useState(0);
-	const { positions, addPosition, pairs } = usePerpsData();
+	const { openPositions, vaults, pairs } = usePerpsData();
 	const { pools } = useLendingData();
 	const [dataLoading, setDataLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -164,12 +164,12 @@ export default function Short() {
 
 	const approveTx = async () => {
 		setApproveLoading(true);
-		const collateralContract = await getContract("MockToken", chain?.id ?? defaultChain.id, positions[selectedPosition]?.id);
+		const collateralContract = await getContract("MockToken", chain?.id ?? defaultChain.id, vaults[selectedPosition]?.id);
 		send(
 			collateralContract,
 			"approve",
 			[
-				positions[selectedPosition]?.id,
+				vaults[selectedPosition]?.id,
 				ethers.constants.MaxUint256
 			]
 		)
@@ -223,7 +223,7 @@ export default function Short() {
 			},
 			value: {
 				owner: address!,
-				spender: positions[selectedPosition]?.id,
+				spender: vaults[selectedPosition]?.id,
 				value,
 				nonce: nonces[tokens[inAssetIndex].id] ?? 0,
 				deadline: BigNumber.from(_deadline),
@@ -289,7 +289,7 @@ export default function Short() {
 				message: "Insufficient Liquidity"
 			}
 		} 
-		else if (!positions[selectedPosition]?.id || (!isSynth(tokens[inAssetIndex].id) && !swapData)) {
+		else if (!vaults[selectedPosition]?.id || (!isSynth(tokens[inAssetIndex].id) && !swapData)) {
 			return {
 				stage: 0,
 				message: "Loading..."
@@ -299,7 +299,7 @@ export default function Short() {
 		// Check allowance if not native
 		if (tokens[inAssetIndex].id !== ethers.constants.AddressZero && !data) {
 			// If not approved
-			if(Big(allowances[tokens[inAssetIndex].id]?.[positions[selectedPosition]?.id] ?? 0).add(Big(approvedAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18))).lt(Big(inAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18)))) {
+			if(Big(allowances[tokens[inAssetIndex].id]?.[vaults[selectedPosition]?.id] ?? 0).add(Big(approvedAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18))).lt(Big(inAmount).mul(10 ** (tokens[inAssetIndex].decimals ?? 18)))) {
 				return {
 					stage: 1,
 					message: "Approve Use Of" + " " + tokens[inAssetIndex].symbol
@@ -328,11 +328,11 @@ export default function Short() {
 	const open = async () => {
 		let calls: any[] = [];
 		setLoading(true);
-		let position = new ethers.Contract(positions[selectedPosition]?.id, getABI("PerpPosition", chain?.id!));
+		let position = new ethers.Contract(vaults[selectedPosition]?.id, getABI("PerpPosition", chain?.id!));
 		let erc20 = new ethers.Contract(tokens[inAssetIndex].id, getABI("MockToken", chain?.id!));
 		let factory = new ethers.Contract(pairs[pair].perpFactory, getABI("PerpFactory", chain?.id!));
 		let _amount = ethers.utils.parseUnits(Big(inAmount).toFixed(tokens[inAssetIndex].decimals, 0), tokens[inAssetIndex].decimals);
-		let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(leverage - 1).div(prices[pairs[pair].token1.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
+		let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(prices[tokens[inAssetIndex].id]).mul(leverage).div(prices[pairs[pair].token1.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
 		let deadline_m = 5;
 
 		// 1. Transfer inAsset to position if doesn't have enough quote asset balance
@@ -396,8 +396,8 @@ export default function Short() {
 		}
 
 		// 4. Approvals
-		let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token0.id, positions[selectedPosition].id]));
-		let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token1.id, positions[selectedPosition].id]));
+		let baseHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token0.id, vaults[selectedPosition].id]));
+		let quoteHash = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["address", "address"], [pairs[pair].token1.id, vaults[selectedPosition].id]));
 		if(Big(allowances[quoteHash][POOL]).lt(ethers.constants.MaxUint256.div(2).toString())){
 			// Position approves to supply cusd pool
 			calls.push(position.interface.encodeFunctionData("call", [pairs[pair].token1.id, erc20.interface.encodeFunctionData("approve", [POOL, ethers.constants.MaxUint256]), 0]));
@@ -413,7 +413,7 @@ export default function Short() {
 		calls.push(position.interface.encodeFunctionData("openPosition", [pairs[pair].token1.id, _leveragedAmount, pairs[pair].token0.id]));
 
 		let tx;
-		if(selectedPosition == positions.length - 1){
+		if(selectedPosition == vaults.length){
 			tx = send(factory, "newPosition", [calls], "10000")
 		} else {
 			tx = send(position, "multicall", [calls]);
@@ -600,6 +600,7 @@ export default function Short() {
                   value={leverage * 10}
                   colorScheme="secondary"
                   mb={"-1px"}
+				  min={10}
                 >
                   <SliderMark value={25} {...labelStyles}>
                     <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 2.5 ? 'secondary.200' : 'whiteAlpha.200'}></Box>
@@ -613,7 +614,7 @@ export default function Short() {
                   <SliderTrack>
                     <SliderFilledTrack />
                   </SliderTrack>
-                  <SliderThumb ml={"-7.5px"} />
+                  <SliderThumb />
                   <SliderMark
                     value={leverage * 10}
                     textAlign='center'
@@ -634,11 +635,11 @@ export default function Short() {
 
           <Divider my={4} mt={4} />
           {/* Select position */}
-          {positions.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
-            <Text m={2} fontSize={'sm'} w={'60%'}>Select Position</Text>
-            {positions.length > 0 && <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={switchPosition}>
-              {positions.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (positions.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
-            </Select>}
+          {vaults.length > 0 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
+            <Text m={2} fontSize={'sm'} w={'60%'}>Select Vault</Text>
+            <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={switchPosition}>
+              {vaults.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (vaults.length)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
+            </Select>
           </Flex>}
 
 		  {swapData && <Box mt={4}>

@@ -29,11 +29,11 @@ import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
 const pageSize = 2;
 
 export default function Closed() {
-    const {positions, closedPositions} = usePerpsData();
+    const {closedPositions} = usePerpsData();
 
     const { currentPage, setCurrentPage, pagesCount, pages } =
 		usePagination({
-			pagesCount: Math.ceil((positions?.length ?? 1) / pageSize) ?? 1,
+			pagesCount: Math.ceil((closedPositions?.length ?? 1) / pageSize) ?? 1,
 			initialState: { currentPage: 1 }
 		}
 	);	

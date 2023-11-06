@@ -87,22 +87,20 @@ function MyApp({ Component, pageProps }: AppProps) {
 					<AppDataProvider>
 						<LendingDataProvider>
 							<PerpsDataProvider>
-								
-							<DEXDataProvider>
-							<BalanceContextProvider>
-								<PriceContextProvider>
-									<TokenContextProvider>
-									<SyntheticsPositionProvider>
-										<Index>
-											<Component {...pageProps} />
-										</Index>
-									</SyntheticsPositionProvider>
-									</TokenContextProvider>
-								</PriceContextProvider>
-							</BalanceContextProvider>
-							</DEXDataProvider>
+								<DEXDataProvider>
+									<BalanceContextProvider>
+										<PriceContextProvider>
+											<TokenContextProvider>
+												<SyntheticsPositionProvider>
+													<Index>
+														<Component {...pageProps} />
+													</Index>
+												</SyntheticsPositionProvider>
+											</TokenContextProvider>
+										</PriceContextProvider>
+									</BalanceContextProvider>
+								</DEXDataProvider>
 							</PerpsDataProvider>
-
 						</LendingDataProvider>
 					</AppDataProvider>
 				</RainbowKitProvider>

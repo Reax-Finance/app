@@ -31,8 +31,8 @@ export default function ClosedPosition({position, index}: any) {
             let _adjustedCollateral = Big(0);
             let _totalDebt = Big(0);
             let _totalStableDebt = Big(0);
-            let collaterals = [];
-            let debts = [];
+            let collaterals: any[] = [];
+            let debts: any[] = [];
             let netApy = Big(0);
             let totalValue = Big(0);
             let rewardApy = Big(0);
@@ -62,11 +62,14 @@ export default function ClosedPosition({position, index}: any) {
                     collateral: position.data[i].depositAmount / prices[position.data[i].tokenAddress],
                     debt: position.data[i].borrowAmount / prices[position.data[i].tokenAddress],
                 }
-    
+
+                
                 if(Number(pos.collateral) > 0){
+                    _totalCollateral = _totalCollateral.add(position.data[i].depositAmount);
                     collaterals.push(pos);
                 }
                 if(Number(pos.debt) > 0){
+                    _totalDebt = _totalDebt.add(position.data[i].borrowAmount);
                     debts.push(pos);
                 }
             }
@@ -127,7 +130,7 @@ export default function ClosedPosition({position, index}: any) {
                 <Box>
                     <Flex gap={1} mb={1} align={'center'}>
                         <Text color={'whiteAlpha.600'} fontSize={'sm'}>Total</Text>
-                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(position?.collateral) || 0)}</Text>
+                        <Text fontSize={'sm'}>{dollarFormatter.format(Number(details?.collateral) || 0)}</Text>
                     </Flex>
                     {(details?.collaterals ?? []).map((pos: any, index: number) => ( <>
                         <Flex align={'center'} color={'whiteAlpha.600'} key={index} my={0} gap={1.5}>

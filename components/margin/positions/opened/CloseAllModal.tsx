@@ -27,7 +27,7 @@ export default function CloseAllModal({details}: any) {
     const [outAssetIndex, setOutAssetIndex] = React.useState(0);
 	const { prices } = usePriceData();
     const { chain } = useNetwork();
-    const { positions, addPosition } = usePerpsData();
+    const { openPositions } = usePerpsData();
 	const [isMax, setIsMax] = useState(false);
     const {address} = useAccount();
 
