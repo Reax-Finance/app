@@ -158,7 +158,6 @@ function PerpsDataProvider({ children }: any) {
 				vault: events[i].args[1].toLowerCase(),
 			})
 		}
-		console.log("_history", _history);
 		_history = history.concat(_history);
 		setHistory(_history);
 		
