@@ -15,7 +15,7 @@ import CloseModal from '../opened/CloseModal';
 
 export default function ClosedPosition({position, index}: any) {
     const {protocols: lendingProtocols, pools} = useLendingData();
-    const {positions } = usePerpsData();
+    const { openPositions } = usePerpsData();
     const {prices} = usePriceData();
     const {walletBalances} = useBalanceData();
 
