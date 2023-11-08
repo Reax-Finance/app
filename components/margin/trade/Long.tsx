@@ -335,7 +335,7 @@ export default function Long() {
       let erc20 = new ethers.Contract(tokens[inAssetIndex].id, getABI("MockToken", chain?.id!));
       let factory = new ethers.Contract(pairs[pair].perpFactory, getABI("PerpFactory", chain?.id!));
       let _amount = ethers.utils.parseUnits(Big(inAmount).toFixed(tokens[inAssetIndex].decimals, 0), tokens[inAssetIndex].decimals);
-      let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(prices[tokens[inAssetIndex].id]).mul(leverage).div(prices[pairs[pair].token0.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
+      let _leveragedAmount = ethers.utils.parseUnits(Big(inAmount).mul(prices[tokens[inAssetIndex].id]).mul(leverage - 1).div(prices[pairs[pair].token0.id]).toFixed(tokens[inAssetIndex].decimals, 0), 18);
       let deadline_m = 5;
       let maxSlippage = 0.5;
       // 1. Transfer inAsset to position if doesn't have enough base asset balance
@@ -410,7 +410,7 @@ export default function Long() {
       calls.push(position.interface.encodeFunctionData("openPosition", [pairs[pair].token0.id, _leveragedAmount, pairs[pair].token1.id]));
 
       let tx: any;
-      if(selectedPosition == vaults.length){
+      if(selectedPosition == vaults.length - 1){
         console.log("new");
         tx = send(factory, "newPosition", [calls], "10000")
       } else {
@@ -637,10 +637,10 @@ export default function Long() {
 
           <Divider my={4} mt={4} />
           {/* Select position */}
-          {vaults.length > 0 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
+          {vaults.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Vault</Text>
             <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select vault' value={selectedPosition} onChange={switchPosition}>
-              {[...vaults, {}].map((vault: any, index: number) => <option key={vault.id} value={index}>{(index !== (vaults.length)) ? vault?.id?.slice(0, 6)+'..'+vault?.id?.slice(-4) : 'New Position'}</option>)}
+              {[...vaults, {}].map((vault: any, index: number) => <option key={vault.id} value={index}>{(index !== (vaults.length - 1)) ? vault?.id?.slice(0, 6)+'..'+vault?.id?.slice(-4) : 'New Position'}</option>)}
             </Select>
           </Flex>}
 

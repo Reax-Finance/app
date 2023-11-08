@@ -350,12 +350,6 @@ export default function Short() {
 		}
 		const pythUpdateData = await getUpdateData(assetPriceToUpdate);
 		calls.push(position.interface.encodeFunctionData("updatePythData", [pythUpdateData]));
-		// // 3. Swap
-		// // Check if swap is needed
-		// if(tokens[inAssetIndex].id !== pairs[pair].token1.id){
-		// 	// Fetch route
-		// 	calls.push(position.interface.encodeFunctionData("swap", [tokens[inAssetIndex].id, _amount, pairs[pair].token1.id]));
-		// }
 
 		// 3. Swap
 		// Check if swap is needed
@@ -413,7 +407,7 @@ export default function Short() {
 		calls.push(position.interface.encodeFunctionData("openPosition", [pairs[pair].token1.id, _leveragedAmount, pairs[pair].token0.id]));
 
 		let tx;
-		if(selectedPosition == vaults.length){
+		if(selectedPosition == vaults.length - 1){
 			tx = send(factory, "newPosition", [calls], "10000")
 		} else {
 			tx = send(position, "multicall", [calls]);
@@ -635,10 +629,10 @@ export default function Short() {
 
           <Divider my={4} mt={4} />
           {/* Select position */}
-          {vaults.length > 0 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
+          {vaults.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Vault</Text>
             <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={switchPosition}>
-              {vaults.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (vaults.length)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
+              {vaults.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (vaults.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
             </Select>
           </Flex>}
 

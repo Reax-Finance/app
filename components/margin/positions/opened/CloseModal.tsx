@@ -56,6 +56,7 @@ export default function CloseModal({details}: any) {
             // Withdraw all collaterals
             for(let i = 0; i < details?.collaterals.length; i++){
                 calls.push(position.interface.encodeFunctionData("call", [pool.address, pool.interface.encodeFunctionData("withdraw", [details?.collaterals[i].market.inputToken.id, ethers.constants.MaxUint256, address, []]), 0]));
+                calls.push(position.interface.encodeFunctionData("transferOut", [supplied.address, ethers.constants.MaxUint256]));
             }
         }
 

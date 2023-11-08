@@ -117,8 +117,8 @@ export default function Position({position, index}: any) {
     return (<>  
         <Tr>
             <Td>
-                <Box>
-                    <Flex align={'center'} cursor={'pointer'}  onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
+                <Box cursor={'pointer'} onClick={() => window.open(defaultChain.blockExplorers.default.url + '/address/' + position.id)}>
+                    <Flex align={'center'}>
                         {position?.data?.map((token: any) => (<>
                             <Image mr={-3} src={`/icons/${token.tokenSymbol}.svg`} w={'30px'} />
                         </>))}

@@ -11,13 +11,13 @@ let _transports: (transports.FileTransportInstance | transports.ConsoleTransport
   new transports.Console()
 ];
 
-if (NODE_ENV === 'production') {
-  _transports = [
-    new transports.File({ filename: './src/logs/error.log', level: "error" }), // path from the root
-    new transports.File({ filename: './src/logs/info.log', level: "info" }),
-    new transports.File({ filename: './src/logs/warn.log', level: "warn" })
-  ];
-}
+// if (NODE_ENV === 'production') {
+//   _transports = [
+//     new transports.File({ filename: './src/logs/error.log', level: "error" }), // path from the root
+//     new transports.File({ filename: './src/logs/info.log', level: "info" }),
+//     new transports.File({ filename: './src/logs/warn.log', level: "warn" })
+//   ];
+// }
 
 const log =
   createLogger({
