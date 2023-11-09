@@ -36,7 +36,7 @@ export default async function handler(
 
       const longToken = pair.split('-')[0];
       const shortToken = pair.split('-')[1];
-      if (!TOKEN_LIST[lendingPool].includes(longToken) || !TOKEN_LIST[lendingPool].includes(shortToken)) {
+      if (!TOKEN_LIST[lendingPool]?.includes(longToken) || !TOKEN_LIST[lendingPool]?.includes(shortToken)) {
         log.warn(`${ERROR.TOKEN_NOT_FOUND_IN_PAIR_LIST} - ${longToken} - ${shortToken}`)
         return
       }
