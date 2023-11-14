@@ -10,7 +10,7 @@ import {
   Text,
   Image
 } from '@chakra-ui/react'
-import { dollarFormatter, tokenFormatter } from '../src/const';
+import { EPOCH_REWARDS, dollarFormatter, tokenFormatter } from '../src/const';
 import Head from 'next/head';
 import { useAccount } from 'wagmi';
 import { useDexData } from '../components/context/DexDataProvider';
@@ -21,7 +21,7 @@ import Leaderboard from '../components/others/Leaderboard';
 export default function LeaderboardPage({}: any) {
   const { epoches } = useDexData();
   const { address } = useAccount();
-  const [selectedEpoch, setSelectedEpoch] = React.useState<Number|null>(0);
+  const [selectedEpoch, setSelectedEpoch] = React.useState<Number|null>(Object.keys(EPOCH_REWARDS).filter((epoch: any) => EPOCH_REWARDS[epoch] > 0).length);
 
   const {colorMode} = useColorMode();
 
@@ -45,10 +45,10 @@ export default function LeaderboardPage({}: any) {
       </Flex>
       <Flex align='end' justify='start' my={4} gap={2}>
         {epoches.map((epoch: any, index: number) => (<>
-          <Flex align={'center'} p={2} gap={1} px={4} cursor={'pointer'} className={selectedEpoch == index ? `${VARIANT}-${colorMode}-halfButtonSelected` : `${VARIANT}-${colorMode}-halfButton`} color={selectedEpoch == index ? 'primary.400' : 'whiteAlpha.600'} onClick={()=>setSelectedEpoch(index)}>
+          {EPOCH_REWARDS[index] > 0 && <> <Flex align={'center'} p={2} gap={1} px={4} cursor={'pointer'} className={selectedEpoch == index ? `${VARIANT}-${colorMode}-halfButtonSelected` : `${VARIANT}-${colorMode}-halfButton`} color={selectedEpoch == index ? 'primary.400' : 'whiteAlpha.600'} onClick={()=>setSelectedEpoch(index)}>
             <Heading fontSize={'md'}>Epoch {Number(epoch.id) + 1}</Heading>
             {Number(epoch.id) + 1 == epoches.length && <Tag ml={2} size={'sm'} colorScheme={'green'}><Box w={1} h={1} bg={'green.400'} rounded={'full'} mr={1}/> Live</Tag>}
-          </Flex>
+          </Flex> </>}
         </>))}
       </Flex>
       <Leaderboard epochIndex={selectedEpoch} />
