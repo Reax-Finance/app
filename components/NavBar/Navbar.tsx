@@ -192,7 +192,8 @@ function NavBar() {
 					<NavLocalLink
 						path={"/leaderboard"}
 						title={<Flex gap={2} align={'center'}>
-						<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> <Text color={colorMode == 'dark' ? 'white' : 'black'}>Points</Text>
+						{/* <Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text>  */}
+						<Text color={colorMode == 'dark' ? 'white' : 'black'}>Leaderboard</Text>
 						</Flex>}></NavLocalLink>
 						{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
 							<NavLocalLink

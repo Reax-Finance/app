@@ -44,8 +44,8 @@ export default function LeaderboardPage({}: any) {
       </Box>
       </Flex>
       <Flex align='end' justify='start' my={4} gap={2}>
-        {epoches.map((epoch: any, index: number) => (<>
-          {EPOCH_REWARDS[index] > 0 && <> <Flex align={'center'} p={2} gap={1} px={4} cursor={'pointer'} className={selectedEpoch == index ? `${VARIANT}-${colorMode}-halfButtonSelected` : `${VARIANT}-${colorMode}-halfButton`} color={selectedEpoch == index ? 'primary.400' : 'whiteAlpha.600'} onClick={()=>setSelectedEpoch(index)}>
+        {epoches.map((epoch: any, index: number) => (epoch.id <= 6 && <>
+          {EPOCH_REWARDS[Number(epoch.id) + 1] > 0 && <> <Flex align={'center'} p={2} gap={1} px={4} cursor={'pointer'} className={selectedEpoch == index ? `${VARIANT}-${colorMode}-halfButtonSelected` : `${VARIANT}-${colorMode}-halfButton`} color={selectedEpoch == index ? 'primary.400' : 'whiteAlpha.600'} onClick={()=>setSelectedEpoch(index)}>
             <Heading fontSize={'md'}>Epoch {Number(epoch.id) + 1}</Heading>
             {Number(epoch.id) + 1 == epoches.length && <Tag ml={2} size={'sm'} colorScheme={'green'}><Box w={1} h={1} bg={'green.400'} rounded={'full'} mr={1}/> Live</Tag>}
           </Flex> </>}
