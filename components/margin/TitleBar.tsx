@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, Text, Tooltip } from '@chakra-ui/react'
+import { Box, Divider, Flex, Heading, Text, Tooltip, useColorMode } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import PairSelector from './PairSelector'
 import { usePriceData } from '../context/PriceContext';
@@ -16,6 +16,8 @@ export default function TitleBar() {
     const [token1Rate, setToken1Rate] = React.useState(['0', '0']);
     
     const { pools } = useLendingData();
+    const { colorMode } = useColorMode();
+
     useEffect(() => {
         for(let i in pools){
             let markets = pools[i];
@@ -43,14 +45,14 @@ export default function TitleBar() {
             </Box>
             <Divider orientation="vertical" h={'80px'} />
             <Box px={10}>
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}>Index Price</Text>
+                <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'sm'}>Index Price</Text>
                 <Heading size={'md'}>
                     {(Number(prices[pairs[pair as string]?.token0?.id] ?? 0) / Number(prices[pairs[pair as string]?.token1?.id] ?? 0)).toFixed(4)}
                 </Heading>
             </Box>
             <Divider orientation="vertical" h={'80px'} />
             <Box px={6}>
-                <Text color={'whiteAlpha.600'} fontSize={'sm'}>Base APY</Text>
+                <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'sm'}>Base APY</Text>
                 <Flex>
                     <Tooltip label="LONG" aria-label="LONG">
                         <Heading size={'sm'}>

@@ -102,7 +102,7 @@ export default function Lend() {
             <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>
                 Synthetic Pools
             </Heading>
-            <Text color={'whiteAlpha.600'}>
+            <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>
                 Enabling the creation of trustless synthetic assets
             </Text>
             </Flex>
@@ -124,7 +124,7 @@ export default function Lend() {
                         <Box pt={4} >
                         <Flex mx={4} >
                             <Box>
-                                <Text fontSize={'sm'} color={'whiteAlpha.600'}>TVL</Text>
+                                <Text fontSize={'sm'} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>TVL</Text>
                                 <Flex gap={1.5}>
                                 <Text fontSize={'lg'}>{dollarFormatter.format(Number(pool.totalCollateral))}</Text>
                                 <Flex ml={1}>
@@ -158,7 +158,7 @@ export default function Lend() {
                         </Box> */}
                         <Flex justify={'space-between'} align={'end'} mx={4} mt={4} pb={6}>
                             <Box>
-                                <Text fontSize={'sm'} color={'whiteAlpha.600'}>APR</Text>
+                                <Text fontSize={'sm'} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>APR</Text>
                                 <Box maxW={'100px'}>
                                 <APRInfo
                                     debtBurnApr={pool.debtBurnApr}
@@ -177,7 +177,7 @@ export default function Lend() {
                                 </APRInfo>
                                 </Box>
                             </Box>
-                            <Flex align={'center'} color={'whiteAlpha.600'}>
+                            <Flex align={'center'} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>
                                 <Text>Enter Now</Text>
                                 <BsArrowRightShort />
                             </Flex>

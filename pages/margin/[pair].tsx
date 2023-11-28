@@ -4,6 +4,7 @@ import Perps from '../../components/margin'
 import router, { useRouter } from 'next/router';
 import { usePerpsData } from '../../components/context/PerpsDataProvider';
 import Loading from '../../components/utils/Loading';
+import Head from 'next/head';
 
 export default function PerpsPair() {
   // get pair id from url
@@ -22,6 +23,10 @@ export default function PerpsPair() {
 
   return (
     <>
+      <Head>
+        <title>{process.env.NEXT_PUBLIC_TOKEN_SYMBOL} | Margin</title>
+        <link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}.svg`}></link>
+      </Head>
       <Perps pair={pair} />
     </>
   )

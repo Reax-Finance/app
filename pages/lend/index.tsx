@@ -78,7 +78,7 @@ export default function Lend() {
             <Flex justify={'space-between'} align={'start'}>
                 <Flex flexDir={'column'} align={'start'} gap={6} mb={10}>
                 <Heading fontWeight={HEADING_FONT == 'Chakra Petch' ? 'bold' : 'semibold'} fontSize={'32px'}>Lending Pools</Heading>
-                <Text color={'whiteAlpha.600'}>
+                <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>
                     Isolated pools for secure and simple Lending/Borrowing
                 </Text>
                 </Flex>
@@ -100,13 +100,20 @@ export default function Lend() {
                     {POPULAR_ASSETS.map((asset: string) => {
                         return (
                             <>
-                            <Divider orientation="vertical" h={'30px'} borderColor={'whiteAlpha.400'}/>
-                            <Button size={'sm'} rounded={0} gap={2} key={asset} onClick={() => searchTerm == asset ? search('') : search(asset)} bg={searchTerm == asset ? 'whiteAlpha.600' : 'whiteAlpha.200'}> 
+                            <Divider orientation="vertical" h={'30px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'}/>
+                            <Button size={'sm'} rounded={0} gap={2} key={asset} 
+                                onClick={() => searchTerm == asset ? search('') : search(asset)} bg={searchTerm == asset ? `${colorMode == 'dark' ? 'white' : 'black'}Alpha.600` : `${colorMode == 'dark' ? 'white' : 'black'}Alpha.200`}> 
                                 <Image src={`/icons/${asset}.svg`} alt="" w={'20px'} />
                             </Button>
                             </>
                         )
                     })}
+                    {searchTerm.length > 0 && <Button size={'sm'} rounded={0} gap={2} onClick={() => {
+                        search('');
+                        setSearchTerm('');
+                    }}> 
+                        x
+                    </Button>}
                 </Flex>
             </Flex>
 				<TableContainer h={'100%'} pb={4}>

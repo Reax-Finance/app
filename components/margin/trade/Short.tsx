@@ -508,7 +508,7 @@ export default function Short() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Margin ({dollarFormatter.format(inputValue)})</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>Margin ({dollarFormatter.format(inputValue)})</Text>
                   <NumberInputField rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -530,8 +530,8 @@ export default function Short() {
           </Box>
 
           {/* Divider */}
-		  <Box my={2} p={'5px'} bg={'darkBg.600'} w={'22px'} border={'1px'} borderColor={'whiteAlpha.200'}>
-            <AiOutlineDown color="darkBg.400" size={'10px'} />
+		  <Box my={2} p={'5px'} bg={`${colorMode}Bg.600`} w={'22px'} border={'1px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}>
+            <AiOutlineDown color={`${colorMode}Bg.400`} size={'10px'} />
           </Box>
 
           {/* Output */}
@@ -544,7 +544,7 @@ export default function Short() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
                   <NumberInputField disabled={true} _disabled={{color: "white"}} rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -565,7 +565,7 @@ export default function Short() {
                   />
                   <Text
                     fontSize="xl" fontWeight={'semibold'}
-                    color="whiteAlpha.800"
+                    color={colorMode == 'dark' ? "whiteAlpha.800" : 'blackAlpha.800'}
                   >
                     {pairs[pair]?.token1?.symbol}
                   </Text>
@@ -597,13 +597,13 @@ export default function Short() {
 				  min={10}
                 >
                   <SliderMark value={25} {...labelStyles}>
-                    <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 2.5 ? 'secondary.200' : 'whiteAlpha.200'}></Box>
+                    <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 2.5 ? 'secondary.200' : colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}></Box>
                   </SliderMark>
                   <SliderMark value={50} {...labelStyles}>
-                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 5 ? 'secondary.200' : 'whiteAlpha.200'}></Box>
+                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 5 ? 'secondary.200' : colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}></Box>
                   </SliderMark>
                   <SliderMark value={75} {...labelStyles}>
-                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 7.5 ? 'secondary.200' : 'whiteAlpha.200'}></Box>
+                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 7.5 ? 'secondary.200' : colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}></Box>
                   </SliderMark>
                   <SliderTrack>
                     <SliderFilledTrack />
@@ -629,7 +629,7 @@ export default function Short() {
 
           <Divider my={4} mt={4} />
           {/* Select position */}
-          {vaults.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
+          {vaults.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.300' : 'blackAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Vault</Text>
             <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select position' value={selectedPosition} onChange={switchPosition}>
               {vaults.map((position: any, index: number) => <option key={position.id} value={index}>{(index !== (vaults.length - 1)) ? position.id.slice(0, 6)+'..'+position.id.slice(-4) : 'New Position'}</option>)}
@@ -750,7 +750,7 @@ export default function Short() {
 
           {/* Fees and Liquidity */}
           <Divider mt={4} />
-          <Flex mt={5} flexDir={'column'} gap={0.5}>
+          <Flex mt={5} mb={0} flexDir={'column'} gap={0.5}>
             <Flex justify={'space-between'} fontSize={'sm'}>
               <Text >Available Liquidity</Text>
               <Text ml={"auto"}>{dollarFormatter.format(availableLiquidity())}</Text>
@@ -761,7 +761,7 @@ export default function Short() {
               <Text ml={"auto"}>
                 {netAPY().apy} %
               </Text>
-              <Text ml={"auto"} color={'whiteAlpha.700'}>
+              <Text ml={"auto"}>
                 + {netAPY().rewardsApy} %
               </Text>
               <Image ml={1} src="/veREAX.svg" w={'16px'} rounded={'0'} alt="veREAX" />
@@ -771,7 +771,7 @@ export default function Short() {
               <Text>Fees</Text>
               <Flex gap={1}>
                 {/* <Text ml={"auto"}>{(0.25).toFixed(2)} %</Text> */}
-                <Text ml={"auto"} color={'whiteAlpha.700'}>{dollarFormatter.format(Number(outAmount) * prices[pairs[pair].token0.id] * 0.25 / (leverage * 100))}</Text>
+                <Text ml={"auto"} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'}>{dollarFormatter.format(Number(outAmount) * prices[pairs[pair].token0.id] * 0.25 / (leverage * 100))}</Text>
               </Flex>
             </Flex>
           </Flex>

@@ -48,7 +48,7 @@ export default function History() {
                 </Tr>
                 </Thead>
                 <Tbody>
-                    {history.length > 0 ? [...history.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((_history: any, index: number) => (<HistoryRow key={index} index={index} history={_history}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
+                    {history.length > 0 ? [...history.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((_history: any, index: number) => (<HistoryRow key={index} index={index} history={_history}/>)) : <><Text  color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} mx={4} mt={4}>No History Found</Text></>}
                 </Tbody>
             </Table>
         </TableContainer>

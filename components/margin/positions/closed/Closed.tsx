@@ -53,7 +53,7 @@ export default function Closed() {
                 </Tr>
                 </Thead>
                 <Tbody>
-                    {closedPositions.length > 0 ? [...closedPositions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<ClosedPosition key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
+                    {closedPositions.length > 0 ? [...closedPositions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<ClosedPosition key={index} index={index} position={position}/>)) : <><Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} mx={4} mt={4}>No Closed Positions Found</Text></>}
                 </Tbody>
             </Table>
         </TableContainer>

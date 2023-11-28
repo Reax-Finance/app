@@ -12,8 +12,8 @@ function getLanguageFromURL() {
 const GREEN = "#33ffbc";
 const RED = "#ff631b";
 
-const BACKGROUND = "#191D25"
-const BACKGROUND2 = "#252B36"
+const DARK_BACKGROUND = "#191D25"
+const LIGHT_BACKGROUND = "#C1C1C1"
 
 const HEIGHT = "640px";
 
@@ -49,13 +49,13 @@ const widgetOptions = (props, ref) => {
 		link: "https://app.reax.one"
 	},
 	theme: 'dark',
-	toolbar_bg: BACKGROUND,
+	toolbar_bg: props.colorMode == 'dark' ? DARK_BACKGROUND : LIGHT_BACKGROUND,
 	loading_screen: {
 		backgroundColor: "transparent",
 	},
 	client_id: 'zexe.io',
 	overrides: {
-		"paneProperties.background": BACKGROUND,
+		"paneProperties.background": props.colorMode == 'dark' ? DARK_BACKGROUND : LIGHT_BACKGROUND,
 		"paneProperties.backgroundType": "solid",
 		"mainSeriesProperties.candleStyle.wickUpColor": GREEN,
 		"mainSeriesProperties.candleStyle.wickDownColor": RED,
@@ -65,7 +65,10 @@ const widgetOptions = (props, ref) => {
 		"mainSeriesProperties.candleStyle.borderDownColor": RED,
 		"paneProperties.vertGridProperties.color": "#343B48",
 		"paneProperties.horzGridProperties.color": "#343B48",
-		editorFontsList: ['Poppins']
+		"scalesProperties.textColor": props.colorMode == 'dark' ? "#D9D9D9" : "#000000",
+		editorFontsList: ['Poppins'],
+		// text color
+
    },
 	// enabled_features: ["study_templates"],
 	// charts_storage_url: this.props.chartsStorageUrl,
@@ -76,7 +79,7 @@ const widgetOptions = (props, ref) => {
 	// autosize: this.props.autosize,
 	// studies_overrides: this.props.studiesOverrides,
 	theme: 'dark',
-	toolbar_bg: BACKGROUND2,
+	toolbar_bg: props.colorMode == 'dark' ? DARK_BACKGROUND : LIGHT_BACKGROUND,
 	width: '100%',
 	height: HEIGHT,
 	header_widget_buttons_mode: 'compact'

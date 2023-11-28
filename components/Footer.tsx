@@ -40,13 +40,12 @@ export default function Footer() {
           justify={{ md: 'space-between' }}
           align={{ md: 'center' }}
           color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
-          >
+        >
             <Flex zIndex={1000} align={'center'} gap={1}>
               <Box h={2} w={2} bgColor={block == 0 ? 'red': 'green.400'} rounded='100'></Box>
               <Text fontSize={'xs'}>{chain?.name} ({block == 0 ? 'Not Connected': block})</Text>
-              <Text fontSize={'xs'} color={'whiteAlpha.600'}>| v1.1.0-beta |</Text>
-              
-              <Text fontSize={'xs'} color={'whiteAlpha.600'}> Note: We{"'"}re still in beta. Use with caution</Text>
+              <Text fontSize={'xs'} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>| v1.2.0-beta |</Text>
+              <Text fontSize={'xs'} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}> Note: We{"'"}re in beta. Use with caution</Text>
             </Flex>
             <Stack direction={'row'} align={'center'} spacing={4}>
               <Flex gap={2} align={'center'}>

@@ -20,6 +20,40 @@
 	background-size: 100% 51%;
 }
 
+.edgy-light-halfButton2 {
+	background: linear-gradient(45deg, transparent 0px, #ededed 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #ededed 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-light-halfButton2:hover {
+	background: linear-gradient(45deg, transparent 0px, #f0f0f0 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #f0f0f0 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-light-halfButton {
+	background: linear-gradient(45deg, transparent 0px, #ededed 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #ededed 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-light-halfButton:hover {
+	background: linear-gradient(45deg, transparent 0px, #f0f0f0 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #f0f0f0 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-light-halfButtonSelected {
+	background: linear-gradient(45deg, transparent 0px, #f0f0f0 0) bottom left,
+		linear-gradient(-135deg, transparent 10px, #f0f0f0 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
 .edgy-light-containerBody2 {
 	background: linear-gradient(45deg, transparent 10px, #e8e8e8 0) bottom left,
 		linear-gradient(-135deg, transparent 10px, #e8e8e8 0) top right;
@@ -209,4 +243,17 @@
 	background-repeat: no-repeat;
 	background-size: 100% 51%;
     color: white;
+}
+
+.edgy-light-selectButton {
+	background: linear-gradient(45deg, transparent 6px, #f8f8f8 0) bottom left, linear-gradient(-135deg, transparent 0px, #f8f8f8 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+}
+
+.edgy-light-selectButton:hover {
+	background: linear-gradient(45deg, transparent 6px, #ffffff 0) bottom left, linear-gradient(-135deg, transparent 0px, #ffffff 0) top right;
+	background-repeat: no-repeat;
+	background-size: 100% 51%;
+	opacity: 0.6;
 }

@@ -21,7 +21,7 @@ export default function Perps({pair}: any) {
             </Box>
             <Flex gap={2} align={'stretch'}>
                 <Box w={'65%'} h={'100%'}>
-                    {pair && <TradingViewWidget pair={pair}/>}
+                    {pair && <TradingViewWidget pair={pair} colorMode={colorMode}/>}
                 </Box>
                 <Divider orientation="vertical" h={'100%'} />
                 <Box w={'35%'} bg={colorMode + 'Bg.600'}>

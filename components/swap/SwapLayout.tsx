@@ -108,9 +108,6 @@ export default function SwapLayout({
                 <Flex align={'center'} justify={'space-between'}>
                     <Flex align={'center'} gap={4}>
                         <Heading size={'sm'}>Spot</Heading>
-                        {/* <Tooltip label={'Coming Soon'} placement={'top'}>
-                        <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>Margin [10x]</Heading>
-                        </Tooltip> */}
                     </Flex>
                     <Flex>
                         <Settings maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} deadline={deadline} setDeadline={setDeadline} />
@@ -121,7 +118,7 @@ export default function SwapLayout({
             <Divider />
 
             {/* Input */}
-            <Box px="5" bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} pb={12} pt={10}>
+            <Box px="5" bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.400'} pb={12} pt={10}>
                 <Flex align="center" justify={"space-between"}>
                     <InputGroup width={"70%"}>
                         <NumberInput
