@@ -2,7 +2,7 @@ import * as React from "react";
 import axios from "axios";
 import { getAddress, getABI, getContract } from "../../src/contract";
 import { ADDRESS_ZERO, defaultChain } from '../../src/const';
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useEffect } from 'react';
 import { useNetwork } from "wagmi";
 import { __chains } from "../../pages/_app";
@@ -97,7 +97,7 @@ function AppDataProvider({ children }: any) {
 						}
 
 						setPools(_pools);
-						setPoolFeeds(_pools)
+						setPoolFeeds(_pools, _address!)
 							.then((_poolsWithFeeds) => {
 								setStatus(Status.SUCCESS);
 								resolve(0);
@@ -120,7 +120,7 @@ function AppDataProvider({ children }: any) {
 		});
 	};
 
-	const setPoolFeeds = (_pools: any[], nTries = 0) => {
+	const setPoolFeeds = (_pools: any[], _address: string, nTries = 0) => {
 		return new Promise<any>(async (resolve, reject) => {
 			const chainId = defaultChain.id;
 			const provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
@@ -133,6 +133,7 @@ function AppDataProvider({ children }: any) {
 			for(let i in _pools){
 				const pool = _pools[i];
 				const oracle = new ethers.Contract(pool.oracle, getABI("PythOracle", chainId), provider);
+				const poolContract = new ethers.Contract(pool.id, getABI("Pool", chainId), provider);
 				const fallbackOracle = await oracle.getFallbackOracle();
 				for (let j = 0; j < pool.synths.length; j++) {
 					calls.push([pool.oracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.synths[j].token.id])]);
@@ -145,7 +146,13 @@ function AppDataProvider({ children }: any) {
 					if(fallbackOracle !== ADDRESS_ZERO){
 						calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.collaterals[j].token.id])]);
 					}
+
+					calls.push([pool.id, poolContract.interface.encodeFunctionData("accountCollateralBalance", [_address, pool.collaterals[j].token.id])]);
 				}
+				// get users pool balance
+				calls.push([pool.id, poolContract.interface.encodeFunctionData("balanceOf", [_address])]);
+				// get pool totalSupply
+				calls.push([pool.id, poolContract.interface.encodeFunctionData("totalSupply", [])]);
 			}
 
 			helper.callStatic.aggregate(calls).then(async (res: any) => {
@@ -170,7 +177,13 @@ function AppDataProvider({ children }: any) {
 							pool.collaterals[j].fallbackFeed = res.returnData[index + 1].toString();
 							index += 1;
 						}
+						pool.collaterals[j].balance = BigNumber.from(res.returnData[index]).toString();
+						index += 1;
 					}
+					pool.balance = BigNumber.from(res.returnData[index]).toString();
+					index += 1;
+					pool.totalSupply = BigNumber.from(res.returnData[index]).toString();
+					index += 1;
 				}
 				setPools(_pools);
 				resolve(_pools);
@@ -189,7 +202,7 @@ function AppDataProvider({ children }: any) {
 				else {
 					// try again in 5 seconds
 					setTimeout(() => {
-						setPoolFeeds(_pools, nTries + 1);
+						setPoolFeeds(_pools, _address, nTries + 1);
 					}, 1000)
 				}	
 			})
