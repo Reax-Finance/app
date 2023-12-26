@@ -160,7 +160,6 @@ export default function BorrowModal(props: any) {
 							mt={5}
 							variant={"unstyled"}
 							display="flex"
-							placeholder="Enter amount"
 						>
 							<NumberInput
 								w={"100%"}

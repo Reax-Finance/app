@@ -159,7 +159,6 @@ export default function SupplyModal({
 							mt={5}
 							variant={"unstyled"}
 							display="flex"
-							placeholder="Enter amount"
 						>
 							<NumberInput
 								w={"100%"}

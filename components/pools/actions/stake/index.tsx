@@ -98,9 +98,7 @@ export default function Stake({ pool, isOpen, onClose }: any) {
                             pt={7}
                             pb={7}
                             variant={"unstyled"}
-                            display="flex"
-                            placeholder="Enter amount"
-                            
+                            display="flex"                            
                         >
                             <NumberInput
                                 w={"100%"}
