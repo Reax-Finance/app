@@ -140,6 +140,8 @@ function AppDataProvider({ children }: any) {
 					if(fallbackOracle !== ADDRESS_ZERO){
 						calls.push([fallbackOracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.synths[j].token.id])]);
 					}
+					// set synths total supply to pools[tradingPool].synths[i].totalSupply
+					calls.push([pool.synths[j].token.id, poolContract.interface.encodeFunctionData("totalSupply", [])]);
 				}
 				for(let j = 0; j < pool.collaterals.length; j++){
 					calls.push([pool.oracle, oracle.interface.encodeFunctionData("getSourceOfAsset", [pool.collaterals[j].token.id])]);
@@ -169,6 +171,8 @@ function AppDataProvider({ children }: any) {
 							pool.synths[j].fallbackFeed = res.returnData[index + 1].toString();
 							index += 1;
 						}
+						pool.synths[j].totalSupply = BigNumber.from(res.returnData[index]).toString();
+						index += 1;
 					}
 					for(let j = 0; j < pool.collaterals.length; j++){
 						pool.collaterals[j].feed = res.returnData[index].toString();
