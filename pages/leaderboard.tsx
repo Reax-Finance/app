@@ -24,7 +24,8 @@ export default function LeaderboardPage({}: any) {
   const [selectedEpoch, setSelectedEpoch] = React.useState<Number|null>(Object.keys(EPOCH_REWARDS).filter((epoch: any) => EPOCH_REWARDS[epoch] > 0).length);
 
   const {colorMode} = useColorMode();
-
+  return <></>;
+  
   return (
     <>
     <Head>

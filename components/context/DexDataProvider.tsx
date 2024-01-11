@@ -52,6 +52,7 @@ function DEXDataProvider({ children }: any) {
 			])
 			.then(async (res) => {
 				if (res[0].data.errors || res[1].data.errors || res[2].data.errors) {
+					console.log(res[0].data.errors ?? res[1].data.errors ?? res[2].data.errors);
 					setStatus(Status.ERROR);
 					setMessage("Network Error. Please refresh the page or try again later.");
 					reject(res[0].data.errors ?? res[1].data.errors ?? res[2].data.errors);
@@ -96,9 +97,10 @@ function DEXDataProvider({ children }: any) {
 						_pools[i].stakedBalance = mPool.stakedBalance ?? 0;
 						_pools[i].slpBalance = mPool.slpBalance;
 					}
+					console.log("Fetched DEX data", _dex, _pools);
 
 					setDex(_dex);
-                    setPools(_pools);
+					setPools(_pools);
 					setVault({address: res[0].data.data.balancers[0].address})
 					setStatus(Status.SUCCESS);
 					resolve(0);
