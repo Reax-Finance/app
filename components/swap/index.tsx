@@ -62,7 +62,7 @@ function Swap() {
 
 	const calculateOutputAmount = (inputAmount: string) => {
 		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT+'/getPath', {
+			axios.get(ROUTER_ENDPOINT, {
 				params: {
 					tokenIn: tokens[inputAssetIndex]?.id,
 					tokenOut: tokens[outputAssetIndex]?.id,
@@ -85,7 +85,7 @@ function Swap() {
 
 	const calculateInputAmount = (outputAmount: string) => {
 		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT+'/getPath', {
+			axios.get(ROUTER_ENDPOINT, {
 				params: {
 					tokenIn: tokens[inputAssetIndex]?.id,
 					tokenOut: tokens[outputAssetIndex]?.id,

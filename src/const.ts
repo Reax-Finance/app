@@ -57,8 +57,9 @@ export const APP_NAME = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[mantleMainnet.id]);
 
 export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://hermes-beta.pyth.network' : 'https://hermes.pyth.network';
-export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://routes-api.reax.one' : 'https://mainnet.router-api.reax.one';
+export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_VERCEL_URL + '/api/router';
 export const EPOCH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://rewards-testnet-api.reax.one' : 'https://rewards-mainnet-api.reax.one';
+export const PRICE_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://prices.reax.one' : 'http://prices.mainnet.reax.one'
 
 export const REPLACED_FEEDS: any = {
 	"0x0e9ec6a3f2fba0a3df73db71c84d736b8fc1970577639c9456a2fee0c8f66d93": "0xd45b6d47bf43faa700e6f6fec4f8989fcc80eabb2f2eff862d7258d60026d1b5"
