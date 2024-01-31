@@ -515,7 +515,7 @@ export default function Long() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Margin ({dollarFormatter.format(inputValue)})</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2} color={colorMode == 'dark' ? 'whiteAlpha.600': 'blackAlpha.600'}>Margin ({dollarFormatter.format(inputValue)})</Text>
                   <NumberInputField rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -537,8 +537,8 @@ export default function Long() {
           </Box>
 
           {/* Divider */}
-          <Box my={2} p={'5px'} bg={'darkBg.600'} w={'22px'} border={'1px'} borderColor={'whiteAlpha.200'}>
-            <AiOutlineDown color="darkBg.400" size={'10px'} />
+          <Box my={2} p={'5px'} bg={`${colorMode}Bg.600`} w={'22px'} border={'1px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}>
+            <AiOutlineDown color={`${colorMode}Bg.400`} size={'10px'} />
           </Box>
 
           {/* Output */}
@@ -550,7 +550,7 @@ export default function Long() {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2} color={'whiteAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2}  color={colorMode == 'dark' ? 'whiteAlpha.600': 'blackAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
                   <NumberInputField disabled={true} _disabled={{color: "white"}} rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 
@@ -565,7 +565,7 @@ export default function Long() {
                 >
                   <Image
                     src={`/icons/${
-                      (pair as string).split("-")[0]
+                      pair?.split("-")?.[0]
                     }.svg`}
                     w={30}
                     h={30}
@@ -589,7 +589,7 @@ export default function Long() {
               justify={"space-between"}
               align={"center"}
               border={"1px"}
-              borderColor={"whiteAlpha.200"}
+              borderColor={colorMode == 'dark' ? "whiteAlpha.200" : 'blackAlpha.200'}
             >
               <Flex align={'center'} gap={1.5} bg={colorMode + 'Bg.600'} p={3}>
                 <Text>Leverage</Text>
@@ -605,13 +605,13 @@ export default function Long() {
                   min={10}
                 >
                   <SliderMark value={25} {...labelStyles}>
-                    <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 2.5 ? 'primary.200' : 'whiteAlpha.200'}></Box>
+                    <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 2.5 ? 'primary.200' : colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}></Box>
                   </SliderMark>
                   <SliderMark value={50} {...labelStyles}>
-                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 5 ? 'primary.200' : 'whiteAlpha.200'}></Box>
+                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 5 ? 'primary.200' : colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}></Box>
                   </SliderMark>
                   <SliderMark value={75} {...labelStyles}>
-                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 7.5 ? 'primary.200' : 'whiteAlpha.200'}></Box>
+                  <Box w={'10px'} h={'10px'} rounded={'full'} bg={leverage > 7.5 ? 'primary.200' : colorMode == 'dark' ? 'whiteAlpha.200' : 'blackAlpha.200'}></Box>
                   </SliderMark>
                   <SliderTrack>
                     <SliderFilledTrack />
@@ -637,7 +637,7 @@ export default function Long() {
 
           <Divider my={4} mt={4} />
           {/* Select position */}
-          {vaults.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={'whiteAlpha.300'}>
+          {vaults.length > 1 && <Flex mt={2} align={'center'} border={'1px'} borderColor={colorMode == 'dark' ? 'whiteAlpha.300' : 'blackAlpha.300'}>
             <Text m={2} fontSize={'sm'} w={'60%'}>Select Vault</Text>
             <Select bg={colorMode + "Bg.400"} rounded={0} placeholder='Select vault' value={selectedPosition} onChange={switchPosition}>
               {[...vaults, {}].map((vault: any, index: number) => <option key={vault.id} value={index}>{(index !== (vaults.length - 1)) ? vault?.id?.slice(0, 6)+'..'+vault?.id?.slice(-4) : 'New Position'}</option>)}
@@ -769,7 +769,7 @@ export default function Long() {
               <Text ml={"auto"}>
                 {netAPY().apy} %
               </Text>
-              <Text ml={"auto"} color={'whiteAlpha.700'}>
+              <Text ml={"auto"}>
                 + {netAPY().rewardsApy} %
               </Text>
               <Image ml={1} src="/veREAX.svg" w={'16px'} rounded={'0'} alt="veREAX" />
@@ -779,7 +779,7 @@ export default function Long() {
               <Text>Fees</Text>
               <Flex gap={1}>
                 {/* <Text ml={"auto"}>{(0.25).toFixed(2)} %</Text> */}
-                <Text ml={"auto"} color={'whiteAlpha.700'}>{dollarFormatter.format(Number(outAmount) * prices[pairs[pair].token0.id] * 0.25 / (leverage * 100))}</Text>
+                <Text ml={"auto"} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'}>{dollarFormatter.format(Number(outAmount) * prices[pairs[pair].token0.id] * 0.25 / (leverage * 100))}</Text>
               </Flex>
             </Flex>
           </Flex>

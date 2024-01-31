@@ -7,10 +7,10 @@ const Graph = dynamic(
 	{ ssr: false },
 );
 
-export default function TradingViewWidget({pair}: any) {
+export default function TradingViewWidget({pair, colorMode}: any) {
   return (
     <>
-       {pair && <Graph symbol={pair.split("-").join("").split("c").join("")} libraryPath={
+       {pair && <Graph symbol={pair.split("-").join("").split("c").join("")} colorMode={colorMode} libraryPath={
         process.env.NEXT_PUBLIC_ENVIRONMENT == "production" ? '/static/charting_library/' : '/static/charting_library/'
        } />}
     </>

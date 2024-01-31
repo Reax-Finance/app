@@ -21,7 +21,7 @@ export default function Positions() {
             <Tabs variant={"enclosed"}>
 				<TabList className={VARIANT + "-" + colorMode + "-" + "containerHeader"}>
 					<Tab
-                        color={'whiteAlpha.600'}
+                        color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}
 						_selected={{
 							color: "primary.400",
 							borderColor: "primary.400",
@@ -37,7 +37,7 @@ export default function Positions() {
 					</Tab>
                     <Divider orientation="vertical" h={'40px'} />
 					<Tab
-						color={'whiteAlpha.600'}
+                        color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}
 						_selected={{
 							color: "primary.400",
 							borderColor: "primary.400",
@@ -53,7 +53,7 @@ export default function Positions() {
 					</Tab>
                     <Divider orientation="vertical" h={'40px'} />
 					<Tab
-						color={'whiteAlpha.600'}
+                        color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}
 						_selected={{
 							color: "primary.400",
 							borderColor: "primary.400",

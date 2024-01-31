@@ -68,7 +68,7 @@ export default function PairSelector() {
 										</Flex>
 										</Box>
 									</Flex>
-									<Flex align={'center'} color={'whiteAlpha.700'} >
+									<Flex align={'center'} color={colorMode == 'dark' ? 'whiteAlpha.700' : 'blackAlpha.700'} >
 									<Text fontSize={'sm'} display={{sm: 'none', md: 'block', lg: 'block'}} >{!isOpen ? 'All Pairs' : 'Tap To Close'}</Text>
 									<motion.div
 										variants={{
@@ -124,7 +124,7 @@ export default function PairSelector() {
 							boxShadow: '0px 0px 20px 0px rgba(0,255,0,0.5)',
 						}}
 					>
-						<Box shadow={'2xl'} mt={5} bg={'darkBg.200'} >
+						<Box shadow={'2xl'} mt={5} bg={`${colorMode}Bg.200`} >
 
 						{/* <Divider /> */}
 
@@ -139,7 +139,7 @@ export default function PairSelector() {
 									key={index}
 								>
 									<Box
-										_hover={{ bg: "darkBg.400" }}
+										_hover={{ bg: `${colorMode}Bg.400` }}
 										cursor="pointer"
 										px={4}
 										my={0}
@@ -157,7 +157,7 @@ export default function PairSelector() {
 												</Heading>
 											</Flex>
 											<Box textAlign={'end'}>
-												<Text fontSize={'xs'} mb={-1} color={'whiteAlpha.600'}>Price</Text>
+												<Text fontSize={'xs'} mb={-1} color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'}>Price</Text>
 												<Text>{
 													(Number(prices[pairs[pair]?.token0?.id] ?? 0) / Number(prices[pairs[pair]?.token1?.id] ?? 0)).toFixed(4)
 												}</Text>

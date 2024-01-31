@@ -54,7 +54,12 @@ export default function Open() {
                 </Tr>
                 </Thead>
                 <Tbody>
-                    {openPositions.length > 0 ? [...openPositions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) : <><Text color={'whiteAlpha.600'} mx={4} mt={4}>No Positions Found</Text></>}
+                    {openPositions.length > 0 ? 
+                        [...openPositions.slice((currentPage - 1) * pageSize, currentPage * pageSize)].map((position: any, index: number) => (<Position key={index} index={index} position={position}/>)) 
+                        : <>
+                            <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} mx={4} mt={4}>No Positions Found</Text>
+                        </>
+                    }
                 </Tbody>
             </Table>
         </TableContainer>
