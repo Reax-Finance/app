@@ -52,7 +52,6 @@ export default function StableWithdrawLayout({
                 <InputGroup
                     variant={"unstyled"}
                     display="flex"
-                    placeholder="Enter amount"
                 >
                     <NumberInput
                         w={"100%"}

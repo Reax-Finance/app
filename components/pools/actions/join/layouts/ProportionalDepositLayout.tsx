@@ -63,7 +63,6 @@ export default function ProportionalDepositLayout({
               mt={5}
               variant={"unstyled"}
               display="flex"
-              placeholder="Enter amount"
             >
               <NumberInput
                 w={"100%"}
