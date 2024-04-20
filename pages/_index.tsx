@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Image, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/NavBar/Navbar';
@@ -11,12 +11,36 @@ import { useNetwork, useSwitchNetwork } from 'wagmi';
 import { Status } from '../components/utils/status';
 import { defaultChain } from '../src/const';
 import { usePriceData } from '../components/context/PriceContext';
-import Success from '../components/modals/debt/Success';
+import {
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+} from '@chakra-ui/react'
+import { Widget } from '@typeform/embed-react'
+import Link from 'next/link';
+
 
 export default function Index({ children }: any) {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [refresh, setRefresh] = useState(0);
+
+	// Show a first time message
+	const [showMessage, setShowMessage] = useState(false);
+	const [step, setStep] = useState(0);
+
+	useEffect(() => {
+		const lastMessageShown = localStorage.getItem('betaShutdownMessageShown');
+		console.log("Last Message Shown", lastMessageShown);
+		if(!lastMessageShown || (Date.now() - parseInt(lastMessageShown)) > 1000 * 60 * 60 * 24 * 7) {
+			
+			setShowMessage(true);
+		}
+	}, [])
 
     useEffect(() => {
         const handleStart = (url: any) => {
@@ -93,6 +117,16 @@ export default function Index({ children }: any) {
 					Not optimised for mobile view yet
 				</Text>
 			</Flex>
+
+			<Flex align={'center'} justify={'center'} bgColor={colorMode == "dark" ? "orange.400" : "lightBg.400"} color={'white'}>
+				<Text
+					textAlign={'center'} 
+					fontSize={'sm'}
+					fontWeight="medium"
+					p={1.5}>
+					NOTICE: Beta is shutting down on 31st May 2024. Please withdraw your funds before then.
+				</Text>
+			</Flex>
 			{chain?.id !== defaultChain.id && switchNetworkAsync && <Flex align={'center'} justify={'center'} bgColor="primary.600" color={'white'}>
 				<Text
 					textAlign={'center'} 
@@ -119,6 +153,73 @@ export default function Index({ children }: any) {
 				</Text>
 			)}
 			</Box>
+
+			<Modal isOpen={showMessage} onClose={() => {
+				setShowMessage(false);
+			}} 
+			isCentered
+			
+			>
+				<ModalOverlay opacity={1} bg={'blackAlpha.900'} />
+				<ModalContent minW={'600px'}>
+				<ModalHeader textAlign={'center'}>
+					{ step == 0 ? "Thank you for being a part of our Beta!" : step == 1 ? "We'd love to hear your feedback!" : "Thank you!"}
+				</ModalHeader>
+				{/* <ModalCloseButton /> */}
+				<ModalBody p={0} bg={'blackAlpha.700'} py={6}>
+					{
+						step == 0 ? <Box mx={5} textAlign={'center'}>
+							<Text>
+								Reax was born 2 years ago to revolutionise the derivatives space. 🧑‍🚀 We launched Beta in July 2023 and have been live on mainnet for 10 months now. 🔥
+							</Text>
+							<Text my={2}>
+								We have learnt a lot from our users and are now ready to take on the next phase, truly game-changing the DeFi Derivatives! 🚀
+							</Text>
+							<Image src='/static/beta.jpeg' w={'100%'} my={6} />
+							<Text>
+								We will be shutting down Beta on 31st May 2024. Please withdraw your funds before then.
+							</Text>
+							
+						</Box> : step == 1 ? <>
+						<Box my={0} minH={'300px'} mx={4}>
+								<Widget id="jFKcPhy0" style={{ width: '100%', height: '300px' }} className="my-form" />
+							</Box>
+						</> : <Box textAlign={'center'} mx={5}>
+							<Text mb={4}>
+								Stay tuned for the next phase of Reax! 🚀  We now are taking off to the moon! 🌕
+							</Text>
+
+							<Image src={'/static/take-off.jpeg'} w={'100%'} />
+
+							<Text mt={4}>
+								Read our litepaper <Link style={{color: "orange"}} href={'https://reax.one/litepaper.pdf'} target={'_blank'}>here</Link>!
+							</Text>
+						</Box>
+					}
+				</ModalBody>
+
+				<ModalFooter mx={'auto'}>
+					{step !== 0 && <Button variant={'ghose'} mr={3} onClick={() => {
+						setStep((prev) => prev - 1);
+					}
+					}>
+						{"<"} Back
+					</Button>}
+					<Button colorScheme='orange' color={'white'} bg={'secondary.400'} mr={3} onClick={() => {
+						if(step != 2) {
+							setStep((prev) => prev + 1);
+						} else {
+							localStorage.setItem('betaShutdownMessageShown', Date.now().toString());
+							setShowMessage(false);
+						}
+					}}>
+					{
+						step == 0 ? "Give Feedback >" : step == 1 ? "What's next?" : "Close"
+					}
+					</Button>
+				</ModalFooter>
+				</ModalContent>
+			</Modal>
 
 			
 			{/* <Box bgGradient={'linear(to-b, #090B0F, #090B0F)'} zIndex={0}> */}
