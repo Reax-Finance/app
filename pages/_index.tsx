@@ -20,7 +20,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from '@chakra-ui/react'
-import { Widget } from '@typeform/embed-react'
+// import { Widget } from '@typeform/embed-react'
 import Link from 'next/link';
 
 
@@ -182,7 +182,7 @@ export default function Index({ children }: any) {
 							
 						</Box> : step == 1 ? <>
 						<Box my={0} minH={'300px'} mx={4}>
-								<Widget id="jFKcPhy0" style={{ width: '100%', height: '300px' }} className="my-form" />
+								{/* <Widget id="jFKcPhy0" style={{ width: '100%', height: '300px' }} className="my-form" /> */}
 							</Box>
 						</> : <Box textAlign={'center'} mx={5}>
 							<Text mb={4}>
