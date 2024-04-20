@@ -160,7 +160,7 @@ export default function Index({ children }: any) {
 			isCentered
 			
 			>
-				<ModalOverlay opacity={1} bg={'blackAlpha.900'} />
+				<ModalOverlay opacity={1} bg={'blackAlpha.700'} />
 				<ModalContent minW={'600px'}>
 				<ModalHeader textAlign={'center'}>
 					{ step == 0 ? "Thank you for being a part of our Beta!" : step == 1 ? "We'd love to hear your feedback!" : "Thank you!"}
@@ -173,7 +173,7 @@ export default function Index({ children }: any) {
 								Reax was born 2 years ago to revolutionise the derivatives space. 🧑‍🚀 We launched Beta in July 2023 and have been live on mainnet for 10 months now. 🔥
 							</Text>
 							<Text my={2}>
-								We have learnt a lot from our users and are now ready to take on the next phase, truly game-changing the DeFi Derivatives! 🚀
+								Since then, we have innovated to take Reax on the next phase, a truly game-changing the DeFi Derivatives platform! 🚀
 							</Text>
 							<Image src='/static/beta.jpeg' w={'100%'} my={6} />
 							<Text>
@@ -214,7 +214,7 @@ export default function Index({ children }: any) {
 						}
 					}}>
 					{
-						step == 0 ? "Give Feedback >" : step == 1 ? "What's next?" : "Close"
+						step == 0 ? "Give Feedback >" : step == 1 ? "What's next?" : "LFG! 🚀"
 					}
 					</Button>
 				</ModalFooter>

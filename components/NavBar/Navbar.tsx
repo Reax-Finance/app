@@ -26,6 +26,7 @@ import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
+import { SliderButton, Sidetab } from '@typeform/embed-react'
 
 function NavBar() {
 	const { status, account, fetchData } = useContext(AppDataContext);
@@ -147,6 +148,9 @@ function NavBar() {
 								path={"/pools"}
 								title="Liquidity"
 							></NavLocalLink>
+
+							{/* <SliderButton id="jFKcPhy0" style={{ width: '100%', height: '300px' }} className="my-form" /> */}
+							<Sidetab id="jFKcPhy0" buttonText="Give Feedback" buttonColor="#ff631b" />
 						</Flex>
 					</Flex>
 					
