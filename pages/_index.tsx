@@ -20,8 +20,8 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from '@chakra-ui/react'
-import { Widget } from '@typeform/embed-react'
 import Link from 'next/link';
+import { MdOpenInNew } from 'react-icons/md';
 
 
 export default function Index({ children }: any) {
@@ -181,9 +181,16 @@ export default function Index({ children }: any) {
 							</Text>
 							
 						</Box> : step == 1 ? <>
-						<Box my={0} minH={'300px'} mx={4}>
-								<Widget id="jFKcPhy0" style={{ width: '100%', height: '300px' }} className="my-form" />
-							</Box>
+						<Flex flexDir={'column'} align={'center'} my={0} minH={'300px'} mx={4}>
+								 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSes7aa3khrpH_duozRG5llQRZA2V6j03mGswm3qXcMxwcKekQ/viewform?embedded=true" width="100%" height="400px">Loading…</iframe>
+								<Box>
+								 <Button colorScheme='orange' color={'white'} bg={'secondary.400'} mt={4} >
+								 <Link href={'https://docs.google.com/forms/d/e/1FAIpQLSes7aa3khrpH_duozRG5llQRZA2V6j03mGswm3qXcMxwcKekQ/viewform'} target={'_blank'} >
+									Open In New Tab <MdOpenInNew/>
+								 </Link>
+								 </Button>
+								</Box>
+							</Flex>
 						</> : <Box textAlign={'center'} mx={5}>
 							<Text mb={4}>
 								Stay tuned for the next phase of Reax! 🚀  We now are taking off to the moon! 🌕

@@ -9,7 +9,8 @@ import {
 	Divider,
 	Text,
 	useColorMode,
-	Button
+	Button,
+	Link,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -26,14 +27,13 @@ import { CustomConnectButton } from "./ConnectButton";
 import { useDexData } from "../context/DexDataProvider";
 import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
-import { SliderButton, Sidetab } from '@typeform/embed-react'
+import { MdOpenInNew } from "react-icons/md";
 
 function NavBar() {
 	const { status, account, fetchData } = useContext(AppDataContext);
 	const { fetchData: fetchTokenData } = useContext(TokenContext);
-	const { fetchData: fetchLendingData } = useLendingData()
+	const { fetchData: fetchLendingData } = useLendingData();
 	const { fetchData: fetchDexData, dex } = useDexData();
-
 
 	const { chain, chains } = useNetwork();
 	const [init, setInit] = useState(false);
@@ -96,8 +96,18 @@ function NavBar() {
 			fetchDexData();
 			fetchTokenData();
 		}
-	}, [activeConnector, address, chain?.unsupported, chains, fetchData, init, isConnected, isConnecting, isSubscribed, status]);
-
+	}, [
+		activeConnector,
+		address,
+		chain?.unsupported,
+		chains,
+		fetchData,
+		init,
+		isConnected,
+		isConnecting,
+		isSubscribed,
+		status,
+	]);
 
 	const [isOpen, setIsOpen] = React.useState(false);
 
@@ -107,112 +117,124 @@ function NavBar() {
 		) {
 			setIsOpen(false);
 		}
-
 	});
 
-	const {colorMode} = useColorMode();
+	const { colorMode } = useColorMode();
 	const router = useRouter();
 
 	return (
 		<>
-		<Flex className={`${VARIANT}-${colorMode}-navBar`} justify={'center'} zIndex={0} mt={8} align='center' >
-			<Box minW='0' w={'100%'} maxW='1250px'>
-			<Flex align={"center"} justify="space-between" >
-				<Flex justify="space-between" align={"center"} w='100%'>
-					<Flex gap={10} align='center'>
-						<Image
-							src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo-${colorMode}.svg`}
-							alt="reax logo"
-							height="16px"
-						/>
+			<Flex
+				className={`${VARIANT}-${colorMode}-navBar`}
+				justify={"center"}
+				zIndex={0}
+				mt={8}
+				align="center"
+			>
+				<Box minW="0" w={"100%"} maxW="1250px">
+					<Flex align={"center"} justify="space-between">
+						<Flex justify="space-between" align={"center"} w="100%">
+							<Flex gap={10} align="center">
+								<Image
+									src={`/${process.env.NEXT_PUBLIC_TOKEN_SYMBOL}-logo-${colorMode}.svg`}
+									alt="reax logo"
+									height="16px"
+								/>
+								<Flex
+									align="center"
+									display={{ sm: "none", md: "flex" }}
+								>
+									<NavLocalLink
+										path={"/"}
+										title="Trade"
+									></NavLocalLink>
+
+									<NavLocalLink
+										path={"/synthetics"}
+										title={"Synths"}
+									></NavLocalLink>
+
+									<NavLocalLink
+										path={"/lend"}
+										title="Markets"
+									></NavLocalLink>
+
+									<NavLocalLink
+										path={"/pools"}
+										title="Liquidity"
+									></NavLocalLink>
+								</Flex>
+							</Flex>
+
+							<Flex
+								display={{ sm: "flex", md: "none" }}
+								my={4}
+								gap={2}
+							>
+								<CustomConnectButton />
+								<IconButton
+									onClick={onToggle}
+									icon={
+										isToggleOpen ? (
+											<CloseIcon w={3} h={3} />
+										) : (
+											<HamburgerIcon w={5} h={5} />
+										)
+									}
+									variant={"ghost"}
+									aria-label={"Toggle Navigation"}
+									rounded={0}
+								/>
+							</Flex>
+						</Flex>
+
 						<Flex
-							align="center"
 							display={{ sm: "none", md: "flex" }}
+							justify="flex-end"
+							align={"center"}
+							// gap={2}
+							w="100%"
 						>
-							<NavLocalLink
-								path={"/"}
-								title="Trade"
-							></NavLocalLink>
-
-							<NavLocalLink
-								path={"/synthetics"}
-								title={"Synths"}
-							></NavLocalLink>
-
-							<NavLocalLink
-								path={"/lend"}
-								title="Markets"
-							></NavLocalLink>
-							
-							<NavLocalLink
-								path={"/pools"}
-								title="Liquidity"
-							></NavLocalLink>
-
-							{/* <SliderButton id="jFKcPhy0" style={{ width: '100%', height: '300px' }} className="my-form" /> */}
-							<Sidetab id="jFKcPhy0" buttonText="Give Feedback" buttonColor="#ff631b" />
-						</Flex>
-					</Flex>
-					
-					<Flex display={{sm: 'flex', md: 'none'}} my={4} gap={2}>
-						<CustomConnectButton />
-						<IconButton
-							onClick={onToggle}
-							icon={
-								isToggleOpen ? (
-									<CloseIcon w={3} h={3} />
-								) : (
-									<HamburgerIcon w={5} h={5} />
-								)
-							}
-							variant={"ghost"}
-							aria-label={"Toggle Navigation"}
-							rounded={0}
-						/>
-					</Flex>
-				</Flex>
-
-				<Flex	
-					display={{ sm: "none", md: "flex" }}
-					justify="flex-end"
-					align={"center"}
-					// gap={2}
-					w='100%'
-				>
-					{/* <Button mr={4} size={'sm'} bg={'secondary.600'} _hover={{bg: 'secondary.800'}} px={3} py={1} rounded={'full'} onClick={() => router.push('/synthetics')}>
-						<Flex ml={-1.5} mr={1.5}>
-							<Box border={'0px white solid'} rounded={'full'}>
-								<Image src={'/icons/cBTC.svg'} w={'25px'} />
-							</Box>
-							<Box border={'0px white solid'} rounded={'full'} ml={-2}>
-								<Image src={'/icons/cETH.svg'} w={'25px'}  />
-							</Box>
-							<Box border={'0px white solid'} rounded={'full'} ml={-2}>
-								<Image src={'/icons/cSOL.svg'} w={'25px'} />
-							</Box>
-						</Flex>
-						Mint Synths & Earn {"20"}% APY
-					</Button> */}
-					{/* <NavLocalLink
-						path={"/leaderboard"}
-						title={<Flex gap={2} align={'center'}>
-						<Text color={colorMode == 'dark' ? 'white' : 'black'}>Leaderboard</Text>
-						</Flex>}></NavLocalLink> */}
-						{isConnected && process.env.NEXT_PUBLIC_NETWORK == 'testnet' && <>
-							<NavLocalLink
-							path={"/faucet"}
-							title="Faucet"></NavLocalLink>
-						</>}
-					{/* <Box>
+							<Flex>
+								<Button
+									colorScheme="orange"
+									color={"white"}
+									bg={"secondary.400"}
+									rounded={0}
+								>
+									<Link
+										href={
+											"https://docs.google.com/forms/d/e/1FAIpQLSes7aa3khrpH_duozRG5llQRZA2V6j03mGswm3qXcMxwcKekQ/viewform"
+										}
+										target={"_blank"}
+									>
+										<Flex gap={2}>
+											<Text>Give Feedback</Text>
+											<MdOpenInNew />
+										</Flex>
+									</Link>
+								</Button>
+							</Flex>
+							{isConnected &&
+								process.env.NEXT_PUBLIC_NETWORK ==
+									"testnet" && (
+									<>
+										<NavLocalLink
+											path={"/faucet"}
+											title="Faucet"
+										></NavLocalLink>
+									</>
+								)}
+							{/* <Box>
 						<AccountButton />
 					</Box> */}
-					<Box ml={2}>
-						<CustomConnectButton />
-					</Box>
-				</Flex>
+							<Box ml={2}>
+								<CustomConnectButton />
+							</Box>
+						</Flex>
+					</Flex>
+				</Box>
 			</Flex>
-			</Box>
-		</Flex>
 			<Collapse in={isToggleOpen} animateOpacity>
 				<MobileNav />
 			</Collapse>
@@ -224,29 +246,31 @@ const MobileNav = ({}: any) => {
 	const router = useRouter();
 	const { dex } = useDexData();
 	return (
-		<Flex flexDir={"row"} wrap={'wrap'} gap={0}>
-			<NavLocalLink
-				path={"/"}
-				title={"Trade"}
-			></NavLocalLink>
-			<NavLocalLink
-				path={"/synthetics"}
-				title="Synths"
-			></NavLocalLink>
-			<NavLocalLink
-				path={"/lend"}
-				title="Lending"
-			></NavLocalLink>
-			<NavLocalLink
-				path={"/pools"}
-				title="Pools"
-			></NavLocalLink>
-			<NavLocalLink
-				path={"/leaderboard"}
-				title={<Flex gap={2} align={'center'}>
-				<Text color={'secondary.400'} fontWeight={'bold'} fontSize={'md'}>{tokenFormatter.format(dex?.yourPoints?.totalPoints ?? 0)}</Text> Points
-				</Flex>}
-			></NavLocalLink>
+		<Flex flexDir={"row"} wrap={"wrap"} gap={0}>
+			<NavLocalLink path={"/"} title={"Trade"}></NavLocalLink>
+			<NavLocalLink path={"/synthetics"} title="Synths"></NavLocalLink>
+			<NavLocalLink path={"/lend"} title="Lending"></NavLocalLink>
+			<NavLocalLink path={"/pools"} title="Pools"></NavLocalLink>
+			<Flex>
+				<Button
+					colorScheme="orange"
+					color={"white"}
+					bg={"secondary.400"}
+					rounded={0}
+				>
+					<Link
+						href={
+							"https://docs.google.com/forms/d/e/1FAIpQLSes7aa3khrpH_duozRG5llQRZA2V6j03mGswm3qXcMxwcKekQ/viewform"
+						}
+						target={"_blank"}
+					>
+						<Flex gap={2}>
+							<Text>Give Feedback</Text>
+							<MdOpenInNew />
+						</Flex>
+					</Link>
+				</Button>
+			</Flex>
 		</Flex>
 	);
 };
