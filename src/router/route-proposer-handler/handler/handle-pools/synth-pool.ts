@@ -10,7 +10,7 @@ import { Graph } from "../../helper/graph/graph";
 
 
 
-export function handleSynthPool(poolIds: string[], pools: any, amount: string, usdPrice: number, tokenMap: any, kind: SwapType, graph: Graph): void {
+export function handleSynthPool(poolIds: string[], pools: any, amount: string, usdPrice: number, tokenMap: any, kind: SwapType, graph: Graph, priceData: any): void {
     try {
         const synthDecimals = 18;
         const basePoints = 10000;
@@ -29,8 +29,8 @@ export function handleSynthPool(poolIds: string[], pools: any, amount: string, u
                     const burnFee = Big(pools[poolId]["synths"][tokenIn]["burnFee"]).div(basePoints).toNumber();
                     const mintFee = Big(pools[poolId]["synths"][tokenOut]["mintFee"]).div(basePoints).toNumber();
 
-                    const tokenInPriceUSD = getPrices(tokenIn) ?? Number(constantPrice[tokenIn]);
-                    const tokenOutPriceUSD = getPrices(tokenOut) ?? Number(constantPrice[tokenOut]);
+                    const tokenInPriceUSD = getPrices(tokenIn, priceData) ?? Number(constantPrice[tokenIn]);
+                    const tokenOutPriceUSD = getPrices(tokenOut, priceData) ?? Number(constantPrice[tokenOut]);
 
                     if (!tokenInPriceUSD || !tokenOutPriceUSD) {
                         continue;

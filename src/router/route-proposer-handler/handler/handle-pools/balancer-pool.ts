@@ -13,7 +13,7 @@ import { Graph } from "../../helper/graph/graph";
 
 
 
-export function handleBalancerPool(allPools: any, tokenMap: ITokenMap, amount: string, kind: SwapType, usdPrice: number, graph: Graph): void {
+export function handleBalancerPool(allPools: any, tokenMap: ITokenMap, amount: string, kind: SwapType, usdPrice: number, graph: Graph, priceData: any): void {
 
     for (const currPool of allPools) {
 
@@ -24,7 +24,7 @@ export function handleBalancerPool(allPools: any, tokenMap: ITokenMap, amount: s
             if (token.address === currPool.address) {
                 continue;
             }
-            const tokenPrice = getPrices(token.address) ?? (isNaN(Number(constantPrice[token.address])) ? null : Number(constantPrice[token.address])) ?? token.token.latestUSDPrice;
+            const tokenPrice = getPrices(token.address, priceData) ?? (isNaN(Number(constantPrice[token.address])) ? null : Number(constantPrice[token.address])) ?? token.token.latestUSDPrice;
             if (!tokenPrice) {
                 continue;
             }

@@ -27,7 +27,7 @@ import {
 } from "./handler/routing/helper/update-limits";
 import { FEData } from "./handler/routing/helper/front-end-data";
 
-export async function routeProposer(args: IRouteProposer): Promise<
+export async function routeProposer(args: IRouteProposer, priceData: any): Promise<
 	| IError
 	| {
 			kind: SwapType;
@@ -69,8 +69,8 @@ export async function routeProposer(args: IRouteProposer): Promise<
 
 		let usdPrice: number =
 			kind == SwapType.SwapExactIn
-				? getPrices(t1) ?? Number(constantPrice[t1])
-				: getPrices(t2) ?? Number(constantPrice[t2]);
+				? getPrices(t1, priceData) ?? Number(constantPrice[t1])
+				: getPrices(t2, priceData) ?? Number(constantPrice[t2]);
 		let allPools: IPool[] = getPools();
 		const pools = JSON.parse(
 			(
@@ -89,8 +89,9 @@ export async function routeProposer(args: IRouteProposer): Promise<
 			const tokenAddress = kind === SwapType.SwapExactIn ? t1 : t2;
 			let flag = false;
 			for (const poolId of Object.keys(pools)) {
-				if (pools[poolId]["synths"][tokenAddress]) {
-					const tokenPrice = getPrices(tokenAddress);
+				if (pools[poolId]["synths"]?.[tokenAddress]) {
+					const tokenPrice = getPrices(tokenAddress, priceData);
+					console.log("tokenPrice", tokenPrice);
 					if (tokenPrice) {
 						usdPrice = tokenPrice;
 						flag = true;
@@ -117,7 +118,7 @@ export async function routeProposer(args: IRouteProposer): Promise<
 
 		let tokenMap: ITokenMap = {};
 
-		handleBalancerPool(allPools, tokenMap, amount, kind, usdPrice, graph);
+		handleBalancerPool(allPools, tokenMap, amount, kind, usdPrice, graph, priceData);
 
 		const poolIds = Object.keys(pools);
 
@@ -128,7 +129,8 @@ export async function routeProposer(args: IRouteProposer): Promise<
 			usdPrice,
 			tokenMap,
 			kind,
-			graph
+			graph,
+			priceData
 		);
 
 		const result: { [key: string]: IDijkstraResponse } | IError =
@@ -223,6 +225,7 @@ export async function routeProposer(args: IRouteProposer): Promise<
 
 		return data;
 	} catch (error) {
+		console.log(error);
 		console.log(`Error @ routeProposer ${error}`, __dirname);
 		return {
 			status: false,

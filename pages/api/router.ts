@@ -21,6 +21,7 @@ export default async function handler(
 			slipage,
 			recipient,
 			deadline,
+			priceData
 		} = req.query as any;
 
 		const input = [
@@ -56,7 +57,7 @@ export default async function handler(
 			slipage: Number(slipage),
 			recipient,
 			deadline: Number(deadline),
-		});
+		}, JSON.parse(priceData));
 
 		if (
 			(typeof data == "object" && "status" in data) ||
@@ -87,6 +88,6 @@ export default async function handler(
 async function start() {
 	await fetchSynthPoolData();
 	await fetchPoolData();
-	await startUpdatePrice();
+	// await startUpdatePrice();
 	isRunning = true;
 }

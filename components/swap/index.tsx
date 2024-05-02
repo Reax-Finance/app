@@ -71,7 +71,8 @@ function Swap() {
 					sender: address ?? ADDRESS_ZERO,
 					recipient: address ?? "XYZ",
 					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
-					slipage: maxSlippage
+					slipage: maxSlippage,
+					priceData: prices
 				}
 			})
 			.then((res) => {

@@ -18,9 +18,8 @@ async function updatePrice() {
 	}
 }
 
-export function getPrices(address: string) {
-	console.log("priceData", address);
-	return priceData[address] ? Number(priceData[address][0]) : undefined;
+export function getPrices(address: string, priceData2: any) {
+	return priceData2[address.toLowerCase()] ? Number(priceData2[address.toLowerCase()]) : undefined;
 }
 
 export async function startUpdatePrice() {
