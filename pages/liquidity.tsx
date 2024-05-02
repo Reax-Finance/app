@@ -1,7 +1,7 @@
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import React, { useEffect } from "react";
-import Swap from "../components/swap/index";
+import Liquidity from "../components/liquidity/index";
 import useUpdateData from "../components/utils/useUpdateData";
 
 export default function SwapPage() {
@@ -30,7 +30,7 @@ export default function SwapPage() {
 							paddingBottom={'1px'}
 							border={'0'}
 						>
-							<Swap />
+							<Liquidity />
 						</Box>
 					</motion.div>
 				</Box>

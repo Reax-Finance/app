@@ -13,7 +13,6 @@ import {
 import { EPOCH_ENDPOINT, EPOCH_REWARDS, dollarFormatter, tokenFormatter } from '../../src/const';
 import Head from 'next/head';
 import { useAccount } from 'wagmi';
-import { useDexData } from '../context/DexDataProvider';
 import LeaderboardRow from '../others/LeaderboardRow';
 import { VARIANT } from '../../styles/theme';
 import { useCountdown } from '../context/useCountdown';
@@ -26,7 +25,7 @@ import {
 import { getContract, send } from '../../src/contract';
 
 export default function Leaderboard({epochIndex}: any) {
-  const { epoches } = useDexData();
+  const epoches: any[] = [];
   const { address } = useAccount();
   const [loading, setLoading] = React.useState(false);
 
@@ -139,7 +138,6 @@ export default function Leaderboard({epochIndex}: any) {
 
     const claimRewardsContract = await getContract(
       "ClaimRewards",
-      chainId,
       claimData[epochIndex].claimRewardsContractAddress
     );
 

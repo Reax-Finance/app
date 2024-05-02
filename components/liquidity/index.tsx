@@ -1,32 +1,51 @@
-import { Box, useDisclosure, Text, Flex, Link } from "@chakra-ui/react";
+import {
+	Box,
+	useDisclosure,
+	Text,
+	Flex,
+	Link,
+	useColorMode,
+	Heading,
+	Divider,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { getContract, send, estimateGas } from "../../src/contract";
 import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import TokenSelector from "./TokenSelector";
-import { ADDRESS_ZERO, EIP712_VERSION, ROUTER_ENDPOINT, WETH_ADDRESS, defaultChain, tokenFormatter } from "../../src/const";
+import {
+	dollarFormatter,
+	tokenFormatter,
+} from "../../src/const";
 import SwapSkeleton from "./Skeleton";
-import { useToast } from '@chakra-ui/react';
+import { useToast } from "@chakra-ui/react";
 import useUpdateData from "../utils/useUpdateData";
 import { useBalanceData } from "../context/BalanceProvider";
 import { usePriceData } from "../context/PriceContext";
-import axios from 'axios';
-import SwapLayout from "./SwapLayout";
+import axios from "axios";
+import LiquidityLayout from "./LiquidityLayout";
 import Big from "big.js";
-import { BigNumber, ethers } from "ethers";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { parseInput } from "../utils/number";
+import { formatInput, parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 import { useAppData } from "../context/AppDataProvider";
+import { VARIANT } from "../../styles/theme";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import { BsWallet } from "react-icons/bs";
+import { ArrowRightIcon } from "@chakra-ui/icons";
+import { ethers } from "ethers";
 
-function Swap() {
-	const [inputAssetIndex, setInputAssetIndex] = useState(2);
-	const [outputAssetIndex, setOutputAssetIndex] = useState(0);
-	const [inputAmount, setInputAmount] = useState('');
-	const [outputAmount, setOutputAmount] = useState('');
+interface ApprovalStep {
+	type: "APPROVAL" | "PERMIT" | "DELEGATION";
+	isCompleted: boolean;
+	data: any;
+}
+
+function Liquidity() {
+	const [inputAssetIndex, setInputAssetIndex] = useState(0);
+	const [inputAmount, setInputAmount] = useState("");
+	const [outputAmount, setOutputAmount] = useState("");
 	const [gas, setGas] = useState(0);
-	const [error, setError] = useState('');
-	
+	const [error, setError] = useState("");
+
 	const { chain } = useNetwork();
 	const { prices } = usePriceData();
 	const { isConnected, address } = useAccount();
@@ -36,11 +55,6 @@ function Swap() {
 		onOpen: onInputOpen,
 		onClose: onInputClose,
 	} = useDisclosure();
-	const {
-		isOpen: isOutputOpen,
-		onOpen: onOutputOpen,
-		onClose: onOutputClose,
-	} = useDisclosure();
 
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
@@ -48,136 +62,40 @@ function Swap() {
 	const [data, setData] = useState<any>(null);
 	const [maxSlippage, setMaxSlippage] = useState(0.5);
 	const [deadline_m, setDeadline_m] = useState(20);
-	const {getUpdateData} = useUpdateData();
-	const [approvedAmount, setApprovedAmount] = useState('0');
+	const { getUpdateData } = useUpdateData();
+	const [approvedAmount, setApprovedAmount] = useState("0");
 	const { signTypedDataAsync } = useSignTypedData();
-	const [deadline, setDeadline] = useState('0');
+	const [deadline, setDeadline] = useState("0");
 
-	// const { walletBalances, updateFromTx, tokens: _tokens, allowances, nonces, addNonce } = useBalanceData();
-	const { liquidityData } = useAppData();
-	
-    const tokens: any[] = liquidityData ? liquidityData.synths.concat([liquidityData.lpToken]) : [];
+	const { liquidityData, reserveData, account } = useAppData();
+	const tokens: any[] = reserveData ? reserveData.vaults.map((vault: any) => vault.asset) : [];
+	const outToken = liquidityData?.lpToken;
 
 	const handleError = useHandleError(PlatformType.DEX);
-
-	const isUnwrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO);
-	const isWrap = (tokens[inputAssetIndex]?.id == ADDRESS_ZERO && tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id));
-
-	const calculateOutputAmount = (inputAmount: string) => {
-		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT, {
-				params: {
-					tokenIn: tokens[inputAssetIndex]?.id,
-					tokenOut: tokens[outputAssetIndex]?.id,
-					amount: inputAmount,
-					kind: 0,
-					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? "XYZ",
-					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
-					slipage: maxSlippage
-				}
-			})
-			.then((res) => {
-				resolve(res.data.data);
-			})
-			.catch((err) => {
-				reject(err);
-			})
-		})
-	}
-
-	const calculateInputAmount = (outputAmount: string) => {
-		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT, {
-				params: {
-					tokenIn: tokens[inputAssetIndex]?.id,
-					tokenOut: tokens[outputAssetIndex]?.id,
-					amount: outputAmount,
-					kind: 1,
-					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? "XYZ",
-					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
-					slipage: maxSlippage
-				}
-			})
-			.then((res) => {
-				resolve(res.data.data);
-			})
-			.catch((err) => {
-				reject(err);
-			})
-		})
-	}
 
 	const updateInputAmount = (value: any) => {
 		value = parseInput(value);
 		setInputAmount(value);
-		if (isNaN(Number(value)) || Number(value) == 0) {
-			setOutputAmount('0');
-			return;
-		}
-		if(isWrap || isUnwrap){
-			setOutputAmount(value);
-		} else {
-			setOutputAmount(Big(value).mul(tokens[inputAssetIndex].price.toString()).div(tokens[outputAssetIndex].price.toString()).toString());
-		}
 	};
 
 	const updateOutputAmount = (value: any) => {
 		value = parseInput(value);
 		setOutputAmount(value);
-		if (isNaN(Number(value)) || Number(value) == 0) return;
-		if(isWrap || isUnwrap){
-			setInputAmount(value);
-		} else {
-			setInputAmount(Big(value).mul(tokens[outputAssetIndex].price.toString()).div(tokens[inputAssetIndex].price.toString()).toString());
-		}
 	};
 
 	const onInputTokenSelected = (e: number) => {
-		if (outputAssetIndex == e) {
-			setOutputAssetIndex(inputAssetIndex);
-		}
 		setInputAssetIndex(e);
 		setInputAmount("" as any);
-		setOutputAmount('0');
-		setApprovedAmount('0');
+		setApprovedAmount("0");
 		setData(null);
 		onInputClose();
 		setSwapData(null);
-		setApprovedAmount('0');
-		setDeadline('0');
-		setData(null);
-		setGas(0);
-	};
-	
-	const onOutputTokenSelected = (e: number) => {
-		if (inputAssetIndex == e) {
-			setInputAssetIndex(outputAssetIndex);
-		}
-		setOutputAssetIndex(e);
-		setInputAmount('');
-		setOutputAmount('0');
-		onOutputClose();
-		setSwapData(null);
-		setApprovedAmount('0');
-		setDeadline('0');
+		setApprovedAmount("0");
+		setDeadline("0");
 		setData(null);
 		setGas(0);
 	};
 
-	const switchTokens = () => {
-		let temp = inputAssetIndex;
-		setInputAssetIndex(outputAssetIndex);
-		setOutputAssetIndex(temp);
-		setInputAmount('');
-		setOutputAmount('0');
-		setSwapData(null);
-		setApprovedAmount('0');
-		setDeadline('0');
-		setData(null);
-		setGas(0);
-	};
 
 	const exchange = async () => {
 		const token = tokens[inputAssetIndex];
@@ -233,7 +151,7 @@ function Swap() {
 		// 			title: 'Transaction submitted',
 		// 			description: <Box>
 		// 				<Text>
-		// 					{`You have swapped ${inputAmount} ${tokens[inputAssetIndex]?.symbol} for ${tokens[outputAssetIndex]?.symbol}`}
+		// 					{`You have swapped ${inputAmount} ${tokens[inputAssetIndex]?.symbol} for ${outToken?.symbol}`}
 		// 				</Text>
 		// 				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 		// 					<Flex align={'center'} gap={2}>
@@ -248,7 +166,7 @@ function Swap() {
 		// 			position: 'top-right'
 		// 		})
 		// 		setInputAmount('');
-		// 		setOutputAmount('0');
+		// 		setLpAmount('0');
 		// 		setSwapData(null);
 		// 		if(Big(approvedAmount ?? 0).gt(0)){
 		// 			addNonce(token.id, '1')
@@ -301,7 +219,7 @@ function Swap() {
 		// 	handleError(err);
 		// 	setLoading(false);
 		// })
-	}
+	};
 
 	const approve = async (token: any, routerAddress: string) => {
 		setLoading(true);
@@ -357,47 +275,52 @@ function Swap() {
 	};
 
 	const handleMax = () => {
-			//TODO - max
+		//TODO - max
 
 		let _inputAmount = Big(0).div(10 ** tokens[inputAssetIndex].decimals);
-		updateInputAmount(_inputAmount.toString())
+		updateInputAmount(_inputAmount.toString());
 	};
 
 	const swapInputExceedsBalance = () => {
 		if (inputAmount) {
 			//TODO - max
-			return Big(inputAmount).gt(Big(0).div(10 ** tokens[inputAssetIndex].decimals));
+			return Big(inputAmount).gt(
+				Big(0).div(10 ** tokens[inputAssetIndex].decimals)
+			);
 		}
 		return false;
 	};
 
-	const shouldApprove = () => {
-		// const routerAddress = getAddress("Router", chain?.id! ?? defaultChain.id);
-		// const token = tokens[inputAssetIndex];
-		// if(token.id == ADDRESS_ZERO) return false;
-		// if(isUnwrap) return false;
-		// if (Big(allowances[token.id]?.[routerAddress] ?? 0).add(Big(approvedAmount).mul(10**token.decimals)).lt(Big(inputAmount).mul(10**token.decimals))){
-		// 	return true;
-		// }
-		// return false;
-		return true;
-	}
+	const getSteps = () => {
+		let steps: ApprovalStep[] = [];
+		// Check approval of collateral asset to router
+		const token = tokens[inputAssetIndex];
+		console.log(token);
+		return steps;
+	};
 
 	const validate = () => {
-		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
-		else if (chain?.unsupported) return {valid: false, message: "Unsupported Chain"}
-		if(loading) return {valid: false, message: "Loading..."}
-		if(error.length > 0) return {valid: false, message: error}
-		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
-		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
-		else if (swapInputExceedsBalance()) return {valid: false, message: "Insufficient Balance"}
-		else if (shouldApprove()) return { valid: true, message: `Approve ${tokens[inputAssetIndex].symbol} for use`}
-		else if (Number(deadline_m) == 0) return {valid: false, message: "Please set deadline"}
-		else if (maxSlippage == 0) return {valid: false, message: "Please set slippage"}
-		else if (isWrap) return {valid: true, message: "Wrap"}
-		else if (isUnwrap) return {valid: true, message: "Unwrap"}
-		else return {valid: true, message: "Swap"}
-	}
+		if (!isConnected)
+			return { valid: false, message: "Please connect your wallet" };
+		else if (chain?.unsupported)
+			return { valid: false, message: "Unsupported Chain" };
+		if (loading) return { valid: false, message: "Loading..." };
+		if (error.length > 0) return { valid: false, message: error };
+		else if (Number(inputAmount) <= 0 && Number(outputAmount) <= 0)
+			return { valid: false, message: "Enter Amount" };
+		else if (Big(inputAmount).gt(Big(0).div(10 ** tokens[inputAssetIndex].decimals)))
+			return { valid: false, message: "Insufficient Balance" };
+		else if (getSteps().length > 0)
+			return {
+				valid: false,
+				message: `Add Liquidity`,
+			};
+		else if (Number(deadline_m) == 0)
+			return { valid: false, message: "Please set deadline" };
+		else if (maxSlippage == 0)
+			return { valid: false, message: "Please set slippage" };
+		else return { valid: true, message: "Swap" };
+	};
 
 	const estimateGas = async (_swapData = swapData) => {
 		// if(!_swapData || validate().message !== 'Swap') return;
@@ -430,13 +353,15 @@ function Swap() {
 		// 	console.log("Error estimating gas:", JSON.stringify(err).slice(0, 400));
 		// 	setGas(0);
 		// })
-	}
+	};
 
 	useEffect(() => {
-		if(swapData && Number(inputAmount) > 0){
+		if (swapData && Number(inputAmount) > 0) {
 			estimateGas();
 		}
-	}, [inputAmount, approvedAmount, swapData])
+	}, [inputAmount, approvedAmount, swapData]);
+
+	const { colorMode } = useColorMode();
 
 	return (
 		<>
@@ -444,35 +369,109 @@ function Swap() {
 				<title>
 					{" "}
 					{tokenFormatter.format(
-						(prices[tokens[inputAssetIndex]?.id] / prices[tokens[outputAssetIndex]?.id]) || 0
+						prices[tokens[inputAssetIndex]?.id] /
+							prices[outToken?.id] || 0
 					)}{" "}
-					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
+					{outToken?.symbol}/
+					{tokens[inputAssetIndex]?.symbol} |{" "}
+					{process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
 				</title>
-				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}></link>
+				<link
+					rel="icon"
+					type="image/x-icon"
+					href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}
+				></link>
 			</Head>
 			{tokens.length > 1 ? (
-				<SwapLayout
-					inputAmount={inputAmount}
-					updateInputAmount={updateInputAmount}
-					inputAssetIndex={inputAssetIndex}
-					onInputOpen={onInputOpen}
-					outputAmount={outputAmount}
-					updateOutputAmount={updateOutputAmount}
-					outputAssetIndex={outputAssetIndex}
-					onOutputOpen={onOutputOpen}
-					handleMax={handleMax}
-					switchTokens={switchTokens}
-					exchange={exchange}
-					validate={validate}
-					loading={loading}
-					gas={gas}
-					maxSlippage={maxSlippage}
-					setMaxSlippage={setMaxSlippage}
-					deadline={deadline_m}
-					setDeadline={setDeadline_m}
-					swapData={swapData}
-					tokens={tokens}
-				/>
+				<Box>
+					<Box
+						className={`${VARIANT}-${colorMode}-containerBody`}
+						p={4}
+						my={4}
+					>
+						<Flex justify={"space-between"}>
+							<Flex gap={2} align={"center"}>
+								<BsWallet />
+								<Heading size={"sm"}>Your Position</Heading>
+							</Flex>
+							<Text>Health: {account.healthFactor.gt(10) ? ">10" : account.healthFactor.toString()}</Text>
+						</Flex>
+
+						<Divider my={2} />
+
+						<Flex justify="space-between">
+							<Text>Balance</Text>
+							<Flex align={'center'} gap={1}>
+								<Text>{dollarFormatter.format(account.userTotalBalanceUSD.toString())}</Text>
+								{Number(inputAmount) > 0 && <ArrowRightIcon h={'10px'} />}
+								{Number(inputAmount) > 0 && <Text>{
+									dollarFormatter.format(Number(inputAmount) * tokens[inputAssetIndex].price.div(10**8).toNumber())
+									}</Text>}
+							</Flex>
+						</Flex>
+						<Flex justify="space-between">
+							<Text>Debt</Text>
+							<Flex align={'center'} gap={1}>
+								<Text>{dollarFormatter.format(account.userTotalDebtUSD.toString())}</Text>
+								{Number(outputAmount) > 0 && <ArrowRightIcon h={'10px'} />}
+								{Number(outputAmount) > 0 && <Text>{
+									dollarFormatter.format(Number(outputAmount) * outToken.price.div(ethers.constants.WeiPerEther).toNumber())
+									}</Text>}
+							</Flex>
+						</Flex>
+
+						<Divider my={2} />
+
+						<Flex justify="space-between">
+							<Text>Available to mint</Text>
+							<Flex gap={2} align={'center'}>
+							<Text>0.00</Text>
+							</Flex>
+
+						</Flex>
+					</Box>
+					<Box className={`${VARIANT}-${colorMode}-containerBody`}>
+						<Tabs isFitted colorScheme="orange">
+							<Box
+								className={`${VARIANT}-${colorMode}-containerHeader`}
+								px={0}
+								py={0}
+							>
+								<TabList>
+									<Tab>Add</Tab>
+									<Tab>Remove</Tab>
+								</TabList>
+							</Box>
+
+							<Box>
+								<LiquidityLayout
+									inputAmount={inputAmount}
+									updateInputAmount={updateInputAmount}
+									inputAssetIndex={inputAssetIndex}
+									onInputOpen={onInputOpen}
+									outputAmount={outputAmount}
+									updateOutputAmount={updateOutputAmount}
+									handleMax={handleMax}
+									exchange={exchange}
+									validate={validate}
+									loading={loading}
+									gas={gas}
+									maxSlippage={maxSlippage}
+									setMaxSlippage={setMaxSlippage}
+									deadline={deadline_m}
+									setDeadline={setDeadline_m}
+									swapData={swapData}
+									tokens={tokens}
+									outToken={outToken}
+								/>
+							</Box>
+						</Tabs>
+					</Box>
+
+					<Box className={`${VARIANT}-${colorMode}-containerBody`} p={4} mt={4}>
+						<Text>How it works?</Text>
+					</Box>
+				</Box>
 			) : (
 				<SwapSkeleton />
 			)}
@@ -484,15 +483,8 @@ function Swap() {
 				onTokenSelected={onInputTokenSelected}
 				tokens={tokens}
 			/>
-			<TokenSelector
-				isOpen={isOutputOpen}
-				onOpen={onOutputOpen}
-				onClose={onOutputClose}
-				onTokenSelected={onOutputTokenSelected}
-				tokens={tokens}
-			/>
 		</>
 	);
 }
 
-export default Swap;
+export default Liquidity;

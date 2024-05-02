@@ -5,35 +5,25 @@ import {
 	useDisclosure,
 	Collapse,
 	IconButton,
-	Heading,
-	Divider,
 	Text,
 	useColorMode,
 	Button,
 	Link,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import "../../styles/Home.module.css";
 import { useAccount, useNetwork } from "wagmi";
 import { useContext } from "react";
 import { AppDataContext } from "../context/AppDataProvider";
-import { TokenContext } from "../context/TokenContext";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
 import { Status } from "../utils/status";
-import { useLendingData } from "../context/LendingDataProvider";
 import { CustomConnectButton } from "./ConnectButton";
-import { useDexData } from "../context/DexDataProvider";
-import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
 
 function NavBar() {
 	const { status, account, fetchData } = useContext(AppDataContext);
-	const { fetchData: fetchTokenData } = useContext(TokenContext);
-	const { fetchData: fetchLendingData } = useLendingData();
-	const { fetchData: fetchDexData, dex } = useDexData();
 
 	const { chain, chains } = useNetwork();
 	const [init, setInit] = useState(false);
@@ -48,12 +38,7 @@ function NavBar() {
 		connector: activeConnector,
 	} = useAccount({
 		onConnect({ address, connector, isReconnected }) {
-			// if(!chain) return;
-			// if ((chain as any).unsupported) return;
 			fetchData(address!);
-			fetchLendingData(address!);
-			fetchDexData(address!);
-			fetchTokenData(address!);
 			setInit(true);
 		},
 		onDisconnect() {
@@ -80,11 +65,6 @@ function NavBar() {
 			);
 			setIsSubscribed(true);
 		}
-		// if (localStorage.getItem("chakra-ui-color-mode") === "light") {
-		// 	localStorage.setItem("chakra-ui-color-mode", "dark");
-		// 	// reload
-		// 	window.location.reload();
-		// }
 		if (
 			(!(isConnected && !isConnecting) || chain?.unsupported) &&
 			status !== Status.FETCHING &&
@@ -92,9 +72,6 @@ function NavBar() {
 		) {
 			setInit(true);
 			fetchData();
-			fetchLendingData();
-			fetchDexData();
-			fetchTokenData();
 		}
 	}, [
 		activeConnector,
@@ -109,18 +86,7 @@ function NavBar() {
 		status,
 	]);
 
-	const [isOpen, setIsOpen] = React.useState(false);
-
-	window.addEventListener("click", function (e) {
-		if (
-			!document.getElementById("dao-nav-link")?.contains(e.target as any)
-		) {
-			setIsOpen(false);
-		}
-	});
-
 	const { colorMode } = useColorMode();
-	const router = useRouter();
 
 	return (
 		<>
@@ -128,7 +94,7 @@ function NavBar() {
 				className={`${VARIANT}-${colorMode}-navBar`}
 				justify={"center"}
 				zIndex={0}
-				mt={8}
+				mt={{base: 0, md: 8}}
 				align="center"
 			>
 				<Box minW="0" w={"100%"} maxW="1250px">
@@ -146,22 +112,12 @@ function NavBar() {
 								>
 									<NavLocalLink
 										path={"/"}
-										title="Trade"
+										title="Swap"
 									></NavLocalLink>
 
 									<NavLocalLink
-										path={"/synthetics"}
-										title={"Synths"}
-									></NavLocalLink>
-
-									<NavLocalLink
-										path={"/lend"}
-										title="Markets"
-									></NavLocalLink>
-
-									<NavLocalLink
-										path={"/pools"}
-										title="Liquidity"
+										path={"/liquidity"}
+										title={"Liquidity"}
 									></NavLocalLink>
 								</Flex>
 							</Flex>
@@ -192,15 +148,16 @@ function NavBar() {
 							display={{ sm: "none", md: "flex" }}
 							justify="flex-end"
 							align={"center"}
-							// gap={2}
+							gap={2}
 							w="100%"
 						>
-							<Flex>
+							<Flex mr={2}>
 								<Button
 									colorScheme="orange"
 									color={"white"}
 									bg={"secondary.400"}
 									rounded={0}
+									size={'sm'}
 								>
 									<Link
 										href={
@@ -209,7 +166,7 @@ function NavBar() {
 										target={"_blank"}
 									>
 										<Flex gap={2}>
-											<Text>Give Feedback</Text>
+											<Text>Feedback</Text>
 											<MdOpenInNew />
 										</Flex>
 									</Link>
@@ -228,7 +185,7 @@ function NavBar() {
 							{/* <Box>
 						<AccountButton />
 					</Box> */}
-							<Box ml={2}>
+							<Box >
 								<CustomConnectButton />
 							</Box>
 						</Flex>
@@ -243,20 +200,17 @@ function NavBar() {
 }
 
 const MobileNav = ({}: any) => {
-	const router = useRouter();
-	const { dex } = useDexData();
 	return (
-		<Flex flexDir={"row"} wrap={"wrap"} gap={0}>
-			<NavLocalLink path={"/"} title={"Trade"}></NavLocalLink>
-			<NavLocalLink path={"/synthetics"} title="Synths"></NavLocalLink>
-			<NavLocalLink path={"/lend"} title="Lending"></NavLocalLink>
-			<NavLocalLink path={"/pools"} title="Pools"></NavLocalLink>
+		<Flex flexDir={"row"} align={'center'} wrap={"wrap"} gap={0}>
+			<NavLocalLink path={"/"} title={"Swap"}></NavLocalLink>
+			<NavLocalLink path={"/liquidity"} title={"Liquidity"}></NavLocalLink>
 			<Flex>
 				<Button
 					colorScheme="orange"
 					color={"white"}
 					bg={"secondary.400"}
 					rounded={0}
+					size={"sm"}
 				>
 					<Link
 						href={

@@ -13,13 +13,15 @@ import {
     NumberInputField,
     useColorMode,
     Tooltip,
+    IconButton,
+    Fade,
+    Collapse,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 import { ADDRESS_ZERO, NATIVE, SUPPORTS_ROLLUP_GASFEES, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
-import { InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { CloseIcon, InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 import SelectBody from "./SelectBody";
 import { useBalanceData } from "../context/BalanceProvider";
@@ -32,7 +34,7 @@ import Settings from "./Settings";
 import { BigNumber, ethers } from "ethers";
 import RouteDetails from "./RouteDetails";
 import { VARIANT } from "../../styles/theme";
-
+import { BsPlus } from "react-icons/bs";
 const inputStyle = {
 	variant: "unstyled",
 	fontSize: "3xl",
@@ -56,7 +58,6 @@ export default function SwapLayout({
     outputAssetIndex,
     onOutputOpen,
     handleMax,
-    switchTokens,
     exchange,
     validate,
     loading,
@@ -66,9 +67,9 @@ export default function SwapLayout({
     deadline,
     setDeadline,
     swapData,
-    tokens
+    tokens,
+    outToken
 }: any) {
-    const { walletBalances, tokens: _tokens } = useBalanceData();
     const { prices } = usePriceData();
     const { account } = useAppData();
     const { chain } = useNetwork();
@@ -94,6 +95,19 @@ export default function SwapLayout({
 	const [hidden, setHidden] = useState(!isOpen);
     const { address, isConnected } = useAccount();
 
+    const { isOpen: isStakeOpen, onOpen: onStakeOpen, onClose: onStakeClose } = useDisclosure({
+        onClose: () => {
+            updateInputAmount("");
+        },
+        defaultIsOpen: true
+    });
+    const { isOpen: isMintOpen, onOpen: onMintOpen, onClose: onMintClose } = useDisclosure({
+        onClose: () => {
+            updateOutputAmount("");
+        },
+        defaultIsOpen: true
+    });
+
     const inputValue = (Number(inputAmount) || 0) * prices[tokens[inputAssetIndex]?.id];
     const outputValue = (Number(outputAmount) || 0) * prices[tokens[outputAssetIndex]?.id];
 
@@ -102,48 +116,40 @@ export default function SwapLayout({
     const valid = inputAmount > 0 && outputAmount > 0 && !isWrap;
 	const { colorMode } = useColorMode();
 
-  return (
+    return (
     <>
-        <Box className={`${VARIANT}-${colorMode}-containerBody`}>
-            <Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={4}>
-                <Flex align={'center'} justify={'space-between'}>
-                    <Flex align={'center'} gap={4}>
-                        <Heading size={'sm'}>Market</Heading>
-                        <Tooltip label={'Coming Soon'} placement={'top'}>
-                        <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>Limit</Heading>
-                        </Tooltip>
-                        <Tooltip label={'Coming Soon'} placement={'top'}>
-                        <Heading cursor={'pointer'} size={'sm'} color={'whiteAlpha.400'}>SL/TP</Heading>
-                        </Tooltip>
-                    </Flex>
-                    <Flex>
-                        <Settings maxSlippage={maxSlippage} setMaxSlippage={setMaxSlippage} deadline={deadline} setDeadline={setDeadline} />
-                    </Flex>
-                </Flex>
-            </Box>
+        <Box pt={2}>
 
-            <Divider />
+            
 
             {/* Input */}
-            <Box px={{base: "4", md: "5"}} bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} pb={12} pt={10}>
-                <Flex align="center" justify={"space-between"}>
-                    <InputGroup width={{base: '60%', md: '70%'}}>
-                        <NumberInput
-                            w={"100%"}
-                            value={formatInput(inputAmount)}
-                            onChange={updateInputAmount}
-                            min={0}
-                            step={0.01}
-                            {...inputStyle}
-                        >
-                            <NumberInputField
-                                pr={0}
-                                fontSize={"4xl"}
-                                placeholder="0"
-                                border={0}
-                            />
-                        </NumberInput>
-                    </InputGroup>
+            <Box bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} border={'1px'} borderColor={'whiteAlpha.200'} m={4} py={2} px={4}>
+                <Flex align={'center'} gap={2}>
+                    <Text>Stake Collateral</Text>
+                    {isStakeOpen ? <IconButton icon={<CloseIcon w={'10px'} />} onClick={onStakeClose} aria-label={""} size={'xs'} /> : <IconButton icon={<BsPlus size={20} />} onClick={onStakeOpen} aria-label={""} size={'xs'} />}
+                </Flex>
+
+                {isStakeOpen && <>
+                    <Flex align="center" justify={"space-between"} mt={2}>
+                    <Box width={{base: '60%', md: '70%'}}>
+                        <InputGroup >
+                            <NumberInput
+                                w={"100%"}
+                                value={formatInput(inputAmount)}
+                                onChange={updateInputAmount}
+                                min={0}
+                                step={0.01}
+                                {...inputStyle}
+                            >
+                                <NumberInputField
+                                    pr={0}
+                                    fontSize={"4xl"}
+                                    placeholder="0"
+                                    border={0}
+                                />
+                            </NumberInput>
+                        </InputGroup>
+                    </Box>
 
                     <SelectBody
                         onOpen={onInputOpen}
@@ -160,7 +166,7 @@ export default function SwapLayout({
                 >
                     <Text>
                         {dollarFormatter.format(
-                            inputAmount * (prices[tokens[inputAssetIndex]?.id] ?? 0)
+                            inputAmount * (tokens[inputAssetIndex]?.price?.div(10**8).toNumber() ?? 0)
                         )}
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>
@@ -174,43 +180,23 @@ export default function SwapLayout({
                             {" "}
                             {tokenFormatter.format(
                                 tokens[inputAssetIndex]
-                                    ? Big(walletBalances[tokens[inputAssetIndex].id] ?? 0)
-                                            .div(10**(tokens[inputAssetIndex]?.decimals ?? 18))
-                                            .toNumber()
+                                    ? tokens[inputAssetIndex].balance / 10**tokens[inputAssetIndex].decimals
                                     : 0
                             )}
                         </Text>
                     </Flex>}
-                </Flex>
+                </Flex> </>}
             </Box>
 
-            {/* Switch */}
-            <Flex px={{base: "4", md: "5"}} my={-4} align='center'>
-                {/* <Divider w={'10px'} border='1px' borderColor={colorMode == 'dark' ? 'darkBg.200' : 'blackAlpha.200'} /> */}
-                <Button
-                    _hover={{ bg: colorMode == 'dark' ? "whiteAlpha.50" : 'blackAlpha.100' }}
-                    rounded={'0'}
-                    onClick={switchTokens}
-                    variant="unstyled"
-                    size={'sm'}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    bg={colorMode == 'dark' ? 'darkBg.200' : 'blackAlpha.200'}
-                    transform={"rotate(45deg)"}
-                    mx={1.5}
-                >
-                    <Box  transform="rotate(-45deg)">
-                    <MdOutlineSwapVert size={"20px"} />
-                    </Box>
-                </Button>
-                {/* <Divider border='1px' borderColor={colorMode == 'dark' ? 'darkBg.200' : 'blackAlpha.200'} /> */}
-            </Flex>
-
             {/* Output */}
-            <Box px={{base: "4", md: "5"}} pt={10} pb={14} bg={colorMode == 'dark' ? 'darkBg.600' : 'lightBg.600'}>
-                <Flex align="center" justify={"space-between"}>
-                    <InputGroup width={{base: '60%', md: '70%'}}>
+            <Box bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} border={'1px'} borderColor={'whiteAlpha.200'} m={4} py={2} px={4}>
+                <Flex align={'center'} gap={2}>
+                    <Text>Mint LP</Text>
+                    {isMintOpen ? <IconButton icon={<CloseIcon w={'10px'} />} onClick={onMintClose} aria-label={""} size={'xs'} /> : <IconButton icon={<BsPlus size={20} />} onClick={onMintOpen} aria-label={""} size={'xs'} />}
+                </Flex>
+                {isMintOpen && <><Flex align="center" justify={"space-between"}>
+                    <Box width={{base: '60%', md: '70%'}}>
+                    <InputGroup>
                         <NumberInput
                             w={"100%"}
                             value={formatInput(outputAmount)}
@@ -227,10 +213,10 @@ export default function SwapLayout({
                             />
                         </NumberInput>
                     </InputGroup>
+                    </Box>
 
                     <SelectBody
-                        onOpen={onOutputOpen}
-                        asset={tokens[outputAssetIndex]}
+                        asset={outToken}
                     />
                 </Flex>
 
@@ -240,33 +226,29 @@ export default function SwapLayout({
                     justify={"space-between"}
                     align="center"
                     mt={4}
-                    mb={-4}
                 >
                     <Text>
                         {dollarFormatter.format(
-                            outputAmount * (prices[tokens[outputAssetIndex]?.id] ?? 0)
+                            outputAmount * (outToken?.price?.div(ethers.constants.WeiPerEther).toNumber() ?? 0)
                         )}
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>
-                        <AiOutlineWallet size={"16px"} />
+                        <Text>Max</Text>
                         <Text>
                             {" "}
                             {tokenFormatter.format(
-                                tokens[outputAssetIndex]
-                                    ? Big(walletBalances[tokens[outputAssetIndex].id] ?? 0)
-                                            .div(10**(tokens[outputAssetIndex]?.decimals ?? 18))
-                                            .toNumber()
-                                    : 0
+                                account.availableToMintUSD.toString()
                             )}
                         </Text>
                     </Flex>}
-                </Flex>
+                </Flex> </>}
             </Box>
+            
 
 
             <Box px="5" pb={'1px'} pt={'1px'} >
 
-            {valid && <Box>
+            {/* {valid && <Box>
                 {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} my={2} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} color={'orange'}>
                     <WarningTwoIcon/>
                     <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
@@ -342,7 +324,7 @@ export default function SwapLayout({
                         </Flex></>}
                     </motion.div>
                 </Box>
-                </Box>}
+                </Box>} */}
                 <Box mt={3} mb={5} className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`}>
                 <Button
                     size="lg"

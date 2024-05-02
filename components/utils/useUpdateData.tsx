@@ -7,7 +7,6 @@ import { ethers } from 'ethers';
 export default function useUpdateData() {
     const {
 		pools,
-		tradingPool
 	} = useContext(AppDataContext);
     
     /**
@@ -16,22 +15,11 @@ export default function useUpdateData() {
      * @returns 
      */
     const getUpdateData = async (
-        tokens = (pools[tradingPool]?.collaterals ?? []).map((token: any) => token.token.id).concat((pools[tradingPool]?.synths ?? []).map((token: any) => token.token.id)),
+        pythFeeds: string[]
     ): Promise<string[]> => {
-        let pythFeeds: string[] = [];
+        // let pythFeeds: string[] = [];
         // get feeds for tokens
-        for(let i in pools){
-            for(let j in pools[i].collaterals){
-                if(tokens.findIndex((token: any) => token == pools[i].collaterals[j].token.id) !== -1 && pools[i].collaterals[j].feed.slice(0, 20) !== ethers.constants.HashZero.slice(0, 20)){
-                    pythFeeds.push(REPLACED_FEEDS[pools[i].collaterals[j].feed] ?? pools[i].collaterals[j].feed);
-                }
-            }
-            for(let j in pools[i].synths){
-                if(tokens.findIndex((token: any) => token == pools[i].synths[j].token.id) !== -1 && pools[i].synths[j].feed.slice(0, 20) !== ethers.constants.HashZero.slice(0, 20)){
-                    pythFeeds.push(REPLACED_FEEDS[pools[i].synths[j].feed] ?? pools[i].synths[j].feed);
-                }
-            }
-        }
+        
         const pythPriceService = new EvmPriceServiceConnection(PYTH_ENDPOINT);
         try{
             const priceFeedUpdateData = pythFeeds.length > 0 ? await pythPriceService.getPriceFeedsUpdateData(pythFeeds) : [];
@@ -40,7 +28,7 @@ export default function useUpdateData() {
             console.log("Pyth data fetching failed, trying again...");
             // wait 2 sec and return
             await new Promise(r => setTimeout(r, 2000));
-            return await getUpdateData(tokens)
+            return await getUpdateData(pythFeeds)
         }
     }
 

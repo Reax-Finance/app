@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 
 import { useContext, useState, useEffect } from "react";
-import { AppDataContext } from "../context/AppDataProvider";
 import { tokenFormatter } from "../../src/const";
 
 import {
@@ -24,8 +23,6 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from "@chakra-ui/react";
-import { useBalanceData } from "../context/BalanceProvider";
-import { ethers } from "ethers";
 import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
@@ -42,8 +39,6 @@ function TokenSelector({
 	tokens
 }: any) {
 	const [searchedTokens, setSearchedTokens] = useState<any[]>([]);
-	const { walletBalances, tokens: _tokens } = useBalanceData();
-	const {chain} = useNetwork();
 	const {isConnected} = useAccount();
 
 	const selectToken = (tokenIndex: number) => {
@@ -206,7 +201,7 @@ function TokenSelector({
 									>
 										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
 										<Text fontSize={"md"}>
-											{tokenFormatter.format((walletBalances[token.id] ?? 0) / 10 ** (token.decimals ?? 18))}
+											{tokenFormatter.format((token.balance) / 10 ** (token.decimals ?? 18))}
 										</Text>
 									</Box>}
 								</Flex>

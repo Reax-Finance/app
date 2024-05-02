@@ -10,25 +10,9 @@ import {
     Text,
     Image
 } from "@chakra-ui/react";
-import { AppDataContext } from "../components/context/AppDataProvider";
+import { AppDataContext, useAppData } from "../components/context/AppDataProvider";
 
 const nonMintable = ["MNT", "cMNT", "WETH", "cUSD", "sUSD", "cBTC", 'cETH', 'cBNB', 'sAAPL', 'sMSFT', 'sCOIN', 'sGOOGL', 'cXRP', 'cDOGE', 'cSOL', 'cDOT', 'cADA', 'cLTC', 'WMNT'];
-
-const mintAmounts: any = {
-    "USDT": "1000",
-	"DAI": "1000",
-	"EUROC": "1000",
-	"WETH": "1",
-    "AAVE": "10",
-    "LINK": "10",
-    "Link": "10",
-    "wstETH": "10",
-    "ARB": '10', 
-    // in use
-	"USDC": "1000",
-    "WBTC": "0.1",
-    "ETH": "1",
-};
 
 import Head from "next/head";
 
@@ -51,7 +35,7 @@ import TdBox from "../components/dashboard/TdBox";
 import { VARIANT } from "../styles/theme";
 
 export default function Faucet() {
-	const { pools } = useContext(AppDataContext);
+	const { reserveData } = useAppData();
     const { updateFromTx } = useBalanceData();
     const [loading, setLoading] = React.useState<any>(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,7 +44,7 @@ export default function Faucet() {
     const {address, isConnected}  = useAccount();
     const {chain} = useNetwork();
 
-    const { tokens, walletBalances } = useBalanceData();
+    const tokens = reserveData ? reserveData.vaults.map((vault: any) => vault.asset) : [];
 
     const _onOpen = (collateral: any) => {
         setOpenedCollateral(collateral);
@@ -78,17 +62,16 @@ export default function Faucet() {
 
     const mint = async () => {
         setLoading(true);
-        const token = await getContract("MockToken", chain?.id!, openedCollateral.id);
-        const amount = ethers.utils.parseUnits(mintAmounts[openedCollateral.symbol], openedCollateral.decimals);
-        send(token, "mint", [address, amount])
+        const token = getContract("MockToken", openedCollateral.id);
+        send(token, "mint", [])
             .then(async(res: any) => {
-                let response = await res.wait();
-                updateFromTx(response);
+                await res.wait();
+                // updateFromTx(response);
 
                 setLoading(false);
                 toast({
                     title: `Minted ${openedCollateral.symbol}`,
-                    description: `${mintAmounts[openedCollateral.symbol]} ${openedCollateral.symbol} minted to your wallet.`,
+                    description: `${openedCollateral.symbol} minted to your wallet.`,
                     status: "success",
                     duration: 5000,
                     isClosable: true,
@@ -141,7 +124,6 @@ export default function Faucet() {
 					<Thead>
 						<Tr>
 							<ThBox>Asset</ThBox>
-							<ThBox>Mint Amount</ThBox>
 							<ThBox isNumeric></ThBox>
 						</Tr>
 					</Thead>
@@ -170,12 +152,11 @@ export default function Faucet() {
                                                 />
                                             </Flex>
                                             <Text textAlign={'left'} fontSize={'sm'} color='gray.500'>
-                                            {Big(walletBalances[token.id] ?? 0).div(10**token.decimals).toNumber()} in wallet
+                                            {/* {Big(walletBalances[token.id] ?? 0).div(10**token.decimals).toNumber()} in wallet */}
                                             </Text>
                                         </Box>
                                     </Flex>
                                 </TdBox>
-                                <TdBox style={index == tokens.length - 1 ? {border: 0} : {}}>{mintAmounts[token.symbol]}</TdBox>
                                 <TdBox style={index == tokens.length - 1 ? {border: 0} : {}} isNumeric>
                                 <Flex justify={'end'}>
                                     <Box className={`${VARIANT}-${colorMode}-primaryButton`}>
@@ -210,7 +191,7 @@ export default function Faucet() {
                 <Box  mb={2}>
 
                 <Text color={'gray.400'}>
-                    You are about to mint {mintAmounts[openedCollateral.symbol]} {openedCollateral.symbol} tokens.
+                    You are about to mint {openedCollateral.symbol}.
                 </Text>
                 </Box>
                 </Flex>

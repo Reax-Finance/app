@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet } from "./chains";
-import { mainnet } from "wagmi";
+import { mainnet, sepolia } from "wagmi";
 import { scrollTestnet } from "@wagmi/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
@@ -10,6 +10,7 @@ const NETWORKS: any = {
 	[lineaMainnet.id]: lineaMainnet,
 	[lineaTestnet.id]: lineaTestnet,
 	[scrollTestnet.id]: scrollTestnet,
+	[sepolia.id]: sepolia,
 }
 
 export const defaultChain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
@@ -31,6 +32,7 @@ const _WETH_ADDRESS: any = {
 	[mantleTestnet.id]: "0x5b156dca04f775046064032e1f5e45fd1fcca1e0".toLowerCase(),
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
 	[lineaTestnet.id]: "0x2c1b868d6596a18e32e61b901e4060c872647b6c".toLowerCase(),
+	[sepolia.id]: "0x3c348AdCFd2004984a427B21FA2e108DcdF656aC".toLowerCase(),
 };
 
 export const PERP_CATEGORIES: any = {
@@ -56,7 +58,7 @@ export const APP_NAME = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
 
 export const WETH_ADDRESS = (chainId: number) => _WETH_ADDRESS[chainId] ?? (process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? _WETH_ADDRESS[mantleTestnet.id] : _WETH_ADDRESS[mantleMainnet.id]);
 
-export const PYTH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://hermes-beta.pyth.network' : 'https://hermes.pyth.network';
+export const PYTH_ENDPOINT = 'https://hermes.pyth.network';
 export const ROUTER_ENDPOINT = process.env.NEXT_PUBLIC_VERCEL_URL + '/api/router';
 export const EPOCH_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://rewards-testnet-api.reax.one' : 'https://rewards-mainnet-api.reax.one';
 export const PRICE_ENDPOINT = process.env.NEXT_PUBLIC_NETWORK == 'testnet' ? 'https://prices.reax.one' : 'http://prices.mainnet.reax.one'

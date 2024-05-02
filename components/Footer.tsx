@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import {
   Box,
   Container,
@@ -10,14 +10,20 @@ import {
 } from '@chakra-ui/react';
 import { FaTwitter, FaDiscord, FaGithub } from 'react-icons/fa';
 import { AppDataContext } from './context/AppDataProvider';
-import { useNetwork } from 'wagmi';
+import { useBlockNumber, useNetwork } from 'wagmi';
 import { Switch } from '@chakra-ui/react'
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { BsBook } from 'react-icons/bs';
+import { defaultChain } from '../src/const';
 
 export default function Footer() {
-  const {block} = useContext(AppDataContext);
-  const {chain} = useNetwork();
+  const [block, setBlock] = useState(0);
+  const {} = useBlockNumber({
+    onBlock: (blockNumber: number) => {
+      setBlock(blockNumber);
+    }
+  });
+
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
@@ -41,14 +47,14 @@ export default function Footer() {
           align={{ md: 'center' }}
           color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
           >
-            <Flex zIndex={1000} align={'center'} gap={1}>
-              <Box h={2} w={2} bgColor={block == 0 ? 'red': 'green.400'} rounded='100'></Box>
-              <Text fontSize={'xs'}>{chain?.name} ({block == 0 ? 'Not Connected': block})</Text>
-              <Text fontSize={'xs'} color={'whiteAlpha.600'}>| v1.1.0-beta |</Text>
-              
-              <Text fontSize={'xs'} color={'whiteAlpha.600'}> Note: We{"'"}re still in beta. Use with caution</Text>
+            <Flex zIndex={1000} flexDir={{base: 'column', md: 'row'}} align={'center'} gap={1}>
+              <Flex align={'center'} gap={1}>
+                <Box h={2} w={2} bgColor={block == 0 ? 'red': 'green.400'} rounded='100'></Box>
+                <Text fontSize={'xs'}>{defaultChain?.name} ({block == 0 ? 'Not Connected': block})</Text>
+              </Flex>
+              <Text fontSize={'xs'} color={'whiteAlpha.600'}>v0.1.0-testnet</Text>
             </Flex>
-            <Stack direction={'row'} align={'center'} spacing={4}>
+            <Stack direction={'row'} align={'center'} justify={{base: 'center', md: 'start'}} spacing={4}>
               <Flex gap={2} align={'center'}>
               {colorMode == 'dark' ? <MdDarkMode /> : <MdLightMode/>}
               <Switch zIndex={1000} size="sm" onChange={toggleColorMode} />
