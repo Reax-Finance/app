@@ -71,7 +71,7 @@ function AppDataProvider({ children }: any) {
 				.then(async (res: any) => {
 					setAccount({
 						address: _address,
-						healthFactor: res.healthFactor,
+						healthFactor: res.healthFactor.div(ethers.constants.WeiPerEther),
 						availableToMintUSD: res.availableToMintUSD,
 						userTotalBalanceUSD: res.reserveData.userTotalBalanceUSD,
 						userAdjustedBalanceUSD: res.reserveData.userAdjustedBalanceUSD,
