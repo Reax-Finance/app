@@ -99,7 +99,7 @@ function NavBar() {
 				mt={{ base: 0, md: 6 }}
 				align="center"
 			>
-				<Box minW="0" w={"100%"} maxW="100%" mx={8} ml={10}>
+				<Box minW="0" w={"100%"} maxW="100%" mx={{base: 0, md: 6}}>
 					<Flex align={"center"} justify="space-between">
 						<Flex justify="space-between" align={"center"} w="100%">
 							<Flex gap={10} align="center">
@@ -129,7 +129,6 @@ function NavBar() {
 								my={4}
 								gap={2}
 							>
-								<CustomConnectButton />
 								<IconButton
 									onClick={onToggle}
 									icon={
@@ -143,6 +142,8 @@ function NavBar() {
 									aria-label={"Toggle Navigation"}
 									rounded={0}
 								/>
+								<CustomConnectButton />
+
 							</Flex>
 						</Flex>
 
@@ -155,7 +156,7 @@ function NavBar() {
 						>
 							<Flex mr={2}>
 								<Box
-									className={`${VARIANT}-${colorMode}-primaryButton`}
+									// className={`${VARIANT}-${colorMode}-primaryButton`}
 								>
 									<Button
 										color={"white"}
@@ -188,9 +189,6 @@ function NavBar() {
 										></NavLocalLink>
 									</>
 								)}
-							{/* <Box>
-						<AccountButton />
-					</Box> */}
 							<Box>
 								<CustomConnectButton />
 							</Box>
@@ -215,7 +213,7 @@ const MobileNav = ({}: any) => {
 				title={"Liquidity"}
 			></NavLocalLink>
 			<Flex>
-				<Box className={`${VARIANT}-${colorMode}-primaryButton`}>
+				<Box>
 					<Button
 						color={"white"}
 						bg={"transparent"}

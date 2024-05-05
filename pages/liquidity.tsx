@@ -23,14 +23,14 @@ export default function SwapPage() {
 				></link>
 			</Head>
 			<Flex>
-				<Box w="100%" h={"100%"}>
-					<Flex justify={"center"} align="center" h={"86vh"}>
+				<Box w="100%">
+					<Flex justify={"center"} align="center" h={{base: "100%", md: '86vh'}}>
 						<Flex justify={'center'} zIndex={-10} position={"absolute"} w={'100%'} h={'100%'}>
 							<Box bgImage={"/background-1.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100%"} h={"100%"} position={"absolute"} bottom={0} zIndex={-10} />
 							<Box bgImage={"/background-2.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100%"} h={"60%"} position={"absolute"} bottom={0} zIndex={-8} />
 							<Box bgGradient={`linear(to-t, ${colorMode == 'dark' ? 'black' : 'white'}Alpha.400, ${colorMode == 'dark' ? 'black' : 'white'}Alpha.800)`} bgSize={"cover"} w={"100%"} h={"100%"} position={"absolute"} bottom={0} zIndex={-9} />
 						</Flex>
-						<Box w="100%">
+						<Box w="100%" my={20}>
 							<motion.div
 								initial={{ opacity: 0, y: 15 }}
 								animate={{ opacity: 1, y: 0 }}

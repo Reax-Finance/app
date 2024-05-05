@@ -15,8 +15,6 @@ import { ADDRESS_ZERO, ONE_ETH } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
 import useUpdateData from "../utils/useUpdateData";
-import { usePriceData } from "../context/PriceContext";
-import LiquidityLayout from "./RemoveLiquidityLayout";
 import Big from "big.js";
 import { formatInput, parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
@@ -29,7 +27,6 @@ import { getContract, send } from "../../src/contract";
 import TokenSelector from "../swap/TokenSelector";
 import { useRouter } from "next/router";
 import useApproval from "../context/useApproval";
-import useDelegate from "../context/useDelegate";
 import RemoveLiquidityLayout from "./RemoveLiquidityLayout";
 import { Asset } from "../utils/types";
 
@@ -82,7 +79,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount }: any) {
 
 	// only if vaults[i].userBalance > 0
 	const tokens = reserveData
-		? reserveData.vaults.filter((vault) => (Big(vault.userBalance.toString()).gt(0) && vault.asset.id !== ethers.constants.AddressZero)).map((vault) => ({...vault.vaultToken, name: vault.asset.name, symbol: vault.asset.symbol, decimals: vault.asset.decimals, asset: vault.asset }))
+		? reserveData.vaults.filter((vault) => ((Big(vault.userBalance.toString()).gt(0) || !isConnected) && vault.asset.id !== ethers.constants.AddressZero)).map((vault) => ({...vault.vaultToken, name: vault.asset.name, symbol: vault.asset.symbol, decimals: vault.asset.decimals, asset: vault.asset })) 
 		: [];
 	const outToken = liquidityData?.lpToken;
 	const inToken = tokens[inputAssetIndex];

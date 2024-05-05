@@ -30,7 +30,7 @@ export default function Footer() {
     <Box
       color={'whiteAlpha.400'}
       bg='transparent'
-      pb={2}
+      // pb={2}
       >
       <Box
         borderTopWidth={1}

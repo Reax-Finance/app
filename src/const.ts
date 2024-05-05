@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet } from "./chains";
-import { mainnet, sepolia } from "wagmi";
+import { Chain, mainnet, sepolia } from "wagmi";
 import { scrollTestnet } from "@wagmi/chains";
 import Big from "big.js";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
@@ -15,7 +15,7 @@ const NETWORKS: any = {
 	[sepolia.id]: sepolia,
 }
 
-export const defaultChain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
+export const defaultChain: Chain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
 
 export const NATIVE = defaultChain.nativeCurrency.symbol;
 export const W_NATIVE = `W${NATIVE}`;

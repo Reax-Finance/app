@@ -12,11 +12,11 @@ export default function SwapPage() {
 			<Box w='100%' h={'100%'} >
 			<Flex justify={"center"} align="center" h={"86vh"}>
 				<Flex justify={'center'} zIndex={-10} position={"absolute"} w={'100%'} h={'100%'}>
-					<Box bgImage={"/background-1.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100%"} h={"100%"} position={"absolute"} bottom={0} zIndex={-10} />
-					<Box bgImage={"/background-2.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100%"} h={"60%"} position={"absolute"} bottom={0} zIndex={-8} />
+					<Box bgImage={"/background-1.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100%"} h={"101%"} position={"absolute"} bottom={0} zIndex={-10} />
+					<Box bgImage={"/background-2.svg"} bgRepeat={'no-repeat'} bgSize={'cover'} w={"100vw"} h={"101%"} position={"relative"} bgPos={'bottom'} zIndex={-8} />
 					<Box bgGradient={`linear(to-t, ${colorMode == 'dark' ? 'black' : 'white'}Alpha.400, ${colorMode == 'dark' ? 'black' : 'white'}Alpha.800)`} bgSize={"cover"} w={"100%"} h={"100%"} position={"absolute"} bottom={0} zIndex={-9} />
 				</Flex>
-				<Box w="500px" >
+				<Box w={{base: "100%", md: "500px"}} >
 					<motion.div
 						initial={{ opacity: 0, y: 15 }}
 						animate={{ opacity: 1, y: 0 }}

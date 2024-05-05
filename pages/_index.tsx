@@ -113,7 +113,7 @@ export default function Index({ children }: any) {
 					minH="97vh"
 					maxW={'100%'}
 					>
-					<Box zIndex={2} minW={{sm: '0', md: '0', lg: '1200px'}} w={'100%'} px={{sm: '4', md: '0'}}>
+					<Box zIndex={2} w={'100%'} px={{sm: '4', md: '6'}}>
 						<Flex justify='center'>
 							<Box minW={'0'} w='100%' maxW={'100%'}>
 								<Navbar />

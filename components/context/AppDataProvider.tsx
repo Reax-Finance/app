@@ -71,6 +71,7 @@ function AppDataProvider({ children }: any) {
 
 	const fetchData = (_address = address): Promise<number> => {
 		let chainId = defaultChain.id;
+		const start = Date.now();
 		console.log("Fetching data for chain", chainId);
 		return new Promise((resolve, reject) => {
 			if(status === Status.NOT_FETCHING) setStatus(Status.FETCHING);
@@ -78,7 +79,7 @@ function AppDataProvider({ children }: any) {
 			const uidp = getContract("UIDataProvider", process.env.NEXT_PUBLIC_UIDP_ADDRESS!);
 			uidp.getAllData(_address)
 				.then(async (res: any) => {
-					console.log(res);
+					console.log("Data latency", Date.now() - start, "ms");
 					setAccount({
 						healthFactor: res.healthFactor.toString(),
 						availableToMintUSD: res.availableToMintUSD.toString(),

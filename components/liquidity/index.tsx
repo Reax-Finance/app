@@ -25,19 +25,22 @@ export default function Liquidity() {
 
 	return (
 		<>
-			<Flex gap={"4"} w={"1200px"}>
+			<Flex flexDir={{base: "column", md: 'row'}} gap={"4"}>
 				<Box
-					w={"25%"}
+					w={{base: "100%", md: "25%"}}
 					className={`${VARIANT}-${colorMode}-containerBody`}
+					order={{base: 1, md: 0}}
+
 				>
 					<PoolPosition updatedAccount={updatedAccount} />
 				</Box>
 
 				<Box
-					w={"48%"}
-					minH={"500px"}
+					w={{base: "100%", md: "50%"}}
+					minH={{base: 0, md: "500px"}}
 					flex={1}
 					className={`${VARIANT}-${colorMode}-containerBody`}
+					order={{base: 0, md: 1}}
 				>
 					<Tabs isFitted colorScheme="orange">
 						<Box
@@ -81,8 +84,9 @@ export default function Liquidity() {
 				</Box>
 
 				<Box
-					w={"25%"}
+					w={{base: "100%", md: "25%"}}
 					className={`${VARIANT}-${colorMode}-containerBody`}
+					order={{base: 2, md: 2}}
 				>
 					<PoolLiquidity />
 				</Box>
