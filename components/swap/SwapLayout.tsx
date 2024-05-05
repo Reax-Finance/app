@@ -32,6 +32,7 @@ import Settings from "./Settings";
 import { BigNumber, ethers } from "ethers";
 import RouteDetails from "./RouteDetails";
 import { VARIANT } from "../../styles/theme";
+import { FaBoltLightning } from "react-icons/fa6";
 
 const inputStyle = {
 	variant: "unstyled",
@@ -55,7 +56,6 @@ export default function SwapLayout({
     updateOutputAmount,
     outputAssetIndex,
     onOutputOpen,
-    handleMax,
     switchTokens,
     exchange,
     validate,
@@ -66,41 +66,32 @@ export default function SwapLayout({
     deadline,
     setDeadline,
     swapData,
-    tokens
+    tokens,
+    steps
 }: any) {
     const { walletBalances, tokens: _tokens } = useBalanceData();
-    const { prices } = usePriceData();
     const { account } = useAppData();
     const { chain } = useNetwork();
-    const [gasPrice, setGasPrice] = useState(0);
-    useEffect(() => {
-        let provider = new ethers.providers.JsonRpcProvider(defaultChain.rpcUrls.default.http[0]);
-        if(SUPPORTS_ROLLUP_GASFEES){ 
-            provider.send('rollup_gasPrices', [])
-            .then((res: any) => {
-                setGasPrice(BigNumber.from(res.l1GasPrice).toNumber() / 1e18);
-            })
-        }
-        else {
-            provider.getGasPrice()
-                .then((res: any) => {
-                    let gas = res.toNumber() / 1e18;
-                    setGasPrice(gas);
-                })
-        }
-    }, [])
 
 	const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure()
-	const [hidden, setHidden] = useState(!isOpen);
     const { address, isConnected } = useAccount();
 
-    const inputValue = (Number(inputAmount) || 0) * prices[tokens[inputAssetIndex]?.id];
-    const outputValue = (Number(outputAmount) || 0) * prices[tokens[outputAssetIndex]?.id];
+    const inputValue = Big(Number(inputAmount) || 0).mul(tokens[inputAssetIndex].price).div(10**8).toNumber()
+    const outputValue = Big(Number(outputAmount) || 0).mul(tokens[outputAssetIndex].price).div(10**8).toNumber()
 
-    const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
 	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
     const valid = inputAmount > 0 && outputAmount > 0 && !isWrap;
 	const { colorMode } = useColorMode();
+
+    const handleMax = () => {
+        updateInputAmount(
+            tokens[inputAssetIndex]
+                ? Big(tokens[inputAssetIndex].balance.toString())
+                        .div(10**(tokens[inputAssetIndex]?.decimals ?? 18))
+                        .toString()
+                : 0
+        );
+    }
 
   return (
     <>
@@ -159,9 +150,7 @@ export default function SwapLayout({
                     mt={4}
                 >
                     <Text>
-                        {dollarFormatter.format(
-                            inputAmount * (prices[tokens[inputAssetIndex]?.id] ?? 0)
-                        )}
+                        {dollarFormatter.format(inputValue)}
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>
                         <Text>Max</Text>
@@ -174,7 +163,7 @@ export default function SwapLayout({
                             {" "}
                             {tokenFormatter.format(
                                 tokens[inputAssetIndex]
-                                    ? Big(walletBalances[tokens[inputAssetIndex].id] ?? 0)
+                                    ? Big(tokens[inputAssetIndex].balance.toString())
                                             .div(10**(tokens[inputAssetIndex]?.decimals ?? 18))
                                             .toNumber()
                                     : 0
@@ -243,9 +232,7 @@ export default function SwapLayout({
                     mb={-4}
                 >
                     <Text>
-                        {dollarFormatter.format(
-                            outputAmount * (prices[tokens[outputAssetIndex]?.id] ?? 0)
-                        )}
+                        {dollarFormatter.format(outputValue)}
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>
                         <AiOutlineWallet size={"16px"} />
@@ -253,8 +240,8 @@ export default function SwapLayout({
                             {" "}
                             {tokenFormatter.format(
                                 tokens[outputAssetIndex]
-                                    ? Big(walletBalances[tokens[outputAssetIndex].id] ?? 0)
-                                            .div(10**(tokens[outputAssetIndex]?.decimals ?? 18))
+                                    ? Big(tokens[outputAssetIndex].balance.toString())
+                                            .div(10**(tokens[outputAssetIndex].decimals))
                                             .toNumber()
                                     : 0
                             )}
@@ -267,10 +254,6 @@ export default function SwapLayout({
             <Box px="5" pb={'1px'} pt={'1px'} >
 
             {valid && <Box>
-                {priceImpact < -10 && priceImpact > -100 && <Flex align={'center'} gap={2} px={4} py={2} my={2} bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} color={'orange'}>
-                    <WarningTwoIcon/>
-                    <Text>Warning: High Price Impact ({(priceImpact).toFixed(2)}%)</Text>
-                    </Flex>}
                 <Flex
                     justify="space-between"
                     align={"center"}
@@ -279,69 +262,44 @@ export default function SwapLayout({
                     color={colorMode == 'dark' ? "whiteAlpha.800" : "blackAlpha.800"}
                     px={4}
                     py={2}
-                    cursor="pointer"
+                    // cursor="pointer"
                     {...getButtonProps()}
                     _hover={{ bg: colorMode == 'dark' ? "whiteAlpha.100" : "blackAlpha.100" }}
                 >
                     <Flex align={"center"} gap={2} fontSize="md">
-                        <InfoOutlineIcon />
+                        <FaBoltLightning color="#FFAE2D" />
                         <Text>
                             1 {tokens[inputAssetIndex].symbol} ={" "}
                             {tokenFormatter.format(
-                                (outputValue / inputValue) || 0
+                                (Big(Number(outputAmount) || 0).div(Number(inputAmount) || 0).toNumber())   
                             )}{" "}
                             {tokens[outputAssetIndex].symbol}
                         </Text>
                         <Text fontSize={'sm'} >
                             (
                             {dollarFormatter.format(
-                                ((outputValue / inputValue) || 0) * prices[tokens[inputAssetIndex]?.id]
+                                tokens[inputAssetIndex]?.price / 10**8
                             )}
                             )
                         </Text>
                     </Flex>
-                    <Flex mr={-2}>
-                        {!isOpen ? <RiArrowDropDownLine size={30} /> : <RiArrowDropUpLine size={30} />}
-                    </Flex>
                 </Flex>
-                <Box>
-                    <motion.div
-                        {...getDisclosureProps()}
-                        hidden={hidden}
-                        initial={false}
-                        onAnimationStart={() => setHidden(false)}
-                        onAnimationComplete={() => setHidden(!isOpen)}
-                        animate={{ height: isOpen ? '144px' : 0 }}
-                        style={{
-                            width: '100%'
-                        }}
-                    >
-                    {isOpen && 	<>
-                        <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> 
-                        <Flex bg={colorMode == 'dark' ? 'whiteAlpha.50' : 'blackAlpha.50'} flexDir={'column'} gap={1} px={3} py={2} fontSize='sm' color={colorMode == 'dark' ? 'whiteAlpha.800' : 'blackAlpha.800'}>
-                            <Flex color={priceImpact > 0 ? 'green.400' : priceImpact < -2 ? 'orange.400' : 'whiteAlpha.800'} justify={'space-between'}>
-                            <Text>{priceImpact > 0 ? 'Bonus' : 'Price Impact'}</Text>
-                            <Text>{(priceImpact).toFixed(2)}%</Text>
+                {steps.length > 0 && <Box>
+                    {steps.map((step: any, index: number) => (<>
+                        <Flex align={'center'} px={0} border={'1px'} borderColor={'whiteAlpha.300'} my={2} h={'40px'}>
+                            <Flex justify={'center'} w={'40px'}>
+                                <Text color={'whiteAlpha.500'}>{index + 1}</Text>
                             </Flex>
-                            
-                            <Flex justify={'space-between'}>
-                            <Text>Minimum Out</Text>
-                            <Text>{tokenFormatter.format(outputAmount - outputAmount * maxSlippage/100)} {tokens[outputAssetIndex].symbol}</Text>
+                            <Divider orientation="vertical" />
+                            <Flex align={'center'} justify={'space-between'} gap={1} ml={3} w={'100%'}>
+                                <Text>{(step.type == "APPROVAL" || step.type == "PERMIT") ? "Approve " + step.data.token.symbol + " for use" : "Delegate Mint"}</Text>
+                                <Button rounded={0} onClick={step.execute}>
+                                    {step.type == "APPROVAL" ? "Approve" : step.type == "PERMIT" ? "Sign Message" : "Delegate"}
+                                </Button>
                             </Flex>
-
-                            <Flex justify={'space-between'}>
-                            <Text>Expected Out</Text>
-                            <Text>{tokenFormatter.format(outputAmount)} {tokens[outputAssetIndex].symbol}</Text>
-                            </Flex>
-
-                            <Flex justify={'space-between'}>
-                            <Text>Network Fee</Text>
-                            <Text>~{dollarFormatter.format((3000 * 0.5 * gasPrice))}</Text>
-                            </Flex>
-                            <RouteDetails swapData={swapData} />
-                        </Flex></>}
-                    </motion.div>
-                </Box>
+                        </Flex>
+                    </>))}
+                </Box>}
                 </Box>}
                 <Box mt={3} mb={5} className={validate().valid ? `${VARIANT}-${colorMode}-primaryButton` : `${VARIANT}-${colorMode}-disabledPrimaryButton`}>
                 <Button

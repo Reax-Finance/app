@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Image, Progress, Text, useBreakpointValue, useColorMode, useMediaQuery, useToast } from '@chakra-ui/react';
 import React, { useContext } from 'react';
-import Footer from '../components/Footer';
-import Navbar from '../components/NavBar/Navbar';
+import Footer from '../components/core/Footer';
+import Navbar from '../components/core/Navbar';
 import { useEffect } from 'react';
 import { AppDataContext } from '../components/context/AppDataProvider';
 import { useState } from 'react';
@@ -115,24 +115,26 @@ export default function Index({ children }: any) {
 					>
 					<Box zIndex={2} minW={{sm: '0', md: '0', lg: '1200px'}} w={'100%'} px={{sm: '4', md: '0'}}>
 						<Flex justify='center'>
-							<Box minW={'0'} w='100%' maxW={'1200px'}>
-						<Navbar />
-						<motion.div 
-							initial={{opacity: 0, y: 15}}
-							animate={{opacity: 1, y: 0}}
-							exit={{opacity: 0, y: 15}}
-							transition={{duration: 0.25}}
-						>
-							<Box zIndex={1}>
-								{process.env.NEXT_PUBLIC_UNDER_MAINTAINANCE == "true" ? <Flex h={'80vh'} align={'center'} justify={'center'}>
-									<Box textAlign={'center'}>
-									<Heading>App in under maintainance</Heading>
-									<Text color={'whiteAlpha.600'}>Please Check Back Again in a moment</Text>
+							<Box minW={'0'} w='100%' maxW={'100%'}>
+								<Navbar />
+								<Flex justify={'center'}>
+								<motion.div 
+									initial={{opacity: 0, y: 15}}
+									animate={{opacity: 1, y: 0}}
+									exit={{opacity: 0, y: 15}}
+									transition={{duration: 0.25}}
+								>
+									<Box zIndex={1}>
+										{process.env.NEXT_PUBLIC_UNDER_MAINTAINANCE == "true" ? <Flex h={'80vh'} align={'center'} justify={'center'}>
+											<Box textAlign={'center'}>
+											<Heading>App in under maintainance</Heading>
+											<Text color={'whiteAlpha.600'}>Please Check Back Again in a moment</Text>
+											</Box>
+										</Flex>:<>{children}</>}
 									</Box>
-								</Flex>:<>{children}</>}
+								</motion.div>
+								</Flex>
 							</Box>
-						</motion.div>
-						</Box>
 
 						</Flex>
 

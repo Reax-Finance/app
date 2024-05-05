@@ -6,8 +6,30 @@ import { ethers } from 'ethers';
 
 export default function useUpdateData() {
     const {
-		pools,
+		reserveData,
+        liquidityData
 	} = useContext(AppDataContext);
+
+    const updatePythFeeds = (pythFeeds?: string[]) => {
+        if(!pythFeeds){
+            pythFeeds = [];
+            if(reserveData){
+                for(let i in reserveData.vaults){
+                    pythFeeds.push(reserveData.vaults[i].asset.pythId);
+                }
+            }
+            if(liquidityData){
+                for(let i in liquidityData.synths){
+                    pythFeeds.push(liquidityData.synths[i].pythId);
+                }
+            }
+        };
+        // Remove duplicates
+        pythFeeds = [...new Set(pythFeeds)];
+        // Remove invalid feeds
+        pythFeeds = pythFeeds.filter((feed) => feed !== ethers.constants.HashZero);
+        return pythFeeds;
+    }
     
     /**
      * 
@@ -15,11 +37,11 @@ export default function useUpdateData() {
      * @returns 
      */
     const getUpdateData = async (
-        pythFeeds: string[]
+        pythFeeds?: string[]
     ): Promise<string[]> => {
-        // let pythFeeds: string[] = [];
-        // get feeds for tokens
-        
+        if(!pythFeeds){
+            pythFeeds = updatePythFeeds(pythFeeds)
+        }
         const pythPriceService = new EvmPriceServiceConnection(PYTH_ENDPOINT);
         try{
             const priceFeedUpdateData = pythFeeds.length > 0 ? await pythPriceService.getPriceFeedsUpdateData(pythFeeds) : [];
@@ -32,7 +54,17 @@ export default function useUpdateData() {
         }
     }
 
+    const getUpdateFee = async (
+        pythFeeds?: string[]
+    ): Promise<string> => {
+        if(!pythFeeds){
+            pythFeeds = updatePythFeeds(pythFeeds)
+        }
+        return pythFeeds.length.toString();
+    }
+
     return {
-        getUpdateData
+        getUpdateData,
+        getUpdateFee
     }
 }

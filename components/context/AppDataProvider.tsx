@@ -1,16 +1,14 @@
 import * as React from "react";
-import axios from "axios";
 import { getContract } from "../../src/contract";
-import { ADDRESS_ZERO, defaultChain } from '../../src/const';
+import { ADDRESS_ZERO, DATA_FETCH_FREQUENCY, defaultChain } from '../../src/const';
 import { BigNumber, ethers } from "ethers";
 import { useEffect } from 'react';
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useBlockNumber, useNetwork } from "wagmi";
 import { __chains } from "../../pages/_app";
 import { Status } from "../utils/status";
-import { Endpoints, query } from "../../src/queries/synthetic";
-import Big from "big.js";
+import { Account, ReserveData, LiquidityData } from "../utils/types";
 
-interface AppDataValue {
+export interface AppDataValue {
 	status: Status;
 	message: string;
 	pools: any[];
@@ -21,11 +19,11 @@ interface AppDataValue {
 	setActivePool: (_: number, pools?: any[]) => void;
 	block: number;
 	leaderboard: any[];
-	account: any,
+	account: Account|undefined,
 	setRefresh: (_: number[]) => void; 
 	refresh: number[];
-	reserveData: any;
-	liquidityData: any;
+	reserveData: ReserveData|undefined;
+	liquidityData: LiquidityData|undefined;
 }
 
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
@@ -33,16 +31,27 @@ const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
 function AppDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<AppDataValue['status']>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<AppDataValue['message']>("");
-	const [account, setAccount] = React.useState<any|null>(null);
+	const [account, setAccount] = React.useState<Account>();
 	const [pools, setPools] = React.useState<any[]>([]);
 	
-	const [reserveData, setReserveData] = React.useState<any>(undefined);
-	const [liquidityData, setLiquidityData] = React.useState<any>(undefined);
+	const [reserveData, setReserveData] = React.useState<ReserveData>();
+	const [liquidityData, setLiquidityData] = React.useState<LiquidityData>();
 
 	const [activePool, setActivePool] = React.useState(0);
 	const [leaderboard, setLeaderboard] = React.useState([]);
 
-	const { address } = useAccount();
+	const { address, isConnected } = useAccount();
+
+	useBlockNumber({
+		onBlock: (block) => {
+			console.log("New block", block);
+			if(!isConnected) return;
+			if(block % DATA_FETCH_FREQUENCY[defaultChain.id] === 0){
+				fetchData();
+			}
+		},
+		watch: true
+	})
 
 	useEffect(() => {
 		if(localStorage){
@@ -64,18 +73,19 @@ function AppDataProvider({ children }: any) {
 		let chainId = defaultChain.id;
 		console.log("Fetching data for chain", chainId);
 		return new Promise((resolve, reject) => {
-			setStatus(Status.FETCHING);
+			if(status === Status.NOT_FETCHING) setStatus(Status.FETCHING);
 			if(!_address) _address = ADDRESS_ZERO;
 			const uidp = getContract("UIDataProvider", process.env.NEXT_PUBLIC_UIDP_ADDRESS!);
 			uidp.getAllData(_address)
 				.then(async (res: any) => {
+					console.log(res);
 					setAccount({
-						address: _address,
-						healthFactor: res.healthFactor.div(ethers.constants.WeiPerEther),
-						availableToMintUSD: res.availableToMintUSD,
-						userTotalBalanceUSD: res.reserveData.userTotalBalanceUSD,
-						userAdjustedBalanceUSD: res.reserveData.userAdjustedBalanceUSD,
-						userTotalDebtUSD: res.liquidityData.userTotalDebtUSD
+						healthFactor: res.healthFactor.toString(),
+						availableToMintUSD: res.availableToMintUSD.toString(),
+						userTotalBalanceUSD: res.reserveData.userTotalBalanceUSD.toString(),
+						userAdjustedBalanceUSD: res.reserveData.userAdjustedBalanceUSD.toString(),
+						userThresholdBalanceUSD: res.reserveData.userThresholdBalanceUSD.toString(),
+						userTotalDebtUSD: res.liquidityData.userTotalDebtUSD.toString()
 					});
 					setReserveData(res.reserveData);
 					setLiquidityData(res.liquidityData);

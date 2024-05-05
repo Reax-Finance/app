@@ -18,6 +18,15 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 import { useAppData } from "../context/AppDataProvider";
+import { Asset } from "../utils/types";
+import { useRouter } from "next/router";
+
+interface ApprovalStep {
+	type: "APPROVAL" | "PERMIT";
+	isCompleted: boolean;
+	data: any;
+	execute: any;
+}
 
 function Swap() {
 	const [inputAssetIndex, setInputAssetIndex] = useState(2);
@@ -48,66 +57,42 @@ function Swap() {
 	const [data, setData] = useState<any>(null);
 	const [maxSlippage, setMaxSlippage] = useState(0.5);
 	const [deadline_m, setDeadline_m] = useState(20);
-	const {getUpdateData} = useUpdateData();
+	const { getUpdateData, getUpdateFee } = useUpdateData();
 	const [approvedAmount, setApprovedAmount] = useState('0');
 	const { signTypedDataAsync } = useSignTypedData();
 	const [deadline, setDeadline] = useState('0');
+	const [nonce, setNonce] = useState(-1);
 
-	// const { walletBalances, updateFromTx, tokens: _tokens, allowances, nonces, addNonce } = useBalanceData();
+	const router = useRouter();
+	
 	const { liquidityData } = useAppData();
 	
-    const tokens: any[] = liquidityData ? liquidityData.synths.concat([liquidityData.lpToken]) : [];
-
+    const tokens = liquidityData ? liquidityData.synths.concat([{...liquidityData.lpToken, price: liquidityData.lpToken.price.div('10000000000')}]) : [];
+	const inToken = tokens[inputAssetIndex];
+	const outToken = tokens[outputAssetIndex];
+	useEffect(() => {
+		if (tokens.length > 1) {
+			const inAssetIndex = tokens.findIndex((token) => token.id.toLowerCase() == router.query?.inCurrency?.toString().toLowerCase());
+			const outAssetIndex = tokens.findIndex((token) => token.id.toLowerCase() == router.query?.outCurrency?.toString().toLowerCase());
+			if(inAssetIndex >= 0) setInputAssetIndex(inAssetIndex);
+			if(outAssetIndex >= 0) setOutputAssetIndex(outAssetIndex);
+		}
+	}, [tokens])
+	
 	const handleError = useHandleError(PlatformType.DEX);
 
-	const isUnwrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO);
-	const isWrap = (tokens[inputAssetIndex]?.id == ADDRESS_ZERO && tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id));
+	const isUnwrap = (inToken?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && outToken?.id == ADDRESS_ZERO);
+	const isWrap = (inToken?.id == ADDRESS_ZERO && outToken?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id));
 
-	const calculateOutputAmount = (inputAmount: string) => {
-		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT, {
-				params: {
-					tokenIn: tokens[inputAssetIndex]?.id,
-					tokenOut: tokens[outputAssetIndex]?.id,
-					amount: inputAmount,
-					kind: 0,
-					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? "XYZ",
-					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
-					slipage: maxSlippage
-				}
-			})
-			.then((res) => {
-				resolve(res.data.data);
-			})
-			.catch((err) => {
-				reject(err);
-			})
+	useEffect(() => {
+		if(!inToken) return;
+		const contract = getContract("ERC20Permit", inToken.id);
+		contract.nonces(address).then((nonce: any) => {
+			setNonce(nonce)
+		}).catch((err: any) => {
+			setNonce(-1)
 		})
-	}
-
-	const calculateInputAmount = (outputAmount: string) => {
-		return new Promise((resolve, reject) => {
-			axios.get(ROUTER_ENDPOINT, {
-				params: {
-					tokenIn: tokens[inputAssetIndex]?.id,
-					tokenOut: tokens[outputAssetIndex]?.id,
-					amount: outputAmount,
-					kind: 1,
-					sender: address ?? ADDRESS_ZERO,
-					recipient: address ?? "XYZ",
-					deadline: (Date.now()/1000).toFixed(0) + deadline_m * 60,
-					slipage: maxSlippage
-				}
-			})
-			.then((res) => {
-				resolve(res.data.data);
-			})
-			.catch((err) => {
-				reject(err);
-			})
-		})
-	}
+	}, [inputAssetIndex])
 
 	const updateInputAmount = (value: any) => {
 		value = parseInput(value);
@@ -119,7 +104,7 @@ function Swap() {
 		if(isWrap || isUnwrap){
 			setOutputAmount(value);
 		} else {
-			setOutputAmount(Big(value).mul(tokens[inputAssetIndex].price.toString()).div(tokens[outputAssetIndex].price.toString()).toString());
+			setOutputAmount(Big(value).mul(inToken.price.toString()).div(outToken.price.toString()).toString());
 		}
 	};
 
@@ -130,7 +115,7 @@ function Swap() {
 		if(isWrap || isUnwrap){
 			setInputAmount(value);
 		} else {
-			setInputAmount(Big(value).mul(tokens[outputAssetIndex].price.toString()).div(tokens[inputAssetIndex].price.toString()).toString());
+			setInputAmount(Big(value).mul(outToken.price.toString()).div(inToken.price.toString()).toString());
 		}
 	};
 
@@ -139,6 +124,8 @@ function Swap() {
 			setOutputAssetIndex(inputAssetIndex);
 		}
 		setInputAssetIndex(e);
+		router.query.inCurrency = tokens[e].id;
+		router.push(router);
 		setInputAmount("" as any);
 		setOutputAmount('0');
 		setApprovedAmount('0');
@@ -156,6 +143,8 @@ function Swap() {
 			setInputAssetIndex(outputAssetIndex);
 		}
 		setOutputAssetIndex(e);
+		router.query.outCurrency = tokens[e].id;
+		router.push(router);
 		setInputAmount('');
 		setOutputAmount('0');
 		onOutputClose();
@@ -168,6 +157,9 @@ function Swap() {
 
 	const switchTokens = () => {
 		let temp = inputAssetIndex;
+		router.query.inCurrency = tokens[outputAssetIndex].id;
+		router.query.outCurrency = tokens[temp].id;
+		router.push(router);
 		setInputAssetIndex(outputAssetIndex);
 		setOutputAssetIndex(temp);
 		setInputAmount('');
@@ -180,208 +172,169 @@ function Swap() {
 	};
 
 	const exchange = async () => {
-		const token = tokens[inputAssetIndex];
-		// if(!address) return;
-		// if(swapData?.recipient == "XYZ") {
-		// 	updateInputAmount(inputAmount)
-		// 	return;
-		// };
-		// if(shouldApprove()){
-		// 	const routerAddress = getAddress("Router", chain?.id!);
-		// 	if(token.isPermit) approve(token, routerAddress)
-		// 	else approveTx(token, routerAddress)
-		// } else {
-		// 	if (!inputAmount || !outputAmount) {
-		// 		return;
-		// 	}
-		// 	setLoading(true);
-		// 	// calculateInputAmount()
-		// 	const router = await getContract("Router", chain?.id!);
-		// 	let tx;
-		// 	if(isWrap || isUnwrap){
-		// 		let weth = await getContract("WETH9", chain?.id!, WETH_ADDRESS(chain?.id!));
-		// 		if(isWrap) tx = send(weth, "deposit", [], Big(inputAmount).mul(10**token.decimals).toFixed(0));
-		// 		else tx = send(weth, "withdraw", [Big(outputAmount).mul(10**token.decimals).toFixed(0)]);
-		// 	} else {
-		// 		const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
-		// 		const pythData = await getUpdateData(tokenPricesToUpdate);
-		// 		// concat swap assets[]
-		// 		let _swapData = {...swapData};
-		// 		if(token.id == ADDRESS_ZERO){
-		// 			let ethAmount = Big(inputAmount).mul(10**token.decimals).toFixed(0);
-		// 			tx = send(router, "swap", [_swapData, pythData], ethAmount)
-		// 		} else {
-		// 			let calls = [];
-		// 			if(Big(approvedAmount ?? 0).gt(0)){
-		// 				const {v, r, s} = ethers.utils.splitSignature(data!);
-		// 				calls.push(
-		// 					router.interface.encodeFunctionData("permit", [approvedAmount, deadline, token.id, v, r, s])
-		// 				)
-		// 			}
-		// 			calls.push(
-		// 				router.interface.encodeFunctionData("swap", [_swapData, pythData])
-		// 			);
-		// 			tx = send(router, "multicall", [calls])
-		// 		}
-		// 	}
-
-		// 	tx.then(async (res: any) => {
-		// 		let response = await res.wait();
-		// 		updateFromTx(response);
-		// 		setLoading(false);
-		// 		toast({
-		// 			title: 'Transaction submitted',
-		// 			description: <Box>
-		// 				<Text>
-		// 					{`You have swapped ${inputAmount} ${tokens[inputAssetIndex]?.symbol} for ${tokens[outputAssetIndex]?.symbol}`}
-		// 				</Text>
-		// 				<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
-		// 					<Flex align={'center'} gap={2}>
-		// 					<ExternalLinkIcon />
-		// 					<Text>View Transaction</Text>
-		// 					</Flex>
-		// 				</Link>
-		// 			</Box>,
-		// 			status: 'success',
-		// 			duration: 5000,
-		// 			isClosable: true,
-		// 			position: 'top-right'
-		// 		})
-		// 		setInputAmount('');
-		// 		setOutputAmount('0');
-		// 		setSwapData(null);
-		// 		if(Big(approvedAmount ?? 0).gt(0)){
-		// 			addNonce(token.id, '1')
-		// 			setApprovedAmount('0');
-		// 			setDeadline('0');
-		// 			setData(null);
-		// 		}
-		// 	})
-		// 	.catch((err: any) => {
-		// 		setLoading(false);
-		// 		handleError(err)
-		// 	})
-		// }
-	};
-
-	const approveTx = async (token: any, routerAddress: string) => {
-		// setLoading(true);
-		// const tokenContract = await getContract("MockToken", chain?.id ?? defaultChain.id, token.id);
-		// send(
-		// 	tokenContract,
-		// 	"approve",
-		// 	[
-		// 		routerAddress,
-		// 		ethers.constants.MaxUint256
-		// 	]
-		// )
-		// .then(async (res: any) => {
-		// 	let response = await res.wait();
-		// 	updateFromTx(response);
-		// 	setLoading(false);
-		// 	toast({
-		// 		title: "Approval Successful",
-		// 		description: <Box>
-		// 			<Text>
-		// 				{`You have approved ${token.symbol}`}
-		// 			</Text>
-		// 			<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
-		// 				<Flex align={'center'} gap={2}>
-		// 				<ExternalLinkIcon />
-		// 				<Text>View Transaction</Text>
-		// 				</Flex>
-		// 			</Link>
-		// 		</Box>,
-		// 		status: "success",
-		// 		duration: 10000,
-		// 		isClosable: true,
-		// 		position: "top-right"
-		// 	})
-		// }).catch((err: any) => {
-		// 	handleError(err);
-		// 	setLoading(false);
-		// })
-	}
-
-	const approve = async (token: any, routerAddress: string) => {
 		setLoading(true);
-		// const _deadline =(Math.floor(Date.now() / 1000) + 60 * deadline_m).toFixed(0);
-		// // const _amount = Big(inputAmount).toFixed(token.decimals, 0);
-		// const value = ethers.constants.MaxUint256;
-		// signTypedDataAsync({
-		// 	domain: {
-		// 		name: token.name,
-		// 		version: EIP712_VERSION(token.id),
-		// 		chainId: chain?.id ?? defaultChain.id,
-		// 		verifyingContract: token.id,
-		// 	},
-		// 	types: {
-		// 		Permit: [
-		// 			{ name: "owner", type: "address" },
-		// 			{ name: "spender", type: "address" },
-		// 			{ name: "value", type: "uint256" },
-		// 			{ name: "nonce", type: "uint256" },
-		// 			{ name: "deadline", type: "uint256" },
-		// 		]
-		// 	},
-		// 	value: {
-		// 		owner: address!,
-		// 		spender: routerAddress as any,
-		// 		value,
-		// 		nonce: nonces[token.id] ?? 0,
-		// 		deadline: BigNumber.from(_deadline),
-		// 	}
-		// })
-		// 	.then(async (res: any) => {
-		// 		setData(res);
-		// 		setDeadline(_deadline);
-		// 		setApprovedAmount(ethers.constants.MaxUint256.toString());
-		// 		setLoading(false);
-		// 		toast({
-		// 			title: "Approval Signed",
-		// 			description: <Box>
-		// 				<Text>
-		// 					{`For use of ${token.symbol}`}
-		// 				</Text>
-		// 			</Box>,
-		// 			status: "info",
-		// 			duration: 10000,
-		// 			isClosable: true,
-		// 			position: "top-right"
-		// 		})
-		// 	})
-		// 	.catch((err: any) => {
-		// 		handleError(err);
-		// 		setLoading(false);
-		// 	});
+		const router = getContract("ReaxRouter", process.env.NEXT_PUBLIC_ROUTER_ADDRESS!);
+		const updateData = await getUpdateData();
+		const updateFee = await getUpdateFee();
+		const calls = [];
+		calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
+		if(Big(approvedAmount ?? 0).gt(0)){
+			const { v, r, s } = ethers.utils.splitSignature(data);
+			calls.push(router.interface.encodeFunctionData("permit", [address, router.address, inToken.id, approvedAmount, deadline, v, r, s]));
+		} 
+		calls.push(router.interface.encodeFunctionData("swap", [inToken.id, outToken.id, Big(inputAmount).mul(Big(10).pow(inToken.decimals)).toFixed(0), address]));
+
+		send(router, "multicall", [calls], updateFee)
+			.then(async (res: any) => {
+				await res.wait();
+				setLoading(false);
+				toast({
+					title: 'Transaction submitted',
+					description: <Box>
+						<Text>
+							{`You have swapped ${inputAmount} ${inToken?.symbol} for ${outToken?.symbol}`}
+						</Text>
+						<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
+							<Flex align={'center'} gap={2}>
+							<ExternalLinkIcon />
+							<Text>View Transaction</Text>
+							</Flex>
+						</Link>
+					</Box>,
+					status: 'success',
+					duration: 5000,
+					isClosable: true,
+					position: 'top-right'
+				})
+				setInputAmount('');
+				setOutputAmount('0');
+				setSwapData(null);
+				if(Big(approvedAmount ?? 0).gt(0)){
+					setApprovedAmount('0');
+					setDeadline('0');
+					setData(null);
+					setNonce((prev) => prev + 1);
+				}
+			})
+			.catch((err: any) => {
+				setLoading(false);
+				handleError(err)
+			})
 	};
 
-	const handleMax = () => {
-			//TODO - max
-
-		let _inputAmount = Big(0).div(10 ** tokens[inputAssetIndex].decimals);
-		updateInputAmount(_inputAmount.toString())
+	const approveTx = (token: Asset, routerAddress: string) => {
+		setLoading(true);
+		const tokenContract = getContract("ERC20", token.id);
+		send(tokenContract, "approve", [routerAddress, ethers.constants.MaxUint256])
+		.then(async (res: any) => {
+			await res.wait();
+			setLoading(false);
+			toast({
+				title: "Approval Successful",
+				description: <Box>
+					<Text>
+						{`You have approved ${token.symbol}`}
+					</Text>
+					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
+						<Flex align={'center'} gap={2}>
+						<ExternalLinkIcon />
+						<Text>View Transaction</Text>
+						</Flex>
+					</Link>
+				</Box>,
+				status: "success",
+				duration: 10000,
+				isClosable: true,
+				position: "top-right"
+			})
+		}).catch((err: any) => {
+			handleError(err);
+			setLoading(false);
+		})
 	};
 
-	const swapInputExceedsBalance = () => {
-		if (inputAmount) {
-			//TODO - max
-			return Big(inputAmount).gt(Big(0).div(10 ** tokens[inputAssetIndex].decimals));
+	const approve = async (token: Asset, routerAddress: string) => {
+		setLoading(true);
+		const _deadline =(Math.floor(Date.now() / 1000) + 60 * deadline_m).toFixed(0);
+		// const _amount = Big(inputAmount).toFixed(token.decimals, 0);
+		const value = ethers.constants.MaxUint256;
+		console.log(getContract("ERC20Permit", token.id));
+		const version = (await (getContract("ERC20Permit", token.id)).eip712Domain()).version;
+		signTypedDataAsync({
+			domain: {
+				name: token.name,
+				version: version,
+				chainId: defaultChain.id,
+				verifyingContract: token.id as any,
+			},
+			types: {
+				Permit: [
+					{ name: "owner", type: "address" },
+					{ name: "spender", type: "address" },
+					{ name: "value", type: "uint256" },
+					{ name: "nonce", type: "uint256" },
+					{ name: "deadline", type: "uint256" },
+				]
+			},
+			value: {
+				owner: address!,
+				spender: routerAddress as any,
+				value,
+				nonce: BigNumber.from(nonce.toString()),
+				deadline: BigNumber.from(_deadline),
+			}
+		})
+			.then(async (res: any) => {
+				setData(res);
+				setDeadline(_deadline);
+				setApprovedAmount(ethers.constants.MaxUint256.toString());
+				setLoading(false);
+				toast({
+					title: "Approval Signed",
+					description: <Box>
+						<Text>
+							{`For use of ${token.symbol}`}
+						</Text>
+					</Box>,
+					status: "info",
+					duration: 10000,
+					isClosable: true,
+					position: "top-right"
+				})
+			})
+			.catch((err: any) => {
+				handleError(err);
+				setLoading(false);
+			});
+	};
+
+	const getSteps = () => {
+		let steps: ApprovalStep[] = [];
+		if(!inToken) return steps;
+		if(inToken.id !== ADDRESS_ZERO && Big(approvedAmount).add(inToken.approvalToRouter.toString()).lt(Big(Number(inputAmount) || 0).mul(10**inToken.decimals))){
+			if(nonce >= 0) steps.push({
+				type: "PERMIT",
+				isCompleted: false,
+				data: {
+					amount: inputAmount,
+					token: inToken
+				},
+				execute: () => approve(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!)
+			})
+			else {
+				steps.push({
+					type: "APPROVAL",
+					isCompleted: false,
+					data: {
+						amount: inputAmount,
+						token: inToken
+					},
+					execute: () => approveTx(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!)
+				})
+			}
 		}
-		return false;
+		return steps;
 	};
-
-	const shouldApprove = () => {
-		// const routerAddress = getAddress("Router", chain?.id! ?? defaultChain.id);
-		// const token = tokens[inputAssetIndex];
-		// if(token.id == ADDRESS_ZERO) return false;
-		// if(isUnwrap) return false;
-		// if (Big(allowances[token.id]?.[routerAddress] ?? 0).add(Big(approvedAmount).mul(10**token.decimals)).lt(Big(inputAmount).mul(10**token.decimals))){
-		// 	return true;
-		// }
-		// return false;
-		return true;
-	}
 
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
@@ -390,53 +343,12 @@ function Swap() {
 		if(error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
 		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
-		else if (swapInputExceedsBalance()) return {valid: false, message: "Insufficient Balance"}
-		else if (shouldApprove()) return { valid: true, message: `Approve ${tokens[inputAssetIndex].symbol} for use`}
+		else if (Big(Number(inputAmount) || 0).mul(Big(10).pow(inToken.decimals)).gt(inToken.balance.toString())) return {valid: false, message: "Insufficient Balance"}
+		else if (getSteps().length > 0) return { valid: false, message: "Approve"}
 		else if (Number(deadline_m) == 0) return {valid: false, message: "Please set deadline"}
 		else if (maxSlippage == 0) return {valid: false, message: "Please set slippage"}
-		else if (isWrap) return {valid: true, message: "Wrap"}
-		else if (isUnwrap) return {valid: true, message: "Unwrap"}
 		else return {valid: true, message: "Swap"}
 	}
-
-	const estimateGas = async (_swapData = swapData) => {
-		// if(!_swapData || validate().message !== 'Swap') return;
-		// const token = tokens[inputAssetIndex];
-		// let router = await getContract("Router", chain?.id!);
-		// let provider = new ethers.providers.Web3Provider(window.ethereum as any);
-		// router = router.connect(provider.getSigner());
-		// let tx;
-		// const tokenPricesToUpdate = swapData.swaps.filter((swap: any) => swap.isBalancerPool == false).map((swap: any) => swap.assets).flat();
-		// const pythData = await getUpdateData(tokenPricesToUpdate);
-		// // concat swap assets[]
-		// _swapData = {..._swapData};
-		// if(token.id == ADDRESS_ZERO || !window.ethereum){
-		// 	tx = new Promise((resolve, reject) => resolve(100000));
-		// } else {
-		// 	let calls = [];
-		// 	if(Big(approvedAmount ?? 0).gt(0)){
-		// 		const {v, r, s} = ethers.utils.splitSignature(data!);
-		// 		calls.push(router.interface.encodeFunctionData("permit", [approvedAmount, deadline, token.id, v, r, s]))
-		// 	}
-		// 	calls.push(
-		// 		router.interface.encodeFunctionData("swap", [_swapData, pythData])
-		// 	);
-		// 	tx = router.estimateGas.multicall(calls);
-		// }
-		// tx.then(async (res: any) => {
-		// 	setGas(res.toString());
-		// })
-		// .catch((err: any) => {
-		// 	console.log("Error estimating gas:", JSON.stringify(err).slice(0, 400));
-		// 	setGas(0);
-		// })
-	}
-
-	useEffect(() => {
-		if(swapData && Number(inputAmount) > 0){
-			estimateGas();
-		}
-	}, [inputAmount, approvedAmount, swapData])
 
 	return (
 		<>
@@ -444,9 +356,9 @@ function Swap() {
 				<title>
 					{" "}
 					{tokenFormatter.format(
-						(prices[tokens[inputAssetIndex]?.id] / prices[tokens[outputAssetIndex]?.id]) || 0
+						(prices[inToken?.id] / prices[outToken?.id]) || 0
 					)}{" "}
-					{tokens[outputAssetIndex]?.symbol}/{tokens[inputAssetIndex]?.symbol} | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
+					{outToken?.symbol}/{inToken?.symbol} | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
 				</title>
 				<link rel="icon" type="image/x-icon" href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}></link>
 			</Head>
@@ -460,7 +372,6 @@ function Swap() {
 					updateOutputAmount={updateOutputAmount}
 					outputAssetIndex={outputAssetIndex}
 					onOutputOpen={onOutputOpen}
-					handleMax={handleMax}
 					switchTokens={switchTokens}
 					exchange={exchange}
 					validate={validate}
@@ -472,6 +383,7 @@ function Swap() {
 					setDeadline={setDeadline_m}
 					swapData={swapData}
 					tokens={tokens}
+					steps={getSteps()}
 				/>
 			) : (
 				<SwapSkeleton />

@@ -30,6 +30,7 @@ import { useAccount, useNetwork } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
 import whitelistedTokens from "../../src/whitelistedTokens";
 import { VARIANT } from "../../styles/theme";
+import Big from "big.js";
 
 const POPULAR_TOKENS = ['WETH', 'MNT', 'USDT', 'cUSD']
 
@@ -178,13 +179,13 @@ function TokenSelector({
 												<Text>
 													{token.symbol}
 												</Text>
-												{whitelistedTokens.includes(token.id) && (
+												{/* {whitelistedTokens.includes(token.id) && ( */}
 													<Tooltip label={'Verified'}>
 														<Box color="green.400">
 														<MdVerified />
 														</Box>
 													</Tooltip>
-												)}
+												{/* )} */}
 												</Flex>
 
 												<Text
@@ -206,7 +207,7 @@ function TokenSelector({
 									>
 										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
 										<Text fontSize={"md"}>
-											{tokenFormatter.format((walletBalances[token.id] ?? 0) / 10 ** (token.decimals ?? 18))}
+											{tokenFormatter.format(Big(token.balance ?? 0).div(10 ** (token.decimals ?? 18)).toNumber())}
 										</Text>
 									</Box>}
 								</Flex>

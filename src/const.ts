@@ -2,8 +2,10 @@ import { ethers } from "ethers";
 import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet } from "./chains";
 import { mainnet, sepolia } from "wagmi";
 import { scrollTestnet } from "@wagmi/chains";
+import Big from "big.js";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
+export const ONE_ETH = Big(1e18);
 const NETWORKS: any = {
 	[mantleMainnet.id]: mantleMainnet,
 	[mantleTestnet.id]: mantleTestnet,
@@ -33,6 +35,14 @@ const _WETH_ADDRESS: any = {
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
 	[lineaTestnet.id]: "0x2c1b868d6596a18e32e61b901e4060c872647b6c".toLowerCase(),
 	[sepolia.id]: "0x3c348AdCFd2004984a427B21FA2e108DcdF656aC".toLowerCase(),
+};
+
+// Per block fetching frequency
+export const DATA_FETCH_FREQUENCY: any = {
+	[mantleTestnet.id]: 5,
+	[mantleMainnet.id]: 5,
+	[lineaTestnet.id]: 5,
+	[sepolia.id]: 1,
 };
 
 export const PERP_CATEGORIES: any = {
