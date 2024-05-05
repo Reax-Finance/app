@@ -14,23 +14,15 @@ import {
     useColorMode,
     Tooltip,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
-import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 import { ADDRESS_ZERO, NATIVE, SUPPORTS_ROLLUP_GASFEES, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
-import { InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
-import { motion } from "framer-motion";
 import SelectBody from "./SelectBody";
-import { useBalanceData } from "../context/BalanceProvider";
-import { usePriceData } from "../context/PriceContext";
 import Big from "big.js";
 import { formatInput } from "../utils/number";
 import { AiOutlineWallet } from "react-icons/ai";
-import { useAccount, useFeeData, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import Settings from "./Settings";
-import { BigNumber, ethers } from "ethers";
-import RouteDetails from "./RouteDetails";
 import { VARIANT } from "../../styles/theme";
 import { FaBoltLightning } from "react-icons/fa6";
 
@@ -69,9 +61,7 @@ export default function SwapLayout({
     tokens,
     steps
 }: any) {
-    const { walletBalances, tokens: _tokens } = useBalanceData();
     const { account } = useAppData();
-    const { chain } = useNetwork();
 
 	const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure()
     const { address, isConnected } = useAccount();
@@ -79,7 +69,7 @@ export default function SwapLayout({
     const inputValue = Big(Number(inputAmount) || 0).mul(tokens[inputAssetIndex].price).div(10**8).toNumber()
     const outputValue = Big(Number(outputAmount) || 0).mul(tokens[outputAssetIndex].price).div(10**8).toNumber()
 
-	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
+	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(defaultChain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
     const valid = inputAmount > 0 && outputAmount > 0 && !isWrap;
 	const { colorMode } = useColorMode();
 
@@ -95,7 +85,7 @@ export default function SwapLayout({
 
   return (
     <>
-        <Box className={`${VARIANT}-${colorMode}-containerBody`}>
+        <Box className={`${VARIANT}-${colorMode}-containerBody`} maxW={'540px'}>
             <Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={4}>
                 <Flex align={'center'} justify={'space-between'}>
                     <Flex align={'center'} gap={4}>

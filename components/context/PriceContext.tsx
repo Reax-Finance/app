@@ -1,12 +1,8 @@
 import Big from "big.js";
 import { BigNumber, ethers } from "ethers";
 import * as React from "react";
-import { getABI, getContract } from "../../src/contract";
-import { useAccount, useNetwork } from "wagmi";
 import { ADDRESS_ZERO, PYTH_ENDPOINT, REPLACED_FEEDS, WETH_ADDRESS, defaultChain } from "../../src/const";
-import { useAppData } from "./AppDataProvider";
 import { Status, SubStatus } from "../utils/status";
-import axios from 'axios';
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 
 const PriceContext = React.createContext<PriceValue>({} as PriceValue);
@@ -21,10 +17,6 @@ function PriceContextProvider({ children }: any) {
 	const [prices, setPrices] = React.useState<any>({});
     const [refresh, setRefresh] = React.useState(0);
 
-	const { chain } = useNetwork();
-
-    const { pools } = useAppData();
-    const { address } = useAccount();
 
     React.useEffect(() => {
     }, []);

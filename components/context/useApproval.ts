@@ -80,12 +80,13 @@ const useApproval = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
 					{ name: "deadline", type: "uint256" },
 				]
 			},
-			value: {
+			primaryType: "Permit",
+			message: {
 				owner: address!,
 				spender: spender as `0x${string}`,
-				value,
-				nonce: BigNumber.from(nonce.toString()),
-				deadline: BigNumber.from(_deadline),
+				value: value.toBigInt(),
+				nonce: BigNumber.from(nonce.toString()).toBigInt(),
+				deadline: BigNumber.from(_deadline).toBigInt(),
 			}
 		})
 			.then(async (res: any) => {

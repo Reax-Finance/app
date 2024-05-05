@@ -17,7 +17,7 @@ import { CloseIcon, InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import SelectBody from "./SelectBody";
 import Big from "big.js";
 import { formatInput } from "../utils/number";
-import { useAccount, useFeeData, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { BigNumber, ethers } from "ethers";
 import { VARIANT } from "../../styles/theme";
 import { BsPlus } from "react-icons/bs";
@@ -91,10 +91,9 @@ export default function RemoveLiquidityLayout({
 		updateInputAmount(maxInput());
 	};
 
-
     return (
     <>
-        <Box pt={2}>
+        <Box pt={2} >
 
             {/* Output */}
             <Box bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} border={'1px'} borderColor={'whiteAlpha.200'} m={4} py={2} px={4}>
@@ -102,7 +101,7 @@ export default function RemoveLiquidityLayout({
                     <Text>Burn LP</Text>
                     {isMintOpen ? <IconButton icon={<CloseIcon w={'10px'} />} onClick={onMintClose} aria-label={""} size={'xs'} /> : <IconButton icon={<BsPlus size={20} />} onClick={onMintOpen} aria-label={""} size={'xs'} />}
                 </Flex>
-                {isMintOpen && <><Flex align="center" justify={"space-between"}>
+                {isMintOpen && <><Flex align="center" justify={"space-between"} mt={2}>
                     <Box width={{base: '60%', md: '70%'}}>
                     <InputGroup>
                         <NumberInput

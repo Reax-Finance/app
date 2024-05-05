@@ -1,5 +1,6 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { defaultChain } from './const';
+import Big from 'big.js';
 
 export function getABI(contractName: string) {
   const artifact = require(`../out/${contractName}.sol/${contractName}.json`);
@@ -9,8 +10,8 @@ export function getABI(contractName: string) {
 }
 
 export function getContract(contractName: string, address: string) {
-  let provider = new ethers.providers.JsonRpcProvider(defaultChain?.rpcUrls.public.http[0]);
-  if(window.ethereum) provider = new ethers.providers.Web3Provider(window.ethereum as any);
+  let provider = new ethers.providers.JsonRpcProvider(defaultChain?.rpcUrls.default.http[0]);
+  if(window?.ethereum && BigNumber.from(window?.ethereum?.chainId || 0).toNumber() == defaultChain.id) provider = new ethers.providers.Web3Provider(window.ethereum as any);
   let contract = new ethers.Contract(address!, getABI(contractName), provider);
   return contract;
 }

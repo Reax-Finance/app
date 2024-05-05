@@ -9,10 +9,11 @@ import {
 	useColorMode,
 	Button,
 	Link,
+	Divider,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import "../../styles/Home.module.css";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { useContext } from "react";
 import { AppDataContext } from "../context/AppDataProvider";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
@@ -21,83 +22,53 @@ import { Status } from "../utils/status";
 import { CustomConnectButton } from "./ConnectButton";
 import { VARIANT } from "../../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
+import { ADDRESS_ZERO } from "../../src/const";
+import { useAccountEffect } from 'wagmi'
 
 function NavBar() {
 	const { status, account, fetchData } = useContext(AppDataContext);
-
-	const { chain, chains } = useNetwork();
-	const [init, setInit] = useState(false);
-
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
-	const [isSubscribed, setIsSubscribed] = useState(false);
+	const [addressCache, setAddressCache] = useState<string|undefined>();
 
 	const {
 		address,
 		isConnected,
 		isConnecting,
 		connector: activeConnector,
-	} = useAccount({
-		onConnect({ address, connector, isReconnected }) {
-			fetchData(address!);
-			setInit(true);
+	} = useAccount();
+
+	useAccountEffect({
+		onConnect(data) {
+			console.log('Connected!', data)
+			fetchData(data.address)
 		},
 		onDisconnect() {
-			console.log("onDisconnect");
-			// window.location.reload();
+			console.log('Disconnected!')
+			fetchData(ADDRESS_ZERO)
 		},
-	});
+	})
 
+	// On address change
 	useEffect(() => {
-		if (activeConnector && window.ethereum && !isSubscribed) {
-			(window as any).ethereum.on(
-				"accountsChanged",
-				function (accounts: any[]) {
-					// refresh page
-					// window.location.reload();
-					fetchData(accounts[0]);
-				}
-			);
-			(window as any).ethereum.on(
-				"chainChanged",
-				function (chainId: any[]) {
-					// refresh page
-					// window.location.reload();
-					// fetchData(accounts[0]);
-				}
-			);
-			setIsSubscribed(true);
+		if(!addressCache){
+			setAddressCache(address);
 		}
-		if (
-			(!(isConnected && !isConnecting) || chain?.unsupported) &&
-			status !== Status.FETCHING &&
-			!init
-		) {
-			setInit(true);
-			fetchData();
+		else if (address && address != ADDRESS_ZERO && address != addressCache) {
+			console.log("Address changed", address);
+			setAddressCache(address);
+			fetchData(address);
 		}
-	}, [
-		activeConnector,
-		address,
-		chain?.unsupported,
-		chains,
-		fetchData,
-		init,
-		isConnected,
-		isConnecting,
-		isSubscribed,
-		status,
-	]);
+	}, [address]);
 
 	const { colorMode } = useColorMode();
 
 	return (
 		<>
 			<Flex
-				className={`${VARIANT}-${colorMode}-navBar`}
-				justify={"center"}
-				zIndex={0}
 				mt={{ base: 0, md: 6 }}
 				align="center"
+				justify={'space-between'}
+				w={'100%'}
 			>
 				<Box minW="0" w={"100%"} maxW="100%" mx={{base: 0, md: 6}}>
 					<Flex align={"center"} justify="space-between">
@@ -155,9 +126,7 @@ function NavBar() {
 							w="100%"
 						>
 							<Flex mr={2}>
-								<Box
-									// className={`${VARIANT}-${colorMode}-primaryButton`}
-								>
+								<Box>
 									<Button
 										color={"white"}
 										bg={"transparent"}
@@ -172,7 +141,7 @@ function NavBar() {
 											target={"_blank"}
 										>
 											<Flex gap={2}>
-												<Text>Give Feedback</Text>
+												<Text>Feedback</Text>
 												<MdOpenInNew />
 											</Flex>
 										</Link>
@@ -196,9 +165,11 @@ function NavBar() {
 					</Flex>
 				</Box>
 			</Flex>
-			<Collapse in={isToggleOpen} animateOpacity>
-				<MobileNav />
-			</Collapse>
+			<Box zIndex={10}>
+				<Collapse in={isToggleOpen} animateOpacity>
+					<MobileNav />
+				</Collapse>
+			</Box>
 		</>
 	);
 }
@@ -206,12 +177,14 @@ function NavBar() {
 const MobileNav = ({}: any) => {
 	const { colorMode } = useColorMode();
 	return (
-		<Flex flexDir={"row"} align={"center"} wrap={"wrap"} gap={0}>
+		<Flex w={'100%'} border={'1px'} borderColor={'whiteAlpha.400'} h={'14'} align={"center"} wrap={"wrap"} gap={0} zIndex={10}>
 			<NavLocalLink path={"/"} title={"Swap"}></NavLocalLink>
+			<Divider orientation={"vertical"} />
 			<NavLocalLink
 				path={"/liquidity"}
 				title={"Liquidity"}
 			></NavLocalLink>
+			<Divider orientation={"vertical"} />
 			<Flex>
 				<Box>
 					<Button
@@ -234,6 +207,7 @@ const MobileNav = ({}: any) => {
 					</Button>
 				</Box>
 			</Flex>
+			<Divider orientation={"vertical"} />
 		</Flex>
 	);
 };

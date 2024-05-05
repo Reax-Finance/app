@@ -6,24 +6,22 @@ import { ethers } from 'ethers';
 
 export default function useUpdateData() {
     const {
-		reserveData,
-        liquidityData
+		reserveData: _reserveData,
+        liquidityData: _liquidityData
 	} = useContext(AppDataContext);
 
-    const updatePythFeeds = (pythFeeds?: string[]) => {
-        if(!pythFeeds){
-            pythFeeds = [];
-            if(reserveData){
-                for(let i in reserveData.vaults){
-                    pythFeeds.push(reserveData.vaults[i].asset.pythId);
-                }
+    const getAllPythFeeds = (reserveData = _reserveData, liquidityData = _liquidityData) => {
+        let pythFeeds = [];
+        if(reserveData){
+            for(let i in reserveData.vaults){
+                pythFeeds.push(reserveData.vaults[i].asset.pythId);
             }
-            if(liquidityData){
-                for(let i in liquidityData.synths){
-                    pythFeeds.push(liquidityData.synths[i].pythId);
-                }
+        }
+        if(liquidityData){
+            for(let i in liquidityData.synths){
+                pythFeeds.push(liquidityData.synths[i].pythId);
             }
-        };
+        }
         // Remove duplicates
         pythFeeds = [...new Set(pythFeeds)];
         // Remove invalid feeds
@@ -40,7 +38,7 @@ export default function useUpdateData() {
         pythFeeds?: string[]
     ): Promise<string[]> => {
         if(!pythFeeds){
-            pythFeeds = updatePythFeeds(pythFeeds)
+            pythFeeds = getAllPythFeeds()
         }
         const pythPriceService = new EvmPriceServiceConnection(PYTH_ENDPOINT);
         try{
@@ -58,13 +56,14 @@ export default function useUpdateData() {
         pythFeeds?: string[]
     ): Promise<string> => {
         if(!pythFeeds){
-            pythFeeds = updatePythFeeds(pythFeeds)
+            pythFeeds = getAllPythFeeds(pythFeeds)
         }
         return pythFeeds.length.toString();
     }
 
     return {
         getUpdateData,
-        getUpdateFee
+        getUpdateFee,
+        getAllPythFeeds
     }
 }

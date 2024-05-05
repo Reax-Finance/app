@@ -84,10 +84,10 @@ export default function PoolLiquidity() {
 			</Flex>
 			<Divider mt={2} />
             <Flex flexDir={'column'} gap={1} mt={4}>
-                <PoolStat icon={<IoIosWater />} title={'Total Liquidity'} value={dollarFormatter.format(Big(liquidityData?.totalDebtUSD?.toString() || '0').div(ONE_ETH).toNumber())} />
+                <PoolStat icon={<IoIosWater />} title={'Total Liquidity'} value={Big(liquidityData?.totalDebtUSD?.toString() || '0').div(ONE_ETH).toNumber()} formatter={dollarFormatter.format} />
                 <Box className={`${VARIANT}-${colorMode}-containerBody2`}>
-                    <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'rLP Composition'} value={
-                        dollarFormatter.format(Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()) + " / rLP"  
+                    <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'rLP Composition'} value={Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()} formatter={
+						(value: any) => dollarFormatter.format(value) + " / rLP"  
                     } />
                     <PieChart width={250} height={200}>
                         <Pie

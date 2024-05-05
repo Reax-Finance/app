@@ -9,11 +9,12 @@ import {
 	Divider,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useAccount, useNetwork, useSignTypedData } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import {
 	ADDRESS_ZERO,
 	ONE_ETH,
+	defaultChain,
 } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
@@ -32,16 +33,15 @@ import useDelegate from "../context/useDelegate";
 
 interface ApprovalStep {
 	type: "APPROVAL" | "PERMIT" | "DELEGATION";
-	isCompleted: boolean;
+	loading: boolean;
 	data: any;
 	execute: any;
 }
 
-function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
+function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	const [inputAssetIndex, setInputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState("");
 	const [outputAmount, setOutputAmount] = useState("");
-	const { chain } = useNetwork();
 	const { isConnected, address } = useAccount();
 
 	const {
@@ -55,6 +55,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 	const { getUpdateData, getUpdateFee } = useUpdateData();
 	const { liquidityData, reserveData, account } = useAppData();
 	const router = useRouter();
+	const { chain } = useAccount();
 
 	const {
 		approve,
@@ -80,6 +81,13 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 	const inToken = tokens[inputAssetIndex];
 
 	useEffect(() => {
+		if (tabIndex == 0) {
+			setInputAmount("");
+			setOutputAmount("");
+		}
+	}, [tabIndex]);
+
+	useEffect(() => {
 		if (tokens.length > 1) {
 			const assetIndex = tokens.findIndex(
 				(token) =>
@@ -90,16 +98,12 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 		}
 	}, [tokens, inputAssetIndex]);
 
-	const { colorMode } = useColorMode();
-
 	useEffect(() => {
 		if (!account || !reserveData || !liquidityData || !outToken) return;
 
-		const inUsdScaled = outToken
-			? Big(Number(inputAmount) || 0)
+		const inUsdScaled = Big(Number(inputAmount) || 0)
 					.mul(Big(inToken.price.toString()).div(10 ** 8))
-					.mul(ONE_ETH)
-			: Big(0);
+					.mul(ONE_ETH);
 		let userTotalBalanceUSD = Big(account.userTotalBalanceUSD).add(
 			inUsdScaled
 		);
@@ -138,7 +142,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 			userTotalDebtUSD: userTotalDebtUSD.toString(),
 			userThresholdBalanceUSD: userThresholdBalanceUSD.toString(),
 		});
-	}, [inputAmount, outputAmount]);
+	}, [inputAmount, outputAmount, account]);
 
 	if (!account || !reserveData || !liquidityData || !outToken) return <></>;
 
@@ -153,8 +157,9 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 	};
 
 	const onInputTokenSelected = (e: number) => {
-		router.query.inputCurrency = tokens[e].id;
-		router.push(router);
+		const _router = {...router};
+		_router.query.inputCurrency = tokens[e].id;
+		router.push(_router);
 		setInputAssetIndex(e);
 		setInputAmount("" as any);
 		onInputClose();
@@ -253,7 +258,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 							</Text>
 							<Link
 								href={
-									chain?.blockExplorers?.default.url +
+									defaultChain?.blockExplorers?.default.url +
 									"/tx/" +
 									res.hash
 								}
@@ -283,7 +288,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 		let _outputAmount = Big(updatedAccount.userAdjustedBalanceUSD)
 			.sub(account.userTotalDebtUSD)
 			.div(outToken.price.toString())
-			.mul(0.99);
+			.mul(0.98);
 		return _outputAmount.toNumber();
 	};
 
@@ -298,7 +303,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 		) {
 			steps.push({
 				type: "APPROVAL",
-				isCompleted: false,
+				loading: approvalLoading,
 				data: {
 					amount: inputAmount,
 					token: inToken,
@@ -320,7 +325,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 		) {
 			steps.push({
 				type: "DELEGATION",
-				isCompleted: false,
+				loading: delegationLoading,
 				data: {
 					amount: inputAmount,
 					token: liquidityData.debtToken,
@@ -338,16 +343,16 @@ function AddLiquidity({updatedAccount, setUpdatedAccount}: any) {
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet" };
-		else if (chain?.unsupported)
+		else if (chain?.id !== defaultChain.id)
 			return { valid: false, message: "Unsupported Chain" };
-		if (loading) return { valid: false, message: "Loading..." };
+		else if (loading) return { valid: false, message: "Loading..." };
 		else if (
 			(Number(inputAmount) || 0) <= 0 &&
 			(Number(outputAmount) || 0) <= 0
 		)
 			return { valid: false, message: "Enter Amount" };
 		else if (
-			Big(inputAmount)
+			(Number(inputAmount) || 0) > 0 && Big(inputAmount)
 				.mul(Big(10).pow(inToken.decimals))
 				.gt(Big(inToken.balance.toString()))
 		)

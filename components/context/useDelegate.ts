@@ -80,12 +80,13 @@ const useDelegate = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
 					{ name: "deadline", type: "uint256" },
 				]
 			},
-			value: {
+			primaryType: "DelegationWithSig",
+			message: {
 				delegatee: address!,
 				delegator: spender as `0x${string}`,
-				value,
-				nonce: BigNumber.from(nonce.toString()),
-				deadline: BigNumber.from(_deadline),
+				value: value.toBigInt(),
+				nonce: BigNumber.from(nonce.toString()).toBigInt(),
+				deadline: BigNumber.from(_deadline).toBigInt()
 			}
 		})
 			.then(async (res: any) => {
@@ -94,7 +95,7 @@ const useDelegate = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
 				setDelegatedAmount(ethers.constants.MaxUint256.toString());
 				setLoading(false);
                 toast({
-                    title: "Delegation Signed Successfully",
+                    title: "Delegation Signed",
                     description: `You have signed a permit for delegation of ${token.symbol}`,
                     status: "success",
                     duration: 10000,

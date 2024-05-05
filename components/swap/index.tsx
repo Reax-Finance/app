@@ -1,16 +1,14 @@
 import { Box, useDisclosure, Text, Flex, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { getContract, send, estimateGas } from "../../src/contract";
-import { useAccount, useNetwork, useSignTypedData } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import TokenSelector from "./TokenSelector";
-import { ADDRESS_ZERO, EIP712_VERSION, ROUTER_ENDPOINT, WETH_ADDRESS, defaultChain, tokenFormatter } from "../../src/const";
+import { ADDRESS_ZERO, defaultChain, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from '@chakra-ui/react';
 import useUpdateData from "../utils/useUpdateData";
-import { useBalanceData } from "../context/BalanceProvider";
 import { usePriceData } from "../context/PriceContext";
-import axios from 'axios';
 import SwapLayout from "./SwapLayout";
 import Big from "big.js";
 import { BigNumber, ethers } from "ethers";
@@ -18,8 +16,8 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 import { useAppData } from "../context/AppDataProvider";
-import { Asset } from "../utils/types";
 import { useRouter } from "next/router";
+import useApproval from "../context/useApproval";
 
 interface ApprovalStep {
 	type: "APPROVAL" | "PERMIT";
@@ -36,9 +34,8 @@ function Swap() {
 	const [gas, setGas] = useState(0);
 	const [error, setError] = useState('');
 	
-	const { chain } = useNetwork();
 	const { prices } = usePriceData();
-	const { isConnected, address } = useAccount();
+	const { isConnected, address, chain } = useAccount();
 
 	const {
 		isOpen: isInputOpen,
@@ -63,6 +60,8 @@ function Swap() {
 	const [deadline, setDeadline] = useState('0');
 	const [nonce, setNonce] = useState(-1);
 
+	const { approve } = useApproval({});
+
 	const router = useRouter();
 	
 	const { liquidityData } = useAppData();
@@ -81,9 +80,6 @@ function Swap() {
 	
 	const handleError = useHandleError(PlatformType.DEX);
 
-	const isUnwrap = (inToken?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id) && outToken?.id == ADDRESS_ZERO);
-	const isWrap = (inToken?.id == ADDRESS_ZERO && outToken?.id == WETH_ADDRESS(chain?.id ?? defaultChain.id));
-
 	useEffect(() => {
 		if(!inToken) return;
 		const contract = getContract("ERC20Permit", inToken.id);
@@ -101,22 +97,14 @@ function Swap() {
 			setOutputAmount('0');
 			return;
 		}
-		if(isWrap || isUnwrap){
-			setOutputAmount(value);
-		} else {
-			setOutputAmount(Big(value).mul(inToken.price.toString()).div(outToken.price.toString()).toString());
-		}
+		setOutputAmount(Big(value).mul(inToken.price.toString()).div(outToken.price.toString()).toString());
 	};
 
 	const updateOutputAmount = (value: any) => {
 		value = parseInput(value);
 		setOutputAmount(value);
 		if (isNaN(Number(value)) || Number(value) == 0) return;
-		if(isWrap || isUnwrap){
-			setInputAmount(value);
-		} else {
-			setInputAmount(Big(value).mul(outToken.price.toString()).div(inToken.price.toString()).toString());
-		}
+		setInputAmount(Big(value).mul(outToken.price.toString()).div(inToken.price.toString()).toString());
 	};
 
 	const onInputTokenSelected = (e: number) => {
@@ -194,7 +182,7 @@ function Swap() {
 						<Text>
 							{`You have swapped ${inputAmount} ${inToken?.symbol} for ${outToken?.symbol}`}
 						</Text>
-						<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
+						<Link href={defaultChain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 							<Flex align={'center'} gap={2}>
 							<ExternalLinkIcon />
 							<Text>View Transaction</Text>
@@ -222,92 +210,6 @@ function Swap() {
 			})
 	};
 
-	const approveTx = (token: Asset, routerAddress: string) => {
-		setLoading(true);
-		const tokenContract = getContract("ERC20", token.id);
-		send(tokenContract, "approve", [routerAddress, ethers.constants.MaxUint256])
-		.then(async (res: any) => {
-			await res.wait();
-			setLoading(false);
-			toast({
-				title: "Approval Successful",
-				description: <Box>
-					<Text>
-						{`You have approved ${token.symbol}`}
-					</Text>
-					<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
-						<Flex align={'center'} gap={2}>
-						<ExternalLinkIcon />
-						<Text>View Transaction</Text>
-						</Flex>
-					</Link>
-				</Box>,
-				status: "success",
-				duration: 10000,
-				isClosable: true,
-				position: "top-right"
-			})
-		}).catch((err: any) => {
-			handleError(err);
-			setLoading(false);
-		})
-	};
-
-	const approve = async (token: Asset, routerAddress: string) => {
-		setLoading(true);
-		const _deadline =(Math.floor(Date.now() / 1000) + 60 * deadline_m).toFixed(0);
-		// const _amount = Big(inputAmount).toFixed(token.decimals, 0);
-		const value = ethers.constants.MaxUint256;
-		console.log(getContract("ERC20Permit", token.id));
-		const version = (await (getContract("ERC20Permit", token.id)).eip712Domain()).version;
-		signTypedDataAsync({
-			domain: {
-				name: token.name,
-				version: version,
-				chainId: defaultChain.id,
-				verifyingContract: token.id as any,
-			},
-			types: {
-				Permit: [
-					{ name: "owner", type: "address" },
-					{ name: "spender", type: "address" },
-					{ name: "value", type: "uint256" },
-					{ name: "nonce", type: "uint256" },
-					{ name: "deadline", type: "uint256" },
-				]
-			},
-			value: {
-				owner: address!,
-				spender: routerAddress as any,
-				value,
-				nonce: BigNumber.from(nonce.toString()),
-				deadline: BigNumber.from(_deadline),
-			}
-		})
-			.then(async (res: any) => {
-				setData(res);
-				setDeadline(_deadline);
-				setApprovedAmount(ethers.constants.MaxUint256.toString());
-				setLoading(false);
-				toast({
-					title: "Approval Signed",
-					description: <Box>
-						<Text>
-							{`For use of ${token.symbol}`}
-						</Text>
-					</Box>,
-					status: "info",
-					duration: 10000,
-					isClosable: true,
-					position: "top-right"
-				})
-			})
-			.catch((err: any) => {
-				handleError(err);
-				setLoading(false);
-			});
-	};
-
 	const getSteps = () => {
 		let steps: ApprovalStep[] = [];
 		if(!inToken) return steps;
@@ -329,7 +231,7 @@ function Swap() {
 						amount: inputAmount,
 						token: inToken
 					},
-					execute: () => approveTx(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!)
+					execute: () => approve(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!)
 				})
 			}
 		}
@@ -338,9 +240,9 @@ function Swap() {
 
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
-		else if (chain?.unsupported) return {valid: false, message: "Unsupported Chain"}
-		if(loading) return {valid: false, message: "Loading..."}
-		if(error.length > 0) return {valid: false, message: error}
+		else if (chain?.id !== defaultChain.id) return {valid: false, message: "Unsupported Chain"}
+		else if (loading) return {valid: false, message: "Loading..."}
+		else if (error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
 		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
 		else if (Big(Number(inputAmount) || 0).mul(Big(10).pow(inToken.decimals)).gt(inToken.balance.toString())) return {valid: false, message: "Insufficient Balance"}

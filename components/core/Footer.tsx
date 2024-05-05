@@ -10,18 +10,17 @@ import {
 } from '@chakra-ui/react';
 import { FaTwitter, FaDiscord, FaGithub } from 'react-icons/fa';
 import { AppDataContext } from '../context/AppDataProvider';
-import { useBlockNumber, useNetwork } from 'wagmi';
+import { useBlockNumber } from 'wagmi';
 import { Switch } from '@chakra-ui/react'
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { BsBook } from 'react-icons/bs';
 import { defaultChain } from '../../src/const';
+import { watch } from 'fs';
 
 export default function Footer() {
-  const [block, setBlock] = useState(0);
-  const {} = useBlockNumber({
-    onBlock: (blockNumber: number) => {
-      setBlock(blockNumber);
-    }
+  // const [block, setBlock] = useState(0);
+  const block = useBlockNumber({
+    watch: true,
   });
 
   const { colorMode, toggleColorMode } = useColorMode();
@@ -30,7 +29,7 @@ export default function Footer() {
     <Box
       color={'whiteAlpha.400'}
       bg='transparent'
-      // pb={2}
+      pb={2}
       >
       <Box
         borderTopWidth={1}
@@ -49,8 +48,8 @@ export default function Footer() {
           >
             <Flex zIndex={1000} flexDir={{base: 'column', md: 'row'}} align={'center'} gap={1}>
               <Flex align={'center'} gap={1}>
-                <Box h={2} w={2} bgColor={block == 0 ? 'red': 'green.400'} rounded='100'></Box>
-                <Text fontSize={'xs'}>{defaultChain?.name} ({block == 0 ? 'Not Connected': block})</Text>
+                <Box h={2} w={2} bgColor={Number(block.data?.toString()) == 0 ? 'red': 'green.400'} rounded='100'></Box>
+                <Text fontSize={'xs'}>{defaultChain?.name} ({Number(block.data?.toString()) == 0 ? 'Not Connected': block?.data?.toString()})</Text>
               </Flex>
               <Text fontSize={'xs'} color={'whiteAlpha.600'}>v0.1.0-testnet</Text>
             </Flex>

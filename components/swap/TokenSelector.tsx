@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 
 import { useContext, useState, useEffect } from "react";
-import { AppDataContext } from "../context/AppDataProvider";
 import { tokenFormatter } from "../../src/const";
 
 import {
@@ -24,11 +23,8 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from "@chakra-ui/react";
-import { useBalanceData } from "../context/BalanceProvider";
-import { ethers } from "ethers";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { MdTrendingUp, MdVerified } from "react-icons/md";
-import whitelistedTokens from "../../src/whitelistedTokens";
 import { VARIANT } from "../../styles/theme";
 import Big from "big.js";
 
@@ -43,9 +39,7 @@ function TokenSelector({
 	tokens
 }: any) {
 	const [searchedTokens, setSearchedTokens] = useState<any[]>([]);
-	const { walletBalances, tokens: _tokens } = useBalanceData();
-	const {chain} = useNetwork();
-	const {isConnected} = useAccount();
+	const {isConnected, address} = useAccount();
 
 	const selectToken = (tokenIndex: number) => {
 		onTokenSelected(tokenIndex);
@@ -55,7 +49,7 @@ function TokenSelector({
 		if (tokens.length > 1) {
 			searchToken("");
 		}
-	}, [tokens.length]);
+	}, [tokens.length, address]);
 
 	const searchToken = (searchTerm: string) => {
 		// search token from all pool _mintedTokens
@@ -70,10 +64,7 @@ function TokenSelector({
 					.toLowerCase()
 					.includes(searchTerm.toLowerCase())
 			) {
-				_searchedTokens.push({
-					..._token,
-					tokenIndex: j,
-				});
+				_searchedTokens.push(j);
 			}
 		}
 		setSearchedTokens(_searchedTokens);
@@ -138,7 +129,7 @@ function TokenSelector({
 						{/* Token List */}
 						<Box mx={-6} mt={-2}>
 						{searchedTokens.map(
-							(token: any, tokenIndex: number) => (
+							(tokenIndex: number) => tokens[tokenIndex] && (
 								<Box key={tokenIndex}>
 								{tokenIndex > 0 && <Divider borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.400'} /> }
 								<Flex
@@ -152,7 +143,7 @@ function TokenSelector({
 									}}
 									onClick={() =>
 										selectToken(
-											token.tokenIndex
+											tokenIndex
 										)
 									}
 								>
@@ -167,7 +158,7 @@ function TokenSelector({
 											<Image
 												src={
 													"/icons/" +
-													token.symbol +
+													tokens[tokenIndex].symbol +
 													".svg"
 												}
 												height={'40px'}
@@ -177,7 +168,7 @@ function TokenSelector({
 											<Box>
 												<Flex gap={1} align={'center'}>
 												<Text>
-													{token.symbol}
+													{tokens[tokenIndex].symbol}
 												</Text>
 												{/* {whitelistedTokens.includes(token.id) && ( */}
 													<Tooltip label={'Verified'}>
@@ -194,7 +185,7 @@ function TokenSelector({
 													}
 													fontSize={"sm"}
 												>
-													{token.name}
+													{tokens[tokenIndex].name}
 												</Text>
 											</Box>
 										</Flex>
@@ -207,7 +198,7 @@ function TokenSelector({
 									>
 										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
 										<Text fontSize={"md"}>
-											{tokenFormatter.format(Big(token.balance ?? 0).div(10 ** (token.decimals ?? 18)).toNumber())}
+											{tokenFormatter.format(Big(tokens[tokenIndex].balance ?? 0).div(10 ** (tokens[tokenIndex].decimals ?? 18)).toNumber())}
 										</Text>
 									</Box>}
 								</Flex>

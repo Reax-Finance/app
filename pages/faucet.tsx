@@ -59,7 +59,7 @@ import {
 	ModalCloseButton,
 } from "@chakra-ui/react";
 import { getContract, send } from "../src/contract";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { useBalanceData } from "../components/context/BalanceProvider";
 import Big from "big.js";
@@ -67,16 +67,15 @@ import { VARIANT } from "../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
 import ThBox from "../components/ui/table/ThBox";
 import TdBox from "../components/ui/table/TdBox";
+import { defaultChain } from "../src/const";
 
 export default function Faucet() {
 	const { reserveData } = useAppData();
-	const { updateFromTx } = useBalanceData();
 	const [loading, setLoading] = React.useState<any>(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [openedCollateral, setOpenedCollateral] = React.useState<any>(null);
 
-	const { address, isConnected } = useAccount();
-	const { chain } = useNetwork();
+	const { address, isConnected, chain } = useAccount();
 
 	const tokens = reserveData
 		? reserveData.vaults.map((vault: any) => vault.asset)
@@ -143,7 +142,7 @@ export default function Faucet() {
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet." };
-		else if (chain?.unsupported)
+		else if (chain?.id !== defaultChain.id)
 			return { valid: false, message: "Unsupported network" };
 		else return { valid: true, message: "Mint" };
 	};
@@ -151,7 +150,7 @@ export default function Faucet() {
 	const { colorMode } = useColorMode();
 
 	return (
-		<>
+		<Box h={'60vh'}>
 			<Head>
 				<title>
 					Test Faucet | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
@@ -286,7 +285,7 @@ export default function Faucet() {
 
 			{openedCollateral && (
 				<Modal isOpen={isOpen} onClose={_onClose} isCentered>
-					<ModalOverlay />
+					<ModalOverlay bg={"blackAlpha.800"} backdropFilter={"blur(30px)"} />
 					<ModalContent
 						rounded={0}
 						bg={"transparent"}
@@ -341,6 +340,6 @@ export default function Faucet() {
 					</ModalContent>
 				</Modal>
 			)}
-		</>
+		</Box>
 	);
 }

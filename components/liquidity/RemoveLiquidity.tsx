@@ -9,9 +9,9 @@ import {
 	Divider,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useAccount, useNetwork, useSignTypedData } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import Head from "next/head";
-import { ADDRESS_ZERO, ONE_ETH } from "../../src/const";
+import { ADDRESS_ZERO, ONE_ETH, defaultChain } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
 import useUpdateData from "../utils/useUpdateData";
@@ -40,12 +40,11 @@ interface ApprovalStep {
 	}
 }
 
-function RemoveLiquidity({ updatedAccount, setUpdatedAccount }: any) {
+function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	const [inputAssetIndex, setInputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState("");
 	const [outputAmount, setOutputAmount] = useState("");
-	const { chain } = useNetwork();
-	const { isConnected, address } = useAccount();
+	const { isConnected, address, chain } = useAccount();
 
 	const {
 		isOpen: isInputOpen,
@@ -79,10 +78,17 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount }: any) {
 
 	// only if vaults[i].userBalance > 0
 	const tokens = reserveData
-		? reserveData.vaults.filter((vault) => ((Big(vault.userBalance.toString()).gt(0) || !isConnected) && vault.asset.id !== ethers.constants.AddressZero)).map((vault) => ({...vault.vaultToken, name: vault.asset.name, symbol: vault.asset.symbol, decimals: vault.asset.decimals, asset: vault.asset })) 
+		? reserveData.vaults.filter((vault) => ((Big(vault.userBalance.toString()).gt(0) || Big(account?.userTotalBalanceUSD?.toString() || 0).eq(0)) && vault.asset.id !== ethers.constants.AddressZero)).map((vault) => ({...vault.vaultToken, name: vault.asset.name, symbol: vault.asset.symbol, decimals: vault.asset.decimals, asset: vault.asset })) 
 		: [];
 	const outToken = liquidityData?.lpToken;
 	const inToken = tokens[inputAssetIndex];
+
+	useEffect(() => {
+		if (tabIndex == 1) {
+			setInputAmount("");
+			setOutputAmount("");
+		}
+	}, [tabIndex]);
 
 	useEffect(() => {
 		if (tokens.length > 1) {
@@ -241,7 +247,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount }: any) {
 							</Text>
 							<Link
 								href={
-									chain?.blockExplorers?.default.url +
+									defaultChain?.blockExplorers?.default.url +
 									"/tx/" +
 									res.hash
 								}
@@ -317,8 +323,8 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount }: any) {
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet" };
-		else if (chain?.unsupported)
-			return { valid: false, message: "Unsupported Chain" };
+		// else if (chain?.)
+		// 	return { valid: false, message: "Unsupported Chain" };
 		if (loading) return { valid: false, message: "Loading..." };
 		else if (
 			(Number(inputAmount) || 0) <= 0 &&
@@ -326,7 +332,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount }: any) {
 		)
 			return { valid: false, message: "Enter Amount" };
 		else if (
-			Big(outputAmount)
+			(Number(outputAmount) || 0) > 0 && Big(outputAmount)
 				.mul(ONE_ETH)
 				.gt(outToken.balance.toString())
 		)

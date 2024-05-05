@@ -7,95 +7,59 @@ import "../styles/rounded-light.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import {
+	Chain,
 	RainbowKitProvider,
 	connectorsForWallets,
+	getDefaultConfig,
 } from "@rainbow-me/rainbowkit";
-import {
-	coinbaseWallet,
-	metaMaskWallet,
-	phantomWallet,
-	rainbowWallet,
-	trustWallet,
-	walletConnectWallet,
-} from "@rainbow-me/rainbowkit/wallets";
-import {
-	configureChains,
-	createClient,
-	WagmiConfig,
-	Chain,
-	mainnet,
-} from "wagmi";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
 import { Box, ChakraProvider, Flex } from "@chakra-ui/react";
 import Index from "./_index";
 
 import { AppDataProvider } from "../components/context/AppDataProvider";
 import { theme } from "../styles/theme";
-import rainbowTheme from "../styles/rainbowTheme";
-import { rabbyWallet } from "@rainbow-me/rainbowkit/wallets";
 import { PROJECT_ID, APP_NAME, defaultChain } from "../src/const";
 import {
 	BalanceContext,
 	BalanceContextProvider,
 } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
+import "@rainbow-me/rainbowkit/styles.css";
+
+import { WagmiProvider } from "wagmi";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 const _chains = [];
 _chains.push(defaultChain);
 
 export const __chains: Chain[] = _chains;
 
-const { chains, provider } = configureChains(_chains, [
-	publicProvider(),
-]);
-
-const connectors = connectorsForWallets([
-	{
-		groupName: "Recommended",
-		wallets: [
-			metaMaskWallet({ chains, projectId: PROJECT_ID }),
-			walletConnectWallet({ projectId: PROJECT_ID, chains }),
-		],
-	},
-	{
-		groupName: "All Wallets",
-		wallets: [
-			rainbowWallet({ projectId: PROJECT_ID, chains }),
-			trustWallet({ projectId: PROJECT_ID, chains }),
-			phantomWallet({ chains }),
-			coinbaseWallet({ appName: APP_NAME ?? "Synth", chains }),
-			rabbyWallet({ chains }),
-		],
-	},
-]);
-
-const wagmiClient = createClient({
-	autoConnect: true,
-	connectors,
-	provider,
+const config = getDefaultConfig({
+	appName: "My RainbowKit App",
+	projectId: "YOUR_PROJECT_ID",
+	chains: [defaultChain],
+	ssr: true, // If your dApp uses server side rendering (SSR)
 });
+
+const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<ChakraProvider theme={theme}>
-			<WagmiConfig client={wagmiClient}>
-				<RainbowKitProvider
-					chains={chains}
-					modalSize="compact"
-					theme={rainbowTheme}
-				>
-					<AppDataProvider>
-						<BalanceContextProvider>
-							<PriceContextProvider>
+			<WagmiProvider config={config}>
+				<QueryClientProvider client={queryClient}>
+					<RainbowKitProvider>
+						<AppDataProvider>
+							<BalanceContextProvider>
+								<PriceContextProvider>
 									<Index>
 										<Component {...pageProps} />
 									</Index>
-							</PriceContextProvider>
-						</BalanceContextProvider>
-					</AppDataProvider>
-				</RainbowKitProvider>
-			</WagmiConfig>
+								</PriceContextProvider>
+							</BalanceContextProvider>
+						</AppDataProvider>
+					</RainbowKitProvider>
+				</QueryClientProvider>
+			</WagmiProvider>
 		</ChakraProvider>
 	);
 }

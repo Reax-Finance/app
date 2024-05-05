@@ -14,9 +14,31 @@ export default function Liquidity() {
     const { account } = useAppData();
 	const router = useRouter();
 	const { colorMode } = useColorMode();
+	const [tabIndex, setTabIndex] = React.useState(0);
+
+	useEffect(() => {
+		const action = router.query.action;
+		if (action === "add") {
+			setTabIndex(0);
+		} else if (action === "remove") {
+			setTabIndex(1);
+		}
+	})
+
+	const onChangeTab = (index: number) => {
+		setTabIndex(index);
+		let _router = { ...router };
+		if (index === 0) {
+			router.query.action = "add";
+		} else {
+			router.query.action = "remove";
+		}
+		// router.push(_router);
+	}
 
     useEffect(() => {
-        if(account) {
+        if(account && !updatedAccount) {
+			console.log(account);
             setUpdatedAccount(account as any);
         }
     }, [account])
@@ -25,7 +47,7 @@ export default function Liquidity() {
 
 	return (
 		<>
-			<Flex flexDir={{base: "column", md: 'row'}} gap={"4"}>
+			<Flex flexDir={{base: "column", md: 'row'}} gap={"2"}>
 				<Box
 					w={{base: "100%", md: "25%"}}
 					className={`${VARIANT}-${colorMode}-containerBody`}
@@ -37,12 +59,11 @@ export default function Liquidity() {
 
 				<Box
 					w={{base: "100%", md: "50%"}}
-					minH={{base: 0, md: "500px"}}
-					flex={1}
 					className={`${VARIANT}-${colorMode}-containerBody`}
 					order={{base: 0, md: 1}}
+					h={'500px'}
 				>
-					<Tabs isFitted colorScheme="orange">
+					<Tabs isFitted colorScheme="orange" index={tabIndex} onChange={onChangeTab}>
 						<Box
 							className={`${VARIANT}-${colorMode}-containerHeader`}
 							px={0}
@@ -72,10 +93,10 @@ export default function Liquidity() {
 
 							<TabPanels>
 								<TabPanel p={0}>
-									<AddLiquidity updatedAccount={updatedAccount} setUpdatedAccount={setUpdatedAccount} />
+									<AddLiquidity updatedAccount={updatedAccount} setUpdatedAccount={setUpdatedAccount} tabIndex={tabIndex} />
 								</TabPanel>
 								<TabPanel p={0}>
-									<RemoveLiquidity updatedAccount={updatedAccount} setUpdatedAccount={setUpdatedAccount} />
+									<RemoveLiquidity updatedAccount={updatedAccount} setUpdatedAccount={setUpdatedAccount} tabIndex={tabIndex} />
 								</TabPanel>
 							</TabPanels>
 
