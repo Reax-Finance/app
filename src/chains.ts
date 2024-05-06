@@ -1,3 +1,31 @@
+export const tenderlyMainnet = {
+    id: 1947,
+    chainId: 1947,
+    name: "Reax Environment",
+    network: "rx-mainnet",
+    nativeCurrency: {
+        name: "Ethereum",
+        symbol: "ETH",
+        decimals: 18
+    },
+    rpcUrls: {
+        default: {
+            http: ["https://virtual.mainnet.rpc.tenderly.co/f80217bf-a429-41cf-8962-13a6d30a24ab"],
+            // webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
+        },
+        public: {
+            http: ["https://virtual.mainnet.rpc.tenderly.co/f80217bf-a429-41cf-8962-13a6d30a24ab"],
+            // readonly webSocket: readonly ["wss://alpha-rpc.scroll.io/l2/ws"];
+        }
+    },
+    blockExplorers: {
+        default: {
+            name: "Etherscan",
+            url: "https://dashboard.tenderly.co/explorer/vnet/f80217bf-a429-41cf-8962-13a6d30a24ab"
+        }
+    },
+    testnet: true
+}
 
 export const mantleTestnet = {
     id: 5001,

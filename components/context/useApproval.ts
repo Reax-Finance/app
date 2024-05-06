@@ -63,11 +63,13 @@ const useApproval = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
 	const signPermit = async (token: any, spender: string, amount: string, nonce: string) => {
 		const _deadline =(Math.floor(Date.now() / 1000) + 60 * deadline_m).toFixed(0);
 		const value = ethers.constants.MaxUint256;
-		const version = (await (getContract("ERC20Permit", token.id)).eip712Domain()).version;
+		const domain = await (getContract("ERC20Permit", token.id)).eip712Domain();
+		const version = domain.version;
+		const name = domain.name;
 		signTypedDataAsync({
 			domain: {
-				name: token.name,
-				version: version,
+				name,
+				version,
 				chainId: defaultChain.id,
 				verifyingContract: token.id,
 			},

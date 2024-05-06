@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet } from "./chains";
+import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet, tenderlyMainnet } from "./chains";
 import Big from "big.js";
-import { Chain, mainnet, sepolia } from "wagmi/chains";
+import { Chain, baseSepolia, mainnet, sepolia } from "wagmi/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
 export const ONE_ETH = Big(1e18);
@@ -11,6 +11,8 @@ const NETWORKS: any = {
 	[lineaMainnet.id]: lineaMainnet,
 	[lineaTestnet.id]: lineaTestnet,
 	[sepolia.id]: sepolia,
+	[tenderlyMainnet.id]: tenderlyMainnet,
+	[baseSepolia.id]: baseSepolia,
 }
 
 export const defaultChain: Chain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
@@ -33,7 +35,13 @@ const _WETH_ADDRESS: any = {
     [mantleMainnet.id]: "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8".toLowerCase(),
 	[lineaTestnet.id]: "0x2c1b868d6596a18e32e61b901e4060c872647b6c".toLowerCase(),
 	[sepolia.id]: "0x3c348AdCFd2004984a427B21FA2e108DcdF656aC".toLowerCase(),
+	[tenderlyMainnet.id]: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase(),
 };
+
+const NATIVE_FAUCET_LINK: any = {
+	[baseSepolia.id]: "https://www.alchemy.com/faucets/base-sepolia",
+	[sepolia.id]: "https://www.alchemy.com/faucets/ethereum-sepolia",
+}
 
 // Per block fetching frequency
 export const DATA_FETCH_FREQUENCY: any = {

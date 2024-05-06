@@ -17,7 +17,8 @@ import { useAccount } from "wagmi";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
 import { CustomConnectButton } from "./ConnectButton";
-import { MdOpenInNew } from "react-icons/md";
+import { MdFeedback, MdOpenInNew } from "react-icons/md";
+import { RiFeedbackLine } from "react-icons/ri";
 
 function NavBar() {
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
@@ -79,7 +80,6 @@ function NavBar() {
 									aria-label={"Toggle Navigation"}
 									rounded={0}
 								/>
-								<CustomConnectButton />
 
 							</Flex>
 						</Flex>
@@ -102,13 +102,13 @@ function NavBar() {
 									>
 										<Link
 											href={
-												"https://docs.google.com/forms/d/e/1FAIpQLSes7aa3khrpH_duozRG5llQRZA2V6j03mGswm3qXcMxwcKekQ/viewform"
+												"https://forms.gle/qD8bE1gGMqAxujpz7"
 											}
 											target={"_blank"}
 										>
-											<Flex gap={2}>
+											<Flex gap={2} align={'center'} color="white" >
+												<RiFeedbackLine size={'20'} />
 												<Text>Feedback</Text>
-												<MdOpenInNew />
 											</Flex>
 										</Link>
 									</Button>
@@ -151,6 +151,9 @@ const MobileNav = ({}: any) => {
 				title={"Liquidity"}
 			></NavLocalLink>
 			<Divider orientation={"vertical"} />
+			<CustomConnectButton />
+			<Divider orientation={"vertical"} />
+
 			<Flex>
 				<Box>
 					<Button
@@ -161,19 +164,20 @@ const MobileNav = ({}: any) => {
 					>
 						<Link
 							href={
-								"https://docs.google.com/forms/d/e/1FAIpQLSes7aa3khrpH_duozRG5llQRZA2V6j03mGswm3qXcMxwcKekQ/viewform"
+								"https://forms.gle/qD8bE1gGMqAxujpz7"
 							}
 							target={"_blank"}
 						>
 							<Flex gap={2}>
-								<Text>Give Feedback</Text>
-								<MdOpenInNew />
+
+								<MdFeedback />
 							</Flex>
 						</Link>
 					</Button>
 				</Box>
 			</Flex>
 			<Divider orientation={"vertical"} />
+
 		</Flex>
 	);
 };

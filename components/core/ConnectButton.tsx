@@ -2,6 +2,7 @@ import { Box, Button, useColorMode } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { VARIANT } from '../../styles/theme';
+import { defaultChain } from '../../src/const';
 
 
 export const CustomConnectButton = () => {
@@ -38,7 +39,7 @@ export const CustomConnectButton = () => {
                   </Box>
                 );
               }
-              if (chain.unsupported) {
+              if (chain.id !== defaultChain.id) {
                 return (
                   <Box className={`${VARIANT}-${colorMode}-errorButton`} >
                   <Button size={'md'}  onClick={openChainModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>

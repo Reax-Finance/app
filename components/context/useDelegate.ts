@@ -82,8 +82,8 @@ const useDelegate = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
 			},
 			primaryType: "DelegationWithSig",
 			message: {
-				delegatee: address!,
-				delegator: spender as `0x${string}`,
+				delegatee: spender as `0x${string}`,
+				delegator: address!,
 				value: value.toBigInt(),
 				nonce: BigNumber.from(nonce.toString()).toBigInt(),
 				deadline: BigNumber.from(_deadline).toBigInt()

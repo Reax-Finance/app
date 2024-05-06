@@ -29,26 +29,26 @@ export default function Index({ children }: any) {
 	const [loading, setLoading] = useState(false);
 	const [refresh, setRefresh] = useState(0);
 
-	useEffect(() => {
-		const handleStart = (url: any) => {
-			setLoading(true);
-			setRefresh(Math.random());
-		};
-		const handleComplete = (url: any) => {
-			setLoading(false);
-			setRefresh(Math.random());
-		};
+	// useEffect(() => {
+	// 	const handleStart = (url: any) => {
+	// 		setLoading(true);
+	// 		setRefresh(Math.random());
+	// 	};
+	// 	const handleComplete = (url: any) => {
+	// 		setLoading(false);
+	// 		setRefresh(Math.random());
+	// 	};
 
-		router.events.on("routeChangeStart", handleStart);
-		router.events.on("routeChangeComplete", handleComplete);
-		router.events.on("routeChangeError", handleComplete);
+	// 	router.events.on("routeChangeStart", handleStart);
+	// 	router.events.on("routeChangeComplete", handleComplete);
+	// 	router.events.on("routeChangeError", handleComplete);
 
-		return () => {
-			router.events.off("routeChangeStart", handleStart);
-			router.events.off("routeChangeComplete", handleComplete);
-			router.events.off("routeChangeError", handleComplete);
-		};
-	}, [loading, refresh]);
+	// 	return () => {
+	// 		router.events.off("routeChangeStart", handleStart);
+	// 		router.events.off("routeChangeComplete", handleComplete);
+	// 		router.events.off("routeChangeError", handleComplete);
+	// 	};
+	// }, [loading, refresh]);
 
 	const { status, message } = useContext(AppDataContext);
 	const { chain } = useAccount();
@@ -77,11 +77,11 @@ export default function Index({ children }: any) {
 	return (
 		<Box h={'100vh'}>
 			{/* Wrong Chain */}
-			{chain && chain?.id !== defaultChain.id && (
+			{chain?.id !== defaultChain.id && (
 				<Flex
 					align={"center"}
 					justify={"center"}
-					bgColor="primary.600"
+					bgColor="primary.400"
 					color={"white"}
 					h={8}
 				>
@@ -89,6 +89,7 @@ export default function Index({ children }: any) {
 						textAlign={"center"}
 						fontSize={"sm"}
 						fontWeight="medium"
+						color={'black'}
 					>
 						Please switch to {defaultChain.name} Network to use this
 						app

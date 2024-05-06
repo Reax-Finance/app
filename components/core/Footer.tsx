@@ -20,7 +20,7 @@ import { watch } from 'fs';
 export default function Footer() {
   // const [block, setBlock] = useState(0);
   const block = useBlockNumber({
-    watch: true,
+    // watch: true,
   });
 
   const { colorMode, toggleColorMode } = useColorMode();

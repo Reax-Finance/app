@@ -87,7 +87,7 @@ export default function PoolLiquidity() {
                 <PoolStat icon={<IoIosWater />} title={'Total Liquidity'} value={Big(liquidityData?.totalDebtUSD?.toString() || '0').div(ONE_ETH).toNumber()} formatter={dollarFormatter.format} />
                 <Box className={`${VARIANT}-${colorMode}-containerBody2`}>
                     <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'rLP Composition'} value={Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()} formatter={
-						(value: any) => dollarFormatter.format(value) + " / rLP"  
+						(value: any) => "Price: " + dollarFormatter.format(value) + " / rLP"  
                     } />
                     <PieChart width={250} height={200}>
                         <Pie

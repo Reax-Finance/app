@@ -142,7 +142,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 			userTotalDebtUSD: userTotalDebtUSD.toString(),
 			userThresholdBalanceUSD: userThresholdBalanceUSD.toString(),
 		});
-	}, [inputAmount, outputAmount, account]);
+	}, [inputAmount, outputAmount]);
 
 	if (!account || !reserveData || !liquidityData || !outToken) return <></>;
 
@@ -292,7 +292,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		let _outputAmount = Big(updatedAccount.userAdjustedBalanceUSD)
 			.sub(account.userTotalDebtUSD)
 			.div(outToken.price.toString())
-			.mul(0.98);
+			.mul(0.99);
 		return _outputAmount.toNumber();
 	};
 

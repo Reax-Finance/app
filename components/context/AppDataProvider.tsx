@@ -40,13 +40,14 @@ function AppDataProvider({ children }: any) {
 			let _address = address || ADDRESS_ZERO;
 			let chainId = defaultChain.id;
 			const start = Date.now();
-			console.log("Fetching data for", _address, chainId, updateData);
+			console.log("Fetching data for", _address, chainId);
 			// if(first) setStatus(Status.FETCHING);
 			const uidp = getContract("UIDataProvider", process.env.NEXT_PUBLIC_UIDP_ADDRESS!);
 			uidp.callStatic.multicall([
 				uidp.interface.encodeFunctionData("updatePythData", [updateData]),
 				uidp.interface.encodeFunctionData("getAllData", [_address]),
 			])
+			// uidp.getAllData(_address)
 				.then(async (res: any) => {
 					res = uidp.interface.decodeFunctionResult("getAllData", res[1])[0];
 					console.log("Data latency", Date.now() - start, "ms");
@@ -78,7 +79,7 @@ function AppDataProvider({ children }: any) {
 		const intervalId = setTimeout(async () => {
 				let _updateData = await getUpdateData(getAllPythFeeds(reserveData, liquidityData));
 				setUpdateData(_updateData);
-		}, 4000);
+		}, 8000);
 	
 		// Clean up function
 		return () => clearInterval(intervalId);

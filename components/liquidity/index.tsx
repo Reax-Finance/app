@@ -26,6 +26,7 @@ export default function Liquidity() {
 	})
 
 	const onChangeTab = (index: number) => {
+		setUpdatedAccount(account as any);
 		setTabIndex(index);
 		let _router = { ...router };
 		if (index === 0) {
@@ -33,14 +34,15 @@ export default function Liquidity() {
 		} else {
 			router.query.action = "remove";
 		}
-		// router.push(_router);
+		router.push(_router);
 	}
 
     useEffect(() => {
         if(account && !updatedAccount) {
+			console.log("Setting updated account");
             setUpdatedAccount(account as any);
         }
-    }, [account])
+    }, [account, updatedAccount])
 
     if(!updatedAccount) return <></>;
 
@@ -60,7 +62,7 @@ export default function Liquidity() {
 					w={{base: "100%", md: "50%"}}
 					className={`${VARIANT}-${colorMode}-containerBody`}
 					order={{base: 0, md: 1}}
-					h={'500px'}
+					minH={'500px'}
 				>
 					<Tabs isFitted colorScheme="orange" index={tabIndex} onChange={onChangeTab}>
 						<Box

@@ -104,14 +104,15 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	useEffect(() => {
 		if (!account || !reserveData || !liquidityData || !outToken) return;
 
-		const inUsdScaled = outToken
-			? Big(Number(inputAmount) || 0)
-					.mul(Big(inToken.price.toString()).div(10 ** 8))
+		const inUsdScaled = inToken ? Big(Number(inputAmount) || 0)
+					.mul(Big(inToken.asset.price.toString()).div(10 ** 8))
 					.mul(ONE_ETH)
 			: Big(0);
+		// console.log("inUsdScaled", inUsdScaled.toString(), inToken);
 		let userTotalBalanceUSD = Big(account.userTotalBalanceUSD).sub(
 			inUsdScaled
 		);
+		// console.log("inUsdScaled-userTotalBalanceUSD", userTotalBalanceUSD.toString());
 		let userAdjustedBalanceUSD = Big(account.userAdjustedBalanceUSD).sub(
 			inUsdScaled.mul(
 				Big(
@@ -179,16 +180,16 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 		const updateFee = await getUpdateFee();
 		let calls = [];
 		let value = "0";
-		calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
+		// calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
 		if (Number(outputAmount) > 0) {
-			value = Big(value).add(updateFee).toString();
+			value = Big(value).add(updateFee).toFixed(0);
 			if (Big(approvedLpAmount).gt(0)) {
 				const { v, r, s } = ethers.utils.splitSignature(approvalLpData);
 				calls.push(
 					router.interface.encodeFunctionData("permit", [
 						address,
 						router.address,
-						liquidityData.debtToken.id,
+						liquidityData.lpToken.id,
 						approvedLpAmount,
 						approvalLpDeadline,
 						v,
@@ -202,7 +203,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 					address,
 					Big(outputAmount)
 						.mul(Big(10).pow(outToken.decimals))
-						.toFixed(),
+						.toFixed(0),
 				])
 			);
 		}
@@ -226,7 +227,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 						inToken.asset.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
-							.toFixed()
+							.toFixed(0)
 					])
 				);
 			}
@@ -274,14 +275,14 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 
 	const getSteps = () => {
 		let steps: ApprovalStep[] = [];
-		if (!inToken || !liquidityData.debtToken) return steps;
+		if (!inToken || !liquidityData.lpToken) return steps;
 		if (
 			Number(outputAmount) > 0 &&
 			Big(approvedLpAmount)
 				.add(liquidityData.lpToken.approvalToRouter.toString())
 				.lt(
 					Big(Number(outputAmount) || 0).mul(
-						10 ** liquidityData.debtToken.decimals
+						10 ** liquidityData.lpToken.decimals
 					)
 				)
 		) {

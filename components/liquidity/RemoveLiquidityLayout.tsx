@@ -51,7 +51,7 @@ export default function RemoveLiquidityLayout({
     steps,
     updatedAccount
 }: any) {
-    const { liquidityData } = useAppData();
+    const { liquidityData, account, reserveData } = useAppData();
     const { address, isConnected } = useAccount();
 	const { colorMode } = useColorMode();
     const { isOpen: isStakeOpen, onOpen: onStakeOpen, onClose: onStakeClose } = useDisclosure({
@@ -80,9 +80,13 @@ export default function RemoveLiquidityLayout({
     }
 
     const maxInput = () => {
-        let max = Big(updatedAccount.availableToMintUSD).mul(10**8).div(tokens[inputAssetIndex].price.toString()).div(10**tokens[inputAssetIndex].decimals).toString();
+        if(!account || !reserveData) return '0';
+        let max = Big(account.userAdjustedBalanceUSD).sub(Big(account.userTotalDebtUSD).sub(Big(Number(outputAmount) > 0 ? outputAmount : 0).mul(outToken.price.toString()))).mul(10000).div(reserveData.vaults[inputAssetIndex].config.baseLTV.toString()).div(tokens[inputAssetIndex].price.toString()).mul(10**8).div(ONE_ETH).toString();
+        // console.log(account.userTotalDebtUSD, Big(outputAmount).mul(outToken.price.toString()).toString());
         let balance = Big(tokens[inputAssetIndex].balance.toString()).div(10**tokens[inputAssetIndex].decimals).toString();
         let zero = Big(0);
+
+        // console.log("Max", max.div(ONE_ETH).toString(), "Balance", balance, "Zero", zero.toString());
         if(Big(max).lt(zero)) return zero.toString();
         return Big(max).lt(balance) ? max : balance;
     }

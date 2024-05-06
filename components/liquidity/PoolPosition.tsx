@@ -24,7 +24,7 @@ export default function PoolPosition({ updatedAccount }: any) {
 	const { account } = useAppData();
 	const formatHealthFactor = (hf: string) =>
 		Big(hf).div(ONE_ETH).gt(10) ? "10+" : Big(hf).div(ONE_ETH).toFixed(2);
-	if (!account) return <></>;
+	if (!account || !updatedAccount) return <></>;
 
 	return (
 		<Box className={`${VARIANT}-${colorMode}-containerBody`} p={4}>
@@ -78,11 +78,9 @@ export default function PoolPosition({ updatedAccount }: any) {
 export const PoolStat = ({ title, value, updatedValue, icon, formatter }: any) => {
 	const { colorMode } = useColorMode();
 	// if diff is greater than 1%
-	const hasChanged = updatedValue
-		? Big(value).gt(0) ? Math.abs(
-				Big(value).minus(Big(updatedValue)).div(Big(value)).toNumber()
-		  ) > 0.01 : true
-		: false;
+	const hasChanged = updatedValue !== undefined ? Math.abs(
+				(value - updatedValue) / value
+		  ) > 0.01 : false;
 
 	return (
 		<Flex

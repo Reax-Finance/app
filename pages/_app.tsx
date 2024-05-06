@@ -27,6 +27,8 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { tenderlyMainnet } from "../src/chains";
+import { sepolia } from "viem/chains";
 
 const _chains = [];
 _chains.push(defaultChain);
