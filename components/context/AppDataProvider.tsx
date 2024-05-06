@@ -12,9 +12,9 @@ import useUpdateData from "../utils/useUpdateData";
 export interface AppDataValue {
 	status: Status;
 	message: string;
-	fetchData: (
-		_address?: `0x${string}` | undefined
-	) => Promise<number>;
+	// fetchData: (
+	// 	_address?: `0x${string}` | undefined
+	// ) => Promise<number>;
 	account: Account|undefined,
 	reserveData: ReserveData|undefined;
 	liquidityData: LiquidityData|undefined;
@@ -26,7 +26,6 @@ function AppDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<AppDataValue['status']>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<AppDataValue['message']>("");
 	const [account, setAccount] = React.useState<Account>();
-	const [timeoutState, setTimeoutState] = React.useState<any>();
 	
 	const [reserveData, setReserveData] = React.useState<ReserveData>();
 	const [liquidityData, setLiquidityData] = React.useState<LiquidityData>();
@@ -34,22 +33,16 @@ function AppDataProvider({ children }: any) {
 	const { address, isConnected, isConnecting, isDisconnected } = useAccount();
 
 	const { getUpdateData, getAllPythFeeds } = useUpdateData();
+	const [updateData, setUpdateData] = React.useState<any[]>([]);
 
 	useEffect(() => {
-		fetchData();
-	}, [])
-
-	// We want to fetch data every 10 seconds
-	// Is called when the address changes from navbar
-	const fetchData = (_address = address, first = true, updateData: string[] = []): Promise<number> => {
-		let chainId = defaultChain.id;
-		const start = Date.now();
-		console.log("Fetching data for", _address, chainId);
-		return new Promise((resolve, reject) => {
-			if(first) setStatus(Status.FETCHING);
-			if(!_address) _address = ADDRESS_ZERO;
+		const fetchData = () => {
+			let _address = address || ADDRESS_ZERO;
+			let chainId = defaultChain.id;
+			const start = Date.now();
+			console.log("Fetching data for", _address, chainId, updateData);
+			// if(first) setStatus(Status.FETCHING);
 			const uidp = getContract("UIDataProvider", process.env.NEXT_PUBLIC_UIDP_ADDRESS!);
-			// uidp.getAllData(_address)
 			uidp.callStatic.multicall([
 				uidp.interface.encodeFunctionData("updatePythData", [updateData]),
 				uidp.interface.encodeFunctionData("getAllData", [_address]),
@@ -67,13 +60,8 @@ function AppDataProvider({ children }: any) {
 					});
 					setReserveData(res.reserveData);
 					setLiquidityData(res.liquidityData);
+					
 					setStatus(Status.SUCCESS);
-
-					resolve(Date.now() - start);
-					let _updateData = await getUpdateData(getAllPythFeeds(res.reserveData, res.liquidityData));
-					// Set a timeout to fetch data again
-					if(timeoutState) clearTimeout(timeoutState);
-					setTimeoutState(setTimeout(() => fetchData(_address, false, _updateData), 10000));
 				})
 				.catch(async (err: any) => {
 					console.log("Error", err);
@@ -82,14 +70,24 @@ function AppDataProvider({ children }: any) {
 						"Failed to fetch data. Please refresh the page and try again later."
 					);
 				});
-		});
-	};
+		};
+		// Fetch data immediately
+		fetchData();
+
+		// Then fetch data every 4 seconds
+		const intervalId = setTimeout(async () => {
+				let _updateData = await getUpdateData(getAllPythFeeds(reserveData, liquidityData));
+				setUpdateData(_updateData);
+		}, 4000);
 	
+		// Clean up function
+		return () => clearInterval(intervalId);
+	}, [address, updateData])
+
 	const value: AppDataValue = {
 		account,
 		status,
 		message,
-		fetchData,
 		reserveData,
 		liquidityData,
 	};

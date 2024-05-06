@@ -38,7 +38,6 @@ export default function Liquidity() {
 
     useEffect(() => {
         if(account && !updatedAccount) {
-			console.log(account);
             setUpdatedAccount(account as any);
         }
     }, [account])

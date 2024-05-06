@@ -155,6 +155,7 @@ export default function Index({ children }: any) {
 					bgSize={"cover"}
 					w={"100%"}
 					h={"100%"}
+					opacity={0.5}
 					position={"relative"}
 					bgPos={"top"}
 					zIndex={-8}
@@ -162,9 +163,9 @@ export default function Index({ children }: any) {
 				<Box
 					bgGradient={`linear(to-t, ${
 						colorMode == "dark" ? "black" : "white"
-					}Alpha.400, ${
+					}Alpha.600, ${
 						colorMode == "dark" ? "black" : "white"
-					}Alpha.800)`}
+					}Alpha.900)`}
 					bgSize={"cover"}
 					w={"100%"}
 					h={"100%"}

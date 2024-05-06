@@ -14,51 +14,17 @@ import {
 import React, { useEffect, useState } from "react";
 import "../../styles/Home.module.css";
 import { useAccount } from "wagmi";
-import { useContext } from "react";
-import { AppDataContext } from "../context/AppDataProvider";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
-import { Status } from "../utils/status";
 import { CustomConnectButton } from "./ConnectButton";
-import { VARIANT } from "../../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
-import { ADDRESS_ZERO } from "../../src/const";
-import { useAccountEffect } from 'wagmi'
 
 function NavBar() {
-	const { status, account, fetchData } = useContext(AppDataContext);
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
-	const [addressCache, setAddressCache] = useState<string|undefined>();
 
 	const {
-		address,
 		isConnected,
-		isConnecting,
-		connector: activeConnector,
 	} = useAccount();
-
-	useAccountEffect({
-		onConnect(data) {
-			console.log('Connected!', data)
-			fetchData(data.address)
-		},
-		onDisconnect() {
-			console.log('Disconnected!')
-			fetchData(ADDRESS_ZERO)
-		},
-	})
-
-	// On address change
-	useEffect(() => {
-		if(!addressCache){
-			setAddressCache(address);
-		}
-		else if (address && address != ADDRESS_ZERO && address != addressCache) {
-			console.log("Address changed", address);
-			setAddressCache(address);
-			fetchData(address);
-		}
-	}, [address]);
 
 	const { colorMode } = useColorMode();
 

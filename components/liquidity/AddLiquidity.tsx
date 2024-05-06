@@ -175,8 +175,12 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		const updateFee = await getUpdateFee();
 		let calls = [];
 		let value = "0";
-		if(Number(outputAmount) > 0) calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
+		if(Number(outputAmount) > 0) {
+			calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]))
+			value = Big(value).add(updateFee).toString();
+		};
 		if (Number(inputAmount) > 0) {
+			console.log("inputAmount", inputAmount, inToken);
 			if (Big(approvedAmount).gt(0)) {
 				const { v, r, s } = ethers.utils.splitSignature(approvalData);
 				calls.push(
@@ -196,7 +200,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 						inToken.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
-							.toFixed(0),
+							.toFixed(),
 					])
 				);
 			} else if (inToken.id == ADDRESS_ZERO) {
@@ -212,12 +216,11 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 						inToken.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
-							.toFixed(0),
+							.toFixed(),
 					])
 				);
 		}
 		if (Number(outputAmount) > 0) {
-			value = Big(value).add(updateFee).toString();
 			if (Big(delegatedAmount).gt(0)) {
 				const { v, r, s } = ethers.utils.splitSignature(delegationData);
 				calls.push(
@@ -233,6 +236,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 					])
 				);
 			}
+
 			calls.push(
 				router.interface.encodeFunctionData("mint", [
 					Big(outputAmount)
