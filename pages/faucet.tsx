@@ -67,7 +67,7 @@ import { VARIANT } from "../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
 import ThBox from "../components/ui/table/ThBox";
 import TdBox from "../components/ui/table/TdBox";
-import { defaultChain } from "../src/const";
+import { NATIVE_FAUCET_LINK, defaultChain } from "../src/const";
 
 export default function Faucet() {
 	const { reserveData } = useAppData();
@@ -270,18 +270,18 @@ export default function Faucet() {
 				</Table>
 			</TableContainer>
 
-            <Flex align={'center'} justify={'space-between'} className={`${VARIANT}-${colorMode}-containerBody`} p={4} rounded={0} mt={4}>
+            {NATIVE_FAUCET_LINK[defaultChain.id] && <Flex align={'center'} justify={'space-between'} className={`${VARIANT}-${colorMode}-containerBody`} p={4} rounded={0} mt={4}>
 				<Image src={'/icons/ETH.svg'} w={'40px'} />
                 <Box>
-                    <Heading size={'md'} mb={2}>ETH Faucet</Heading>
+                    <Heading size={'md'} mb={2}>{defaultChain.nativeCurrency.name} Faucet</Heading>
                     <Text fontSize={'sm'} color={'whiteAlpha.600'}>
-                        Get some test ETH on this external faucet.
+                        Get some test {defaultChain.nativeCurrency.symbol} on this external faucet.
                     </Text>
                 </Box>
-                <Link href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">
-                    <Button rounded={0}>Get ETH <MdOpenInNew style={{marginLeft: 6}} /> </Button>
+                <Link href={NATIVE_FAUCET_LINK[defaultChain.id]} target="_blank">
+                    <Button rounded={0}>Get {defaultChain.nativeCurrency.symbol} <MdOpenInNew style={{marginLeft: 6}} /> </Button>
                 </Link>
-            </Flex>
+            </Flex>}
 
 			{openedCollateral && (
 				<Modal isOpen={isOpen} onClose={_onClose} isCentered>

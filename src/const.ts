@@ -38,7 +38,7 @@ const _WETH_ADDRESS: any = {
 	[tenderlyMainnet.id]: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase(),
 };
 
-const NATIVE_FAUCET_LINK: any = {
+export const NATIVE_FAUCET_LINK: any = {
 	[baseSepolia.id]: "https://www.alchemy.com/faucets/base-sepolia",
 	[sepolia.id]: "https://www.alchemy.com/faucets/ethereum-sepolia",
 }
