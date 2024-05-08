@@ -20,9 +20,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { Status } from "../components/utils/status";
-import { defaultChain } from "../src/const";
+import { isSupportedChain } from "../src/const";
 import { usePriceData } from "../components/context/PriceContext";
 import { useAccount, useSwitchChain } from "wagmi";
+import { useChainModal } from "@rainbow-me/rainbowkit";
 
 export default function Index({ children }: any) {
 	const router = useRouter();
@@ -51,11 +52,12 @@ export default function Index({ children }: any) {
 	// }, [loading, refresh]);
 
 	const { status, message } = useContext(AppDataContext);
-	const { chain } = useAccount();
+	const { chain, isConnected } = useAccount();
 
 	const toast = useToast();
 
 	const { switchChain } = useSwitchChain();
+	const { openChainModal } = useChainModal();
 
 	const switchNetwork = async (chainId: number) => {
 		switchChain!({ chainId: chainId });
@@ -77,7 +79,7 @@ export default function Index({ children }: any) {
 	return (
 		<Box h={'100vh'}>
 			{/* Wrong Chain */}
-			{chain?.id !== defaultChain.id && (
+			{isConnected && !isSupportedChain(chain?.id || 0) && (
 				<Flex
 					align={"center"}
 					justify={"center"}
@@ -91,8 +93,7 @@ export default function Index({ children }: any) {
 						fontWeight="medium"
 						color={'black'}
 					>
-						Please switch to {defaultChain.name} Network to use this
-						app
+						Network not supported
 					</Text>
 					<Button
 						ml={2}
@@ -101,9 +102,9 @@ export default function Index({ children }: any) {
 						_hover={{ bg: "whiteAlpha.800" }}
 						color={"black"}
 						rounded={"full"}
-						onClick={() => switchNetwork(defaultChain.id)}
+						onClick={openChainModal}
 					>
-						Switch to {defaultChain.name}
+						Switch
 					</Button>
 				</Flex>
 			)}

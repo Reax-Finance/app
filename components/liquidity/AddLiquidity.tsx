@@ -14,7 +14,7 @@ import Head from "next/head";
 import {
 	ADDRESS_ZERO,
 	ONE_ETH,
-	defaultChain,
+	isSupportedChain,
 } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
@@ -25,11 +25,11 @@ import { formatInput, parseInput } from "../utils/number";
 import { useAppData } from "../context/AppDataProvider";
 import { ArrowRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { BigNumber, ethers } from "ethers";
-import { getContract, send } from "../../src/contract";
 import TokenSelector from "../swap/TokenSelector";
 import { useRouter } from "next/router";
 import useApproval from "../context/useApproval";
 import useDelegate from "../context/useDelegate";
+import useChainData from "../context/useChainData";
 
 interface ApprovalStep {
 	type: "APPROVAL" | "PERMIT" | "DELEGATION";
@@ -79,6 +79,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		: [];
 	const outToken = liquidityData?.lpToken;
 	const inToken = tokens[inputAssetIndex];
+	const { getContract, send, rxRouter } = useChainData();
 
 	useEffect(() => {
 		if (tabIndex == 0) {
@@ -167,16 +168,12 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 
 	const add = async () => {
 		setLoading(true);
-		const router = getContract(
-			"ReaxRouter",
-			process.env.NEXT_PUBLIC_ROUTER_ADDRESS!
-		);
 		const updateData = await getUpdateData();
 		const updateFee = await getUpdateFee();
 		let calls = [];
 		let value = "0";
 		if(Number(outputAmount) > 0) {
-			calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]))
+			calls.push(rxRouter.interface.encodeFunctionData("updateOracleData", [updateData]))
 			value = Big(value).add(updateFee).toString();
 		};
 		if (Number(inputAmount) > 0) {
@@ -184,9 +181,9 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 			if (Big(approvedAmount).gt(0)) {
 				const { v, r, s } = ethers.utils.splitSignature(approvalData);
 				calls.push(
-					router.interface.encodeFunctionData("permit", [
+					rxRouter.interface.encodeFunctionData("permit", [
 						address,
-						router.address,
+						rxRouter.address,
 						inToken.id,
 						approvedAmount,
 						approvalDeadline,
@@ -196,7 +193,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 					])
 				);
 				calls.push(
-					router.interface.encodeFunctionData("stake", [
+					rxRouter.interface.encodeFunctionData("stake", [
 						inToken.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
@@ -206,13 +203,13 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 			} else if (inToken.id == ADDRESS_ZERO) {
 				value = Big(inputAmount).mul(ONE_ETH).toString();
 				calls.push(
-					router.interface.encodeFunctionData("stakeEth", [
+					rxRouter.interface.encodeFunctionData("stakeEth", [
 						ethers.constants.MaxUint256,
 					])
 				);
 			} else
 				calls.push(
-					router.interface.encodeFunctionData("stake", [
+					rxRouter.interface.encodeFunctionData("stake", [
 						inToken.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
@@ -224,9 +221,9 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 			if (Big(delegatedAmount).gt(0)) {
 				const { v, r, s } = ethers.utils.splitSignature(delegationData);
 				calls.push(
-					router.interface.encodeFunctionData("permitDelegation", [
+					rxRouter.interface.encodeFunctionData("permitDelegation", [
 						address,
-						router.address,
+						rxRouter.address,
 						liquidityData.debtToken.id,
 						delegatedAmount,
 						delegationDeadline,
@@ -238,7 +235,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 			}
 
 			calls.push(
-				router.interface.encodeFunctionData("mint", [
+				rxRouter.interface.encodeFunctionData("mint", [
 					Big(outputAmount)
 						.mul(Big(10).pow(outToken.decimals))
 						.toFixed(),
@@ -247,7 +244,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 				])
 			);
 		}
-		send(router, "multicall", [calls], value)
+		send(rxRouter, "multicall", [calls], value)
 			.then(async (res: any) => {
 				await res.wait();
 				setLoading(false);
@@ -262,7 +259,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 							</Text>
 							<Link
 								href={
-									defaultChain?.blockExplorers?.default.url +
+									chain?.blockExplorers?.default.url +
 									"/tx/" +
 									res.hash
 								}
@@ -313,7 +310,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 					token: inToken,
 				},
 				execute: () =>
-					approve(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!),
+					approve(inToken, rxRouter.address!),
 			});
 		}
 		if (
@@ -337,7 +334,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 				execute: () =>
 					delegate(
 						liquidityData.debtToken,
-						process.env.NEXT_PUBLIC_ROUTER_ADDRESS!
+						rxRouter.address
 					),
 			});
 		}
@@ -347,7 +344,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet" };
-		else if (chain?.id !== defaultChain.id)
+		else if (!isSupportedChain(chain!.id))
 			return { valid: false, message: "Unsupported Chain" };
 		else if (loading) return { valid: false, message: "Loading..." };
 		else if (

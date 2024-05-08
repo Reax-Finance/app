@@ -17,28 +17,20 @@ import Index from "./_index";
 
 import { AppDataProvider } from "../components/context/AppDataProvider";
 import { theme } from "../styles/theme";
-import { PROJECT_ID, APP_NAME, defaultChain } from "../src/const";
+import { supportedChains } from "../src/const";
 import {
 	BalanceContext,
 	BalanceContextProvider,
 } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
 import "@rainbow-me/rainbowkit/styles.css";
-
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { tenderlyMainnet } from "../src/chains";
-import { sepolia } from "viem/chains";
-
-const _chains = [];
-_chains.push(defaultChain);
-
-export const __chains: Chain[] = _chains;
 
 const config = getDefaultConfig({
 	appName: "My RainbowKit App",
 	projectId: "YOUR_PROJECT_ID",
-	chains: [defaultChain],
+	chains: supportedChains as any,
 	ssr: true, // If your dApp uses server side rendering (SSR)
 });
 

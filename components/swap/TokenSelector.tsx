@@ -11,7 +11,7 @@ import {
 	useColorMode
 } from "@chakra-ui/react";
 
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { tokenFormatter } from "../../src/const";
 
 import {
@@ -44,14 +44,8 @@ function TokenSelector({
 	const selectToken = (tokenIndex: number) => {
 		onTokenSelected(tokenIndex);
 	};
-
-	useEffect(() => {
-		if (tokens.length > 1) {
-			searchToken("");
-		}
-	}, [tokens.length, address]);
-
-	const searchToken = (searchTerm: string) => {
+	
+	const searchToken = useCallback((searchTerm: string) => {
 		// search token from all pool _mintedTokens
 		const _searchedTokens = [];
 		for (let j in tokens) {
@@ -68,17 +62,24 @@ function TokenSelector({
 			}
 		}
 		setSearchedTokens(_searchedTokens);
-	};
+	}, [tokens]);
+
+	useEffect(() => {
+		if (tokens.length > 1) {
+			searchToken("");
+		}
+	}, [tokens.length, address, searchToken]);
+
+	
 
 	const _onClose = () => {
 		searchToken("");
 		onClose();
 	}
 
-	if(tokens.length <= 1) return <></>
-
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { colorMode } = useColorMode();
+
+	if(tokens.length <= 1) return <></>
 
 	return (
 		<>

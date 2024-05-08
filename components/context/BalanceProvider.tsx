@@ -1,8 +1,7 @@
 import Big from "big.js";
 import * as React from "react";
-import { getABI, getContract } from "../../src/contract";
 import { useAccount } from "wagmi";
-import { ADDRESS_ZERO, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO } from "../../src/const";
 import { useAppData } from "./AppDataProvider";
 import { Status, SubStatus } from "../utils/status";
 

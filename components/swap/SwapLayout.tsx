@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { MdOutlineSwapVert } from "react-icons/md";
 import { useAppData } from "../context/AppDataProvider";
-import { ADDRESS_ZERO, NATIVE, SUPPORTS_ROLLUP_GASFEES, WETH_ADDRESS, defaultChain, dollarFormatter, tokenFormatter } from "../../src/const";
+import { dollarFormatter, tokenFormatter } from "../../src/const";
 import SelectBody from "./SelectBody";
 import Big from "big.js";
 import { formatInput } from "../utils/number";
@@ -69,8 +69,7 @@ export default function SwapLayout({
     const inputValue = Big(Number(inputAmount) || 0).mul(tokens[inputAssetIndex].price).div(10**8).toNumber()
     const outputValue = Big(Number(outputAmount) || 0).mul(tokens[outputAssetIndex].price).div(10**8).toNumber()
 
-	const isWrap = (tokens[inputAssetIndex]?.id == WETH_ADDRESS(defaultChain?.id ?? defaultChain.id) && tokens[outputAssetIndex]?.id == ADDRESS_ZERO) || (tokens[outputAssetIndex]?.id == WETH_ADDRESS(defaultChain.id) && tokens[inputAssetIndex]?.id == ADDRESS_ZERO);
-    const valid = inputAmount > 0 && outputAmount > 0 && !isWrap;
+    const valid = inputAmount > 0 && outputAmount > 0;
 	const { colorMode } = useColorMode();
 
     const handleMax = () => {

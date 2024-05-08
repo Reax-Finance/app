@@ -1,20 +1,16 @@
 import * as React from "react";
-import { getContract } from "../../src/contract";
-import { ADDRESS_ZERO, defaultChain } from '../../src/const';
+import { ADDRESS_ZERO, isSupportedChain } from '../../src/const';
 import { BigNumber, ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount } from "wagmi";
-import { __chains } from "../../pages/_app";
 import { Status } from "../utils/status";
 import { Account, ReserveData, LiquidityData } from "../utils/types";
 import useUpdateData from "../utils/useUpdateData";
+import useChainData from "./useChainData";
 
 export interface AppDataValue {
 	status: Status;
 	message: string;
-	// fetchData: (
-	// 	_address?: `0x${string}` | undefined
-	// ) => Promise<number>;
 	account: Account|undefined,
 	reserveData: ReserveData|undefined;
 	liquidityData: LiquidityData|undefined;
@@ -30,24 +26,23 @@ function AppDataProvider({ children }: any) {
 	const [reserveData, setReserveData] = React.useState<ReserveData>();
 	const [liquidityData, setLiquidityData] = React.useState<LiquidityData>();
 
-	const { address, isConnected, isConnecting, isDisconnected } = useAccount();
+	const { address, chain } = useAccount();
 
 	const { getUpdateData, getAllPythFeeds } = useUpdateData();
 	const [updateData, setUpdateData] = React.useState<any[]>([]);
+	const { getContract, send, uidp } = useChainData();
 
 	useEffect(() => {
+		if(typeof window === "undefined") return;
 		const fetchData = () => {
 			let _address = address || ADDRESS_ZERO;
-			let chainId = defaultChain.id;
 			const start = Date.now();
-			console.log("Fetching data for", _address, chainId);
+			console.log("Fetching data for", _address, chain?.id);
 			// if(first) setStatus(Status.FETCHING);
-			const uidp = getContract("UIDataProvider", process.env.NEXT_PUBLIC_UIDP_ADDRESS!);
 			uidp.callStatic.multicall([
 				uidp.interface.encodeFunctionData("updatePythData", [updateData]),
 				uidp.interface.encodeFunctionData("getAllData", [_address]),
 			])
-			// uidp.getAllData(_address)
 				.then(async (res: any) => {
 					res = uidp.interface.decodeFunctionResult("getAllData", res[1])[0];
 					console.log("Data latency", Date.now() - start, "ms");
@@ -83,7 +78,7 @@ function AppDataProvider({ children }: any) {
 	
 		// Clean up function
 		return () => clearInterval(intervalId);
-	}, [address, updateData])
+	}, [address, updateData, chain])
 
 	const value: AppDataValue = {
 		account,

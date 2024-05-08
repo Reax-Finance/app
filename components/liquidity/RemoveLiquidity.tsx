@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
 import Head from "next/head";
-import { ADDRESS_ZERO, ONE_ETH, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, ONE_ETH } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
 import useUpdateData from "../utils/useUpdateData";
@@ -23,12 +23,12 @@ import { VARIANT } from "../../styles/theme";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { ArrowRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { BigNumber, ethers } from "ethers";
-import { getContract, send } from "../../src/contract";
 import TokenSelector from "../swap/TokenSelector";
 import { useRouter } from "next/router";
 import useApproval from "../context/useApproval";
 import RemoveLiquidityLayout from "./RemoveLiquidityLayout";
 import { Asset } from "../utils/types";
+import useChainData from "../context/useChainData";
 
 interface ApprovalStep {
 	type: "APPROVAL" | "PERMIT" | "DELEGATION";
@@ -75,6 +75,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 		approvedAmount: approvedLpAmount,
 		reset: resetApprovalLp,
 	} = useApproval({});
+	const { getContract, send, rxRouter } = useChainData();
 
 	// only if vaults[i].userBalance > 0
 	const tokens = reserveData
@@ -248,7 +249,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 							</Text>
 							<Link
 								href={
-									defaultChain?.blockExplorers?.default.url +
+									chain?.blockExplorers?.default.url +
 									"/tx/" +
 									res.hash
 								}
@@ -291,7 +292,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 				execute: () =>
 					approveLp(
 						liquidityData.lpToken,
-						process.env.NEXT_PUBLIC_ROUTER_ADDRESS!
+						rxRouter.address!
 					),
 				data: {
 					token: liquidityData.lpToken,
@@ -309,7 +310,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 			steps.push({
 				type: "APPROVAL",
 				execute: () =>
-					approve(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!),
+					approve(inToken, rxRouter.address!),
 				data: {
 					token: inToken,
 					amount: inputAmount,

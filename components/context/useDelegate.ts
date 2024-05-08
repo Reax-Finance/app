@@ -2,10 +2,9 @@ import { Box, useToast } from '@chakra-ui/react';
 import { BigNumber, ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { Asset } from '../utils/types';
-import { getContract, send } from '../../src/contract';
 import useHandleError, { PlatformType } from '../utils/useHandleError';
 import { useAccount, useSignTypedData } from 'wagmi';
-import { defaultChain } from '../../src/const';
+import useChainData from './useChainData';
 
 type TxType = "DELEGATE" | "PERMIT";
 
@@ -20,10 +19,11 @@ const useDelegate = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
     const [loading, setLoading] = useState(false);
 	const handleError = useHandleError(PlatformType.DEX);
     const { signTypedDataAsync } = useSignTypedData();
-    const { address } = useAccount();
+    const { address, chain } = useAccount();
     const [data, setData] = useState<any>();
     const [deadline, setDeadline] = useState<string>("");
     const [delegatedAmount, setDelegatedAmount] = useState<string>("0");
+	const { getContract, send } = useChainData();
 
     const delegate = async (token: Asset, spender: string, amount: string = ethers.constants.MaxUint256.toString()) => {
         setLoading(true);
@@ -68,7 +68,7 @@ const useDelegate = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
 			domain: {
 				name: token.name,
 				version: version,
-				chainId: defaultChain.id,
+				chainId: chain!.id,
 				verifyingContract: token.id
 			},
 			types: {

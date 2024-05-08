@@ -34,7 +34,7 @@ export default function NavLink({
 					px={4}
 					cursor="pointer"
 					flex='stretch'
-					color={isPath ? (colorMode == 'dark' ? 'secondary.400' : 'black') : `${colorMode == 'dark' ? 'white' : 'black'}Alpha.600`}
+					color={isPath ? (colorMode == 'dark' ? 'white' : 'black') : `${colorMode == 'dark' ? 'white' : 'black'}Alpha.600`}
 					// className={`${VARIANT}-${colorMode}-navLink${isPath ? 'Selected' : ''}`}
 				>
 					<Box

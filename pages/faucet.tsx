@@ -58,7 +58,6 @@ import {
 	ModalBody,
 	ModalCloseButton,
 } from "@chakra-ui/react";
-import { getContract, send } from "../src/contract";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { useBalanceData } from "../components/context/BalanceProvider";
@@ -67,13 +66,15 @@ import { VARIANT } from "../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
 import ThBox from "../components/ui/table/ThBox";
 import TdBox from "../components/ui/table/TdBox";
-import { NATIVE_FAUCET_LINK, defaultChain } from "../src/const";
+import { NATIVE_FAUCET_LINK, isSupportedChain } from "../src/const";
+import useChainData from "../components/context/useChainData";
 
 export default function Faucet() {
 	const { reserveData } = useAppData();
 	const [loading, setLoading] = React.useState<any>(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [openedCollateral, setOpenedCollateral] = React.useState<any>(null);
+	const { getContract, send } = useChainData();
 
 	const { address, isConnected, chain } = useAccount();
 
@@ -138,16 +139,16 @@ export default function Faucet() {
 			},
 		});
 	};
+	const { colorMode } = useColorMode();
+	if(!chain) return <></>;
 
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet." };
-		else if (chain?.id !== defaultChain.id)
+		else if (!isSupportedChain(chain?.id!))
 			return { valid: false, message: "Unsupported network" };
 		else return { valid: true, message: "Mint" };
 	};
-
-	const { colorMode } = useColorMode();
 
 	return (
 		<Box h={'60vh'}>
@@ -270,16 +271,16 @@ export default function Faucet() {
 				</Table>
 			</TableContainer>
 
-            {NATIVE_FAUCET_LINK[defaultChain.id] && <Flex align={'center'} justify={'space-between'} className={`${VARIANT}-${colorMode}-containerBody`} p={4} rounded={0} mt={4}>
+            {NATIVE_FAUCET_LINK[chain.id] && <Flex align={'center'} justify={'space-between'} className={`${VARIANT}-${colorMode}-containerBody`} p={4} rounded={0} mt={4}>
 				<Image src={'/icons/ETH.svg'} w={'40px'} />
                 <Box>
-                    <Heading size={'md'} mb={2}>{defaultChain.nativeCurrency.name} Faucet</Heading>
+                    <Heading size={'md'} mb={2}>{chain.nativeCurrency.name} Faucet</Heading>
                     <Text fontSize={'sm'} color={'whiteAlpha.600'}>
-                        Get some test {defaultChain.nativeCurrency.symbol} on this external faucet.
+                        Get some test {chain.nativeCurrency.symbol} on this external faucet.
                     </Text>
                 </Box>
-                <Link href={NATIVE_FAUCET_LINK[defaultChain.id]} target="_blank">
-                    <Button rounded={0}>Get {defaultChain.nativeCurrency.symbol} <MdOpenInNew style={{marginLeft: 6}} /> </Button>
+                <Link href={NATIVE_FAUCET_LINK[chain.id]} target="_blank">
+                    <Button rounded={0}>Get {chain.nativeCurrency.symbol} <MdOpenInNew style={{marginLeft: 6}} /> </Button>
                 </Link>
             </Flex>}
 

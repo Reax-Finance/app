@@ -1,10 +1,9 @@
 import { Box, useDisclosure, Text, Flex, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { getContract, send, estimateGas } from "../../src/contract";
 import { useAccount, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import TokenSelector from "./TokenSelector";
-import { ADDRESS_ZERO, defaultChain, tokenFormatter } from "../../src/const";
+import { ADDRESS_ZERO, isSupportedChain, tokenFormatter } from "../../src/const";
 import SwapSkeleton from "./Skeleton";
 import { useToast } from '@chakra-ui/react';
 import useUpdateData from "../utils/useUpdateData";
@@ -18,6 +17,7 @@ import useHandleError, { PlatformType } from "../utils/useHandleError";
 import { useAppData } from "../context/AppDataProvider";
 import { useRouter } from "next/router";
 import useApproval from "../context/useApproval";
+import useChainData from "../context/useChainData";
 
 interface ApprovalStep {
 	type: "APPROVAL" | "PERMIT";
@@ -59,6 +59,7 @@ function Swap() {
 	const { signTypedDataAsync } = useSignTypedData();
 	const [deadline, setDeadline] = useState('0');
 	const [nonce, setNonce] = useState(-1);
+	const { getContract, send, rxRouter } = useChainData();
 
 	const { approve } = useApproval({});
 
@@ -161,18 +162,17 @@ function Swap() {
 
 	const exchange = async () => {
 		setLoading(true);
-		const router = getContract("ReaxRouter", process.env.NEXT_PUBLIC_ROUTER_ADDRESS!);
 		const updateData = await getUpdateData();
 		const updateFee = await getUpdateFee();
 		const calls = [];
-		calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
+		calls.push(rxRouter.interface.encodeFunctionData("updateOracleData", [updateData]));
 		if(Big(approvedAmount ?? 0).gt(0)){
 			const { v, r, s } = ethers.utils.splitSignature(data);
-			calls.push(router.interface.encodeFunctionData("permit", [address, router.address, inToken.id, approvedAmount, deadline, v, r, s]));
+			calls.push(rxRouter.interface.encodeFunctionData("permit", [address, rxRouter.address, inToken.id, approvedAmount, deadline, v, r, s]));
 		} 
-		calls.push(router.interface.encodeFunctionData("swap", [inToken.id, outToken.id, Big(inputAmount).mul(Big(10).pow(inToken.decimals)).toFixed(0), address]));
+		calls.push(rxRouter.interface.encodeFunctionData("swap", [inToken.id, outToken.id, Big(inputAmount).mul(Big(10).pow(inToken.decimals)).toFixed(0), address]));
 
-		send(router, "multicall", [calls], updateFee)
+		send(rxRouter, "multicall", [calls], updateFee)
 			.then(async (res: any) => {
 				await res.wait();
 				setLoading(false);
@@ -182,7 +182,7 @@ function Swap() {
 						<Text>
 							{`You have swapped ${inputAmount} ${inToken?.symbol} for ${outToken?.symbol}`}
 						</Text>
-						<Link href={defaultChain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
+						<Link href={chain?.blockExplorers?.default.url + "/tx/" + res.hash} target="_blank">
 							<Flex align={'center'} gap={2}>
 							<ExternalLinkIcon />
 							<Text>View Transaction</Text>
@@ -221,7 +221,7 @@ function Swap() {
 					amount: inputAmount,
 					token: inToken
 				},
-				execute: () => approve(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!)
+				execute: () => approve(inToken, rxRouter.address!)
 			})
 			else {
 				steps.push({
@@ -231,7 +231,7 @@ function Swap() {
 						amount: inputAmount,
 						token: inToken
 					},
-					execute: () => approve(inToken, process.env.NEXT_PUBLIC_ROUTER_ADDRESS!)
+					execute: () => approve(inToken, rxRouter.address!)
 				})
 			}
 		}
@@ -240,7 +240,7 @@ function Swap() {
 
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
-		else if (chain?.id !== defaultChain.id) return {valid: false, message: "Unsupported Chain"}
+		else if (!isSupportedChain(chain!.id)) return {valid: false, message: "Unsupported Chain"}
 		else if (loading) return {valid: false, message: "Loading..."}
 		else if (error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}

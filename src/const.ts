@@ -4,21 +4,24 @@ import Big from "big.js";
 import { Chain, baseSepolia, mainnet, sepolia } from "wagmi/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
+const _sepolia = {...sepolia, rpcUrls: {default: {http: ['https://eth-sepolia.g.alchemy.com/v2/_yRldozKQjqTn6ifrZ6xqqbjk2JCdgM8']}}};
+
 export const ONE_ETH = Big(1e18);
 const NETWORKS: any = {
 	[mantleMainnet.id]: mantleMainnet,
 	[mantleTestnet.id]: mantleTestnet,
 	[lineaMainnet.id]: lineaMainnet,
 	[lineaTestnet.id]: lineaTestnet,
-	[sepolia.id]: sepolia,
+	[sepolia.id]: _sepolia,
 	[tenderlyMainnet.id]: tenderlyMainnet,
 	[baseSepolia.id]: baseSepolia,
 }
 
-export const defaultChain: Chain = NETWORKS[process.env.NEXT_PUBLIC_CHAIN_ID!] ?? mainnet;
+export const supportedChains: Chain[] = process.env.NEXT_PUBLIC_SUPPORTED_CHAINS?.split(',').map((id: string) => NETWORKS[id]) ?? [sepolia];
+export const isSupportedChain = (chainId: number) => {
+	return supportedChains.map((chain) => chain.id).includes(chainId);
+};
 
-export const NATIVE = defaultChain.nativeCurrency.symbol;
-export const W_NATIVE = `W${NATIVE}`;
 export const ESYX_PRICE = 0.0075;
 export const SUPPORTS_ROLLUP_GASFEES = false;
 

@@ -1,9 +1,19 @@
 import Big from "big.js";
 import { BigNumber, ethers } from "ethers";
 import * as React from "react";
-import { ADDRESS_ZERO, PYTH_ENDPOINT, REPLACED_FEEDS, WETH_ADDRESS, defaultChain } from "../../src/const";
+import { ADDRESS_ZERO, PYTH_ENDPOINT, REPLACED_FEEDS, WETH_ADDRESS } from "../../src/const";
 import { Status, SubStatus } from "../utils/status";
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
+
+const defaultChain = {
+    id: 1,
+    rpcUrls: {
+        default: {
+            http: ["https://mainnet.infura.io/v3/3d3e0c8b3f3b4c3e8b0c6d1d4b2c4d3e"],
+            ws: ["wss://mainnet.infura.io/ws/v3/3d3e0c8b3f3b4c3e8b0c6d1d4b2c4d3e"],
+        },
+    },
+};
 
 const PriceContext = React.createContext<PriceValue>({} as PriceValue);
 

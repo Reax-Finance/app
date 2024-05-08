@@ -1,9 +1,8 @@
-import { Box, Button, useColorMode } from '@chakra-ui/react';
+import { Box, Button, Flex, useColorMode, Image } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { VARIANT } from '../../styles/theme';
-import { defaultChain } from '../../src/const';
-
+import { isSupportedChain } from '../../src/const';
 
 export const CustomConnectButton = () => {
 	const { colorMode } = useColorMode();
@@ -39,7 +38,7 @@ export const CustomConnectButton = () => {
                   </Box>
                 );
               }
-              if (chain.id !== defaultChain.id) {
+              if (!isSupportedChain(chain.id)) {
                 return (
                   <Box className={`${VARIANT}-${colorMode}-errorButton`} >
                   <Button size={'md'}  onClick={openChainModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
@@ -49,11 +48,14 @@ export const CustomConnectButton = () => {
                 );
               }
               return (
-                <Box >
+                <Flex >
+                  <Button onClick={openChainModal} rounded={'full'} size={'sm'} py={'18px'} px={'8px'} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
+                    {chain.hasIcon ? <Image src={`${chain.iconUrl}`} w={'25px'} alt='' /> : chain.name}
+                  </Button>
                   <Button rounded={0} size={'sm'} py={'18px'} onClick={openAccountModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
                     {account.displayName} <RiArrowDropDownLine size={24}/>
                   </Button>
-                </Box>
+                </Flex>
               );
             })()}
           </div>

@@ -10,6 +10,7 @@ import {
 	Button,
 	Link,
 	Divider,
+	Heading,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import "../../styles/Home.module.css";
@@ -23,9 +24,7 @@ import { RiFeedbackLine } from "react-icons/ri";
 function NavBar() {
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
 
-	const {
-		isConnected,
-	} = useAccount();
+	const { isConnected } = useAccount();
 
 	const { colorMode } = useColorMode();
 
@@ -34,10 +33,10 @@ function NavBar() {
 			<Flex
 				mt={{ base: 0, md: 6 }}
 				align="center"
-				justify={'space-between'}
-				w={'100%'}
+				justify={"space-between"}
+				w={"100%"}
 			>
-				<Box minW="0" w={"100%"} maxW="100%" mx={{base: 0, md: 6}}>
+				<Box minW="0" w={"100%"} maxW="100%" mx={{ base: 0, md: 6 }}>
 					<Flex align={"center"} justify="space-between">
 						<Flex justify="space-between" align={"center"} w="100%">
 							<Flex gap={10} align="center">
@@ -80,7 +79,6 @@ function NavBar() {
 									aria-label={"Toggle Navigation"}
 									rounded={0}
 								/>
-
 							</Flex>
 						</Flex>
 
@@ -96,7 +94,7 @@ function NavBar() {
 									<Button
 										color={"white"}
 										bg={"transparent"}
-										_hover={{bg: 'transparent'}}
+										_hover={{ bg: "transparent" }}
 										rounded={0}
 										size={"sm"}
 									>
@@ -106,9 +104,13 @@ function NavBar() {
 											}
 											target={"_blank"}
 										>
-											<Flex gap={2} align={'center'} color="white" >
-												<RiFeedbackLine size={'20'} />
-												<Text>Feedback</Text>
+											<Flex
+												gap={2}
+												align={"center"}
+												color="whiteAlpha.600"
+											>
+												<RiFeedbackLine size={"20"} />
+												<Heading size={'sm'}>Feedback</Heading>
 											</Flex>
 										</Link>
 									</Button>
@@ -143,7 +145,16 @@ function NavBar() {
 const MobileNav = ({}: any) => {
 	const { colorMode } = useColorMode();
 	return (
-		<Flex w={'100%'} border={'1px'} borderColor={'whiteAlpha.400'} h={'14'} align={"center"} wrap={"wrap"} gap={0} zIndex={10}>
+		<Flex
+			w={"100%"}
+			border={"1px"}
+			borderColor={"whiteAlpha.400"}
+			h={"14"}
+			align={"center"}
+			wrap={"wrap"}
+			gap={0}
+			zIndex={10}
+		>
 			<NavLocalLink path={"/"} title={"Swap"}></NavLocalLink>
 			<Divider orientation={"vertical"} />
 			<NavLocalLink
@@ -163,13 +174,10 @@ const MobileNav = ({}: any) => {
 						size={"sm"}
 					>
 						<Link
-							href={
-								"https://forms.gle/qD8bE1gGMqAxujpz7"
-							}
+							href={"https://forms.gle/qD8bE1gGMqAxujpz7"}
 							target={"_blank"}
 						>
 							<Flex gap={2}>
-
 								<MdFeedback />
 							</Flex>
 						</Link>
@@ -177,7 +185,6 @@ const MobileNav = ({}: any) => {
 				</Box>
 			</Flex>
 			<Divider orientation={"vertical"} />
-
 		</Flex>
 	);
 };
