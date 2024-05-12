@@ -20,6 +20,7 @@ export default function SwapPage() {
 							<Box
 								animation={"fadeIn 0.5s ease-in-out"}
 								boxShadow={"xl"}
+								minW={{base: '100%', md: '500px'}}
 							>
 								<Swap />
 							</Box>

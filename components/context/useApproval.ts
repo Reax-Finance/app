@@ -117,7 +117,7 @@ const useApproval = ({deadline_m = 20, onSuccess, onError}: ApprovalProps) => {
     const reset = () => {
         setData(undefined);
         setDeadline("");
-        setApprovedAmount("");
+        setApprovedAmount("0");
     }
 
     return { approve, loading, data, deadline, approvedAmount, reset };

@@ -282,7 +282,7 @@ export default function SwapLayout({
                             <Divider orientation="vertical" />
                             <Flex align={'center'} justify={'space-between'} gap={1} ml={3} w={'100%'}>
                                 <Text>{(step.type == "APPROVAL" || step.type == "PERMIT") ? "Approve " + step.data.token.symbol + " for use" : "Delegate Mint"}</Text>
-                                <Button rounded={0} onClick={step.execute}>
+                                <Button rounded={0} onClick={step.execute} isLoading={step.loading} size={'md'} colorScheme={'blue'}>
                                     {step.type == "APPROVAL" ? "Approve" : step.type == "PERMIT" ? "Sign Message" : "Delegate"}
                                 </Button>
                             </Flex>

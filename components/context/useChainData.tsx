@@ -18,6 +18,7 @@ export default function useChainData() {
 	};
 
 	const getContract = (contractName: string, address: string) => {
+        // console.log(contractName, address, chain?.id);
 		let provider = new ethers.providers.JsonRpcProvider((chain ?? baseSepolia)?.rpcUrls.default.http[0]);
 		if(typeof window !== "undefined" && window?.ethereum && isSupportedChain(BigNumber.from(window?.ethereum?.chainId || 0).toNumber())) provider = new ethers.providers.Web3Provider(window.ethereum as any);
         if(!address) return new ethers.Contract(ADDRESS_ZERO, getABI(contractName), provider);

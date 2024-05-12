@@ -20,8 +20,8 @@ import useApproval from "../context/useApproval";
 import useChainData from "../context/useChainData";
 
 interface ApprovalStep {
-	type: "APPROVAL" | "PERMIT";
-	isCompleted: boolean;
+	type: "APPROVAL" | "PERMIT" | "DELEGATION";
+	loading: boolean;
 	data: any;
 	execute: any;
 }
@@ -51,17 +51,12 @@ function Swap() {
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
 	const [swapData, setSwapData] = useState<any>(null);
-	const [data, setData] = useState<any>(null);
 	const [maxSlippage, setMaxSlippage] = useState(0.5);
 	const [deadline_m, setDeadline_m] = useState(20);
 	const { getUpdateData, getUpdateFee } = useUpdateData();
-	const [approvedAmount, setApprovedAmount] = useState('0');
-	const { signTypedDataAsync } = useSignTypedData();
-	const [deadline, setDeadline] = useState('0');
-	const [nonce, setNonce] = useState(-1);
 	const { getContract, send, rxRouter } = useChainData();
 
-	const { approve } = useApproval({});
+	const { approve, loading: approvalLoading, data, deadline, approvedAmount, reset } = useApproval({});
 
 	const router = useRouter();
 	
@@ -80,16 +75,6 @@ function Swap() {
 	}, [tokens])
 	
 	const handleError = useHandleError(PlatformType.DEX);
-
-	useEffect(() => {
-		if(!inToken) return;
-		const contract = getContract("ERC20Permit", inToken.id);
-		contract.nonces(address).then((nonce: any) => {
-			setNonce(nonce)
-		}).catch((err: any) => {
-			setNonce(-1)
-		})
-	}, [inputAssetIndex])
 
 	const updateInputAmount = (value: any) => {
 		value = parseInput(value);
@@ -117,14 +102,10 @@ function Swap() {
 		router.push(router);
 		setInputAmount("" as any);
 		setOutputAmount('0');
-		setApprovedAmount('0');
-		setData(null);
 		onInputClose();
 		setSwapData(null);
-		setApprovedAmount('0');
-		setDeadline('0');
-		setData(null);
 		setGas(0);
+		reset();
 	};
 	
 	const onOutputTokenSelected = (e: number) => {
@@ -138,9 +119,7 @@ function Swap() {
 		setOutputAmount('0');
 		onOutputClose();
 		setSwapData(null);
-		setApprovedAmount('0');
-		setDeadline('0');
-		setData(null);
+		reset();
 		setGas(0);
 	};
 
@@ -154,10 +133,8 @@ function Swap() {
 		setInputAmount('');
 		setOutputAmount('0');
 		setSwapData(null);
-		setApprovedAmount('0');
-		setDeadline('0');
-		setData(null);
 		setGas(0);
+		reset();
 	};
 
 	const exchange = async () => {
@@ -198,10 +175,7 @@ function Swap() {
 				setOutputAmount('0');
 				setSwapData(null);
 				if(Big(approvedAmount ?? 0).gt(0)){
-					setApprovedAmount('0');
-					setDeadline('0');
-					setData(null);
-					setNonce((prev) => prev + 1);
+					reset();
 				}
 			})
 			.catch((err: any) => {
@@ -214,26 +188,15 @@ function Swap() {
 		let steps: ApprovalStep[] = [];
 		if(!inToken) return steps;
 		if(inToken.id !== ADDRESS_ZERO && Big(approvedAmount).add(inToken.approvalToRouter.toString()).lt(Big(Number(inputAmount) || 0).mul(10**inToken.decimals))){
-			if(nonce >= 0) steps.push({
-				type: "PERMIT",
-				isCompleted: false,
+			steps.push({
+				type: "APPROVAL",
+				loading: approvalLoading,
 				data: {
 					amount: inputAmount,
 					token: inToken
 				},
 				execute: () => approve(inToken, rxRouter.address!)
 			})
-			else {
-				steps.push({
-					type: "APPROVAL",
-					isCompleted: false,
-					data: {
-						amount: inputAmount,
-						token: inToken
-					},
-					execute: () => approve(inToken, rxRouter.address!)
-				})
-			}
 		}
 		return steps;
 	};
