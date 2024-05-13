@@ -84,7 +84,7 @@ function AppDataProvider({ children }: any) {
 			intervalId = setInterval(async () => {
 				let _updateData = await getUpdateData(getAllPythFeeds(reserveData, liquidityData));
 				setUpdateData(_updateData);
-			}, 2000);
+			}, 10000);
 		};
 	
 		const stopInterval = () => {
