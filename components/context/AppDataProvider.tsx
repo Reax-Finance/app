@@ -32,6 +32,8 @@ function AppDataProvider({ children }: any) {
 	const [updateData, setUpdateData] = React.useState<any[]>([]);
 	const { getContract, send, uidp } = useChainData();
 
+	const [errorCount, setErrorCount] = React.useState<number>(0);
+
 	useEffect(() => {
 		if(typeof window === "undefined") return;
 		const fetchData = () => {
@@ -56,15 +58,19 @@ function AppDataProvider({ children }: any) {
 					});
 					setReserveData(res.reserveData);
 					setLiquidityData(res.liquidityData);
+					setErrorCount(0);
 					
 					setStatus(Status.SUCCESS);
 				})
 				.catch(async (err: any) => {
 					console.log("Error", err);
-					setStatus(Status.ERROR);
-					setMessage(
-						"Failed to fetch data. Please refresh the page and try again later."
-					);
+					setErrorCount((prev) => prev + 1);
+					if(errorCount > 3) {
+						setStatus(Status.ERROR);
+						setMessage(
+							"Failed to fetch data. Please refresh the page and try again later."
+						);
+					}
 				});
 		};
 		// Fetch data immediately
