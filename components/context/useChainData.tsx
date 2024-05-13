@@ -18,12 +18,10 @@ export default function useChainData() {
 	};
 
 	const getContract = (contractName: string, address: string) => {
-        // console.log(contractName, address, chain?.id);
 		let provider = new ethers.providers.JsonRpcProvider((chain ?? baseSepolia)?.rpcUrls.default.http[0]);
-		if(typeof window !== "undefined" && window?.ethereum && isSupportedChain(BigNumber.from(window?.ethereum?.chainId || 0).toNumber())) provider = new ethers.providers.Web3Provider(window.ethereum as any);
-        if(!address) return new ethers.Contract(ADDRESS_ZERO, getABI(contractName), provider);
-		let contract = new ethers.Contract(
-			address!,
+		if(chain && typeof window !== "undefined" && window?.ethereum && isSupportedChain(BigNumber.from(window?.ethereum?.chainId || 0).toNumber())) provider = new ethers.providers.Web3Provider(window.ethereum as any);
+        let contract = new ethers.Contract(
+			address,
 			getABI(contractName),
 			provider
 		);
@@ -46,8 +44,8 @@ export default function useChainData() {
         84532: process.env.NEXT_PUBLIC_UIDP_ADDRESS_84532
     }
 
-    const rxRouter = getContract("ReaxRouter", routerAddress[chain?.id ?? baseSepolia.id]!);
-    const uidp = getContract("UIDataProvider", uidpAddress[chain?.id ?? baseSepolia.id]!);
+    const rxRouter = () => getContract("ReaxRouter", routerAddress[chain?.id ?? baseSepolia.id]!);
+    const uidp = () => getContract("UIDataProvider", uidpAddress[chain?.id ?? baseSepolia.id]!);
 
     return {
         getABI,

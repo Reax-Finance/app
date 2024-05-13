@@ -79,7 +79,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		: [];
 	const outToken = liquidityData?.lpToken;
 	const inToken = tokens[inputAssetIndex];
-	const { getContract, send, rxRouter } = useChainData();
+	const { getContract, send, rxRouter: _rxRouter } = useChainData();
 
 	useEffect(() => {
 		if (tabIndex == 0) {
@@ -172,6 +172,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		const updateFee = await getUpdateFee();
 		let calls = [];
 		let value = "0";
+		const rxRouter = _rxRouter();
 		if(Number(outputAmount) > 0) {
 			calls.push(rxRouter.interface.encodeFunctionData("updateOracleData", [updateData]))
 			value = Big(value).add(updateFee).toString();
@@ -296,6 +297,8 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	const getSteps = () => {
 		let steps: ApprovalStep[] = [];
 		if (!inToken || !liquidityData.debtToken) return steps;
+		const rxRouter = _rxRouter();
+
 		if (
 			inToken.id !== ADDRESS_ZERO &&
 			Big(approvedAmount)
@@ -344,7 +347,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet" };
-		else if (!isSupportedChain(chain!.id))
+		else if (!chain || !isSupportedChain(chain?.id))
 			return { valid: false, message: "Unsupported Chain" };
 		else if (loading) return { valid: false, message: "Loading..." };
 		else if (

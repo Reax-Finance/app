@@ -145,7 +145,7 @@ export default function Faucet() {
 	const validate = () => {
 		if (!isConnected)
 			return { valid: false, message: "Please connect your wallet." };
-		else if (!isSupportedChain(chain?.id!))
+		else if (!isSupportedChain(chain?.id))
 			return { valid: false, message: "Unsupported network" };
 		else return { valid: true, message: "Mint" };
 	};

@@ -57,6 +57,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	const { getUpdateData, getUpdateFee } = useUpdateData();
 	const { liquidityData, reserveData, account } = useAppData();
 	const router = useRouter();
+	const { rxRouter: _rxRouter } = useChainData();
 
 	const {
 		approve,
@@ -173,15 +174,14 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 
 	const remove = async () => {
 		setLoading(true);
-		const router = getContract(
-			"ReaxRouter",
-			process.env.NEXT_PUBLIC_ROUTER_ADDRESS!
-		);
+		
 		const updateData = await getUpdateData();
 		const updateFee = await getUpdateFee();
 		let calls = [];
 		let value = "0";
-		// calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
+		
+		const router = _rxRouter();
+		calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
 		if (Number(outputAmount) > 0) {
 			value = Big(value).add(updateFee).toFixed(0);
 			if (Big(approvedLpAmount).gt(0)) {
@@ -277,6 +277,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	const getSteps = () => {
 		let steps: ApprovalStep[] = [];
 		if (!inToken || !liquidityData.lpToken) return steps;
+		const rxRouter = _rxRouter();
 		if (
 			Number(outputAmount) > 0 &&
 			Big(approvedLpAmount)

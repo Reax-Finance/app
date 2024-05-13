@@ -54,7 +54,7 @@ function Swap() {
 	const [maxSlippage, setMaxSlippage] = useState(0.5);
 	const [deadline_m, setDeadline_m] = useState(20);
 	const { getUpdateData, getUpdateFee } = useUpdateData();
-	const { getContract, send, rxRouter } = useChainData();
+	const { getContract, send, rxRouter: _rxRouter } = useChainData();
 
 	const { approve, loading: approvalLoading, data, deadline, approvedAmount, reset } = useApproval({});
 
@@ -142,6 +142,7 @@ function Swap() {
 		const updateData = await getUpdateData();
 		const updateFee = await getUpdateFee();
 		const calls = [];
+		const rxRouter = _rxRouter();
 		calls.push(rxRouter.interface.encodeFunctionData("updateOracleData", [updateData]));
 		if(Big(approvedAmount ?? 0).gt(0)){
 			const { v, r, s } = ethers.utils.splitSignature(data);
@@ -195,7 +196,7 @@ function Swap() {
 					amount: inputAmount,
 					token: inToken
 				},
-				execute: () => approve(inToken, rxRouter.address!)
+				execute: () => approve(inToken, _rxRouter().address!)
 			})
 		}
 		return steps;
@@ -203,7 +204,7 @@ function Swap() {
 
 	const validate = () => {
 		if(!isConnected) return {valid: false, message: "Please connect your wallet"}
-		else if (!isSupportedChain(chain!.id)) return {valid: false, message: "Unsupported Chain"}
+		else if (!chain || !isSupportedChain(chain?.id)) return {valid: false, message: "Unsupported Chain"}
 		else if (loading) return {valid: false, message: "Loading..."}
 		else if (error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}

@@ -104,7 +104,7 @@ export default function Index({ children }: any) {
 						rounded={"full"}
 						onClick={openChainModal}
 					>
-						Switch
+						Switch Chain
 					</Button>
 				</Flex>
 			)}

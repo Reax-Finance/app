@@ -1,6 +1,5 @@
 import * as React from "react";
 import { ADDRESS_ZERO, isSupportedChain } from '../../src/const';
-import { BigNumber, ethers } from "ethers";
 import { useEffect } from 'react';
 import { useAccount } from "wagmi";
 import { Status } from "../utils/status";
@@ -30,16 +29,20 @@ function AppDataProvider({ children }: any) {
 
 	const { getUpdateData, getAllPythFeeds } = useUpdateData();
 	const [updateData, setUpdateData] = React.useState<any[]>([]);
-	const { getContract, send, uidp } = useChainData();
+	const { getContract, send, uidp: _uidp } = useChainData();
 
 	const [errorCount, setErrorCount] = React.useState<number>(0);
 
 	useEffect(() => {
 		if(typeof window === "undefined") return;
+
+		let intervalId: NodeJS.Timeout;
+
 		const fetchData = () => {
 			let _address = address || ADDRESS_ZERO;
 			const start = Date.now();
 			console.log("Fetching data for", _address, chain?.id);
+			const uidp = _uidp();
 			// if(first) setStatus(Status.FETCHING);
 			uidp.callStatic.multicall([
 				uidp.interface.encodeFunctionData("updatePythData", [updateData]),
@@ -73,17 +76,43 @@ function AppDataProvider({ children }: any) {
 					}
 				});
 		};
-		// Fetch data immediately
-		fetchData();
-
-		// Then fetch data every 4 seconds
-		const intervalId = setTimeout(async () => {
+		const startInterval = async () => {
+			// Fetch data immediately
+			fetchData();
+	
+			// Then fetch data every 2 seconds
+			intervalId = setInterval(async () => {
 				let _updateData = await getUpdateData(getAllPythFeeds(reserveData, liquidityData));
 				setUpdateData(_updateData);
-		}, 8000);
+			}, 2000);
+		};
+	
+		const stopInterval = () => {
+			if (intervalId) {
+				clearInterval(intervalId);
+			}
+		};
+	
+		// Function to start or stop the interval when the page visibility changes
+		const handleVisibilityChange = () => {
+			if (document.hidden) {
+				stopInterval();
+			} else {
+				startInterval();
+			}
+		};
+	
+		// Start the interval when the component mounts
+		startInterval();
+	
+		// Listen for visibility change events
+		document.addEventListener("visibilitychange", handleVisibilityChange);
 	
 		// Clean up function
-		return () => clearInterval(intervalId);
+		return () => {
+			stopInterval();
+			document.removeEventListener("visibilitychange", handleVisibilityChange);
+		};
 	}, [address, updateData, chain])
 
 	const value: AppDataValue = {
