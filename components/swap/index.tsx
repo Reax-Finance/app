@@ -222,7 +222,7 @@ function Swap() {
 				<title>
 					{" "}
 					{tokenFormatter.format(
-						(prices[inToken?.id] / prices[outToken?.id]) || 0
+						(inToken?.price?.toNumber()) / (outToken?.price?.toNumber()) || 0
 					)}{" "}
 					{outToken?.symbol}/{inToken?.symbol} | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
 				</title>

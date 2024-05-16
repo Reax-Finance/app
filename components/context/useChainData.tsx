@@ -36,12 +36,14 @@ export default function useChainData() {
 
     const routerAddress: { [key: number]: string | undefined } = {
         11155111: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_11155111,
-        84532: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_84532
+        84532: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_84532,
+        421614: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_421614
     }
 
     const uidpAddress: { [key: number]: string | undefined } = {
         11155111: process.env.NEXT_PUBLIC_UIDP_ADDRESS_11155111,
-        84532: process.env.NEXT_PUBLIC_UIDP_ADDRESS_84532
+        84532: process.env.NEXT_PUBLIC_UIDP_ADDRESS_84532,
+        421614: process.env.NEXT_PUBLIC_UIDP_ADDRESS_421614
     }
 
     const rxRouter = () => getContract("ReaxRouter", routerAddress[chain?.id ?? baseSepolia.id]!);
