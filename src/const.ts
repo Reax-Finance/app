@@ -45,6 +45,7 @@ const _WETH_ADDRESS: any = {
 export const NATIVE_FAUCET_LINK: any = {
 	[baseSepolia.id]: "https://www.alchemy.com/faucets/base-sepolia",
 	[sepolia.id]: "https://www.alchemy.com/faucets/ethereum-sepolia",
+	[arbitrumSepolia.id]: "https://www.alchemy.com/faucets/arbitrum-sepolia",
 }
 
 // Per block fetching frequency

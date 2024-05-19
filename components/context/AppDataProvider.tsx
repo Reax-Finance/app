@@ -41,8 +41,8 @@ function AppDataProvider({ children }: any) {
 		const fetchData = () => {
 			let _address = address || ADDRESS_ZERO;
 			const start = Date.now();
-			console.log("Fetching data for", _address, chain?.id);
 			const uidp = _uidp();
+			console.log("Fetching data for", _address, chain?.id, uidp.provider);
 			// if(first) setStatus(Status.FETCHING);
 			uidp.callStatic.multicall([
 				uidp.interface.encodeFunctionData("updatePythData", [updateData]),
@@ -51,7 +51,7 @@ function AppDataProvider({ children }: any) {
 				.then(async (res: any) => {
 					res = uidp.interface.decodeFunctionResult("getAllData", res[1])[0];
 					console.log("Data latency", Date.now() - start, "ms");
-					setAccount({
+					setAccount((prev) => prev && !chain ? prev :{
 						healthFactor: res.healthFactor.toString(),
 						availableToMintUSD: res.availableToMintUSD.toString(),
 						userTotalBalanceUSD: res.reserveData.userTotalBalanceUSD.toString(),
@@ -59,8 +59,8 @@ function AppDataProvider({ children }: any) {
 						userThresholdBalanceUSD: res.reserveData.userThresholdBalanceUSD.toString(),
 						userTotalDebtUSD: res.liquidityData.userTotalDebtUSD.toString()
 					});
-					setReserveData(res.reserveData);
-					setLiquidityData(res.liquidityData);
+					setReserveData((prev) => prev && !chain ? prev : res.reserveData);
+					setLiquidityData((prev) => prev && !chain ? prev : res.liquidityData);
 					setErrorCount(0);
 					
 					setStatus(Status.SUCCESS);
