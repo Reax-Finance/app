@@ -21,6 +21,7 @@ import Big from "big.js";
 import { PoolStat } from "./PoolPosition";
 import { IoIosWater } from "react-icons/io";
 import { ONE_ETH, dollarFormatter } from "../../src/const";
+import { SynthData } from "../utils/types";
 
 const COLORS = [
 	"#ff631b2e",
@@ -35,14 +36,14 @@ const RADIAN = Math.PI / 180;
 
 export default function PoolLiquidity() {
 	const { colorMode } = useColorMode();
-	const { liquidityData } = useAppData();
+	const { synths } = useAppData();
 
 	const data =
-		liquidityData?.synths.map((synth) => {
+		synths.map((synthData) => {
 			return {
-				name: synth.symbol,
-				value: Big(synth.totalSupply.toString())
-					.mul(synth.price.toString())
+				name: synthData.synth.symbol,
+				value: Big(synthData.synth.totalSupply.toString())
+					.mul(synthData.synth.price.toString())
 					.div(1e24)
 					.toNumber(),
 			};
@@ -75,6 +76,14 @@ export default function PoolLiquidity() {
 		);
 	};
 
+	const totalLiquidity = synths.reduce((acc, synthData) => {
+		return acc.add(
+			Big(synthData.synth.totalSupply.toString()).mul(
+				synthData.synth.price.toString()
+			)
+		);
+	} , Big(0));
+
 	return (
 		<Box p={4}>
 			<Flex justify={"space-between"}>
@@ -84,11 +93,11 @@ export default function PoolLiquidity() {
 			</Flex>
 			<Divider mt={2} />
             <Flex flexDir={'column'} gap={1} mt={4}>
-                <PoolStat icon={<IoIosWater />} title={'Total Liquidity'} value={Big(liquidityData?.totalDebtUSD?.toString() || '0').div(ONE_ETH).toNumber()} formatter={dollarFormatter.format} />
+                <PoolStat icon={<IoIosWater />} title={'Total Liquidity'} value={Big(totalLiquidity.toString() || '0').div(ONE_ETH).toNumber()} formatter={dollarFormatter.format} />
                 <Box className={`${VARIANT}-${colorMode}-containerBody2`}>
-                    <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'rLP Composition'} value={Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()} formatter={
+                    {/* <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'Pool Composition'} value={Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()} formatter={
 						(value: any) => "Price: " + dollarFormatter.format(value) + " / rLP"  
-                    } />
+                    } /> */}
                     <PieChart width={250} height={200}>
                         <Pie
                             data={data}

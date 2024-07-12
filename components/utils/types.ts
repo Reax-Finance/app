@@ -1,12 +1,11 @@
 import { BigNumber } from "ethers";
 
 export interface Account {
-	healthFactor: string;
-	availableToMintUSD: string;
-	userTotalBalanceUSD: string;
-	userAdjustedBalanceUSD: string;
-	userThresholdBalanceUSD: string;
-	userTotalDebtUSD: string;
+	userTotalBalanceUSD: BigNumber;
+	userAdjustedBalanceUSD: BigNumber;
+	userThresholdBalanceUSD: BigNumber;
+	userDebtUSD: BigNumber;
+	accountHealth: BigNumber;
 }
 
 export interface ReserveData {
@@ -17,13 +16,13 @@ export interface ReserveData {
 	vaults: VaultData[];
 }
 
-export interface VaultData {
-	asset: Asset;
-	vaultToken: Asset;
-	totalAssets: BigNumber;
-	userBalance: BigNumber;
-	config: ReserveConfig;
-}
+// export interface VaultData {
+// 	asset: Asset;
+// 	vaultToken: Asset;
+// 	totalAssets: BigNumber;
+// 	userBalance: BigNumber;
+// 	config: ReserveConfig;
+// }
 
 export interface Asset {
 	id: string;
@@ -33,7 +32,7 @@ export interface Asset {
 	totalSupply: BigNumber;
 	pythId: string;
 	price: BigNumber;
-	balance: BigNumber;
+	walletBalance: BigNumber;
 	approvalToRouter: BigNumber;
 }
 
@@ -53,4 +52,38 @@ export interface LiquidityData {
 	lpToken: Asset;
 	debtToken: Asset;
 	synths: Asset[];
+}
+
+// ------------------------------
+
+export interface UIData {
+	synths: SynthData[];
+	router: string;
+	blockNumber: number;
+}
+
+export interface SynthData {
+	synth: Asset;
+	market: MarketData;
+}
+
+export interface MarketData {
+	exists: boolean;
+	totalAssetsUSD: BigNumber;
+	totalDebtUSD: BigNumber;
+	userTotalBalanceUSD: BigNumber;
+	userAdjustedBalanceUSD: BigNumber;
+	userThresholdBalanceUSD: BigNumber;
+	userDebtUSD: BigNumber;
+	accountHealth: BigNumber;
+	interestRate: BigNumber;
+	debtToken: Asset;
+	vaults: VaultData[];
+}
+
+export interface VaultData {
+	asset: Asset;
+	vaultToken: Asset;
+	ratio: BigNumber;
+	config: ReserveConfig;
 }

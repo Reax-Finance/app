@@ -34,19 +34,14 @@ export default function useChainData() {
         return contract.connect(provider.getSigner())[method](...params, {value: value});
     }
 
-    const routerAddress: { [key: number]: string | undefined } = {
-        11155111: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_11155111,
-        84532: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_84532,
-        421614: process.env.NEXT_PUBLIC_ROUTER_ADDRESS_421614
-    }
-
     const uidpAddress: { [key: number]: string | undefined } = {
         11155111: process.env.NEXT_PUBLIC_UIDP_ADDRESS_11155111,
         84532: process.env.NEXT_PUBLIC_UIDP_ADDRESS_84532,
-        421614: process.env.NEXT_PUBLIC_UIDP_ADDRESS_421614
+        421614: process.env.NEXT_PUBLIC_UIDP_ADDRESS_421614,
+        1337: process.env.NEXT_PUBLIC_UIDP_ADDRESS_1337,
     }
 
-    const rxRouter = () => getContract("ReaxRouter", routerAddress[chain?.id ?? baseSepolia.id]!);
+    const rxRouter = () => getContract("ReaxRouter", uidpAddress[chain?.id ?? baseSepolia.id]!);
     const uidp = () => getContract("UIDataProvider", uidpAddress[chain?.id ?? baseSepolia.id]!);
 
     return {

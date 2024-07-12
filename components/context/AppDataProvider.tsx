@@ -3,7 +3,7 @@ import { ADDRESS_ZERO, isSupportedChain } from '../../src/const';
 import { useEffect } from 'react';
 import { useAccount } from "wagmi";
 import { Status } from "../utils/status";
-import { Account, ReserveData, LiquidityData } from "../utils/types";
+import { Account, ReserveData, LiquidityData, SynthData, UIData } from '../utils/types';
 import useUpdateData from "../utils/useUpdateData";
 import useChainData from "./useChainData";
 
@@ -13,6 +13,9 @@ export interface AppDataValue {
 	account: Account|undefined,
 	reserveData: ReserveData|undefined;
 	liquidityData: LiquidityData|undefined;
+	synths: SynthData[];
+	routerAddress: string|undefined;
+	blockNumber: number;
 }
 
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
@@ -24,6 +27,11 @@ function AppDataProvider({ children }: any) {
 	
 	const [reserveData, setReserveData] = React.useState<ReserveData>();
 	const [liquidityData, setLiquidityData] = React.useState<LiquidityData>();
+
+	const [synths, setSynths] = React.useState<SynthData[]>([]);
+
+	const [routerAddress, setRouterAddress] = React.useState<any>();
+	const [blockNumber, setBlockNumber] = React.useState<number>(0);
 
 	const { address, chain } = useAccount();
 
@@ -42,27 +50,20 @@ function AppDataProvider({ children }: any) {
 			let _address = address || ADDRESS_ZERO;
 			const start = Date.now();
 			const uidp = _uidp();
-			console.log("Fetching data for", _address, chain?.id, uidp.provider);
+			console.log("Fetching data for", _address, chain?.id, updateData);
 			// if(first) setStatus(Status.FETCHING);
 			uidp.callStatic.multicall([
 				uidp.interface.encodeFunctionData("updatePythData", [updateData]),
-				uidp.interface.encodeFunctionData("getAllData", [_address]),
+				uidp.interface.encodeFunctionData("getAllData", [_address, updateData.length > 0]),
 			])
+			// uidp.callStatic.getAllData(_address, updateData.length > 0)
 				.then(async (res: any) => {
 					res = uidp.interface.decodeFunctionResult("getAllData", res[1])[0];
+					console.log("Data", res);
+					setSynths(res.synths);
+					setRouterAddress(res.router);
+					setBlockNumber(res.blockNumber);
 					console.log("Data latency", Date.now() - start, "ms");
-					setAccount((prev) => prev && !chain ? prev :{
-						healthFactor: res.healthFactor.toString(),
-						availableToMintUSD: res.availableToMintUSD.toString(),
-						userTotalBalanceUSD: res.reserveData.userTotalBalanceUSD.toString(),
-						userAdjustedBalanceUSD: res.reserveData.userAdjustedBalanceUSD.toString(),
-						userThresholdBalanceUSD: res.reserveData.userThresholdBalanceUSD.toString(),
-						userTotalDebtUSD: res.liquidityData.userTotalDebtUSD.toString()
-					});
-					setReserveData((prev) => prev && !chain ? prev : res.reserveData);
-					setLiquidityData((prev) => prev && !chain ? prev : res.liquidityData);
-					setErrorCount(0);
-					
 					setStatus(Status.SUCCESS);
 				})
 				.catch(async (err: any) => {
@@ -82,7 +83,7 @@ function AppDataProvider({ children }: any) {
 	
 			// Then fetch data every 2 seconds
 			intervalId = setInterval(async () => {
-				let _updateData = await getUpdateData(getAllPythFeeds(reserveData, liquidityData));
+				let _updateData = await getUpdateData(getAllPythFeeds(synths));
 				setUpdateData(_updateData);
 			}, 10000);
 		};
@@ -121,6 +122,9 @@ function AppDataProvider({ children }: any) {
 		message,
 		reserveData,
 		liquidityData,
+		synths,
+		routerAddress,
+		blockNumber,
 	};
 
 	return (

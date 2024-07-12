@@ -6,20 +6,19 @@ import { ethers } from 'ethers';
 
 export default function useUpdateData() {
     const {
-		reserveData: _reserveData,
-        liquidityData: _liquidityData
+        synths: _synths
 	} = useContext(AppDataContext);
 
-    const getAllPythFeeds = (reserveData = _reserveData, liquidityData = _liquidityData) => {
+    const getAllPythFeeds = (synths = _synths) => {
         let pythFeeds = [];
-        if(reserveData){
-            for(let i in reserveData.vaults){
-                pythFeeds.push(reserveData.vaults[i].asset.pythId);
-            }
-        }
-        if(liquidityData){
-            for(let i in liquidityData.synths){
-                pythFeeds.push(liquidityData.synths[i].pythId);
+        if(synths){
+            for(let i in synths){
+                // Add synth 
+                pythFeeds.push(synths[i].synth.pythId);
+                // Add vaults
+                for(let j in synths[i].market.vaults){
+                    pythFeeds.push(synths[i].market.vaults[j].vaultToken.pythId);
+                }
             }
         }
         // Remove duplicates

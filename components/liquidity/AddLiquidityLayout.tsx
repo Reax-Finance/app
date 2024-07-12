@@ -55,7 +55,7 @@ export default function AddLiquidityLayout({
 	}
 
     const handleMaxInput = () => {
-		let _inputAmount = Big(tokens[inputAssetIndex].balance.toString()).div(Big(10).pow(tokens[inputAssetIndex].decimals).toString());
+		let _inputAmount = Big(tokens[inputAssetIndex].walletBalance.toString()).div(Big(10).pow(tokens[inputAssetIndex].decimals).toString());
 		updateInputAmount(_inputAmount.toString());
 	};
 
@@ -137,7 +137,7 @@ export default function AddLiquidityLayout({
                             {" "}
                             {tokenFormatter.format(
                                 tokens[inputAssetIndex]
-                                    ? tokens[inputAssetIndex].balance / 10**tokens[inputAssetIndex].decimals
+                                    ? tokens[inputAssetIndex].walletBalance / 10**tokens[inputAssetIndex].decimals
                                     : 0
                             )}
                         </Text>
@@ -148,7 +148,7 @@ export default function AddLiquidityLayout({
             {/* Output */}
             <Box bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} border={'1px'} borderColor={'whiteAlpha.200'} m={4} py={2} px={4}>
                 <Flex align={'center'} gap={2}>
-                    <Text>Mint LP</Text>
+                    <Text>Mint</Text>
                     {isMintOpen ? <IconButton icon={<CloseIcon w={'10px'} />} onClick={onMintClose} aria-label={""} size={'xs'} /> : <IconButton icon={<BsPlus size={20} />} onClick={onMintOpen} aria-label={""} size={'xs'} />}
                 </Flex>
                 {isMintOpen && <><Flex align="center" justify={"space-between"} mt={2}>
@@ -205,11 +205,8 @@ export default function AddLiquidityLayout({
                     </Flex>}
                 </Flex> </>}
             </Box>
-            
-
 
             <Box px="5" >
-
                 {steps.length > 0 && <Box>
                     {steps.map((step: any, index: number) => (<>
                         <Flex align={'center'} px={0} border={'1px'} borderColor={'whiteAlpha.300'} my={2} h={'40px'}>

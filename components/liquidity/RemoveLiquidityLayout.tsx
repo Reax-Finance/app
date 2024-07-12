@@ -49,9 +49,12 @@ export default function RemoveLiquidityLayout({
     tokens,
     outToken,
     steps,
-    updatedAccount
+    updatedAccount,
+    account,
+    debtToken,
+    config
 }: any) {
-    const { liquidityData, account, reserveData } = useAppData();
+    const { synths, reserveData } = useAppData();
     const { address, isConnected } = useAccount();
 	const { colorMode } = useColorMode();
     const { isOpen: isStakeOpen, onOpen: onStakeOpen, onClose: onStakeClose } = useDisclosure({
@@ -67,26 +70,35 @@ export default function RemoveLiquidityLayout({
         defaultIsOpen: true
     });
 
-    if(!liquidityData) return <></>;
+    if(!debtToken || !outToken) return <></>;
 
     const handleMaxOutput = () => {
 		updateOutputAmount(maxLp());
 	}
 
     const maxLp = () => {
-        let balance = Big(liquidityData?.lpToken?.balance?.toString()).div(ONE_ETH).toString();
-        let debt = Big(liquidityData?.debtToken?.balance?.toString()).div(ONE_ETH).toString();
+        let balance = Big(outToken?.walletBalance?.toString()).div(ONE_ETH).toString();
+        let debt = Big(debtToken?.walletBalance?.toString()).div(ONE_ETH).toString();
         return Big(balance).gt(debt) ? debt : balance;
     }
 
     const maxInput = () => {
-        if(!account || !reserveData) return '0';
-        let max = Big(account.userAdjustedBalanceUSD).sub(Big(account.userTotalDebtUSD).sub(Big(Number(outputAmount) > 0 ? outputAmount : 0).mul(outToken.price.toString()))).mul(10000).div(reserveData.vaults[inputAssetIndex].config.baseLTV.toString()).div(tokens[inputAssetIndex].price.toString()).mul(10**8).div(ONE_ETH).toString();
+        if(!account || !config || !tokens[inputAssetIndex] || tokens[inputAssetIndex].price?.eq(0)) return '0';
+        let max = Big(account.userAdjustedBalanceUSD.toString())
+            .sub(Big(account.userDebtUSD.toString())
+            .sub(Big(Number(outputAmount) > 0 ? outputAmount : 0)
+            // .mul(ONE_ETH)
+            .mul(outToken.price.toString())))
+            // .div(10**8)
+            .mul(10000).div(config.baseLTV.toString())
+            .div(tokens[inputAssetIndex].price.toString())
+            .mul(10**8)
+            .div(ONE_ETH).toString();
         // console.log(account.userTotalDebtUSD, Big(outputAmount).mul(outToken.price.toString()).toString());
-        let balance = Big(tokens[inputAssetIndex].balance.toString()).div(10**tokens[inputAssetIndex].decimals).toString();
+        let balance = Big(tokens[inputAssetIndex].walletBalance.toString()).div(10**tokens[inputAssetIndex].decimals).toString();
         let zero = Big(0);
 
-        // console.log("Max", max.div(ONE_ETH).toString(), "Balance", balance, "Zero", zero.toString());
+        console.log("Max", max.toString(), "Balance", balance, "Zero", zero.toString());
         if(Big(max).lt(zero)) return zero.toString();
         return Big(max).lt(balance) ? max : balance;
     }
@@ -102,7 +114,7 @@ export default function RemoveLiquidityLayout({
             {/* Output */}
             <Box bg={colorMode == 'dark' ? 'darkBg.400' : 'lightBg.600'} border={'1px'} borderColor={'whiteAlpha.200'} m={4} py={2} px={4}>
                 <Flex align={'center'} gap={2}>
-                    <Text>Burn LP</Text>
+                    <Text>Burn</Text>
                     {isMintOpen ? <IconButton icon={<CloseIcon w={'10px'} />} onClick={onMintClose} aria-label={""} size={'xs'} /> : <IconButton icon={<BsPlus size={20} />} onClick={onMintOpen} aria-label={""} size={'xs'} />}
                 </Flex>
                 {isMintOpen && <><Flex align="center" justify={"space-between"} mt={2}>
@@ -145,7 +157,7 @@ export default function RemoveLiquidityLayout({
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>
                         <Text>{
-                            Big(liquidityData?.lpToken?.balance?.toString()).gt(liquidityData?.debtToken?.balance?.toString()) ? "Max" : "Balance"
+                            Big(outToken?.walletBalance?.toString()).gt(debtToken?.walletBalance?.toString()) ? "Max" : "Balance"
                         }</Text>
                         <Text
                             onClick={handleMaxOutput}

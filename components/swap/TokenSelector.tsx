@@ -79,7 +79,7 @@ function TokenSelector({
 
 	const { colorMode } = useColorMode();
 
-	if(tokens.length <= 1) return <></>
+	// if(tokens.length <= 1) return <></>
 
 	return (
 		<>
@@ -199,7 +199,7 @@ function TokenSelector({
 									>
 										<Text fontSize={'xs'} color={"gray.500"}>Balance</Text>
 										<Text fontSize={"md"}>
-											{tokenFormatter.format(Big(tokens[tokenIndex].balance ?? 0).div(10 ** (tokens[tokenIndex].decimals ?? 18)).toNumber())}
+											{tokenFormatter.format(Big(tokens[tokenIndex].walletBalance ?? 0).div(10 ** (tokens[tokenIndex].decimals ?? 18)).toNumber())}
 										</Text>
 									</Box>}
 								</Flex>

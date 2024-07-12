@@ -18,13 +18,13 @@ import { FaArrowRight } from "react-icons/fa";
 import { ArrowRightIcon } from "@chakra-ui/icons";
 import { RiCashLine } from "react-icons/ri";
 import { DiAtom } from "react-icons/di";
+import { Account } from "../utils/types";
 
-export default function PoolPosition({ updatedAccount }: any) {
+export default function PoolPosition({ updatedAccount, account }: { updatedAccount?: Account; account?: Account }) {
 	const { colorMode } = useColorMode();
-	const { account } = useAppData();
 	const formatHealthFactor = (hf: string) =>
 		Big(hf).div(ONE_ETH).gt(10) ? "10+" : Big(hf).div(ONE_ETH).toFixed(2);
-	if (!account || !updatedAccount) return <></>;
+	if (!account || !updatedAccount?.userDebtUSD) return <></>;
 
 	return (
 		<Box className={`${VARIANT}-${colorMode}-containerBody`} p={4}>
@@ -38,8 +38,8 @@ export default function PoolPosition({ updatedAccount }: any) {
 				<PoolStat
 					icon={<RiCashLine size={"18px"} />}
 					title={"Staked Balance"}
-					value={Big(account.userTotalBalanceUSD).div(ONE_ETH).toNumber()}
-					updatedValue={Big(updatedAccount.userTotalBalanceUSD)
+					value={Big(account.userTotalBalanceUSD.toString()).div(ONE_ETH).toNumber()}
+					updatedValue={Big(updatedAccount.userTotalBalanceUSD.toString())
 							.div(ONE_ETH)
 							.toNumber()}
 					formatter={dollarFormatter.format}
@@ -47,8 +47,8 @@ export default function PoolPosition({ updatedAccount }: any) {
 				<PoolStat
 					icon={<BsBank />}
 					title={"Debt"}
-					value={Big(account.userTotalDebtUSD).div(ONE_ETH).toNumber()}
-					updatedValue={Big(updatedAccount.userTotalDebtUSD)
+					value={Big(account.userDebtUSD.toString()).div(ONE_ETH).toNumber()}
+					updatedValue={Big(updatedAccount.userDebtUSD.toString())
 							.div(ONE_ETH)
 							.toNumber()}
 					formatter={dollarFormatter.format}
@@ -57,15 +57,15 @@ export default function PoolPosition({ updatedAccount }: any) {
 				<PoolStat
 					icon={<BsHeart />}
 					title={"Health Factor"}
-					value={account.healthFactor}
-					updatedValue={updatedAccount.healthFactor}
+					value={account.accountHealth.toString()}
+					updatedValue={updatedAccount.accountHealth.toString()}
 					formatter={formatHealthFactor}
 				/>
 				<PoolStat
 					icon={<DiAtom size={'20px'} />}
 					title={"Available to mint"}
-					value={Big(account.availableToMintUSD).div(ONE_ETH).toNumber()}
-					updatedValue={Big(updatedAccount.availableToMintUSD)
+					value={Big(account.userAdjustedBalanceUSD.toString()).sub(account.userDebtUSD.toString()).div(ONE_ETH).toNumber()}
+					updatedValue={Big(account.userAdjustedBalanceUSD.toString()).sub(account.userDebtUSD.toString())
 							.div(ONE_ETH)
 							.toNumber()}
 					formatter={dollarFormatter.format}

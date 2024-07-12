@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet, tenderlyMainnet } from "./chains";
 import Big from "big.js";
-import { Chain, arbitrumGoerli, arbitrumSepolia, baseSepolia, mainnet, sepolia } from "wagmi/chains";
+import { Chain, arbitrumGoerli, arbitrumSepolia, baseSepolia, localhost, mainnet, sepolia } from "wagmi/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
 const _sepolia = {...sepolia, rpcUrls: {default: {http: ['https://eth-sepolia.g.alchemy.com/v2/_yRldozKQjqTn6ifrZ6xqqbjk2JCdgM8']}}};
@@ -14,6 +14,7 @@ const NETWORKS: any = {
 	[lineaTestnet.id]: lineaTestnet,
 	[sepolia.id]: _sepolia,
 	[tenderlyMainnet.id]: tenderlyMainnet,
+	// [baseSepolia.id]: baseSepolia,
 	[baseSepolia.id]: baseSepolia,
 	[arbitrumSepolia.id]: arbitrumSepolia
 }

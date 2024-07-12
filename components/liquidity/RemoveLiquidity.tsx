@@ -4,30 +4,22 @@ import {
 	Text,
 	Flex,
 	Link,
-	useColorMode,
-	Heading,
-	Divider,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
-import Head from "next/head";
 import { ADDRESS_ZERO, ONE_ETH } from "../../src/const";
-import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
 import useUpdateData from "../utils/useUpdateData";
 import Big from "big.js";
 import { formatInput, parseInput } from "../utils/number";
-import useHandleError, { PlatformType } from "../utils/useHandleError";
 import { useAppData } from "../context/AppDataProvider";
-import { VARIANT } from "../../styles/theme";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { ArrowRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { BigNumber, ethers } from "ethers";
 import TokenSelector from "../swap/TokenSelector";
 import { useRouter } from "next/router";
 import useApproval from "../context/useApproval";
 import RemoveLiquidityLayout from "./RemoveLiquidityLayout";
-import { Asset } from "../utils/types";
+import { Account, Asset } from "../utils/types";
 import useChainData from "../context/useChainData";
 
 interface ApprovalStep {
@@ -40,7 +32,15 @@ interface ApprovalStep {
 	}
 }
 
-function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
+interface RemoveLiquidityProps {
+	updatedAccount: Account|undefined;
+	setUpdatedAccount: (account: Account) => void;
+	account: Account|undefined;
+	tabIndex: number;
+	marketIndex: number;
+}
+
+function RemoveLiquidity({ updatedAccount, setUpdatedAccount, account, tabIndex, marketIndex }: RemoveLiquidityProps) {
 	const [inputAssetIndex, setInputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState("");
 	const [outputAmount, setOutputAmount] = useState("");
@@ -55,9 +55,8 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
 	const { getUpdateData, getUpdateFee } = useUpdateData();
-	const { liquidityData, reserveData, account } = useAppData();
+	const { synths, routerAddress } = useAppData();
 	const router = useRouter();
-	const { rxRouter: _rxRouter } = useChainData();
 
 	const {
 		approve,
@@ -79,11 +78,14 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	const { getContract, send, rxRouter } = useChainData();
 
 	// only if vaults[i].userBalance > 0
-	const tokens = reserveData
-		? reserveData.vaults.filter((vault) => ((Big(vault.userBalance.toString()).gt(0) || Big(account?.userTotalBalanceUSD?.toString() || 0).eq(0)) && vault.asset.id !== ethers.constants.AddressZero)).map((vault) => ({...vault.vaultToken, name: vault.asset.name, symbol: vault.asset.symbol, decimals: vault.asset.decimals, asset: vault.asset })) 
+	const tokens = synths[marketIndex]
+		? synths[marketIndex].market.vaults.filter((vault) => ((Big(vault.vaultToken.walletBalance.toString()).gt(0) || Big(account?.userTotalBalanceUSD?.toString() || 0).eq(0)) && 
+		vault.asset.id !== ethers.constants.AddressZero)).map((vault) => ({...vault.vaultToken, name: vault.asset.name, symbol: vault.asset.symbol, decimals: vault.asset.decimals, asset: vault.asset })) 
 		: [];
-	const outToken = liquidityData?.lpToken;
+	
+	const outToken = synths[marketIndex]?.synth;
 	const inToken = tokens[inputAssetIndex];
+	const debtToken = synths[marketIndex]?.market.debtToken;
 
 	useEffect(() => {
 		if (tabIndex == 1) {
@@ -104,36 +106,36 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	}, [tokens, inputAssetIndex]);
 
 	useEffect(() => {
-		if (!account || !reserveData || !liquidityData || !outToken) return;
+		if (!account || !synths[marketIndex] || !outToken) return;
 
 		const inUsdScaled = inToken ? Big(Number(inputAmount) || 0)
 					.mul(Big(inToken.asset.price.toString()).div(10 ** 8))
 					.mul(ONE_ETH)
 			: Big(0);
 		// console.log("inUsdScaled", inUsdScaled.toString(), inToken);
-		let userTotalBalanceUSD = Big(account.userTotalBalanceUSD).sub(
+		let userTotalBalanceUSD = Big(account.userTotalBalanceUSD.toString()).sub(
 			inUsdScaled
 		);
 		// console.log("inUsdScaled-userTotalBalanceUSD", userTotalBalanceUSD.toString());
-		let userAdjustedBalanceUSD = Big(account.userAdjustedBalanceUSD).sub(
+		let userAdjustedBalanceUSD = Big(account.userAdjustedBalanceUSD.toString()).sub(
 			inUsdScaled.mul(
 				Big(
-					reserveData.vaults[
+					synths[marketIndex].market.vaults[
 						inputAssetIndex
 					].config.baseLTV.toString()
 				).div(10000)
 			)
 		);
-		let userThresholdBalanceUSD = Big(account.userThresholdBalanceUSD).sub(
+		let userThresholdBalanceUSD = Big(account.userThresholdBalanceUSD.toString()).sub(
 			inUsdScaled.mul(
 				Big(
-					reserveData.vaults[
+					synths[marketIndex].market.vaults[
 						inputAssetIndex
 					].config.liquidationThreshold.toString()
 				).div(10000)
 			)
 		);
-		let userTotalDebtUSD = Big(account.userTotalDebtUSD).sub(
+		let userTotalDebtUSD = Big(account.userDebtUSD.toString()).sub(
 			Big(Number(outputAmount) || 0).mul(Big(outToken.price.toString()))
 		);
 		let healthFactor = Big(ethers.constants.MaxUint256.toString());
@@ -141,18 +143,16 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 			healthFactor = userThresholdBalanceUSD
 				.div(userTotalDebtUSD)
 				.mul(ONE_ETH);
-		let availableToMintUSD = userAdjustedBalanceUSD.sub(userTotalDebtUSD);
 		setUpdatedAccount({
-			healthFactor: healthFactor.toString(),
-			availableToMintUSD: availableToMintUSD.toString(),
-			userTotalBalanceUSD: userTotalBalanceUSD.toString(),
-			userAdjustedBalanceUSD: userAdjustedBalanceUSD.toString(),
-			userTotalDebtUSD: userTotalDebtUSD.toString(),
-			userThresholdBalanceUSD: userThresholdBalanceUSD.toString(),
+			accountHealth: BigNumber.from(healthFactor.toFixed(0)),
+			userTotalBalanceUSD: BigNumber.from(userTotalBalanceUSD.toFixed(0)),
+			userAdjustedBalanceUSD: BigNumber.from(userAdjustedBalanceUSD.toFixed(0)),
+			userThresholdBalanceUSD: BigNumber.from(userThresholdBalanceUSD.toFixed(0)),
+			userDebtUSD: BigNumber.from(userTotalDebtUSD.toFixed(0))
 		});
 	}, [inputAmount, outputAmount]);
 
-	if (!account || !reserveData || !liquidityData || !outToken) return <></>;
+	if (!account || !synths[marketIndex] || !outToken) return <></>;
 
 	const updateInputAmount = (value: any) => {
 		value = parseInput(value);
@@ -173,6 +173,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 	};
 
 	const remove = async () => {
+		if(!routerAddress) return;
 		setLoading(true);
 		
 		const updateData = await getUpdateData();
@@ -180,7 +181,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 		let calls = [];
 		let value = "0";
 		
-		const router = _rxRouter();
+		const router = getContract("ReaxRouter", routerAddress);
 		calls.push(router.interface.encodeFunctionData("updateOracleData", [updateData]));
 		if (Number(outputAmount) > 0) {
 			value = Big(value).add(updateFee).toFixed(0);
@@ -190,7 +191,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 					router.interface.encodeFunctionData("permit", [
 						address,
 						router.address,
-						liquidityData.lpToken.id,
+						outToken.id,
 						approvedLpAmount,
 						approvalLpDeadline,
 						v,
@@ -201,10 +202,11 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 			}
 			calls.push(
 				router.interface.encodeFunctionData("burn", [
-					address,
+					debtToken.id,
 					Big(outputAmount)
 						.mul(Big(10).pow(outToken.decimals))
 						.toFixed(0),
+					address,
 				])
 			);
 		}
@@ -225,6 +227,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 				);
 				calls.push(
 					router.interface.encodeFunctionData("unstake", [
+						debtToken.id,
 						inToken.asset.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
@@ -276,15 +279,15 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 
 	const getSteps = () => {
 		let steps: ApprovalStep[] = [];
-		if (!inToken || !liquidityData.lpToken) return steps;
-		const rxRouter = _rxRouter();
+		if (!inToken || !outToken) return steps;
+		
 		if (
 			Number(outputAmount) > 0 &&
 			Big(approvedLpAmount)
-				.add(liquidityData.lpToken.approvalToRouter.toString())
+				.add(outToken.approvalToRouter.toString())
 				.lt(
 					Big(Number(outputAmount) || 0).mul(
-						10 ** liquidityData.lpToken.decimals
+						10 ** outToken.decimals
 					)
 				)
 		) {
@@ -292,11 +295,11 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 				type: "APPROVAL",
 				execute: () =>
 					approveLp(
-						liquidityData.lpToken,
-						rxRouter.address!
+						outToken,
+						routerAddress!
 					),
 				data: {
-					token: liquidityData.lpToken,
+					token: outToken,
 					amount: outputAmount,
 				},
 				loading: approvalLpLoading,
@@ -311,7 +314,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 			steps.push({
 				type: "APPROVAL",
 				execute: () =>
-					approve(inToken, rxRouter.address!),
+					approve(inToken, routerAddress!),
 				data: {
 					token: inToken,
 					amount: inputAmount,
@@ -337,13 +340,13 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 		else if (
 			(Number(outputAmount) || 0) > 0 && Big(outputAmount)
 				.mul(ONE_ETH)
-				.gt(outToken.balance.toString())
+				.gt(outToken.walletBalance.toString())
 		)
 			return {
 				valid: false,
 				message: `Insufficient ${outToken.symbol} Balance`,
 			};
-		else if (Big(updatedAccount.availableToMintUSD).lt(0))
+		else if (Big(updatedAccount?.userAdjustedBalanceUSD?.toString() || 0).sub(updatedAccount?.userDebtUSD?.toString() || 0).lt(0))
 			return { valid: false, message: "Insufficient Staked Balance" };
 		else if (getSteps().length > 0)
 			return {
@@ -370,6 +373,9 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
 				outToken={outToken}
 				steps={getSteps()}
 				updatedAccount={updatedAccount}
+				account={account}
+				debtToken={debtToken}
+				config={synths[marketIndex].market.vaults[inputAssetIndex].config}
 			/>
 
 			<TokenSelector

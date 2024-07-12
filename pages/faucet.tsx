@@ -68,9 +68,10 @@ import ThBox from "../components/ui/table/ThBox";
 import TdBox from "../components/ui/table/TdBox";
 import { NATIVE_FAUCET_LINK, isSupportedChain } from "../src/const";
 import useChainData from "../components/context/useChainData";
+import { Asset } from "../components/utils/types";
 
 export default function Faucet() {
-	const { reserveData } = useAppData();
+	const { synths } = useAppData();
 	const [loading, setLoading] = React.useState<any>(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [openedCollateral, setOpenedCollateral] = React.useState<any>(null);
@@ -78,9 +79,22 @@ export default function Faucet() {
 
 	const { address, isConnected, chain } = useAccount();
 
-	const tokens = reserveData
-		? reserveData.vaults.map((vault: any) => vault.asset)
-		: [];
+	// synths.synth.market.vaults is an array of all the asset for that market
+	// fetch assets from all synth markets
+	const tokens = () => {
+		if (!synths?.[0]) return [];
+		let tokens: Asset[] = [];
+		for (let i = 0; i < synths.length; i++) {
+			tokens = tokens.concat(synths[i].market.vaults.map((vault) => vault.asset));
+		}
+		// remove duplicates
+		tokens = tokens.filter((asset, index, self) =>
+			index === self.findIndex((t) => t.id === asset.id)
+		);
+		// remove non mintable tokens
+		tokens = tokens.filter((token) => !nonMintable.includes(token.symbol));
+		return tokens;
+	}
 
 	const _onOpen = (collateral: any) => {
 		setOpenedCollateral(collateral);
@@ -190,9 +204,7 @@ export default function Faucet() {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{tokens.map((token: any, index: number) => {
-							if (nonMintable.includes(token.symbol)) return;
-							return (
+						{tokens().map((token: any, index: number) => (
 								<Tr key={index}>
 									<TdBox
 										style={
@@ -265,8 +277,8 @@ export default function Faucet() {
 										</Flex>
 									</TdBox>
 								</Tr>
-							);
-						})}
+							)
+						)}
 					</Tbody>
 				</Table>
 			</TableContainer>

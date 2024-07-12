@@ -30,6 +30,7 @@ import { useRouter } from "next/router";
 import useApproval from "../context/useApproval";
 import useDelegate from "../context/useDelegate";
 import useChainData from "../context/useChainData";
+import { Account } from "../utils/types";
 
 interface ApprovalStep {
 	type: "APPROVAL" | "PERMIT" | "DELEGATION";
@@ -38,7 +39,15 @@ interface ApprovalStep {
 	execute: any;
 }
 
-function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
+interface AddLiquidityProps {
+	updatedAccount: Account;
+	setUpdatedAccount: (account: Account) => void;
+	account: Account;
+	tabIndex: number;
+	marketIndex: number;
+}
+
+function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, marketIndex}: AddLiquidityProps) {
 	const [inputAssetIndex, setInputAssetIndex] = useState(0);
 	const [inputAmount, setInputAmount] = useState("");
 	const [outputAmount, setOutputAmount] = useState("");
@@ -53,7 +62,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	const [loading, setLoading] = useState(false);
 	const toast = useToast();
 	const { getUpdateData, getUpdateFee } = useUpdateData();
-	const { liquidityData, reserveData, account } = useAppData();
+	const { synths, routerAddress } = useAppData();
 	const router = useRouter();
 	const { chain } = useAccount();
 
@@ -74,12 +83,15 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		reset: resetDelegation,
 	} = useDelegate({});
 
-	const tokens = reserveData
-		? reserveData.vaults.map((vault) => vault.asset)
+	const tokens = synths[marketIndex]
+		? synths[marketIndex].market.vaults.map((vault) => vault.asset)
 		: [];
-	const outToken = liquidityData?.lpToken;
+
+	const outToken = synths[marketIndex]?.synth;
 	const inToken = tokens[inputAssetIndex];
-	const { getContract, send, rxRouter: _rxRouter } = useChainData();
+
+	const debtToken = synths[marketIndex]?.market.debtToken;
+	const { getContract, send } = useChainData();
 
 	useEffect(() => {
 		if (tabIndex == 0) {
@@ -100,33 +112,33 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	}, [tokens, inputAssetIndex]);
 
 	useEffect(() => {
-		if (!account || !reserveData || !liquidityData || !outToken) return;
+		if (!account || !synths[marketIndex]?.market?.vaults || !outToken) return;
 
 		const inUsdScaled = Big(Number(inputAmount) || 0)
 					.mul(Big(inToken.price.toString()).div(10 ** 8))
 					.mul(ONE_ETH);
-		let userTotalBalanceUSD = Big(account.userTotalBalanceUSD).add(
+		let userTotalBalanceUSD = Big(account.userTotalBalanceUSD.toString()).add(
 			inUsdScaled
 		);
-		let userAdjustedBalanceUSD = Big(account.userAdjustedBalanceUSD).add(
+		let userAdjustedBalanceUSD = Big(account.userAdjustedBalanceUSD.toString()).add(
 			inUsdScaled.mul(
 				Big(
-					reserveData.vaults[
+					synths[marketIndex]?.market?.vaults[
 						inputAssetIndex
 					].config.baseLTV.toString()
 				).div(10000)
 			)
 		);
-		let userThresholdBalanceUSD = Big(account.userThresholdBalanceUSD).add(
+		let userThresholdBalanceUSD = Big(account.userThresholdBalanceUSD.toString()).add(
 			inUsdScaled.mul(
 				Big(
-					reserveData.vaults[
+					synths[marketIndex]?.market?.vaults[
 						inputAssetIndex
 					].config.liquidationThreshold.toString()
 				).div(10000)
 			)
 		);
-		let userTotalDebtUSD = Big(account.userTotalDebtUSD).add(
+		let userTotalDebtUSD = Big(account.userDebtUSD.toString()).add(
 			Big(Number(outputAmount) || 0).mul(Big(outToken.price.toString()))
 		);
 		let healthFactor = Big(ethers.constants.MaxUint256.toString());
@@ -134,18 +146,17 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 			healthFactor = userThresholdBalanceUSD
 				.div(userTotalDebtUSD)
 				.mul(ONE_ETH);
-		let availableToMintUSD = userAdjustedBalanceUSD.sub(userTotalDebtUSD);
+		
 		setUpdatedAccount({
-			healthFactor: healthFactor.toString(),
-			availableToMintUSD: availableToMintUSD.toString(),
-			userTotalBalanceUSD: userTotalBalanceUSD.toString(),
-			userAdjustedBalanceUSD: userAdjustedBalanceUSD.toString(),
-			userTotalDebtUSD: userTotalDebtUSD.toString(),
-			userThresholdBalanceUSD: userThresholdBalanceUSD.toString(),
+			accountHealth: BigNumber.from(healthFactor.toFixed(0)),
+			userTotalBalanceUSD: BigNumber.from(userTotalBalanceUSD.toFixed(0)),
+			userAdjustedBalanceUSD: BigNumber.from(userAdjustedBalanceUSD.toFixed(0)),
+			userThresholdBalanceUSD: BigNumber.from(userThresholdBalanceUSD.toFixed(0)),
+			userDebtUSD: BigNumber.from(userTotalDebtUSD.toFixed(0))
 		});
 	}, [inputAmount, outputAmount]);
 
-	if (!account || !reserveData || !liquidityData || !outToken) return <></>;
+	if (!account || !synths[marketIndex] || !outToken) return <></>;
 
 	const updateInputAmount = (value: any) => {
 		value = parseInput(value);
@@ -167,12 +178,13 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 	};
 
 	const add = async () => {
+		if(!routerAddress) return;
 		setLoading(true);
 		const updateData = await getUpdateData();
 		const updateFee = await getUpdateFee();
 		let calls = [];
 		let value = "0";
-		const rxRouter = _rxRouter();
+		const rxRouter = getContract("ReaxRouter", routerAddress);
 		if(Number(outputAmount) > 0) {
 			calls.push(rxRouter.interface.encodeFunctionData("updateOracleData", [updateData]))
 			value = Big(value).add(updateFee).toString();
@@ -195,6 +207,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 				);
 				calls.push(
 					rxRouter.interface.encodeFunctionData("stake", [
+						debtToken.id,
 						inToken.id,
 						Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
@@ -205,7 +218,8 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 				value = Big(inputAmount).mul(ONE_ETH).toString();
 				calls.push(
 					rxRouter.interface.encodeFunctionData("stakeEth", [
-						ethers.constants.MaxUint256,
+						debtToken.id,
+						ethers.constants.MaxUint256
 					])
 				);
 			} else
@@ -225,7 +239,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 					rxRouter.interface.encodeFunctionData("permitDelegation", [
 						address,
 						rxRouter.address,
-						liquidityData.debtToken.id,
+						debtToken.id,
 						delegatedAmount,
 						delegationDeadline,
 						v,
@@ -237,9 +251,10 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 
 			calls.push(
 				rxRouter.interface.encodeFunctionData("mint", [
+					debtToken.id,
 					Big(outputAmount)
 						.mul(Big(10).pow(outToken.decimals))
-						.toFixed(),
+						.toFixed(0),
 					address,
 					address,
 				])
@@ -287,17 +302,19 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 
 	
 	const maxMint = (): number => {
-		let _outputAmount = Big(updatedAccount.userAdjustedBalanceUSD)
-			.sub(account.userTotalDebtUSD)
+		if(outToken.price.eq(0)) return 0;
+		let _outputAmount = Big(updatedAccount.userAdjustedBalanceUSD.toString())
+			.sub(account.userDebtUSD.toString())
+			.mul(10**8)
 			.div(outToken.price.toString())
+			.div(ONE_ETH)
 			.mul(0.99);
 		return _outputAmount.toNumber();
 	};
 
 	const getSteps = () => {
 		let steps: ApprovalStep[] = [];
-		if (!inToken || !liquidityData.debtToken) return steps;
-		const rxRouter = _rxRouter();
+		if (!inToken || !debtToken) return steps;
 
 		if (
 			inToken.id !== ADDRESS_ZERO &&
@@ -313,17 +330,17 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 					token: inToken,
 				},
 				execute: () =>
-					approve(inToken, rxRouter.address!),
+					approve(inToken, routerAddress!),
 			});
 		}
 		if (
 			Number(inputAmount) > 0 &&
 			Number(outputAmount) > 0 &&
 			Big(delegatedAmount)
-				.add(liquidityData.debtToken.approvalToRouter.toString())
+				.add(debtToken.approvalToRouter.toString())
 				.lt(
 					Big(Number(outputAmount) || 0).mul(
-						10 ** liquidityData.debtToken.decimals
+						10 ** debtToken.decimals
 					)
 				)
 		) {
@@ -332,12 +349,12 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 				loading: delegationLoading,
 				data: {
 					amount: inputAmount,
-					token: liquidityData.debtToken,
+					token: debtToken,
 				},
 				execute: () =>
 					delegate(
-						liquidityData.debtToken,
-						rxRouter.address
+						debtToken,
+						routerAddress!
 					),
 			});
 		}
@@ -358,13 +375,13 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, tabIndex}: any) {
 		else if (
 			(Number(inputAmount) || 0) > 0 && Big(inputAmount)
 				.mul(Big(10).pow(inToken.decimals))
-				.gt(Big(inToken.balance.toString()))
+				.gt(Big(inToken.walletBalance.toString()))
 		)
 			return {
 				valid: false,
 				message: `Insufficient ${inToken.symbol} Balance`,
 			};
-		else if (Big(updatedAccount.availableToMintUSD).lt(0))
+		else if (Big(updatedAccount.userAdjustedBalanceUSD.toString()).sub(updatedAccount.userDebtUSD.toString()).lt(0))
 			return { valid: false, message: "Insufficient Staked Balance" };
 		else if (getSteps().length > 0)
 			return {
