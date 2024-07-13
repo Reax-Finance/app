@@ -136,7 +136,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, account, tabIndex,
 			)
 		);
 		let userTotalDebtUSD = Big(account.userDebtUSD.toString()).sub(
-			Big(Number(outputAmount) || 0).mul(Big(outToken.price.toString()))
+			Big(Number(outputAmount) || 0).mul(ONE_ETH).mul(Big(outToken.price.toString())).div(10 ** 8)
 		);
 		let healthFactor = Big(ethers.constants.MaxUint256.toString());
 		if (userTotalDebtUSD.gt(0))

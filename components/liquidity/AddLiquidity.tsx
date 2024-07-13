@@ -4,9 +4,6 @@ import {
 	Text,
 	Flex,
 	Link,
-	useColorMode,
-	Heading,
-	Divider,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
@@ -234,7 +231,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 		}
 		if (Number(outputAmount) > 0) {
 			if (Big(delegatedAmount).gt(0)) {
-				const { v, r, s } = ethers.utils.splitSignature(delegationData);
+				const { v: _v, r: _r, s: _s } = ethers.utils.splitSignature(delegationData);
 				calls.push(
 					rxRouter.interface.encodeFunctionData("permitDelegation", [
 						address,
@@ -242,9 +239,9 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 						debtToken.id,
 						delegatedAmount,
 						delegationDeadline,
-						v,
-						r,
-						s,
+						_v,
+						_r,
+						_s,
 					])
 				);
 			}
@@ -334,7 +331,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 			});
 		}
 		if (
-			Number(inputAmount) > 0 &&
+			// Number(inputAmount) > 0 &&
 			Number(outputAmount) > 0 &&
 			Big(delegatedAmount)
 				.add(debtToken.approvalToRouter.toString())

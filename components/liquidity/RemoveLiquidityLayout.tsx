@@ -54,7 +54,6 @@ export default function RemoveLiquidityLayout({
     debtToken,
     config
 }: any) {
-    const { synths, reserveData } = useAppData();
     const { address, isConnected } = useAccount();
 	const { colorMode } = useColorMode();
     const { isOpen: isStakeOpen, onOpen: onStakeOpen, onClose: onStakeClose } = useDisclosure({
@@ -85,20 +84,16 @@ export default function RemoveLiquidityLayout({
     const maxInput = () => {
         if(!account || !config || !tokens[inputAssetIndex] || tokens[inputAssetIndex].price?.eq(0)) return '0';
         let max = Big(account.userAdjustedBalanceUSD.toString())
-            .sub(Big(account.userDebtUSD.toString())
-            .sub(Big(Number(outputAmount) > 0 ? outputAmount : 0)
-            // .mul(ONE_ETH)
-            .mul(outToken.price.toString())))
+            .sub(Big(account.userDebtUSD.toString()))
+            .add(Big(Number(outputAmount) > 0 ? outputAmount : 0).mul(ONE_ETH).mul(outToken.price.toString()).div(10**8))
             // .div(10**8)
             .mul(10000).div(config.baseLTV.toString())
             .div(tokens[inputAssetIndex].price.toString())
             .mul(10**8)
             .div(ONE_ETH).toString();
-        // console.log(account.userTotalDebtUSD, Big(outputAmount).mul(outToken.price.toString()).toString());
         let balance = Big(tokens[inputAssetIndex].walletBalance.toString()).div(10**tokens[inputAssetIndex].decimals).toString();
         let zero = Big(0);
 
-        console.log("Max", max.toString(), "Balance", balance, "Zero", zero.toString());
         if(Big(max).lt(zero)) return zero.toString();
         return Big(max).lt(balance) ? max : balance;
     }
@@ -152,7 +147,7 @@ export default function RemoveLiquidityLayout({
                 >
                     <Text>
                         {dollarFormatter.format(
-                            (Number(outputAmount) || 0) * (outToken?.price?.div(ethers.constants.WeiPerEther).toNumber() ?? 0)
+                            (Number(outputAmount) || 0) * (outToken?.price?.div(100_000_000).toNumber() ?? 0)
                         )}
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>

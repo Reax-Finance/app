@@ -8,38 +8,39 @@ import useUpdateData from "../utils/useUpdateData";
 import useChainData from "./useChainData";
 
 export interface AppDataValue {
-	status: Status;
-	message: string;
-	account: Account|undefined,
-	reserveData: ReserveData|undefined;
-	liquidityData: LiquidityData|undefined;
-	synths: SynthData[];
-	routerAddress: string|undefined;
-	blockNumber: number;
+  status: Status;
+  message: string;
+  account: Account|undefined,
+  reserveData: ReserveData|undefined;
+  liquidityData: LiquidityData|undefined;
+  synths: SynthData[];
+  routerAddress: string|undefined;
+  blockNumber: number;
 }
 
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
 
 function AppDataProvider({ children }: any) {
-	const [status, setStatus] = React.useState<AppDataValue['status']>(Status.NOT_FETCHING);
-	const [message, setMessage] = React.useState<AppDataValue['message']>("");
-	const [account, setAccount] = React.useState<Account>();
+  const [status, setStatus] = React.useState<AppDataValue['status']>(Status.NOT_FETCHING);
+  const [message, setMessage] = React.useState<AppDataValue['message']>("");
+  
+  const [account, setAccount] = React.useState<Account>();
 	
-	const [reserveData, setReserveData] = React.useState<ReserveData>();
-	const [liquidityData, setLiquidityData] = React.useState<LiquidityData>();
+  const [reserveData, setReserveData] = React.useState<ReserveData>();
+  const [liquidityData, setLiquidityData] = React.useState<LiquidityData>();
 
-	const [synths, setSynths] = React.useState<SynthData[]>([]);
+  const [synths, setSynths] = React.useState<SynthData[]>([]);
 
-	const [routerAddress, setRouterAddress] = React.useState<any>();
-	const [blockNumber, setBlockNumber] = React.useState<number>(0);
+  const [routerAddress, setRouterAddress] = React.useState<any>();
+  const [blockNumber, setBlockNumber] = React.useState<number>(0);
 
-	const { address, chain } = useAccount();
+  const { address, chain } = useAccount();
 
-	const { getUpdateData, getAllPythFeeds } = useUpdateData();
-	const [updateData, setUpdateData] = React.useState<any[]>([]);
-	const { getContract, send, uidp: _uidp } = useChainData();
+  const { getUpdateData, getAllPythFeeds } = useUpdateData();
+  const [updateData, setUpdateData] = React.useState<any[]>([]);
+  const { getContract, send, uidp: _uidp } = useChainData();
 
-	const [errorCount, setErrorCount] = React.useState<number>(0);
+  const [errorCount, setErrorCount] = React.useState<number>(0);
 
 	useEffect(() => {
 		if(typeof window === "undefined") return;
@@ -85,7 +86,7 @@ function AppDataProvider({ children }: any) {
 			intervalId = setInterval(async () => {
 				let _updateData = await getUpdateData(getAllPythFeeds(synths));
 				setUpdateData(_updateData);
-			}, 10000);
+			}, 5000);
 		};
 	
 		const stopInterval = () => {
@@ -116,26 +117,26 @@ function AppDataProvider({ children }: any) {
 		};
 	}, [address, updateData, chain])
 
-	const value: AppDataValue = {
-		account,
-		status,
-		message,
-		reserveData,
-		liquidityData,
-		synths,
-		routerAddress,
-		blockNumber,
-	};
+  const value: AppDataValue = {
+    account,
+    status,
+    message,
+    reserveData,
+    liquidityData,
+    synths,
+    routerAddress,
+    blockNumber,
+  };
 
-	return (
-		<AppDataContext.Provider value={value}>
-			{children}
-		</AppDataContext.Provider>
-	);
+  return (
+    <AppDataContext.Provider value={value}>
+      {children}
+    </AppDataContext.Provider>
+  );
 }
 
 export const useAppData = () => {
-	return React.useContext(AppDataContext);
+  return React.useContext(AppDataContext);
 }
 
 export { AppDataProvider, AppDataContext };

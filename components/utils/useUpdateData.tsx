@@ -25,6 +25,7 @@ export default function useUpdateData() {
         pythFeeds = [...new Set(pythFeeds)];
         // Remove invalid feeds
         pythFeeds = pythFeeds.filter((feed) => feed !== ethers.constants.HashZero);
+
         return pythFeeds;
     }
     

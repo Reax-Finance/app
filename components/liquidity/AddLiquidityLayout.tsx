@@ -186,7 +186,7 @@ export default function AddLiquidityLayout({
                 >
                     <Text>
                         {dollarFormatter.format(
-                            (Number(outputAmount) || 0) * (outToken?.price?.div(ethers.constants.WeiPerEther).toNumber() ?? 0)
+                            (Number(outputAmount) || 0) * (outToken?.price?.div(100_000_000).toNumber() ?? 0)
                         )}
                     </Text>
                     {isConnected && <Flex align={'center'} gap={1}>
