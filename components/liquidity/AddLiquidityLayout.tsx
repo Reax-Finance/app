@@ -49,6 +49,8 @@ export default function AddLiquidityLayout({
     tokens,
     outToken,
     steps,
+    isInputMax,
+    setIsInputMax
 }: any) {
     const handleMaxOutput = () => {
 		updateOutputAmount(maxMint().toString());
@@ -57,6 +59,7 @@ export default function AddLiquidityLayout({
     const handleMaxInput = () => {
 		let _inputAmount = Big(tokens[inputAssetIndex].walletBalance.toString()).div(Big(10).pow(tokens[inputAssetIndex].decimals).toString());
 		updateInputAmount(_inputAmount.toString());
+        setIsInputMax(true);
 	};
 
     const { address, isConnected } = useAccount();
@@ -126,7 +129,7 @@ export default function AddLiquidityLayout({
                             (Number(inputAmount) || 0) * (tokens[inputAssetIndex]?.price?.div(10**8).toNumber() ?? 0)
                         )}
                     </Text>
-                    {isConnected && <Flex align={'center'} gap={1}>
+                    {isConnected && <Flex align={'center'} gap={1} color={isInputMax ? 'primary.400' : ''}>
                         <Text>Max</Text>
                         <Text
                             onClick={handleMaxInput}

@@ -49,6 +49,8 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 	const [inputAmount, setInputAmount] = useState("");
 	const [outputAmount, setOutputAmount] = useState("");
 	const { isConnected, address } = useAccount();
+	const [isInputMax, setIsInputMax] = useState(false);
+	const [isOutputMax, setIsOutputMax] = useState(false);
 
 	const {
 		isOpen: isInputOpen,
@@ -158,6 +160,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 	const updateInputAmount = (value: any) => {
 		value = parseInput(value);
 		setInputAmount(value);
+		setIsInputMax(false);
 	};
 
 	const updateOutputAmount = (value: any) => {
@@ -206,7 +209,7 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 					rxRouter.interface.encodeFunctionData("stake", [
 						debtToken.id,
 						inToken.id,
-						Big(inputAmount)
+						isInputMax ? ethers.constants.MaxUint256 : Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
 							.toFixed(),
 					])
@@ -222,8 +225,9 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 			} else
 				calls.push(
 					rxRouter.interface.encodeFunctionData("stake", [
+						debtToken.id,
 						inToken.id,
-						Big(inputAmount)
+						isInputMax ? ethers.constants.MaxUint256 : Big(inputAmount)
 							.mul(Big(10).pow(inToken.decimals))
 							.toFixed(),
 					])
@@ -405,6 +409,10 @@ function AddLiquidity({updatedAccount, setUpdatedAccount, account, tabIndex, mar
 				tokens={tokens}
 				outToken={outToken}
 				steps={getSteps()}
+				isInputMax={isInputMax}
+				isOutputMax={isOutputMax}
+				setIsInputMax={setIsInputMax}
+				setIsOutputMax={setIsOutputMax}
 			/>
 
 			<TokenSelector
