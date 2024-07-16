@@ -72,7 +72,6 @@ export default function Liquidity() {
       console.log("Setting updated account");
       setUpdatedAccount(synths[marketIndex].market);
       setAccount(synths[marketIndex].market);
-      console.log("synths is here", synths[2].market.exists);
     }
   }, [synths, updatedAccount]);
 
@@ -326,7 +325,7 @@ export default function Liquidity() {
           className={`${VARIANT}-${colorMode}-containerBody`}
           order={{ base: 2, md: 2 }}
         >
-          <PoolLiquidity />
+          <PoolLiquidity marketIndex={marketIndex} />
         </Box>
       </Flex>
     </>

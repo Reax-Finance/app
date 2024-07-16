@@ -1,21 +1,17 @@
 import {
-	Box,
-	useDisclosure,
-	Text,
-	Flex,
-	Link,
-	useColorMode,
-	Heading,
-	Divider,
-    Image,
+  Box,
+  useDisclosure,
+  Text,
+  Flex,
+  Link,
+  useColorMode,
+  Heading,
+  Divider,
+  Image,
 } from "@chakra-ui/react";
 import React from "react";
 import { VARIANT } from "../../styles/theme";
-import {
-	PieChart,
-	Pie,
-	Cell,
-} from "recharts";
+import { PieChart, Pie, Cell } from "recharts";
 import { useAppData } from "../context/AppDataProvider";
 import Big from "big.js";
 import { PoolStat } from "./PoolPosition";
@@ -24,106 +20,117 @@ import { ONE_ETH, dollarFormatter } from "../../src/const";
 import { SynthData } from "../utils/types";
 
 const COLORS = [
-	"#ff631b2e",
-	"#933D15ae",
-	"#FFBB28ae",
-	"#FF8042ae",
-	"#BB7F20ae",
-	"#FFC871ae",
+  "#ff631b2e",
+  "#933D15ae",
+  "#FFBB28ae",
+  "#FF8042ae",
+  "#BB7F20ae",
+  "#FFC871ae",
 ];
 
 const RADIAN = Math.PI / 180;
 
-export default function PoolLiquidity() {
-	const { colorMode } = useColorMode();
-	const { synths } = useAppData();
+export default function PoolLiquidity({
+  marketIndex,
+}: {
+  marketIndex: number;
+}) {
+  const { colorMode } = useColorMode();
+  const { synths } = useAppData();
 
-	const data =
-		synths.map((synthData) => {
-			return {
-				name: synthData.synth.symbol,
-				value: Big(synthData.synth.totalSupply.toString())
-					.mul(synthData.synth.price.toString())
-					.div(1e24)
-					.toNumber(),
-			};
-		}) || [];
+  const data =
+    synths.map((synthData) => {
+      return {
+        name: synthData.synth.symbol,
+        value: Big(synthData.synth.totalSupply.toString())
+          .mul(synthData.synth.price.toString())
+          .div(1e24)
+          .toNumber(),
+      };
+    }) || [];
 
-	const renderCustomizedLabel = ({
-		cx,
-		cy,
-		midAngle,
-		innerRadius,
-		outerRadius,
-		percent,
-		index,
-	}: any) => {
-		const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-		const x = cx + radius * Math.cos(-midAngle * RADIAN);
-		const y = cy + radius * Math.sin(-midAngle * RADIAN);
-		if (percent < 0.05) return <></>;
-		return (
-			<text
-				x={x}
-				y={y}
-				fill="white"
-				textAnchor={x > cx ? "start" : "end"}
-				dominantBaseline="central"
-				fontSize={"12px"}
-			>
-				{data[index].name} ({`${(percent * 100).toFixed(0)}%`})
-			</text>
-		);
-	};
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    index,
+  }: any) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    if (percent < 0.05) return <></>;
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+        fontSize={"12px"}
+      >
+        {data[index].name} ({`${(percent * 100).toFixed(0)}%`})
+      </text>
+    );
+  };
 
-	const totalLiquidity = synths.reduce((acc, synthData) => {
-		return acc.add(
-			Big(synthData.synth.totalSupply.toString()).mul(
-				synthData.synth.price.toString()
-			)
-		);
-	} , Big(0));
+  const totalLiquidity = synths.reduce((acc, synthData) => {
+    return acc.add(
+      Big(synthData.synth.totalSupply.toString()).mul(
+        synthData.synth.price.toString()
+      )
+    );
+  }, Big(0));
 
-	return (
-		<Box p={4}>
-			<Flex justify={"space-between"}>
-				<Flex gap={2} align={"center"}>
-					<Heading size={"sm"}>Pool Liquidity</Heading>
-				</Flex>
-			</Flex>
-			<Divider mt={2} />
-            <Flex flexDir={'column'} gap={1} mt={4}>
-                <PoolStat icon={<IoIosWater />} title={'Total Liquidity'} value={Big(totalLiquidity.toString() || '0').div(ONE_ETH).toNumber()} formatter={dollarFormatter.format} />
-                <Box className={`${VARIANT}-${colorMode}-containerBody2`}>
-                    {/* <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'Pool Composition'} value={Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()} formatter={
+  return (
+    <Box p={4}>
+      <Flex justify={"space-between"}>
+        <Flex gap={2} align={"center"}>
+          <Heading size={"sm"}>Pool Liquidity</Heading>
+        </Flex>
+      </Flex>
+      <Divider mt={2} />
+      <Flex flexDir={"column"} gap={1} mt={4}>
+        <PoolStat
+          icon={<IoIosWater />}
+          title={"Total Liquidity"}
+          value={Big(totalLiquidity.toString() || "0")
+            .div(ONE_ETH)
+            .toNumber()}
+          formatter={dollarFormatter.format}
+        />
+        <Box className={`${VARIANT}-${colorMode}-containerBody2`}>
+          {/* <PoolStat icon={<Image src="/icons/rLP.svg" w={'25px'} rounded={'full'} />} title={'Pool Composition'} value={Big(liquidityData?.lpToken?.price?.toString() || 0).div(ONE_ETH).toNumber()} formatter={
 						(value: any) => "Price: " + dollarFormatter.format(value) + " / rLP"  
                     } /> */}
-                    <PieChart width={250} height={200}>
-                        <Pie
-                            data={data}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={renderCustomizedLabel}
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                            stroke="#933D15"
-                        >
-                            {data.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                />
-                            ))}
-                        </Pie>
-                    </PieChart>
+          {marketIndex === 4 && (
+            <PieChart width={250} height={200}>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+                stroke="#933D15"
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          )}
 
-                    {/* <Text fontSize={'sm'} color={'gray.500'} textAlign={'center'}>rLP Composition</Text> */}
-                </Box>
-
-            </Flex>
-
-		</Box>
-	);
+          {/* <Text fontSize={'sm'} color={'gray.500'} textAlign={'center'}>rLP Composition</Text> */}
+        </Box>
+      </Flex>
+    </Box>
+  );
 }
