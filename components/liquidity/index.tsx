@@ -4,9 +4,14 @@ import AddLiquidity from "./AddLiquidity";
 import RemoveLiquidity from "./RemoveLiquidity";
 import {
   Box,
+  Button,
   Divider,
   Flex,
   Heading,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
   useColorMode,
   useDisclosure,
@@ -53,11 +58,21 @@ export default function Liquidity() {
     router.push(_router);
   };
 
+  const onChangeMarket = (index: number) => {
+    setUpdatedAccount(account as any);
+    setMarketIndex(index);
+    let _router = { ...router };
+    router.query.market =
+      index === 0 ? "reax-ethereum" : index === 3 ? "reax-usd" : "reax-lp";
+    router.push(_router);
+  };
+
   useEffect(() => {
     if (synths[marketIndex] && !updatedAccount && !account) {
       console.log("Setting updated account");
       setUpdatedAccount(synths[marketIndex].market);
       setAccount(synths[marketIndex].market);
+      console.log("synths is here", synths[2].market.exists);
     }
   }, [synths, updatedAccount]);
 
@@ -72,29 +87,88 @@ export default function Liquidity() {
         h={"90px"}
         mb={2}
       >
-        <Flex
-          w={{ base: "100%", md: "25%" }}
-          p={4}
-          gap={4}
-          align={"center"}
-          cursor={"pointer"}
-          _hover={{ bg: "whiteAlpha.50" }}
-        >
-          <Image
-            src={`/icons/${synths[marketIndex]?.synth.symbol}.svg`}
-            alt="icon"
-            boxSize={12}
-          />
-          <Box>
-            <Text fontSize={"sm"} color={"whiteAlpha.600"}>
-              {synths[marketIndex]?.synth.name}
-            </Text>
-            <Heading size={"md"}>{synths[marketIndex]?.synth.symbol}</Heading>
-          </Box>
-          <Box ml={"auto"}>
-            <ChevronDownIcon w={8} h={6} />
-          </Box>
-        </Flex>
+        {/* menu */}
+
+        <Menu matchWidth>
+          <MenuButton
+            as={Button}
+            h={"100%"}
+            rightIcon={<ChevronDownIcon w={8} h={6} />}
+            className={`${VARIANT}-${colorMode}-containerBody`}
+            w={{ base: "100%", md: "25%" }}
+            p={4}
+            gap={4}
+            display={"flex"}
+            cursor={"pointer"}
+            background="transparent"
+            _hover={"transparent"}
+            _active={"transparent"}
+          >
+            <Flex gap={4} alignItems={"center"}>
+              <Image
+                src={`/icons/${synths[marketIndex]?.synth.symbol}.svg`}
+                alt="icon"
+                boxSize={16}
+              />
+              <Box textAlign={"start"}>
+                <Text fontSize={"sm"} color={"whiteAlpha.600"}>
+                  {synths[marketIndex]?.synth.name}
+                </Text>
+                <Heading size={"md"}>
+                  {synths[marketIndex]?.synth.symbol}
+                </Heading>
+              </Box>
+            </Flex>
+          </MenuButton>
+          <MenuList backgroundColor={"#191D25"}>
+            {synths.map((item, index) => (
+              <>
+                {item.market.exists === true ? (
+                  <MenuItem
+                    minH="40px"
+                    key={index}
+                    onClick={() => onChangeMarket(index)} //added route switch
+                    // onClick={() => setMarketIndex(index)}
+                    backdropBlur={"10px"}
+                    backgroundColor={"#191D25"}
+                    _hover={{ bg: "#252B36" }}
+                  >
+                    <Flex
+                      w={{ base: "100%", md: "25%" }}
+                      p={4}
+                      gap={4}
+                      h={"100%"}
+                      align={"center"}
+                      cursor={"pointer"}
+                    >
+                      <Image
+                        src={`/icons/${item?.synth.symbol}.svg`}
+                        alt="icon"
+                        boxSize={12}
+                      />
+                      <Box>
+                        <Text
+                          fontSize={"sm"}
+                          color={"whiteAlpha.600"}
+                          w={"100%"}
+                          whiteSpace={"nowrap"}
+                        >
+                          {item?.synth.name}
+                        </Text>
+                        <Heading size={"md"} w={"100%"}>
+                          {item?.synth.symbol}
+                        </Heading>
+                      </Box>
+                    </Flex>
+                  </MenuItem>
+                ) : null}
+              </>
+            ))}
+          </MenuList>
+        </Menu>
+
+        {/* menu end  */}
+
         <Divider orientation={"vertical"} />
         <Flex
           w={{ base: "100%", md: "50%" }}
