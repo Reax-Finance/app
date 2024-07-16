@@ -391,7 +391,12 @@ function AddLiquidity({
         valid: true,
         message: "Mint Maximum",
       };
-    else return { valid: true, message: "Mint" };
+    else if ((Number(inputAmount) || 0) > 0 && Number(outputAmount) === 0) {
+      return {
+        valaid: true,
+        message: "Stake",
+      };
+    } else return { valid: true, message: "Mint" };
   };
 
   return (
