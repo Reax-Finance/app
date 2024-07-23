@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model WhitelistedUser {
+  // Wallet Address
+  id       String  @id @db.VarChar(255)
+  // Amount of XP Earned
+  balance  Int     @default(0)
+  // Unique username
+  username String? @unique @db.VarChar(255)
+
+  // Allowlisted Record
+  allowlistedUser AllowlistedUser?
+
+  // Referral Data
+  referralCodes ReferralCode[] @relation(name: "ReferralCode")
+  referredBy    ReferralCode?  @relation(name: "ReferredBy")
+
+  // Meta
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model ReferralCode {
+  id String @id @db.VarChar(255)
+
+  referredUserId    String?          @unique
+  referredUser      WhitelistedUser? @relation(name: "ReferredBy", fields: [referredUserId], references: [id])
+  whitelistedUserId String
+  WhitelistedUser   WhitelistedUser  @relation(name: "ReferralCode", fields: [whitelistedUserId], references: [id])
+}
+
+model AllowlistedUser {
+  // Wallet Address
+  id String @id
+
+  whitelistedUserId String?          @unique
+  WhitelistedUser   WhitelistedUser? @relation(fields: [whitelistedUserId], references: [id])
+}

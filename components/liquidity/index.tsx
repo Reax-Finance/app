@@ -76,8 +76,9 @@ export default function Liquidity() {
 									color: "primary.400",
 									borderColor: "primary.400",
 								}}
+								
 								>
-									<Heading size={"sm"}>Add Liquidity</Heading>
+									<Heading size={"sm"} py={1}>Add Liquidity</Heading>
 								</Tab>
 								<Tab
 									_selected={{

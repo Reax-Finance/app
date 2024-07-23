@@ -24,6 +24,7 @@ import { isSupportedChain } from "../src/const";
 import { usePriceData } from "../components/context/PriceContext";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
+import Connect from "../components/connect/Connect";
 
 export default function Index({ children }: any) {
 	const router = useRouter();
@@ -74,6 +75,11 @@ export default function Index({ children }: any) {
 
 	if (!hydrated) {
 		return <></>;
+	}
+
+	// TODO: Who gets to access the app?
+	if(!isConnected){
+		return <Connect />
 	}
 
 	return (

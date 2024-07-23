@@ -27,12 +27,12 @@ export const CustomConnectButton = () => {
           (!authenticationStatus ||
             authenticationStatus === 'authenticated');
         return (
-          <div>
+          <Box >
             {(() => {
               if (!connected) {
                 return (
                     <Box className={`${VARIANT}-${colorMode}-primaryButton`} >
-                  <Button size={'md'} onClick={openConnectModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
+                  <Button size={'md'} onClick={openConnectModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }} w={'100%'}>
                     Connect Wallet
                   </Button>
                   </Box>
@@ -58,7 +58,7 @@ export const CustomConnectButton = () => {
                 </Flex>
               );
             })()}
-          </div>
+          </Box>
         );
       }}
     </ConnectButton.Custom>
