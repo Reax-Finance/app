@@ -3,7 +3,7 @@ import "../styles/edgy-dark.css";
 import "../styles/edgy-light.css";
 import "../styles/rounded-dark.css";
 import "../styles/rounded-light.css";
-
+import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth';
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import {
@@ -26,6 +26,8 @@ import { PriceContextProvider } from "../components/context/PriceContext";
 import "@rainbow-me/rainbowkit/styles.css";
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { SessionProvider } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
 const config = getDefaultConfig({
 	appName: "My RainbowKit App",
@@ -36,12 +38,22 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
+import {
+	GetSiweMessageOptions,
+  } from '@rainbow-me/rainbowkit-siwe-next-auth';
+  
+  const getSiweMessageOptions: GetSiweMessageOptions = () => ({
+	statement: 'Sign in to REAX',
+  });
+
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<ChakraProvider theme={theme}>
+				<SessionProvider refetchInterval={0} session={pageProps.session}>
 			<WagmiProvider config={config}>
 				<QueryClientProvider client={queryClient}>
-					<RainbowKitProvider>
+					<RainbowKitSiweNextAuthProvider getSiweMessageOptions={getSiweMessageOptions}>
+					<RainbowKitProvider chains={supportedChains}>
 						<AppDataProvider>
 							<BalanceContextProvider>
 								<PriceContextProvider>
@@ -52,8 +64,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 							</BalanceContextProvider>
 						</AppDataProvider>
 					</RainbowKitProvider>
+					</RainbowKitSiweNextAuthProvider>
 				</QueryClientProvider>
 			</WagmiProvider>
+				</SessionProvider>
 		</ChakraProvider>
 	);
 }
