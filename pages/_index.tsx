@@ -2,13 +2,9 @@ import {
 	Box,
 	Button,
 	Flex,
-	Heading,
-	Image,
 	Progress,
 	Text,
-	useBreakpointValue,
 	useColorMode,
-	useMediaQuery,
 	useToast,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
@@ -21,15 +17,18 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
-import { usePriceData } from "../components/context/PriceContext";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
 import Connect from "../components/connect/Connect";
+import { useSession } from "next-auth/react";
+import { useUserData } from "../components/context/UserDataProvider";
 
 export default function Index({ children }: any) {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [refresh, setRefresh] = useState(0);
+
+	const {status: sessionStatus} = useSession();
 
 	// useEffect(() => {
 	// 	const handleStart = (url: any) => {
@@ -48,7 +47,7 @@ export default function Index({ children }: any) {
 	// 	return () => {
 	// 		router.events.off("routeChangeStart", handleStart);
 	// 		router.events.off("routeChangeComplete", handleComplete);
-	// 		router.events.off("routeChangeError", handleComplete);
+	// 		router.events.off("routeChangeError", handleComplete);yarn 
 	// 	};
 	// }, [loading, refresh]);
 
@@ -63,6 +62,8 @@ export default function Index({ children }: any) {
 	const switchNetwork = async (chainId: number) => {
 		switchChain!({ chainId: chainId });
 	};
+
+	const { user, status: userStatus } = useUserData();
 
 	const { colorMode } = useColorMode();
 
@@ -79,6 +80,10 @@ export default function Index({ children }: any) {
 
 	// TODO: Who gets to access the app?
 	if(!isConnected){
+		return <Connect />
+	} else if(sessionStatus != "authenticated"){
+		return <Connect />
+	} else if(!user && userStatus == Status.SUCCESS){
 		return <Connect />
 	}
 

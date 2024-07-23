@@ -17,6 +17,7 @@ export const CustomConnectButton = () => {
         authenticationStatus,
         mounted,
       }) => {
+        console.log(authenticationStatus, "authenticationStatus");
         // Note: If your app doesn't use authentication, you
         // can remove all 'authenticationStatus' checks
         const ready = mounted && authenticationStatus !== 'loading';
