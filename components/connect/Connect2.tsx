@@ -62,9 +62,11 @@ export default function Connect2() {
                 <Heading>Welcome to REAX!</Heading>
 
                 {status == "connected" || sessionStatus != "authenticated" ? (
-                  <Text mt={2}>
-                    To begin your journey, please connect your crypto wallet
-                  </Text>
+                  <Flex direction={"column"} gap={4}>
+                    <Text mt={2}>The future of finance starts here.</Text>
+
+                    <Button>Let{"'"}s Go</Button>
+                  </Flex>
                 ) : user ? (
                   <Box>
                     <Text mt={2}>Sign up to get started</Text>
