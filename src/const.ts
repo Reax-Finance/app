@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { lineaMainnet, lineaTestnet, mantleMainnet, mantleTestnet, tenderlyMainnet } from "./chains";
 import Big from "big.js";
-import { Chain, arbitrumGoerli, arbitrumSepolia, baseSepolia, mainnet, sepolia } from "wagmi/chains";
+import { Chain, arbitrumGoerli, arbitrumSepolia, baseSepolia, cronosTestnet, mainnet, sepolia } from "wagmi/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
 const _sepolia = {...sepolia, rpcUrls: {default: {http: ['https://eth-sepolia.g.alchemy.com/v2/_yRldozKQjqTn6ifrZ6xqqbjk2JCdgM8']}}};
@@ -15,7 +15,8 @@ const NETWORKS: any = {
 	[sepolia.id]: _sepolia,
 	[tenderlyMainnet.id]: tenderlyMainnet,
 	[baseSepolia.id]: baseSepolia,
-	[arbitrumSepolia.id]: arbitrumSepolia
+	[arbitrumSepolia.id]: arbitrumSepolia,
+	[cronosTestnet.id]: cronosTestnet,
 }
 
 export const supportedChains: Chain[] = process.env.NEXT_PUBLIC_SUPPORTED_CHAINS?.split(',').map((id: string) => NETWORKS[id]) ?? [sepolia];
@@ -40,6 +41,7 @@ const _WETH_ADDRESS: any = {
 	[lineaTestnet.id]: "0x2c1b868d6596a18e32e61b901e4060c872647b6c".toLowerCase(),
 	[sepolia.id]: "0x3c348AdCFd2004984a427B21FA2e108DcdF656aC".toLowerCase(),
 	[tenderlyMainnet.id]: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase(),
+	[cronosTestnet.id]: "0x644868D6f755eDad9FF803249ED91b55a1Bd95f1".toLowerCase(),
 };
 
 export const NATIVE_FAUCET_LINK: any = {

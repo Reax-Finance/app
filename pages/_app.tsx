@@ -25,12 +25,38 @@ import {
 	GetSiweMessageOptions,
 } from "@rainbow-me/rainbowkit-siwe-next-auth";
 import { UserDataProvider } from "../components/context/UserDataProvider";
+import {
+	metaMaskWallet,
+	rainbowWallet,
+	safeWallet,
+	safepalWallet,
+	walletConnectWallet,
+	coinbaseWallet,
+	uniswapWallet,
+	trustWallet,
+	rabbyWallet
+  } from '@rainbow-me/rainbowkit/wallets';
+
 
 const config = getDefaultConfig({
-	appName: "My RainbowKit App",
-	projectId: "YOUR_PROJECT_ID",
+	appName: "REAX",
+	projectId: "reax",
 	chains: supportedChains as any,
 	ssr: true, // If your dApp uses server side rendering (SSR)
+	wallets: [
+		{
+			groupName: "Recommended",
+			wallets: [rabbyWallet, metaMaskWallet, walletConnectWallet, coinbaseWallet, uniswapWallet],
+		},
+		{
+			groupName: "Hardware",
+			wallets: [safeWallet, safepalWallet],
+		},
+		{
+			groupName: "Mobile",
+			wallets: [rainbowWallet, trustWallet],
+		}
+	]
 });
 
 const queryClient = new QueryClient();

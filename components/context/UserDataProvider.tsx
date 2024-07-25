@@ -30,22 +30,24 @@ function UserDataProvider({ children }: any) {
 	
 	useEffect(() => {
 		if(typeof window === "undefined") return;
-		if(address == ADDRESS_ZERO) return;
+		if(!address || address == ADDRESS_ZERO) return;
 		if(sessionStatus !== "authenticated") return;
 
 		const start = Date.now();
-		console.log("Fetching user data for", address);
+		console.log("Getting user data for", address);
 		// if(first) setStatus(Status.FETCHING);
 		axios.get("/api/user/get-user", {
 			params: {address}
 		})
 			.then(async (res: any) => {
 				console.log("Data latency", Date.now() - start, "ms");
+				console.log("User data", res.data);
 				setUser(res.data.user);
 				setStatus(Status.SUCCESS);
 			})
 			.catch(async (err: any) => {
 				console.log("Error", err);
+				setStatus(Status.ERROR);
 			});
 	}, [address, sessionStatus])
 

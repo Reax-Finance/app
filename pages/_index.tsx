@@ -79,11 +79,8 @@ export default function Index({ children }: any) {
 	}
 
 	// TODO: Who gets to access the app?
-	if(!isConnected){
-		return <Connect />
-	} else if(sessionStatus != "authenticated"){
-		return <Connect />
-	} else if(!user && userStatus == Status.SUCCESS){
+
+	if(!user?.WhitelistedUser){
 		return <Connect />
 	}
 
