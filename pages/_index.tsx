@@ -52,13 +52,8 @@ export default function Index({ children }: any) {
   // 	};
   // }, [loading, refresh]);
 
-<<<<<<< HEAD
 	const { status, message } = useContext(AppDataContext);
 	const { chain, isConnected, address } = useAccount();
-=======
-  const { status, message } = useContext(AppDataContext);
-  const { chain, isConnected } = useAccount();
->>>>>>> 2488a08493ea152f7c176a0673563c384f8d00d8
 
   const toast = useToast();
 
@@ -86,15 +81,9 @@ export default function Index({ children }: any) {
 
   // TODO: Who gets to access the app?
 
-<<<<<<< HEAD
 	if(!(user?.isAllowlisted && user?.id == address?.toLowerCase())){
 		return <ConnectPage />
 	}
-=======
-  if (!user?.WhitelistedUser) {
-    return <Connect2 />;
-  }
->>>>>>> 2488a08493ea152f7c176a0673563c384f8d00d8
 
   return (
     <Box h={"100vh"}>
