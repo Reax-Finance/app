@@ -61,7 +61,7 @@ export default function Connect2() {
               <Box px={20} py={10}>
                 <Heading>Welcome to REAX!</Heading>
 
-                {status == "connected" || sessionStatus != "authenticated" ? (
+                {status != "connected" || sessionStatus != "authenticated" ? (
                   <Flex direction={"column"} gap={4}>
                     <Text mt={2}>The future of finance starts here.</Text>
 
