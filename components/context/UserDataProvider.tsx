@@ -10,6 +10,7 @@ import axios from 'axios';
 
 interface User extends AllowlistedUser {
 	WhitelistedUser?: WhitelistedUser;
+	isAllowlisted: boolean;
 }
 
 export interface UserDataValue {
@@ -42,7 +43,8 @@ function UserDataProvider({ children }: any) {
 			.then(async (res: any) => {
 				console.log("Data latency", Date.now() - start, "ms");
 				console.log("User data", res.data);
-				setUser(res.data.user);
+
+				setUser({...res.data.user, isAllowlisted: Boolean(res.data.user), id: address.toLowerCase()});
 				setStatus(Status.SUCCESS);
 			})
 			.catch(async (err: any) => {

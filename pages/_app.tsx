@@ -40,7 +40,7 @@ import {
 
 const config = getDefaultConfig({
 	appName: "REAX",
-	projectId: "reax",
+	projectId: "d68eb355bf31e1395b01db4b9acac212",
 	chains: supportedChains as any,
 	ssr: true, // If your dApp uses server side rendering (SSR)
 	wallets: [

@@ -19,7 +19,7 @@ import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useChainModal } from "@rainbow-me/rainbowkit";
-import Connect from "../components/connect/Connect";
+import ConnectPage from "../components/connect/ConnectPage";
 import { useSession } from "next-auth/react";
 import { useUserData } from "../components/context/UserDataProvider";
 
@@ -52,7 +52,7 @@ export default function Index({ children }: any) {
 	// }, [loading, refresh]);
 
 	const { status, message } = useContext(AppDataContext);
-	const { chain, isConnected } = useAccount();
+	const { chain, isConnected, address } = useAccount();
 
 	const toast = useToast();
 
@@ -80,8 +80,8 @@ export default function Index({ children }: any) {
 
 	// TODO: Who gets to access the app?
 
-	if(!user?.WhitelistedUser){
-		return <Connect />
+	if(!(user?.isAllowlisted && user?.id == address?.toLowerCase())){
+		return <ConnectPage />
 	}
 
 	return (
