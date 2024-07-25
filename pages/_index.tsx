@@ -1,11 +1,11 @@
 import {
-	Box,
-	Button,
-	Flex,
-	Progress,
-	Text,
-	useColorMode,
-	useToast,
+  Box,
+  Button,
+  Flex,
+  Progress,
+  Text,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import Footer from "../components/core/Footer";
@@ -22,194 +22,204 @@ import { useChainModal } from "@rainbow-me/rainbowkit";
 import ConnectPage from "../components/connect/ConnectPage";
 import { useSession } from "next-auth/react";
 import { useUserData } from "../components/context/UserDataProvider";
+import Connect2 from "../components/connect/Connect2";
 
 export default function Index({ children }: any) {
-	const router = useRouter();
-	const [loading, setLoading] = useState(false);
-	const [refresh, setRefresh] = useState(0);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(0);
 
-	const {status: sessionStatus} = useSession();
+  const { status: sessionStatus } = useSession();
 
-	// useEffect(() => {
-	// 	const handleStart = (url: any) => {
-	// 		setLoading(true);
-	// 		setRefresh(Math.random());
-	// 	};
-	// 	const handleComplete = (url: any) => {
-	// 		setLoading(false);
-	// 		setRefresh(Math.random());
-	// 	};
+  // useEffect(() => {
+  // 	const handleStart = (url: any) => {
+  // 		setLoading(true);
+  // 		setRefresh(Math.random());
+  // 	};
+  // 	const handleComplete = (url: any) => {
+  // 		setLoading(false);
+  // 		setRefresh(Math.random());
+  // 	};
 
-	// 	router.events.on("routeChangeStart", handleStart);
-	// 	router.events.on("routeChangeComplete", handleComplete);
-	// 	router.events.on("routeChangeError", handleComplete);
+  // 	router.events.on("routeChangeStart", handleStart);
+  // 	router.events.on("routeChangeComplete", handleComplete);
+  // 	router.events.on("routeChangeError", handleComplete);
 
-	// 	return () => {
-	// 		router.events.off("routeChangeStart", handleStart);
-	// 		router.events.off("routeChangeComplete", handleComplete);
-	// 		router.events.off("routeChangeError", handleComplete);yarn 
-	// 	};
-	// }, [loading, refresh]);
+  // 	return () => {
+  // 		router.events.off("routeChangeStart", handleStart);
+  // 		router.events.off("routeChangeComplete", handleComplete);
+  // 		router.events.off("routeChangeError", handleComplete);yarn
+  // 	};
+  // }, [loading, refresh]);
 
+<<<<<<< HEAD
 	const { status, message } = useContext(AppDataContext);
 	const { chain, isConnected, address } = useAccount();
+=======
+  const { status, message } = useContext(AppDataContext);
+  const { chain, isConnected } = useAccount();
+>>>>>>> 2488a08493ea152f7c176a0673563c384f8d00d8
 
-	const toast = useToast();
+  const toast = useToast();
 
-	const { switchChain } = useSwitchChain();
-	const { openChainModal } = useChainModal();
+  const { switchChain } = useSwitchChain();
+  const { openChainModal } = useChainModal();
 
-	const switchNetwork = async (chainId: number) => {
-		switchChain!({ chainId: chainId });
-	};
+  const switchNetwork = async (chainId: number) => {
+    switchChain!({ chainId: chainId });
+  };
 
-	const { user, status: userStatus } = useUserData();
+  const { user, status: userStatus } = useUserData();
 
-	const { colorMode } = useColorMode();
+  const { colorMode } = useColorMode();
 
-	const [hydrated, setHydrated] = useState(false);
-	useEffect(() => {
-		if (!hydrated) {
-			setHydrated(true);
-		}
-	}, [hydrated]);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    if (!hydrated) {
+      setHydrated(true);
+    }
+  }, [hydrated]);
 
-	if (!hydrated) {
-		return <></>;
-	}
+  if (!hydrated) {
+    return <></>;
+  }
 
-	// TODO: Who gets to access the app?
+  // TODO: Who gets to access the app?
 
+<<<<<<< HEAD
 	if(!(user?.isAllowlisted && user?.id == address?.toLowerCase())){
 		return <ConnectPage />
 	}
+=======
+  if (!user?.WhitelistedUser) {
+    return <Connect2 />;
+  }
+>>>>>>> 2488a08493ea152f7c176a0673563c384f8d00d8
 
-	return (
-		<Box h={'100vh'}>
-			{/* Wrong Chain */}
-			{isConnected && !isSupportedChain(chain?.id || 0) && (
-				<Flex
-					align={"center"}
-					justify={"center"}
-					bgColor="primary.400"
-					color={"white"}
-					h={8}
-				>
-					<Text
-						textAlign={"center"}
-						fontSize={"sm"}
-						fontWeight="medium"
-						color={'black'}
-					>
-						Network not supported
-					</Text>
-					<Button
-						ml={2}
-						size="xs"
-						bg={"white"}
-						_hover={{ bg: "whiteAlpha.800" }}
-						color={"black"}
-						rounded={"full"}
-						onClick={openChainModal}
-					>
-						Switch Chain
-					</Button>
-				</Flex>
-			)}
-			{/* Loading */}
-			{(status == Status.FETCHING || loading) && (
-				<Progress
-					bg={"blackAlpha.200"}
-					colorScheme="primary"
-					size="xs"
-					isIndeterminate
-				/>
-			)}
-			{/* Error */}
-			<Box bgColor="gray.800" color={"gray.400"}>
-				{status == Status.ERROR && (
-					<Text
-						textAlign={"center"}
-						width="100%"
-						fontSize={"sm"}
-						fontWeight="bold"
-						p={2}
-					>
-						{message}
-					</Text>
-				)}
-			</Box>
+  return (
+    <Box h={"100vh"}>
+      {/* Wrong Chain */}
+      {isConnected && !isSupportedChain(chain?.id || 0) && (
+        <Flex
+          align={"center"}
+          justify={"center"}
+          bgColor="primary.400"
+          color={"white"}
+          h={8}
+        >
+          <Text
+            textAlign={"center"}
+            fontSize={"sm"}
+            fontWeight="medium"
+            color={"black"}
+          >
+            Network not supported
+          </Text>
+          <Button
+            ml={2}
+            size="xs"
+            bg={"white"}
+            _hover={{ bg: "whiteAlpha.800" }}
+            color={"black"}
+            rounded={"full"}
+            onClick={openChainModal}
+          >
+            Switch Chain
+          </Button>
+        </Flex>
+      )}
+      {/* Loading */}
+      {(status == Status.FETCHING || loading) && (
+        <Progress
+          bg={"blackAlpha.200"}
+          colorScheme="primary"
+          size="xs"
+          isIndeterminate
+        />
+      )}
+      {/* Error */}
+      <Box bgColor="gray.800" color={"gray.400"}>
+        {status == Status.ERROR && (
+          <Text
+            textAlign={"center"}
+            width="100%"
+            fontSize={"sm"}
+            fontWeight="bold"
+            p={2}
+          >
+            {message}
+          </Text>
+        )}
+      </Box>
 
-			{/* BG */}
-			<Flex
-				justify={"center"}
-				zIndex={0}
-				position={"absolute"}
-				w={"100%"}
-				h={"100%"}
-			>
-				<Box
-					bgImage={"/background-1.svg"}
-					bgRepeat={"no-repeat"}
-					bgSize={"cover"}
-					w={"100%"}
-					h={"100%"}
-					position={"absolute"}
-					bgPos={"top"}
-					top={0}
-					zIndex={-10}
-				/>
-				<Box
-					bgImage={"/background-2.svg"}
-					bgRepeat={"no-repeat"}
-					bgSize={"cover"}
-					w={"100%"}
-					h={"100%"}
-					opacity={0.5}
-					position={"relative"}
-					bgPos={"top"}
-					zIndex={-8}
-				/>
-				<Box
-					bgGradient={`linear(to-t, ${
-						colorMode == "dark" ? "black" : "white"
-					}Alpha.600, ${
-						colorMode == "dark" ? "black" : "white"
-					}Alpha.900)`}
-					bgSize={"cover"}
-					w={"100%"}
-					h={"100%"}
-					position={"absolute"}
-					top={0}
-					zIndex={-9}
-				/>
-			</Flex>
+      {/* BG */}
+      <Flex
+        justify={"center"}
+        zIndex={0}
+        position={"absolute"}
+        w={"100%"}
+        h={"100%"}
+      >
+        <Box
+          bgImage={"/background-1.svg"}
+          bgRepeat={"no-repeat"}
+          bgSize={"cover"}
+          w={"100%"}
+          h={"100%"}
+          position={"absolute"}
+          bgPos={"top"}
+          top={0}
+          zIndex={-10}
+        />
+        <Box
+          bgImage={"/background-2.svg"}
+          bgRepeat={"no-repeat"}
+          bgSize={"cover"}
+          w={"100%"}
+          h={"100%"}
+          opacity={0.5}
+          position={"relative"}
+          bgPos={"top"}
+          zIndex={-8}
+        />
+        <Box
+          bgGradient={`linear(to-t, ${
+            colorMode == "dark" ? "black" : "white"
+          }Alpha.600, ${colorMode == "dark" ? "black" : "white"}Alpha.900)`}
+          bgSize={"cover"}
+          w={"100%"}
+          h={"100%"}
+          position={"absolute"}
+          top={0}
+          zIndex={-9}
+        />
+      </Flex>
 
-			<Flex
-				flexDir={"column"}
-				justify={"space-between"}
-				h={"100%"}
-				px={{ sm: "4", md: "6" }}
-			>
-				<Flex flexDir={'column'} zIndex={2}>
-				<Navbar />
-				</Flex>
-				<Box zIndex={2} w={"100%"}>
-					<Flex justify={"center"}>
-						<motion.div
-							initial={{ opacity: 0, y: 15 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 15 }}
-							transition={{ duration: 0.25 }}
-						>
-							<>{children}</>
-						</motion.div>
-					</Flex>
-				</Box>
-				<Box>
-				<Footer />
-				</Box>
-			</Flex>
-		</Box>
-	);
+      <Flex
+        flexDir={"column"}
+        justify={"space-between"}
+        h={"100%"}
+        px={{ sm: "4", md: "6" }}
+      >
+        <Flex flexDir={"column"} zIndex={2}>
+          <Navbar />
+        </Flex>
+        <Box zIndex={2} w={"100%"}>
+          <Flex justify={"center"}>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+              transition={{ duration: 0.25 }}
+            >
+              <>{children}</>
+            </motion.div>
+          </Flex>
+        </Box>
+        <Box>
+          <Footer />
+        </Box>
+      </Flex>
+    </Box>
+  );
 }
