@@ -41,6 +41,47 @@ export default function Connect2() {
   return (
     <>
       <Flex
+        justify={"center"}
+        zIndex={0}
+        position={"absolute"}
+        w={"100%"}
+        h={"100%"}
+      >
+        <Box
+          bgImage={"/background-1.svg"}
+          bgRepeat={"no-repeat"}
+          bgSize={"cover"}
+          w={"100%"}
+          h={"100%"}
+          position={"absolute"}
+          bgPos={"top"}
+          top={0}
+          zIndex={-10}
+        />
+        <Box
+          bgImage={"/background-2.svg"}
+          bgRepeat={"no-repeat"}
+          bgSize={"cover"}
+          w={"100%"}
+          h={"100%"}
+          opacity={0.5}
+          position={"relative"}
+          bgPos={"top"}
+          zIndex={-8}
+        />
+        <Box
+          bgGradient={`linear(to-t, ${
+            colorMode == "dark" ? "black" : "white"
+          }Alpha.600, ${colorMode == "dark" ? "black" : "white"}Alpha.900)`}
+          bgSize={"cover"}
+          w={"100%"}
+          h={"100%"}
+          position={"absolute"}
+          top={0}
+          zIndex={-9}
+        />
+      </Flex>
+      <Flex
         h={"100vh"}
         py={10}
         flexDir={"column"}
