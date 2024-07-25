@@ -30,8 +30,8 @@ export default async function auth(req: any, res: any) {
 
           const result = await siwe.verify({
             signature: credentials?.signature || "",
-            // domain: nextAuthUrl.host,
-            domain: "localhost:3000", // for local development
+            // domain: "localhost:3000", // for local development
+            domain: process.env.NEXTAUTH_URL! as string,
             nonce: await getCsrfToken({ req }),
           });
 
