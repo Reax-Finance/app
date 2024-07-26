@@ -27,7 +27,7 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
-import axios from 'axios';
+import axios from "axios";
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -36,15 +36,15 @@ export default function ConnectPage() {
   const { colorMode } = useColorMode();
 
   const [join, setJoin] = React.useState(false);
-  const [accessCode, setAccessCode] = React.useState('');
+  const [accessCode, setAccessCode] = React.useState("");
 
-//   console.log("user", user);
-//   console.log("userStatus", userStatus);
-//   console.log("session Status", sessionStatus);
-//   console.log("Status", status);
-//   console.log("address", address);
+  //   console.log("user", user);
+  //   console.log("userStatus", userStatus);
+  //   console.log("session Status", sessionStatus);
+  //   console.log("Status", status);
+  //   console.log("address", address);
 
-console.log('join', join);
+  console.log("join", join);
 
   return (
     <Box h={"100vh"}>
@@ -98,28 +98,36 @@ console.log('join', join);
         <Image src="/logo.svg" w={100} h={100} alt="" zIndex={2} />
         <Box display={"flex"} alignItems={"center"} w={"100%"} px={20}>
           <Flex flexDir={"column"} align={"center"} w={"100%"} py={20}>
-		  {join ? <SignupInterface accessCode={accessCode} /> : <>
-            {status == "disconnected" || sessionStatus == "unauthenticated" ? (
-              <ConnectInterface />
-            ) : null}
-            {status == "connected" && sessionStatus == "authenticated" ? (
-              userStatus == Status.SUCCESS &&
-              user?.isAllowlisted &&
-              user?.id == address?.toLowerCase() ? (
-                <GetStarted setJoin={setJoin} />
-              ) : (
-                <NotWhitelisted setJoin={setJoin} accessCode={accessCode} setAccessCode={setAccessCode}/>
-              )
-            ) : null}
-            {(userStatus == Status.FETCHING ||
-              status == "connecting" ||
-              status == "reconnecting") && (
+            {join ? (
+              <SignupInterface accessCode={accessCode} />
+            ) : (
               <>
-                <Text zIndex={2}>Loading...</Text>
+                {status == "disconnected" ||
+                sessionStatus == "unauthenticated" ? (
+                  <ConnectInterface />
+                ) : null}
+                {status == "connected" && sessionStatus == "authenticated" ? (
+                  userStatus == Status.SUCCESS &&
+                  user?.isAllowlisted &&
+                  user?.id == address?.toLowerCase() ? (
+                    <GetStarted setJoin={setJoin} />
+                  ) : (
+                    <NotWhitelisted
+                      setJoin={setJoin}
+                      accessCode={accessCode}
+                      setAccessCode={setAccessCode}
+                    />
+                  )
+                ) : null}
+                {(userStatus == Status.FETCHING ||
+                  status == "connecting" ||
+                  status == "reconnecting") && (
+                  <>
+                    <Text zIndex={2}>Loading...</Text>
+                  </>
+                )}
               </>
             )}
-</>
-		}
           </Flex>
         </Box>
         <Text w={"100%"} textAlign={"center"} zIndex={2}>
@@ -134,74 +142,80 @@ function ConnectInterface() {
   const { colorMode } = useColorMode();
 
   return (
-	<Flex gap={4}>
-    <Box
-      className={`${VARIANT}-${colorMode}-containerBody`}
-      rounded={0}
-      zIndex={2}
-	  w={'60%'}
-    >
-		<Box className={`${VARIANT}-${colorMode}-containerBody2`} p={6} pb={3}>
-			<Heading>Welcome to REAX!</Heading>
-		</Box>
-		<Box p={6} pt={3}>
+    <Flex gap={4}>
+      <Box
+        className={`${VARIANT}-${colorMode}-containerBody`}
+        rounded={0}
+        zIndex={2}
+        w={"60%"}
+      >
+        <Box className={`${VARIANT}-${colorMode}-containerBody2`} p={6} pb={3}>
+          <Heading>Welcome to REAX!</Heading>
+        </Box>
+        <Box p={6} pt={3}>
+          <Text mt={2}>
+            To begin your journey, please connect your crypto wallet
+          </Text>
 
-      <Text mt={2}>Please connect your wallet to continue.</Text>
-
-      <Box mt={6}>
-        <CustomConnectButton />
+          <Box mt={6}>
+            <CustomConnectButton />
+          </Box>
+        </Box>
       </Box>
-		</Box>
-    </Box>
-	<FAQ />
-	</Flex>
+      <FAQ />
+    </Flex>
   );
 }
 
-function SignupInterface({accessCode}: any) {
-	const {address} = useAccount();
-	const { colorMode } = useColorMode();
+function SignupInterface({ accessCode }: any) {
+  const { address } = useAccount();
+  const { colorMode } = useColorMode();
 
-	const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
-	const toast = useToast();
+  const toast = useToast();
 
-	const signUp = () => {
-		setLoading(true);
-		axios.post('/api/user/join', {address, accessCode})
-		.then((res) => {
-			setLoading(false);
-			console.log(res);
-		})
-		.catch((err) => {
-			setLoading(false);
-			console.log(err);
-			toast({
-				title: 'Error',
-				description: 'Failed to sign up. Please try again later',
-				status: 'error',
-				duration: 9000,
-				isClosable: true
-			})
-		})
-	
-	}
-	return (<Box zIndex={2}>
-		<Heading>
-			Sign up
-		</Heading>
-		<Box className={`${VARIANT}-${colorMode}-primaryButton`} mt={8}>
-		<Button onClick={signUp} bg={"transparent"}
+  const signUp = () => {
+    setLoading(true);
+    axios
+      .post("/api/user/join", { address, accessCode })
+      .then((res) => {
+        setLoading(false);
+        console.log(res);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+        toast({
+          title: "Error",
+          description: "Failed to sign up. Please try again later",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      });
+  };
+  return (
+    <Box zIndex={2}>
+      <Heading>Sign up</Heading>
+      <Box className={`${VARIANT}-${colorMode}-primaryButton`} mt={8}>
+        <Button
+          onClick={signUp}
+          bg={"transparent"}
           _hover={{ opacity: 0.6 }}
-		  isLoading={loading}
-          w={"100%"}>Sign Up</Button>
-		</Box>
-	</Box>)
+          isLoading={loading}
+          w={"100%"}
+        >
+          Sign Up
+        </Button>
+      </Box>
+    </Box>
+  );
 }
 
-function GetStarted({setJoin}: any) {
+function GetStarted({ setJoin }: any) {
   const signIn = () => {
-	setJoin(true);
+    setJoin(true);
   };
 
   const { colorMode } = useColorMode();
@@ -210,9 +224,9 @@ function GetStarted({setJoin}: any) {
     <Box px={20} py={10} zIndex={2}>
       <Heading>You are on the Allowlist!</Heading>
       <Text mt={2}>
-		You are now ready to start using Reax. Click the button below to get
-		started.
-	  </Text>
+        You are now ready to start using Reax. Click the button below to get
+        started.
+      </Text>
       <Box className={`${VARIANT}-${colorMode}-primaryButton`} mt={8}>
         <Button
           size={"md"}
@@ -230,36 +244,45 @@ function GetStarted({setJoin}: any) {
   );
 }
 
-function NotWhitelisted({setJoin, accessCode, setAccessCode}: any) {
-	const { openAccountModal } = useAccountModal();
-	const { colorMode } = useColorMode();
-	const [error, setError] = React.useState<String|undefined>();
+function NotWhitelisted({ setJoin, accessCode, setAccessCode }: any) {
+  const { openAccountModal } = useAccountModal();
+  const { colorMode } = useColorMode();
+  const [error, setError] = React.useState<String | undefined>();
 
-	const validateAndJoin = () => {
-		// validate
-		axios.get('/api/user/validate-ac')
-		.then((res) => {
-			// set join as true
-			setJoin(true);
-		})
-		.catch((err) => {
-			setError('Invalid access code');
-		})
-	}
+  const validateAndJoin = () => {
+    // validate
+    axios
+      .get("/api/user/validate-ac")
+      .then((res) => {
+        // set join as true
+        setJoin(true);
+      })
+      .catch((err) => {
+        setError("Invalid access code");
+      });
+  };
 
-	const onChange = (e: any) => {
-		setError(undefined);
-		setAccessCode(e.target.value);
-	}
+  const onChange = (e: any) => {
+    setError(undefined);
+    setAccessCode(e.target.value);
+  };
 
-	const isValidInput = accessCode.length == 7 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
-
+  const isValidInput =
+    accessCode.length == 7 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
 
   return (
-    <Box zIndex={2}>
+    <Box zIndex={2} display={"flex"} flexDirection={"column"}>
       <Text mt={2}>
-        Sorry, You are not on the allowed list. Please try a different account.
+        Uh oh! It looks like your wallet isn't on our allowlist. This might be
+        because:
       </Text>
+
+      <Flex direction={"column"} ml={2} pt={4}>
+        <Text>
+          → You didn't participate in our previous mainnet iteration, or
+        </Text>
+        <Text>→ You're using a new wallet address</Text>
+      </Flex>
       <Flex
         flexDir={"column"}
         p={4}
@@ -281,30 +304,52 @@ function NotWhitelisted({setJoin, accessCode, setAccessCode}: any) {
         </Box>
       </Flex>
 
-	  <Box mt={6} className={`${VARIANT}-${colorMode}-primaryButton`}>
-		<Button onClick={openAccountModal} w={'100%'} bg={'transparent'} _hover={{ opacity: 0.6 }}>
-			Switch Wallet
-		</Button>
-	</Box>
+      <Box mt={6} className={`${VARIANT}-${colorMode}-primaryButton`}>
+        <Button
+          onClick={openAccountModal}
+          w={"100%"}
+          bg={"transparent"}
+          _hover={{ opacity: 0.6 }}
+        >
+          Switch Wallet
+        </Button>
+      </Box>
 
-	<Flex w={'100%'} align={'center'} gap={2} my={4}>
-		<Divider borderColor={'whiteAlpha.600'}/>
-		<Text>Or</Text>
-		<Divider borderColor={'whiteAlpha.600'}/>
-	</Flex>
+      <Flex w={"100%"} align={"center"} gap={2} my={4}>
+        <Divider borderColor={"whiteAlpha.600"} />
+        <Text>Or</Text>
+        <Divider borderColor={"whiteAlpha.600"} />
+      </Flex>
 
-	<Box>
-		<Heading size='md'>
-			Join with an Access Code
-		</Heading>
-		
-		<Flex align={'center'} mt={4}>
-		<Input placeholder='Access Code' borderRadius={0} w={'100%'} bg={'whiteAlpha.200'} onChange={onChange} isInvalid={!isValidInput} ></Input>
-		<IconButton aria-label='Join' icon={<ChevronRightIcon/>} rounded={0} isDisabled={!isValidInput} bg={'secondary.400'} _hover={{opacity: 0.6}} onClick={validateAndJoin}/>
-		</Flex>
+      <Box>
+        <Heading size="md">Join with an Access Code</Heading>
 
-		{error && <Text color='red.400' fontSize={'sm'} mt={2}>{error}</Text>}
-	</Box>
+        <Flex align={"center"} mt={4}>
+          <Input
+            placeholder="Access Code"
+            borderRadius={0}
+            w={"100%"}
+            bg={"whiteAlpha.200"}
+            onChange={onChange}
+            isInvalid={!isValidInput}
+          ></Input>
+          <IconButton
+            aria-label="Join"
+            icon={<ChevronRightIcon />}
+            rounded={0}
+            isDisabled={!isValidInput}
+            bg={"secondary.400"}
+            _hover={{ opacity: 0.6 }}
+            onClick={validateAndJoin}
+          />
+        </Flex>
+
+        {error && (
+          <Text color="red.400" fontSize={"sm"} mt={2}>
+            {error}
+          </Text>
+        )}
+      </Box>
     </Box>
   );
 }
@@ -320,7 +365,7 @@ function FAQ() {
       py={6}
       className={`${VARIANT}-${colorMode}-containerBody`}
       rounded={0}
-    //   w={"100%"}
+      //   w={"100%"}
       zIndex={2}
     >
       <Accordion allowToggle w={"100%"}>
