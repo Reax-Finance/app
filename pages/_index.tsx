@@ -81,7 +81,7 @@ export default function Index({ children }: any) {
 
   // TODO: Who gets to access the app?
 
-  if (!(user?.isAllowlisted && user?.id == address?.toLowerCase())) {
+  if (!(user?.user && user?.id == address?.toLowerCase())) {
     return <ConnectPage />;
   }
 

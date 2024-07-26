@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 
-import auth from "../auth/[...nextauth]";
-
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,7 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 id: (address as string).toLowerCase()
             },
             include: {
-                user: true
+                user: true,
+                
             }
         })
         console.log("User: ", user);

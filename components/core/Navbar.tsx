@@ -20,11 +20,13 @@ import NavLocalLink from "./NavLocalLink";
 import { CustomConnectButton } from "./ConnectButton";
 import { MdFeedback, MdOpenInNew } from "react-icons/md";
 import { RiFeedbackLine } from "react-icons/ri";
+import { useUserData } from "../context/UserDataProvider";
 
 function NavBar() {
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
 
 	const { isConnected } = useAccount();
+	const { user } = useUserData();
 
 	const { colorMode } = useColorMode();
 
@@ -116,6 +118,7 @@ function NavBar() {
 									</Button>
 								</Box>
 							</Flex>
+							<Box>
 							{isConnected &&
 								process.env.NEXT_PUBLIC_NETWORK ==
 									"testnet" && (
@@ -126,6 +129,18 @@ function NavBar() {
 										></NavLocalLink>
 									</>
 								)}
+								</Box>
+
+								<NavLocalLink
+									path={"/account"}
+									title="My Account"
+								></NavLocalLink>
+
+								<Box>
+									<Text>
+										{user?.user?.balance} XP
+									</Text>
+								</Box>
 							<Box>
 								<CustomConnectButton />
 							</Box>
