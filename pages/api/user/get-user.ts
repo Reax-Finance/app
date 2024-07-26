@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 id: (address as string).toLowerCase()
             },
             include: {
-                WhitelistedUser: true
+                user: true
             }
         })
         console.log("User: ", user);

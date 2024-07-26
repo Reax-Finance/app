@@ -9,12 +9,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
-model WhitelistedUser {
+model User {
   // Wallet Address
   id       String  @id @db.VarChar(255)
   // Amount of XP Earned
@@ -26,27 +26,27 @@ model WhitelistedUser {
   allowlistedUser AllowlistedUser?
 
   // Referral Data
-  referralCodes ReferralCode[] @relation(name: "ReferralCode")
-  referredBy    ReferralCode?  @relation(name: "ReferredBy")
+  accessCodes AccessCode[] @relation(name: "AccessCode")
+  joinedBy    AccessCode?  @relation(name: "JoinedBy")
 
   // Meta
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
-model ReferralCode {
+model AccessCode {
   id String @id @db.VarChar(255)
 
-  referredUserId    String?          @unique
-  referredUser      WhitelistedUser? @relation(name: "ReferredBy", fields: [referredUserId], references: [id])
-  whitelistedUserId String
-  WhitelistedUser   WhitelistedUser  @relation(name: "ReferralCode", fields: [whitelistedUserId], references: [id])
+  joinedUserId String? @unique
+  joinedUser   User?   @relation(name: "JoinedBy", fields: [joinedUserId], references: [id])
+  userId       String
+  user         User    @relation(name: "AccessCode", fields: [userId], references: [id])
 }
 
 model AllowlistedUser {
   // Wallet Address
   id String @id
 
-  whitelistedUserId String?          @unique
-  WhitelistedUser   WhitelistedUser? @relation(fields: [whitelistedUserId], references: [id])
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
 }

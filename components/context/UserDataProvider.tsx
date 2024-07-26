@@ -4,19 +4,19 @@ import { useEffect } from 'react';
 import { useAccount } from "wagmi";
 import { Status } from "../utils/status";
 import { Account, ReserveData, LiquidityData } from "../utils/types";
-import { AllowlistedUser, WhitelistedUser } from "@prisma/client";
+import { AllowlistedUser, User as _User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import axios from 'axios';
 
-interface User extends AllowlistedUser {
-	WhitelistedUser?: WhitelistedUser;
+interface UserData extends _User {
+	user?: _User;
 	isAllowlisted: boolean;
 }
 
 export interface UserDataValue {
 	status: Status;
 	message: string;
-	user: User|undefined,
+	user: UserData|undefined,
 }
 
 const UserDataContext = React.createContext<UserDataValue>({} as UserDataValue);
@@ -24,7 +24,7 @@ const UserDataContext = React.createContext<UserDataValue>({} as UserDataValue);
 function UserDataProvider({ children }: any) {
 	const [status, setStatus] = React.useState<UserDataValue['status']>(Status.NOT_FETCHING);
 	const [message, setMessage] = React.useState<UserDataValue['message']>("");
-	const [user, setUser] = React.useState<User>();
+	const [user, setUser] = React.useState<UserData>();
 
 	const { address } = useAccount();
 	const { status: sessionStatus } = useSession();
