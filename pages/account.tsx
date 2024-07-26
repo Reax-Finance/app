@@ -13,7 +13,10 @@ import { useAccount } from "wagmi";
 import { useUserData } from "../components/context/UserDataProvider";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import axios from "axios";
-
+import AccessCode from "../components/ui/access-code/AccessCode";
+import Swiper, { Autoplay, Navigation } from "swiper";
+import "swiper/swiper.min.css";
+Swiper.use([Autoplay, Navigation]);
 export default function Account() {
   const { address } = useAccount();
   const { user } = useUserData();
@@ -23,6 +26,23 @@ export default function Account() {
 
   const [isValidInput, setIsValidInput] = React.useState(false);
   const balance = user?.user?.balance;
+  const [accessCodes, setAccessCodes] = React.useState([]);
+  const fetchAccessCodes = async () => {
+    const data = await axios
+      .get("/api/user/get-access-codes", {
+        params: { address },
+      })
+      .then((res) => {
+        console.log("Access Codes: ", res.data);
+        setAccessCodes(res.data.accessCodes);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useEffect(() => {
+    fetchAccessCodes();
+  }, []);
 
   useEffect(() => {
     const data = async () => {
@@ -42,6 +62,34 @@ export default function Account() {
           }
         });
     };
+  }, []);
+
+  useEffect(() => {
+    const carousel = new Swiper(".carousel", {
+      breakpoints: {
+        320: {
+          slidesPerView: 1,
+        },
+        640: {
+          slidesPerView: 2,
+        },
+        1024: {
+          slidesPerView: 3,
+        },
+      },
+      grabCursor: true,
+      loop: false,
+      centeredSlides: false,
+      initialSlide: 0,
+      spaceBetween: 24,
+      autoplay: {
+        delay: 7000,
+      },
+      navigation: {
+        nextEl: ".carousel-next",
+        prevEl: ".carousel-prev",
+      },
+    });
   }, []);
 
   const submitUsername = async () => {
@@ -120,6 +168,36 @@ export default function Account() {
           </Box>
         )}
       </Box>
+      <div className="carousel swiper-container">
+        <div className="swiper-wrapper">
+          {accessCodes.map((code) => (
+            <AccessCode code={code} />
+          ))}
+        </div>
+      </div>
+      {/* Arrows  */}
+      <div className="flex mt-12 space-x-4 justify-end">
+        <button className="carousel-prev relative z-20 w-14 h-14 rounded-none flex items-center justify-center group corneredButtonSecondary transition duration-150 ease-in-out">
+          <span className="sr-only">Previous</span>
+          <svg
+            className="w-4 h-4 fill-slate-400 transition duration-150 ease-in-out"
+            viewBox="0 0 16 16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M6.7 14.7l1.4-1.4L3.8 9H16V7H3.8l4.3-4.3-1.4-1.4L0 8z" />
+          </svg>
+        </button>
+        <button className="carousel-next relative z-20 w-14 h-14 rounded-none flex items-center justify-center group corneredButtonSecondary transition duration-150 ease-in-out">
+          <span className="sr-only">Next</span>
+          <svg
+            className="w-4 h-4 fill-slate-400 transition duration-150 ease-in-out"
+            viewBox="0 0 16 16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M9.3 14.7l-1.4-1.4L12.2 9H0V7h12.2L7.9 2.7l1.4-1.4L16 8z" />
+          </svg>
+        </button>
+      </div>
     </Box>
   );
 }

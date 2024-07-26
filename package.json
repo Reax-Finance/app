@@ -41,6 +41,7 @@
     "react-tradingview-embed": "^3.0.6",
     "recharts": "^2.12.6",
     "siwe": "^2",
+    "swiper": "^8.4.7",
     "tailwind-merge": "^2.4.0",
     "viem": "2.x",
     "wagmi": "^2.8.1",

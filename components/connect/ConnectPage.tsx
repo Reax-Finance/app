@@ -11,7 +11,7 @@ import {
   IconButton,
   useToast,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { use, useEffect } from "react";
 import { CustomConnectButton } from "../core/ConnectButton";
 import { useUserData } from "../context/UserDataProvider";
 import { useSession } from "next-auth/react";
@@ -29,6 +29,9 @@ import {
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import { BsDiscord } from "react-icons/bs";
+import AccessCode from "../ui/access-code/AccessCode";
+import { table } from "console";
+import { useRouter } from "next/router";
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -357,6 +360,8 @@ function NotWhitelisted({ setJoin, accessCode, setAccessCode }: any) {
 
 function FAQ() {
   const { colorMode } = useColorMode();
+  const router = useRouter();
+
   return (
     <Box
       display={"flex"}
@@ -446,6 +451,7 @@ function FAQ() {
           gap={2}
           bg={"#515BE7"}
           _hover={{ opacity: 0.8 }}
+          onClick={() => window.open("https://discord.gg/ccxfyveZ", "_blank")}
         >
           <BsDiscord fill="white" /> Discord
         </Button>
