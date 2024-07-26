@@ -28,6 +28,7 @@ import {
 } from "@chakra-ui/react";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
+import { BsDiscord } from "react-icons/bs";
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -434,6 +435,21 @@ function FAQ() {
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
+      <Box>
+        <Text>
+          Need Help? If you're having any issues, our support team is ready to
+          assist you.
+        </Text>
+        <Button
+          mt={4}
+          display={"flex"}
+          gap={2}
+          bg={"#515BE7"}
+          _hover={{ opacity: 0.8 }}
+        >
+          <BsDiscord fill="white" /> Discord
+        </Button>
+      </Box>
     </Box>
   );
 }
