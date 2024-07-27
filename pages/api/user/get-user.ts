@@ -19,8 +19,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 id: (address as string).toLowerCase()
             },
             include: {
-                user: true,
-                
+                user: {
+                    include: {
+                        accessCodes: {
+                            include: {
+                                joinedUser: {
+                                    select: {
+                                        id: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         })
         console.log("User: ", user);

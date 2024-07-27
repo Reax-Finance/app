@@ -2,15 +2,17 @@ import { CheckIcon, CloseIcon, CopyIcon } from "@chakra-ui/icons";
 import { Box, Flex, Text, useColorMode, useToast } from "@chakra-ui/react";
 import React from "react";
 import { VARIANT } from "../../../styles/theme";
+import { AccessCode } from "@prisma/client";
+import Dark400Box2C from "../boxes/Dark400Box2C";
 
-const AccessCode = ({ code }: { code: string }) => {
+const AccessCodeComponent = ({ code }: { code: AccessCode }) => {
   const { colorMode } = useColorMode();
   const [copied, setCopied] = React.useState(false);
   const [isUsedAccessCode, setIsUsedAccessCode] = React.useState(false); //if its used by some user it gets disabled
   const toast = useToast();
   const copyCode = () => {
     if (!isUsedAccessCode) {
-      navigator.clipboard.writeText(code);
+      navigator.clipboard.writeText(code.id);
       toast({
         title: "Copied to clipboard",
         status: "success",
@@ -30,8 +32,9 @@ const AccessCode = ({ code }: { code: string }) => {
       });
     }
   };
+
   return (
-    <>
+    <Dark400Box2C>
       {!isUsedAccessCode ? (
         <Box
           px={6}
@@ -42,7 +45,7 @@ const AccessCode = ({ code }: { code: string }) => {
           as="button"
         >
           <Flex justifyContent={"center"} alignItems={"center"} gap={4}>
-            <Text>{code.toUpperCase()}</Text>
+            <Text>{code?.id?.toUpperCase()}</Text>
             {copied ? <CopyIcon /> : <CheckIcon />}
           </Flex>
         </Box>
@@ -57,13 +60,13 @@ const AccessCode = ({ code }: { code: string }) => {
           opacity={0.5}
         >
           <Flex justifyContent={"center"} alignItems={"center"} gap={4}>
-            <Text>{code.toUpperCase()}</Text>
+            <Text>{code?.id?.toUpperCase()}</Text>
             <CloseIcon />
           </Flex>
         </Box>
       )}
-    </>
+    </Dark400Box2C>
   );
 };
 
-export default AccessCode;
+export default AccessCodeComponent;

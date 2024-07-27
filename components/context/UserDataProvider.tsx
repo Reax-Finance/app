@@ -4,12 +4,16 @@ import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Status } from "../utils/status";
 import { Account, ReserveData, LiquidityData } from "../utils/types";
-import { AllowlistedUser, User as _User } from "@prisma/client";
+import { AccessCode, AllowlistedUser, User as _User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 
-interface UserData extends _User {
-  user?: _User;
+interface UserObject extends _User {
+  accessCodes: AccessCode[];
+}
+
+interface UserData extends AllowlistedUser {
+  user?: UserObject;
   isAllowlisted: boolean;
 }
 
@@ -17,6 +21,8 @@ export interface UserDataValue {
   status: Status;
   message: string;
   user: UserData | undefined;
+  setUser: React.Dispatch<React.SetStateAction<UserData | undefined>>;
+  updateUser: () => void;
 }
 
 const UserDataContext = React.createContext<UserDataValue>({} as UserDataValue);
@@ -32,21 +38,21 @@ function UserDataProvider({ children }: any) {
   const { status: sessionStatus } = useSession();
 
   useEffect(() => {
+    updateUser();
+  }, [address, sessionStatus]);
+
+  function updateUser () {
     if (typeof window === "undefined") return;
+
     if (!address || address == ADDRESS_ZERO) return;
     if (sessionStatus !== "authenticated") return;
 
-    const start = Date.now();
-    console.log("Getting user data for", address);
-    // if(first) setStatus(Status.FETCHING);
     axios
       .get("/api/user/get-user", {
         params: { address },
       })
       .then(async (res: any) => {
-        console.log("Data latency", Date.now() - start, "ms");
         console.log("User data", res.data);
-
         setUser({
           ...res.data.user,
           isAllowlisted: Boolean(res.data.user),
@@ -58,12 +64,14 @@ function UserDataProvider({ children }: any) {
         console.log("Error", err);
         setStatus(Status.ERROR);
       });
-  }, [address, sessionStatus]);
+  }
 
   const value: UserDataValue = {
     user,
+    setUser,
     status,
     message,
+    updateUser
   };
 
   return (

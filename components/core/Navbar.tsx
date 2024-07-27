@@ -21,6 +21,7 @@ import { CustomConnectButton } from "./ConnectButton";
 import { MdFeedback, MdOpenInNew } from "react-icons/md";
 import { RiFeedbackLine } from "react-icons/ri";
 import { useUserData } from "../context/UserDataProvider";
+import { VARIANT } from "../../styles/theme";
 
 function NavBar() {
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
@@ -136,7 +137,7 @@ function NavBar() {
 									title="My Account"
 								></NavLocalLink>
 
-								<Box>
+								<Box className={`${VARIANT}-${colorMode}-containerBody2`} px={4} py={2}>
 									<Text>
 										{user?.user?.balance} XP
 									</Text>

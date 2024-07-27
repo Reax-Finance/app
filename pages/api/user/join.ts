@@ -1,11 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
+import { JOINEE_XP_REWARD, REFERRER_XP_REWARD } from '../../../src/const';
 
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { address, accessCode }: {address: string, accessCode: string} = req.body;
-    console.log(address, accessCode);
+    let initialXp = 0;
+    let referrer = null;
     if(!accessCode){
         // Check if the address is allowlisted
         const allowlist = await prisma.allowlistedUser.findUniqueOrThrow({
@@ -18,14 +20,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const accessCodeRecord = await prisma.accessCode.findUniqueOrThrow({
             where: {
                 id: accessCode
+            },
+            include: {
+                joinedUser: true,
+                user: true
             }
-        })
+        });
+
+        initialXp += JOINEE_XP_REWARD;
+        referrer = accessCodeRecord.user.id;
     }
     
     // Create a whitelisted user
     await prisma.user.create({
         data: {
             id: address.toLowerCase(),
+            balance: initialXp
         }
     })
 
@@ -39,7 +49,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
     }))
     .then(() => {
+        if(referrer){
+            // Increment the referrer's balance
+            prisma.user.update({
+                where: {
+                    id: referrer
+                },
+                data: {
+                    balance: {
+                        increment: REFERRER_XP_REWARD
+                    }
+                }
+            })
+        }
         res.status(200).json({ message: "User joined successfully" });
+
     })
     .catch(async (err) => {
         await prisma.user.delete({

@@ -117,3 +117,7 @@ export const numOrZero = (num: number) => {
 	if (num === undefined || num === null || isNaN(num)) return 0;
 	return num;
 };
+
+export const USERNAME_XP_REWARD = 100;
+export const JOINEE_XP_REWARD = 50;
+export const REFERRER_XP_REWARD = 50;

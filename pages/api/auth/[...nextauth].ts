@@ -2,10 +2,16 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
+import type { NextAuthOptions } from "next-auth"
+import { NextApiRequest } from "next";
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
 export default async function auth(req: any, res: any) {
+  return await NextAuth(req, res, authOptions({req}));
+}
+
+export const authOptions = ({req}: {req: NextApiRequest}): NextAuthOptions => {
   const providers = [
     CredentialsProvider({
       name: "Ethereum",
@@ -56,8 +62,7 @@ export default async function auth(req: any, res: any) {
   if (isDefaultSigninPage) {
     providers.pop();
   }
-
-  return await NextAuth(req, res, {
+  return {
     // https://next-auth.js.org/configuration/providers/oauth
     providers,
     session: {
@@ -72,5 +77,6 @@ export default async function auth(req: any, res: any) {
         return session;
       },
     },
-  });
+  }
+  
 }

@@ -13,6 +13,8 @@ export default async function handler(
       username: username.toLowerCase(),
     },
   });
+
+  
   if (isValidUsername) {
     res.status(200).json({ message: "Username is valid" });
   } else {
