@@ -47,5 +47,5 @@ model AllowlistedUser {
   // Wallet Address
   id String @id
 
-  user   User?
+  user User?
 }
