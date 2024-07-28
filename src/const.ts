@@ -121,3 +121,14 @@ export const numOrZero = (num: number) => {
 export const USERNAME_XP_REWARD = 100;
 export const JOINEE_XP_REWARD = 50;
 export const REFERRER_XP_REWARD = 50;
+
+export const TWITTER_SCOPE = [
+	"users.read", 
+	// "tweet.read", 
+	// "follows.read", 
+	// "offline.access", 
+	// "like.read",
+	// "like.write",
+	// "tweet.write",
+	// "follows.write",
+].join(" ");

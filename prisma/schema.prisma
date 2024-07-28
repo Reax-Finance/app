@@ -23,8 +23,7 @@ model User {
   username String? @unique @db.VarChar(255)
 
   // Allowlisted Record
-  allowlistedUserId String? @unique
-  allowlistedUser AllowlistedUser? @relation(fields: [allowlistedUserId], references: [id])
+  allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
 
   // Referral Data
   accessCodes AccessCode[] @relation(name: "AccessCode")
@@ -48,5 +47,29 @@ model AllowlistedUser {
   // Wallet Address
   id String @id
 
+  // Social connections
+  twitter TwitterAccount? 
+
   user User?
+}
+
+model TwitterAccount {
+  // Twitter User ID
+  id String @id
+
+  name            String   @db.VarChar(255)
+  username        String   @unique @db.VarChar(255)
+  profileImageUrl String   @default("") @db.VarChar(255)
+  followersCount  Int      @default(0)
+  accessToken     String   @default("") @db.VarChar(255)
+  refreshToken    String   @default("") @db.VarChar(255)
+  expiresIn       Int
+  joined          DateTime @default(now()) @db.Timestamp(6)
+
+  // User ID
+  allowlistedUserId String          @unique
+  allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
+
+  // Meta
+  updatedAt       DateTime @updatedAt @db.Timestamp(6)
 }

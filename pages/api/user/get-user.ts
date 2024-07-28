@@ -40,10 +40,13 @@ export default async function handler(
 				},
 			}),
 		]);
-		const user = {
+		let user: any = {
             ...allowlistedUser,
             user: userRecord,
         }
+        if(!allowlistedUser && !userRecord) {
+            user = null
+        };
 		res.status(200).json({ message: "Success", user });
 	} catch (error) {
 		console.error(error);
