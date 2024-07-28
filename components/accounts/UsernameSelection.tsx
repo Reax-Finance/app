@@ -162,7 +162,7 @@ export default function UsernameSelection() {
               /> */}
             </Flex>
           )}
-          <Text pb={4} ml={4}>
+          <Text pb={4} ml={4} fontSize={"sm"} color={"whiteAlpha.600"}>
             {!isValidInput && error}
           </Text>
         </>

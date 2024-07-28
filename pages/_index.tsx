@@ -80,12 +80,12 @@ export default function Index({ children }: any) {
 
   // TODO: Who gets to access the app?
 
-  // if (
-  //   !(user?.user && user?.id == address?.toLowerCase()) ||
-  //   sessionStatus !== "authenticated"
-  // ) {
-  //   return <ConnectPage />;
-  // }
+  if (
+    !(user?.user && user?.id == address?.toLowerCase()) ||
+    sessionStatus !== "authenticated"
+  ) {
+    return <ConnectPage />;
+  }
 
   return (
     <Box h={"100vh"}>
