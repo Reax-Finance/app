@@ -286,3 +286,16 @@
   background-repeat: no-repeat;
   background-size: 100% 51%;
 }
+
+.edgy-dark-PrimaryLeftCut {
+  background: linear-gradient(45deg, transparent 6px, #9b6a1c 0) bottom left,
+    linear-gradient(-135deg, transparent 0px, #9b6a1c 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+.edgy-dark-SecondryRightCut {
+  background: linear-gradient(45deg, transparent 0px, #933d15 0) bottom left,
+    linear-gradient(-135deg, transparent 6px, #933d15 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}

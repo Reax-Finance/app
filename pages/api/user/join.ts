@@ -8,21 +8,22 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let { address, accessCode }: { address: string; accessCode: string } = req.body;
+  let { address, accessCode }: { address: string; accessCode: string } =
+    req.body;
   address = address.toLowerCase();
   accessCode = accessCode.toLowerCase();
 
   let initialXp = 0;
   let referrer = null;
 
-  if (!accessCode) {
+  if (accessCode.length < 2) {
     // Check if the address is allowlisted
     const allowlist = await prisma.allowlistedUser.findUniqueOrThrow({
       where: {
         id: address,
       },
     });
-    if(!allowlist) {
+    if (!allowlist) {
       res.status(400).json({ message: "User not allowlisted" });
       return;
     }
@@ -47,7 +48,7 @@ export default async function handler(
     data: {
       id: address,
       balance: initialXp,
-      allowlistedUser: (accessCode ? undefined: {id: address} as any),
+      allowlistedUser: accessCode ? undefined : ({ id: address } as any),
     },
   });
 
