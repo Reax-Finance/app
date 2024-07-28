@@ -101,23 +101,21 @@ export default function FAQ() {
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <Box>
+      <Box mt={-4}>
         <Text>
           Need Help? If you{"'"}re having any issues, our support team is ready
           to assist you.
         </Text>
-        <Box className={`${VARIANT}-${colorMode}-discordButton`} maxW={"100%"}>
+        <Box className={`${VARIANT}-${colorMode}-discordButton`} mt={4}>
           <Button
-            rounded={0}
-            mt={4}
-            display={"flex"}
-            gap={2}
-            // bg={"#515BE7"}
+            size={"md"}
+            type="button"
             bg={"transparent"}
-            _hover={{ opacity: 0.8 }}
-            onClick={() => window.open("https://discord.gg/ccxfyveZ", "_blank")}
+            _hover={{ opacity: 0.6 }}
+            w={"100%"}
+            leftIcon={<BsDiscord fill="white" />}
           >
-            <BsDiscord fill="white" /> Discord
+            Join Discord
           </Button>
         </Box>
       </Box>
