@@ -48,11 +48,12 @@ export default function Account() {
         </Box>
       </Flex>
 
-      <Divider my={4} />
-
+      {/* <Divider my={4} /> */}
+      <Box mt={8}>
       <AccessCodes />
+      </Box>
 
-      <Divider my={4} />
+      {/* <Divider my={4} /> */}
       <Heading size={'lg'} my={8}>
         Quests
       </Heading>

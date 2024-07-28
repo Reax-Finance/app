@@ -35,7 +35,7 @@ export default function GetStarted({ setJoin }: any) {
 					_hover={{ opacity: 0.6 }}
 					w={"100%"}
 				>
-					Get started
+					Get Started
 					<ChevronRightIcon />
 				</Button>
 			</Box>

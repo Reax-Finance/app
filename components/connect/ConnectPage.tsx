@@ -14,6 +14,7 @@ import NotWhitelisted from "./NotWhitelisted";
 import ConnectInterface from "./ConnectInterface";
 import SignupInterface from "./SignupInterface";
 import GetStarted from "./GetStarted";
+import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -23,6 +24,7 @@ export default function ConnectPage() {
 
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
+
 
   return (
     <Box h={"100vh"}>
@@ -108,9 +110,9 @@ export default function ConnectPage() {
             )}
           </Flex>
         </Box>
-        <Text w={"100%"} textAlign={"center"} zIndex={2}>
+        {/* <Text w={"100%"} textAlign={"center"} zIndex={2}>
           RWAs on steriods 🚀
-        </Text>
+        </Text> */}
       </Flex>
     </Box>
   );

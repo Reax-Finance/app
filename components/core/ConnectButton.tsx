@@ -55,10 +55,10 @@ export const CustomConnectButton = () => {
                   <Button onClick={openChainModal} rounded={'full'} size={'sm'} py={'18px'} px={'8px'} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
                     {chain.hasIcon ? <Image src={`${chain.iconUrl}`} w={'25px'} alt='' /> : chain.name}
                   </Button>
-                  <Button rounded={0} size={'sm'} py={'18px'} onClick={() => router.push('/account')} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
+                  <Button rounded={0} size={'sm'} py={'18px'} onClick={openAccountModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
                     {account.displayName}
                     <Box>
-
+                      <RiArrowDropDownLine />
                     </Box>
                   </Button>
                 </Flex>

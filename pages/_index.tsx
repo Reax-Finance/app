@@ -22,7 +22,6 @@ import { useChainModal } from "@rainbow-me/rainbowkit";
 import ConnectPage from "../components/connect/ConnectPage";
 import { useSession } from "next-auth/react";
 import { useUserData } from "../components/context/UserDataProvider";
-import Connect2 from "../components/connect/Connect2";
 
 export default function Index({ children }: any) {
   const router = useRouter();
@@ -81,7 +80,7 @@ export default function Index({ children }: any) {
 
   // TODO: Who gets to access the app?
 
-  if (!(user?.user && user?.id == address?.toLowerCase())) {
+  if (!(user?.user && user?.id == address?.toLowerCase()) || sessionStatus !== "authenticated") {
     return <ConnectPage />;
   }
 

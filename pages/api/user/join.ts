@@ -8,8 +8,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { address, accessCode }: { address: string; accessCode: string } =
-    req.body;
+  let { address, accessCode }: { address: string; accessCode: string } = req.body;
+  address = address.toLowerCase();
+  accessCode = accessCode.toLowerCase();
+
   let initialXp = 0;
   let referrer = null;
 
@@ -17,9 +19,13 @@ export default async function handler(
     // Check if the address is allowlisted
     const allowlist = await prisma.allowlistedUser.findUniqueOrThrow({
       where: {
-        id: address.toLowerCase(),
+        id: address,
       },
     });
+    if(!allowlist) {
+      res.status(400).json({ message: "User not allowlisted" });
+      return;
+    }
   } else {
     // Validate the access code
     const accessCodeRecord = await prisma.accessCode.findUniqueOrThrow({
@@ -39,8 +45,9 @@ export default async function handler(
   // Create a whitelisted user
   await prisma.user.create({
     data: {
-      id: address.toLowerCase(),
+      id: address,
       balance: initialXp,
+      allowlistedUser: (accessCode ? undefined: {id: address} as any),
     },
   });
 
@@ -51,7 +58,7 @@ export default async function handler(
         return prisma.accessCode.create({
           data: {
             id: Math.random().toString(36).substring(7),
-            userId: address.toLowerCase(),
+            userId: address,
           },
         });
       })
@@ -75,7 +82,7 @@ export default async function handler(
     .catch(async (err) => {
       await prisma.user.delete({
         where: {
-          id: address.toLowerCase(),
+          id: address,
         },
       });
       res

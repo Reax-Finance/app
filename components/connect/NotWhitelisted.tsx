@@ -32,6 +32,8 @@ import { BsDiscord } from "react-icons/bs";
 import AccessCode from "../ui/access-code/AccessCode";
 import { table } from "console";
 import { useRouter } from "next/router";
+import Dark400Box2C from "../ui/boxes/Dark400Box2C";
+import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 
 export default function NotWhitelisted({
   setJoin,
@@ -41,15 +43,19 @@ export default function NotWhitelisted({
   const { openAccountModal } = useAccountModal();
   const { colorMode } = useColorMode();
   const [error, setError] = React.useState<String | undefined>();
+  const [checkingAC, setCheckingAC] = React.useState(false);
 
   const validateAndJoin = () => {
     // validate
+    setCheckingAC(true);
     axios
       .get(`/api/user/validate-ac?accessCode=${accessCode}`)
       .then((res) => {
+        setCheckingAC(false);
         setJoin(true);
       })
       .catch((err) => {
+        setCheckingAC(false);
         setError("Invalid access code");
       });
   };
@@ -63,7 +69,8 @@ export default function NotWhitelisted({
     accessCode.length == 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
 
   return (
-    <Box zIndex={2} display={"flex"} flexDirection={"column"}>
+    <Dark600Box2C p={6} zIndex={2} display={"flex"} flexDirection={"column"}>
+      <Heading size={"lg"} mb={4}>Not Whitelisted</Heading>
       <Text mt={2}>
         Uh oh! It looks like your wallet isn{"'"}t on our allowlist. This might
         be because:
@@ -144,16 +151,17 @@ export default function NotWhitelisted({
               bg={"transparent"}
               _hover={{ bg: "transparent" }}
               onClick={validateAndJoin}
+              isLoading={checkingAC}
             />
           </Box>
         </Flex>
 
         {error && (
-          <Text color="red.400" fontSize={"sm"} mt={2}>
+          <Text color="red.400" fontSize={"sm"} mt={3} mb={-2}>
             {error}
           </Text>
         )}
       </Box>
-    </Box>
+    </Dark600Box2C>
   );
 }

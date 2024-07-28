@@ -23,7 +23,8 @@ model User {
   username String? @unique @db.VarChar(255)
 
   // Allowlisted Record
-  allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
+  allowlistedUserId String? @unique
+  allowlistedUser AllowlistedUser? @relation(fields: [allowlistedUserId], references: [id])
 
   // Referral Data
   accessCodes AccessCode[] @relation(name: "AccessCode")
