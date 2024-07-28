@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Status } from "../utils/status";
 import { Account, ReserveData, LiquidityData } from "../utils/types";
-import { AccessCode, AllowlistedUser, User as _User } from "@prisma/client";
+import { AccessCode, AllowlistedUser, TwitterAccount, User as _User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 
@@ -15,6 +15,7 @@ interface UserObject extends _User {
 interface UserData extends AllowlistedUser {
   user?: UserObject;
   isAllowlisted: boolean;
+  twitter: TwitterAccount | null;
 }
 
 export interface UserDataValue {
