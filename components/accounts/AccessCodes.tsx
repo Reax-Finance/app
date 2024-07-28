@@ -19,6 +19,7 @@ import { useUserData } from "../context/UserDataProvider";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaCopy } from "react-icons/fa";
 import { VARIANT } from "../../styles/theme";
+import ShareTweetPill from "../ui/boxes/pills/ShareTweetPill";
 
 export default function AccessCodes() {
   const { colorMode } = useColorMode();
@@ -65,18 +66,7 @@ export default function AccessCodes() {
             ))}
           </Flex>
 
-          <Flex align={"end"}>
-            <Button leftIcon={<FaCopy />} rounded={0}>
-              Copy Message
-            </Button>
-            <Button
-              leftIcon={<FaXTwitter />}
-              colorScheme={"twitter"}
-              rounded={0}
-            >
-              Share
-            </Button>
-          </Flex>
+          <ShareTweetPill args={{ align: "end" }} />
         </Flex>
       </Dark600Box2C>
     </div>

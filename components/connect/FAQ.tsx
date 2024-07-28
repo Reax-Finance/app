@@ -106,7 +106,7 @@ export default function FAQ() {
           Need Help? If you{"'"}re having any issues, our support team is ready
           to assist you.
         </Text>
-        <Box className={`${VARIANT}-${colorMode}-discordButton`} maxW={"24%"}>
+        <Box className={`${VARIANT}-${colorMode}-discordButton`} maxW={"100%"}>
           <Button
             rounded={0}
             mt={4}

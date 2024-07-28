@@ -270,13 +270,13 @@
 
 .edgy-dark-rightCutActive {
   background: linear-gradient(45deg, transparent 0px, #f64e00 0) bottom left,
-    linear-gradient(-135deg, transparent 10px, #f64e00 0) top right;
+    linear-gradient(-135deg, transparent 6px, #f64e00 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 51%;
 }
 .edgy-dark-rightCutInactive {
   background: linear-gradient(45deg, transparent 0px, #b34f2b 0) bottom left,
-    linear-gradient(-135deg, transparent 10px, #b34f2b 0) top right;
+    linear-gradient(-135deg, transparent 6px, #b34f2b 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 51%;
 }
@@ -296,6 +296,20 @@
 .edgy-dark-SecondryRightCut {
   background: linear-gradient(45deg, transparent 0px, #933d15 0) bottom left,
     linear-gradient(-135deg, transparent 6px, #933d15 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.edgy-dark-copyButton {
+  background: linear-gradient(45deg, transparent 6px, #3e4148 0) bottom left,
+    linear-gradient(-135deg, transparent 0px, #3e4148 0) top right;
+  background-repeat: no-repeat;
+  background-size: 100% 51%;
+}
+
+.edgy-dark-shareTweetButton {
+  background: linear-gradient(45deg, transparent 0px, #83cdf7 0) bottom left,
+    linear-gradient(-135deg, transparent 6px, #83cdf7 0) top right;
   background-repeat: no-repeat;
   background-size: 100% 51%;
 }
