@@ -14,7 +14,6 @@ import NotWhitelisted from "./NotWhitelisted";
 import ConnectInterface from "./ConnectInterface";
 import SignupInterface from "./SignupInterface";
 import GetStarted from "./GetStarted";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -25,50 +24,8 @@ export default function ConnectPage() {
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
 
-
   return (
     <Box h={"100vh"}>
-      <Flex
-        justify={"center"}
-        zIndex={0}
-        position={"absolute"}
-        w={"100%"}
-        h={"100%"}
-      >
-        <Box
-          bgImage={"/background-1.svg"}
-          bgRepeat={"no-repeat"}
-          bgSize={"cover"}
-          w={"100%"}
-          h={"100%"}
-          position={"absolute"}
-          bgPos={"top"}
-          top={0}
-          zIndex={-10}
-        />
-        <Box
-          bgImage={"/background-2.svg"}
-          bgRepeat={"no-repeat"}
-          bgSize={"cover"}
-          w={"100%"}
-          h={"100%"}
-          opacity={0.5}
-          position={"relative"}
-          bgPos={"top"}
-          zIndex={-8}
-        />
-        <Box
-          bgGradient={`linear(to-t, ${
-            colorMode == "dark" ? "black" : "white"
-          }Alpha.600, ${colorMode == "dark" ? "black" : "white"}Alpha.900)`}
-          bgSize={"cover"}
-          w={"100%"}
-          h={"100%"}
-          position={"absolute"}
-          top={0}
-          zIndex={-9}
-        />
-      </Flex>
       <Flex
         py={10}
         flexDir={"column"}
@@ -110,9 +67,6 @@ export default function ConnectPage() {
             )}
           </Flex>
         </Box>
-        {/* <Text w={"100%"} textAlign={"center"} zIndex={2}>
-          RWAs on steriods 🚀
-        </Text> */}
       </Flex>
     </Box>
   );

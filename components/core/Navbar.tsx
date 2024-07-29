@@ -21,6 +21,7 @@ import { CustomConnectButton } from "./ConnectButton";
 import { MdFeedback, MdOpenInNew } from "react-icons/md";
 import { RiFeedbackLine } from "react-icons/ri";
 import { useUserData } from "../context/UserDataProvider";
+import { useRouter } from "next/router";
 
 function NavBar() {
 	const { isOpen: isToggleOpen, onToggle } = useDisclosure();
@@ -29,6 +30,12 @@ function NavBar() {
 	const { user } = useUserData();
 
 	const { colorMode } = useColorMode();
+
+	const router = useRouter();
+
+	if(router.pathname == "/connect") {
+		return null;
+	}
 
 	return (
 		<>

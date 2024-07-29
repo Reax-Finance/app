@@ -9,10 +9,7 @@ export default async function handler(
 ) {
 	try {
 		const { address } = req.query;
-		console.log("Address: ", address);
 
-		// const nextAuth = await auth(req, res);
-		// console.log("NextAuth: ", nextAuth);
 		if (!address) {
 			res.status(400).json({ message: "Bad Request" });
 			return;
@@ -22,6 +19,9 @@ export default async function handler(
 				where: {
 					id: (address as string).toLowerCase(),
 				},
+                include: {
+                    twitter: true,
+                }
 			}),
 			prisma.user.findUnique({
 				where: {

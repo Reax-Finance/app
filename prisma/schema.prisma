@@ -21,14 +21,10 @@ model User {
   balance  Int     @default(0)
   // Unique username
   username String? @unique @db.VarChar(255)
-
   // Allowlisted Record
   allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
-
-  // Referral Data
+  // Referral Codes Created
   accessCodes AccessCode[] @relation(name: "AccessCode")
-  joinedBy    AccessCode?  @relation(name: "JoinedBy")
-
   // Meta
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
@@ -36,27 +32,29 @@ model User {
 
 model AccessCode {
   id String @id @db.VarChar(255)
-
-  joinedUserId String? @unique
-  joinedUser   User?   @relation(name: "JoinedBy", fields: [joinedUserId], references: [id])
+  // Consumed By
+  joinedUserId String?          @unique
+  joinedUser   AllowlistedUser? @relation(name: "JoinedBy", fields: [joinedUserId], references: [id])
+  // Created By
   userId       String
-  user         User    @relation(name: "AccessCode", fields: [userId], references: [id])
+  user         User             @relation(name: "AccessCode", fields: [userId], references: [id])
 }
 
 model AllowlistedUser {
   // Wallet Address
-  id String @id
-
+  id       String      @id
+  // Consumed Access Code
+  joinedBy AccessCode? @relation(name: "JoinedBy")
   // Social connections
-  twitter TwitterAccount? 
-
+  twitter TwitterAccount?
+  // Created User
   user User?
 }
 
 model TwitterAccount {
   // Twitter User ID
   id String @id
-
+  // User Profile
   name            String   @db.VarChar(255)
   username        String   @unique @db.VarChar(255)
   profileImageUrl String   @default("") @db.VarChar(255)
@@ -65,11 +63,9 @@ model TwitterAccount {
   refreshToken    String   @default("") @db.VarChar(255)
   expiresIn       Int
   joined          DateTime @default(now()) @db.Timestamp(6)
-
   // User ID
   allowlistedUserId String          @unique
   allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
-
   // Meta
-  updatedAt       DateTime @updatedAt @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
 }

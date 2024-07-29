@@ -2,38 +2,21 @@ import {
   Flex,
   Text,
   Heading,
-  Image,
   Box,
   Divider,
   Button,
   useColorMode,
   Input,
   IconButton,
-  useToast,
 } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
-import { CustomConnectButton } from "../core/ConnectButton";
-import { useUserData } from "../context/UserDataProvider";
-import { useSession } from "next-auth/react";
-import { Status } from "../utils/status";
-import { useAccount } from "wagmi";
 import { VARIANT } from "../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-} from "@chakra-ui/react";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
-import { BsDiscord } from "react-icons/bs";
-import AccessCode from "../ui/access-code/AccessCode";
-import { table } from "console";
-import { useRouter } from "next/router";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 import Dark600Box2C from "../ui/boxes/Dark600Box2C";
+import { useUserData } from "../context/UserDataProvider";
 
 export default function NotWhitelisted({
   setJoin,
@@ -44,14 +27,15 @@ export default function NotWhitelisted({
   const { colorMode } = useColorMode();
   const [error, setError] = React.useState<String | undefined>();
   const [checkingAC, setCheckingAC] = React.useState(false);
+  const { updateUser } = useUserData();
 
-  const validateAndJoin = () => {
-    // validate
+  const consumeAndJoin = () => {
     setCheckingAC(true);
     axios
-      .get(`/api/user/validate-ac?accessCode=${accessCode}`)
+      .get(`/api/user/consume-ac?accessCode=${accessCode}`)
       .then((res) => {
         setCheckingAC(false);
+        updateUser();
         setJoin(true);
       })
       .catch((err) => {
@@ -150,7 +134,7 @@ export default function NotWhitelisted({
               isDisabled={!isValidInput}
               bg={"transparent"}
               _hover={{ bg: "transparent" }}
-              onClick={validateAndJoin}
+              onClick={consumeAndJoin}
               isLoading={checkingAC}
             />
           </Box>

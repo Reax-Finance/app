@@ -124,11 +124,14 @@ export const REFERRER_XP_REWARD = 50;
 
 export const TWITTER_SCOPE = [
 	"users.read", 
-	// "tweet.read", 
-	// "follows.read", 
-	// "offline.access", 
-	// "like.read",
+	"tweet.read", 
+	"follows.read", 
+	"offline.access", 
+	"like.read",
 	// "like.write",
 	// "tweet.write",
 	// "follows.write",
 ].join(" ");
+
+export const X_ACCOUNT_AGE_MIN = 0 * 24 * 60 * 60 * 1000;
+export const X_ACCOUNT_FOLLOWERS_MIN = 0;

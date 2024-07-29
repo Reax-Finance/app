@@ -16,6 +16,7 @@ import axios from "axios";
 import { useUserData } from "../context/UserDataProvider";
 import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
+import XConnect from "./XConnect";
 
 export default function SignupInterface({ accessCode }: any) {
 	const { address } = useAccount();
@@ -56,7 +57,9 @@ export default function SignupInterface({ accessCode }: any) {
 		<Dark600Box2C zIndex={2}>
 			<Box maxW={"600px"}>
 				<Dark400Box2C p={4}>
-					<Heading>Heads up!</Heading>
+					<Heading>
+						Get started! 
+					</Heading>
 				</Dark400Box2C>
 				<Box p={4}>
 					<Text>
@@ -76,6 +79,10 @@ export default function SignupInterface({ accessCode }: any) {
 							the access code <b>{accessCode}</b>
 						</Text>
 					)}
+		<Box mt={6}>
+          <XConnect />
+		</Box>
+
 					<Box
 						className={`${VARIANT}-${colorMode}-primaryButton`}
 						mt={6}

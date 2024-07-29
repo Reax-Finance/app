@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { JOINEE_XP_REWARD, REFERRER_XP_REWARD } from "../../../src/const";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]";
 
 const prisma = new PrismaClient();
 
@@ -8,38 +10,43 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let { address, accessCode }: { address: string; accessCode: string } = req.body;
-  address = address.toLowerCase();
-  accessCode = accessCode.toLowerCase();
+  const session = await getServerSession(req, res, authOptions({ req }));
+  let address = session?.user?.name?.toLowerCase();
+  if (!address) {
+    res.status(400).json({ message: "Bad Request" });
+    return;
+  }
 
   let initialXp = 0;
   let referrer = null;
 
-  if (!accessCode) {
-    // Check if the address is allowlisted
-    const allowlist = await prisma.allowlistedUser.findUniqueOrThrow({
-      where: {
-        id: address,
-      },
-    });
-    if(!allowlist) {
-      res.status(400).json({ message: "User not allowlisted" });
-      return;
+  // Check if the address is allowlisted and has a twitter account
+  const allowlistedUser = await prisma.allowlistedUser.findUnique({
+    where: {
+      id: address,
+    },
+    include: {
+      twitter: true,
+      joinedBy: true,
+      user: true,
     }
-  } else {
-    // Validate the access code
-    const accessCodeRecord = await prisma.accessCode.findUniqueOrThrow({
-      where: {
-        id: accessCode,
-      },
-      include: {
-        joinedUser: true,
-        user: true,
-      },
-    });
-
+  });
+  if(!allowlistedUser) {
+    res.status(400).json({ message: "User not allowlisted" });
+    return;
+  }
+  if(allowlistedUser.user) {
+    res.status(400).json({ message: "User already joined" });
+    return;
+  }
+  if(!allowlistedUser.twitter) {
+    res.status(400).json({ message: "Twitter account not verified" });
+    return;
+  }
+  // If the user has a referrer, increment the initial XP
+  if(allowlistedUser.joinedBy) {
     initialXp += JOINEE_XP_REWARD;
-    referrer = accessCodeRecord.user.id;
+    referrer = allowlistedUser.joinedBy.userId;
   }
 
   // Create a whitelisted user
@@ -47,7 +54,6 @@ export default async function handler(
     data: {
       id: address,
       balance: initialXp,
-      allowlistedUser: (accessCode ? undefined: {id: address} as any),
     },
   });
 

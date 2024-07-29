@@ -11,6 +11,8 @@ import {
 import React, { use, useEffect } from "react";
 import { VARIANT } from "../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
+import Dark600Box2C from "../ui/boxes/Dark600Box2C";
+import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 
 export default function GetStarted({ setJoin }: any) {
 	const signIn = () => {
@@ -20,25 +22,32 @@ export default function GetStarted({ setJoin }: any) {
 	const { colorMode } = useColorMode();
 
 	return (
-		<Box px={20} py={10} zIndex={2}>
-			<Heading>You are on the Allowlist!</Heading>
-			<Text mt={2}>
-				You are now ready to start using Reax. Click the button below to
-				get started.
-			</Text>
-			<Box className={`${VARIANT}-${colorMode}-primaryButton`} mt={8}>
-				<Button
-					size={"md"}
-					onClick={signIn}
-					type="button"
-					bg={"transparent"}
-					_hover={{ opacity: 0.6 }}
-					w={"100%"}
-				>
-					Get Started
-					<ChevronRightIcon />
-				</Button>
+		<Dark600Box2C zIndex={2}>
+			<Dark400Box2C p={4}>
+				<Heading>
+					You are on the Allowlist! 🎉
+				</Heading>
+			</Dark400Box2C>
+
+			<Box p={4}>
+				<Text mt={2}>
+					You are now ready to start using Reax. Click the button
+					below to get started.
+				</Text>
+				<Box className={`${VARIANT}-${colorMode}-primaryButton`} mt={8}>
+					<Button
+						size={"md"}
+						onClick={signIn}
+						type="button"
+						bg={"transparent"}
+						_hover={{ opacity: 0.6 }}
+						w={"100%"}
+					>
+						Get Started
+						<ChevronRightIcon />
+					</Button>
+				</Box>
 			</Box>
-		</Box>
+		</Dark600Box2C>
 	);
 }
