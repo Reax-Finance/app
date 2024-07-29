@@ -1,12 +1,12 @@
 import {
-	Flex,
-	Text,
-	Heading,
-	Image,
-	Box,
-	Button,
-	useColorMode,
-	useToast,
+  Flex,
+  Text,
+  Heading,
+  Image,
+  Box,
+  Button,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -19,11 +19,11 @@ import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 import XConnect from "./XConnect";
 
 export default function SignupInterface({ accessCode }: any) {
-	const { address } = useAccount();
-	const { colorMode } = useColorMode();
-	const { updateUser } = useUserData();
+  const { address } = useAccount();
+  const { colorMode } = useColorMode();
+  const { updateUser } = useUserData();
 
-	const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
 	const toast = useToast();
 	const signUp = () => {
