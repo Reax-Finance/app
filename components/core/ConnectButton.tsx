@@ -4,10 +4,14 @@ import { RiArrowDropDownLine } from 'react-icons/ri';
 import { VARIANT } from '../../styles/theme';
 import { isSupportedChain } from '../../src/const';
 import { useRouter } from 'next/router';
+import { useUserData } from '../context/UserDataProvider';
 
 export const CustomConnectButton = () => {
 	const { colorMode } = useColorMode();
   const router = useRouter();
+  const {user} = useUserData();
+
+
   return (
     <ConnectButton.Custom>
       {({
@@ -56,7 +60,7 @@ export const CustomConnectButton = () => {
                     {chain.hasIcon ? <Image src={`${chain.iconUrl}`} w={'25px'} alt='' /> : chain.name}
                   </Button>
                   <Button rounded={0} size={'sm'} py={'18px'} onClick={openAccountModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
-                    {account.displayName}
+                    {user?.user?.username || account.displayName}
                     <Box>
                       <RiArrowDropDownLine />
                     </Box>

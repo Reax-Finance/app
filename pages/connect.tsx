@@ -8,6 +8,7 @@ import ConnectInterface from "../components/connect/ConnectInterface";
 import SignupInterface from "../components/connect/SignupInterface";
 import GetStarted from "../components/connect/GetStarted";
 import { useUserData } from "../components/context/UserDataProvider";
+import { useRouter } from "next/router";
 
 export default function ConnectPage() {
 	const { user, status: userStatus } = useUserData();
@@ -17,6 +18,15 @@ export default function ConnectPage() {
 
 	const [join, setJoin] = React.useState(false);
 	const [accessCode, setAccessCode] = React.useState("");
+
+
+	const router = useRouter();
+
+	useEffect(() => {
+		if(userStatus == Status.SUCCESS && user?.user){
+			router.push("/");
+		}
+	}, [router, userStatus, user])
 
 	return (
 		<Box h={"100vh"}>

@@ -1,12 +1,12 @@
 import {
-  Flex,
-  Text,
-  Heading,
-  Image,
-  Box,
-  Button,
-  useColorMode,
-  useToast,
+	Flex,
+	Text,
+	Heading,
+	Image,
+	Box,
+	Button,
+	useColorMode,
+	useToast,
 } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -17,13 +17,14 @@ import { useUserData } from "../context/UserDataProvider";
 import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 import XConnect from "./XConnect";
+import PrimaryButton from "../ui/buttons/PrimaryButton";
 
 export default function SignupInterface({ accessCode }: any) {
-  const { address } = useAccount();
-  const { colorMode } = useColorMode();
-  const { updateUser, user } = useUserData();
+	const { address } = useAccount();
+	const { colorMode } = useColorMode();
+	const { updateUser, user } = useUserData();
 
-  const [loading, setLoading] = React.useState(false);
+	const [loading, setLoading] = React.useState(false);
 
 	const toast = useToast();
 	const signUp = () => {
@@ -57,9 +58,7 @@ export default function SignupInterface({ accessCode }: any) {
 		<Dark600Box2C zIndex={2}>
 			<Box maxW={"600px"}>
 				<Dark400Box2C p={4}>
-					<Heading>
-						Get started! 
-					</Heading>
+					<Heading>Get started!</Heading>
 				</Dark400Box2C>
 				<Box p={4}>
 					<Text>
@@ -68,10 +67,11 @@ export default function SignupInterface({ accessCode }: any) {
 						of DeFi built on top of RWAs.
 					</Text>
 
-          <Text mt={6}>
-            This is a testnet, so you will not be using real money. You
-            will be using test tokens to interact with the platform.
-          </Text>
+					<Text mt={6}>
+						This is a testnet, so you will not be using real money.
+						You will be using test tokens to interact with the
+						platform.
+					</Text>
 
 					{accessCode && (
 						<Text mt={6}>
@@ -79,25 +79,20 @@ export default function SignupInterface({ accessCode }: any) {
 							the access code <b>{accessCode}</b>
 						</Text>
 					)}
-		<Box mt={6}>
-          <XConnect />
-		</Box>
+					<Box mt={6}>
+						<XConnect />
+					</Box>
 
-					<Box
-						className={`${VARIANT}-${colorMode}-primaryButton`}
-						mt={6}
-					>
-						<Button
+					<Box mt={6}>
+						<PrimaryButton
 							onClick={signUp}
-							bg={"transparent"}
-							_hover={{ opacity: 0.6 }}
 							isLoading={loading}
 							w={"100%"}
 							isDisabled={!user?.twitter}
 						>
 							Sign Up
 							<ChevronRightIcon />
-						</Button>
+						</PrimaryButton>
 					</Box>
 				</Box>
 			</Box>

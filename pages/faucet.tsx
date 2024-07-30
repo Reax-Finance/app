@@ -68,6 +68,7 @@ import ThBox from "../components/ui/table/ThBox";
 import TdBox from "../components/ui/table/TdBox";
 import { NATIVE_FAUCET_LINK, isSupportedChain } from "../src/const";
 import useChainData from "../components/context/useChainData";
+import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 
 export default function Faucet() {
 	const { reserveData } = useAppData();
@@ -152,6 +153,7 @@ export default function Faucet() {
 
 	return (
 		<Box h={'60vh'}>
+			<OnlyAuthenticated />
 			<Head>
 				<title>
 					Test Faucet | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}

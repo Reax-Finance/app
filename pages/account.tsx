@@ -23,6 +23,7 @@ import { tokenFormatter } from "../src/const";
 import AccessCodes from "../components/accounts/AccessCodes";
 import { BsClock } from "react-icons/bs";
 import { VARIANT } from "../styles/theme";
+import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 
 Swiper.use([Autoplay, Navigation]);
 
@@ -33,6 +34,7 @@ export default function Account() {
 
   return (
     <Box maxW={"1350px"}>
+      <OnlyAuthenticated />
       <Flex gap={10} justify={"space-between"}>
         <Box>
           <Heading>

@@ -63,7 +63,7 @@ export default async function handler(
       [0, 0, 0, 0, 0].map(() => {
         return prisma.accessCode.create({
           data: {
-            id: Math.random().toString(36).substring(7),
+            id: Math.random().toString(36).slice(-6),
             userId: address,
           },
         });

@@ -54,7 +54,7 @@ function UserDataProvider({ children }: any) {
       .get("/api/user/get-user", {
         params: { address },
       })
-      .then(async (res: any) => {
+      .then((res: any) => {
         console.log("User data", res.data);
         setUser({
           ...res.data.user,
@@ -64,7 +64,7 @@ function UserDataProvider({ children }: any) {
         setStatus(Status.SUCCESS);
         resolve();
       })
-      .catch(async (err: any) => {
+      .catch((err: any) => {
         console.log("Error", err);
         setStatus(Status.ERROR);
         reject(err);

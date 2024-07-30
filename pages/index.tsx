@@ -6,21 +6,13 @@ import { useUserData } from "../components/context/UserDataProvider";
 import { useAccount } from "wagmi";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 
 export default function SwapPage() {
-	const { user } = useUserData();
-	const { address } = useAccount();
-	const { status: sessionStatus } = useSession();
-	const router = useRouter();
-
-	useEffect(() => {
-		if (!(user?.user && user?.id == address?.toLowerCase()) || sessionStatus !== "authenticated") {
-			router.push("/connect");
-		}
-	}, [user, address, sessionStatus, router]);
 
 	return (
 			<Box >
+				<OnlyAuthenticated />
 				<Flex justify={"center"} align="center" >
 					<Box >
 						<motion.div
