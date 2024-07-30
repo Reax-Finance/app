@@ -10,6 +10,9 @@ const ShareTweetPill = ({ ...args }: { args?: FlexProps }) => {
       <Box
         className={`${VARIANT}-${colorMode}-copyButton`}
         _hover={{ opacity: 0.8 }}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
       >
         <Button
           leftIcon={<FaCopy />}
@@ -23,6 +26,9 @@ const ShareTweetPill = ({ ...args }: { args?: FlexProps }) => {
       <Box
         className={`${VARIANT}-${colorMode}-shareTweetButton`}
         _hover={{ opacity: 0.8 }}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
       >
         <Button
           leftIcon={<FaXTwitter />}
