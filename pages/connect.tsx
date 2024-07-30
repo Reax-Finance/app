@@ -49,8 +49,7 @@ export default function ConnectPage() {
 									<ConnectInterface />
 								) : null}
 								{status == "connected" &&
-								sessionStatus == "authenticated" ? (
-									userStatus == Status.SUCCESS &&
+								sessionStatus == "authenticated" && userStatus == Status.SUCCESS ? (
 									user?.isAllowlisted &&
 									user?.id == address?.toLowerCase() ? (
 										<GetStarted setJoin={setJoin} />
@@ -66,7 +65,7 @@ export default function ConnectPage() {
 									status == "connecting" ||
 									status == "reconnecting") && (
 									<>
-										<Text zIndex={2}>Loading...</Text>
+										<Text>Loading...</Text>
 									</>
 								)}
 							</>

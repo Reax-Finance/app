@@ -29,7 +29,7 @@ export default function TwitterCallback() {
       state: router.query.state,
       code: router.query.code,
       error: router.query.error
-    }).then((response) => {
+    }).then(async (response) => {
       // Redirect to the dashboard
       if(response.status === 200){
         toast({
@@ -41,7 +41,7 @@ export default function TwitterCallback() {
         
         })
         // Update userData
-        updateUser();
+        // await updateUser();
         router.push("/");
       }
     }).catch((error: any) => {
@@ -60,7 +60,9 @@ export default function TwitterCallback() {
   return (
     <Flex bgImage={'/images/whitelist-page-bg.svg'} bgSize={'cover'} bgRepeat={'no-repeat'} minH={'100vh'} w={'100%'} justifyContent={'center'} alignItems={'center'}>
       <Flex w={'100%'} justifyContent={'center'} alignItems={'center'}>
-        <Text color={'white'} fontSize={'2xl'}>Loading...</Text>
+        <Text color={'white'} fontSize={'2xl'}>
+          Connecting your account...
+        </Text>
       </Flex>
     </Flex>
   )

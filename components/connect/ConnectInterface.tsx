@@ -20,7 +20,6 @@ export default function ConnectInterface() {
 				flexDir={'column'}
 				className={`${VARIANT}-${colorMode}-containerBody`}
 				rounded={0}
-				zIndex={2}
 				w={"60%"}
 				// justify={'space-between'}
 			>

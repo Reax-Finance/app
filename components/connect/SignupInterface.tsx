@@ -21,7 +21,7 @@ import XConnect from "./XConnect";
 export default function SignupInterface({ accessCode }: any) {
   const { address } = useAccount();
   const { colorMode } = useColorMode();
-  const { updateUser } = useUserData();
+  const { updateUser, user } = useUserData();
 
   const [loading, setLoading] = React.useState(false);
 
@@ -93,6 +93,7 @@ export default function SignupInterface({ accessCode }: any) {
 							_hover={{ opacity: 0.6 }}
 							isLoading={loading}
 							w={"100%"}
+							isDisabled={!user?.twitter}
 						>
 							Sign Up
 							<ChevronRightIcon />

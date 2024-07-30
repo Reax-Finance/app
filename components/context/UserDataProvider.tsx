@@ -23,7 +23,7 @@ export interface UserDataValue {
   message: string;
   user: UserData | undefined;
   setUser: React.Dispatch<React.SetStateAction<UserData | undefined>>;
-  updateUser: () => void;
+  updateUser: () => Promise<void>;
 }
 
 const UserDataContext = React.createContext<UserDataValue>({} as UserDataValue);
@@ -42,7 +42,9 @@ function UserDataProvider({ children }: any) {
     updateUser();
   }, [address, sessionStatus]);
 
-  function updateUser () {
+  async function updateUser (): Promise<void> {
+    return new Promise((resolve, reject) => {
+    setStatus(Status.FETCHING);
     if (typeof window === "undefined") return;
 
     if (!address || address == ADDRESS_ZERO) return;
@@ -60,11 +62,14 @@ function UserDataProvider({ children }: any) {
           id: address.toLowerCase(),
         });
         setStatus(Status.SUCCESS);
+        resolve();
       })
       .catch(async (err: any) => {
         console.log("Error", err);
         setStatus(Status.ERROR);
+        reject(err);
       });
+    });
   }
 
   const value: UserDataValue = {

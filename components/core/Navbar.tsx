@@ -33,7 +33,7 @@ function NavBar() {
 
 	const router = useRouter();
 
-	if(router.pathname == "/connect") {
+	if(router.pathname == "/connect" || router.pathname.includes("/callback")) {
 		return null;
 	}
 
