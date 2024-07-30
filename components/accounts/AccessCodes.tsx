@@ -62,11 +62,20 @@ export default function AccessCodes() {
         <Flex justify={"space-between"}>
           <Flex gap={4} mt={6} align={"center"}>
             {user?.user?.accessCodes?.map((code, i) => (
-              <Box key={i}>{code && <AccessCode code={code} />}</Box>
+              <Box key={i}>
+                {code && (
+                  <AccessCode
+                    code={code}
+                    isUsedAccessCode={code.joinedUserId}
+                  />
+                )}
+              </Box>
             ))}
           </Flex>
 
-          <ShareTweetPill args={{ align: "end" }} />
+          <ShareTweetPill
+            args={{ alignItems: "center", justifyContent: "center" }}
+          />
         </Flex>
       </Dark600Box2C>
     </div>

@@ -286,14 +286,6 @@
   background-repeat: no-repeat;
   background-size: 100% 51%;
 }
-<<<<<<< HEAD
-.edgy-dark-twitterButton {
-  background: linear-gradient(45deg, transparent 6px, #1da1f2 0) bottom left,
-    linear-gradient(-135deg, transparent 6px, #1da1f2 0) top right;
-  background-repeat: no-repeat;
-  background-size: 100% 51%;
-}
-=======
 
 .edgy-dark-PrimaryLeftCut {
   background: linear-gradient(45deg, transparent 6px, #9b6a1c 0) bottom left,
@@ -321,4 +313,3 @@
   background-repeat: no-repeat;
   background-size: 100% 51%;
 }
->>>>>>> ab087dc16b39bf4fd14af320ea669679d4d22841
