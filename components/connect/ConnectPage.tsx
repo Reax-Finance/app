@@ -1,10 +1,4 @@
-import {
-  Flex,
-  Text,
-  Image,
-  Box,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Flex, Text, Image, Box, useColorMode } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
 import { useUserData } from "../context/UserDataProvider";
 import { useSession } from "next-auth/react";
@@ -33,7 +27,13 @@ export default function ConnectPage() {
         justify={"space-between"}
       >
         <Image src="/logo.svg" w={100} h={100} alt="" zIndex={2} />
-        <Box display={"flex"} alignItems={"center"} w={"100%"} px={20} maxW={'1350px'}>
+        <Box
+          display={"flex"}
+          alignItems={"center"}
+          w={"100%"}
+          px={20}
+          maxW={"1350px"}
+        >
           <Flex flexDir={"column"} align={"center"} w={"100%"} py={20}>
             {join ? (
               <SignupInterface accessCode={accessCode} />
@@ -59,9 +59,7 @@ export default function ConnectPage() {
                 {(userStatus == Status.FETCHING ||
                   status == "connecting" ||
                   status == "reconnecting") && (
-                  <>
-                    <Text zIndex={2}>Loading...</Text>
-                  </>
+                  <Text zIndex={2}>Loading...</Text>
                 )}
               </>
             )}

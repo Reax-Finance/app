@@ -12,8 +12,8 @@ export default async function handler(
   const session = await getServerSession(req, res, authOptions({ req }));
   let address = session?.user?.name?.toLowerCase();
   if (!address) {
-      res.status(400).json({ message: "Bad Request" });
-      return;
+    res.status(400).json({ message: "Bad Request" });
+    return;
   }
 
   const accessCodeRecord = await prisma.accessCode.findUnique({
@@ -22,22 +22,31 @@ export default async function handler(
     },
   });
 
-  if(!accessCodeRecord){
+  if (!accessCodeRecord) {
     res.status(400).json({ message: "Invalid access code" });
     return;
   }
 
-  if(accessCodeRecord?.joinedUserId){
+  if (accessCodeRecord?.joinedUserId) {
     res.status(400).json({ message: "Access code already used" });
     return;
   }
 
-  // Consuming the access code
-  await prisma.allowlistedUser.create({
-    data: {
+  // Check if the user is already in the allowlistedUser table
+  const existingUser = await prisma.allowlistedUser.findUnique({
+    where: {
       id: address,
     },
   });
+
+  if (!existingUser) {
+    // Consuming the access code
+    await prisma.allowlistedUser.create({
+      data: {
+        id: address,
+      },
+    });
+  }
 
   await prisma.accessCode.update({
     where: {
@@ -47,6 +56,8 @@ export default async function handler(
       joinedUserId: address,
     },
   });
+
+  console.log("updated accessCode");
 
   res.status(200).json({ message: "Success" });
 }

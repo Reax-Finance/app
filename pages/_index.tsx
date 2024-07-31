@@ -18,7 +18,11 @@ import { useRouter } from "next/router";
 import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
 import { useAccount, useSwitchChain } from "wagmi";
-import { useAccountModal, useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
+import {
+  useAccountModal,
+  useChainModal,
+  useConnectModal,
+} from "@rainbow-me/rainbowkit";
 import ConnectPage from "../components/connect/ConnectPage";
 import { useSession } from "next-auth/react";
 import { useUserData } from "../components/context/UserDataProvider";
@@ -78,7 +82,6 @@ export default function Index({ children }: any) {
   if (!hydrated) {
     return <></>;
   }
-
   return (
     <Box h={"100vh"}>
       {/* Wrong Chain */}

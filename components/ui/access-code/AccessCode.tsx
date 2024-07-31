@@ -19,16 +19,17 @@ const AccessCodeComponent = ({
   const copyCode = () => {
     if (!isUsedAccessCode) {
       navigator.clipboard.writeText(code.id);
+      setCopied(true);
       toast({
-        title: "Copied to clipboard",
+        title: `${code.id.toLocaleUpperCase()} Copied to clipboard`,
         status: "success",
         duration: 2000,
         isClosable: true,
       });
+
       setTimeout(() => {
-        setCopied(true);
+        setCopied(false);
       }, 5000);
-      setCopied(false);
     } else {
       toast({
         title: "Access code has already been used",
@@ -67,7 +68,7 @@ const AccessCodeComponent = ({
         >
           <Flex justifyContent={"center"} alignItems={"center"} gap={4}>
             <Text>{code?.id?.toUpperCase()}</Text>
-            {copied ? <CopyIcon /> : <CheckIcon />}
+            {copied ? <CheckIcon /> : <CopyIcon />}
           </Flex>
         </Box>
       )}
