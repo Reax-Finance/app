@@ -16,22 +16,22 @@ datasource db {
 
 model User {
   // Wallet Address
-  id       String  @id @db.VarChar(255)
+  id              String           @id @db.VarChar(255)
   // Amount of XP Earned
-  balance  Int     @default(0)
+  balance         Int              @default(0)
   // Unique username
-  username String? @unique @db.VarChar(255)
+  username        String?          @unique @db.VarChar(255)
   // Allowlisted Record
   allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
   // Referral Codes Created
-  accessCodes AccessCode[] @relation(name: "AccessCode")
+  accessCodes     AccessCode[]     @relation(name: "AccessCode")
   // Meta
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  createdAt       DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime         @updatedAt @db.Timestamp(6)
 }
 
 model AccessCode {
-  id String @id @db.VarChar(255)
+  id           String           @id @db.VarChar(255)
   // Consumed By
   joinedUserId String?          @unique
   joinedUser   AllowlistedUser? @relation(name: "JoinedBy", fields: [joinedUserId], references: [id])
@@ -42,30 +42,44 @@ model AccessCode {
 
 model AllowlistedUser {
   // Wallet Address
-  id       String      @id
+  id       String          @id
   // Consumed Access Code
-  joinedBy AccessCode? @relation(name: "JoinedBy")
+  joinedBy AccessCode?     @relation(name: "JoinedBy")
   // Social connections
-  twitter TwitterAccount?
+  twitter  TwitterAccount?
+  discord  DiscordConnect?
   // Created User
-  user User?
+  user     User?
 }
 
 model TwitterAccount {
   // Twitter User ID
-  id String @id
+  id                String          @id
   // User Profile
-  name            String   @db.VarChar(255)
-  username        String   @unique @db.VarChar(255)
-  profileImageUrl String   @default("") @db.VarChar(255)
-  followersCount  Int      @default(0)
-  accessToken     String   @default("") @db.VarChar(255)
-  refreshToken    String   @default("") @db.VarChar(255)
-  expiresIn       Int
-  joined          DateTime @default(now()) @db.Timestamp(6)
+  name              String          @db.VarChar(255)
+  username          String          @unique @db.VarChar(255)
+  profileImageUrl   String          @default("") @db.VarChar(255)
+  followersCount    Int             @default(0)
+  accessToken       String          @default("") @db.VarChar(255)
+  refreshToken      String          @default("") @db.VarChar(255)
+  expiresIn         Int
+  joined            DateTime        @default(now()) @db.Timestamp(6)
   // User ID
   allowlistedUserId String          @unique
   allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
   // Meta
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  updatedAt         DateTime        @updatedAt @db.Timestamp(6)
+}
+
+model DiscordConnect {
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(255)
+  userId          String          @unique
+  discordId       String          @unique @db.VarChar(255)
+  username        String          @db.VarChar(255)
+  avatar          String          @default("") @db.VarChar(255)
+  createdAt       DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime        @updatedAt @db.Timestamp(6)
+  expiresIn       Int
+  AllowlistedUser AllowlistedUser @relation(fields: [userId], references: [id])
 }

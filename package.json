@@ -38,6 +38,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
+    "react-responsive-carousel": "^3.2.18",
     "react-tradingview-embed": "^3.0.6",
     "recharts": "^2.12.6",
     "siwe": "^2",

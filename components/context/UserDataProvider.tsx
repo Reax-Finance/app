@@ -1,12 +1,17 @@
+import {
+  AccessCode,
+  AllowlistedUser,
+  TwitterAccount,
+  DiscordConnect,
+  User as _User,
+} from "@prisma/client";
+import axios from "axios";
+import { useSession } from "next-auth/react";
 import * as React from "react";
-import { ADDRESS_ZERO, isSupportedChain } from "../../src/const";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
+import { ADDRESS_ZERO } from "../../src/const";
 import { Status } from "../utils/status";
-import { Account, ReserveData, LiquidityData } from "../utils/types";
-import { AccessCode, AllowlistedUser, TwitterAccount, User as _User } from "@prisma/client";
-import { useSession } from "next-auth/react";
-import axios from "axios";
 
 interface UserObject extends _User {
   accessCodes: AccessCode[];
@@ -16,6 +21,7 @@ interface UserData extends AllowlistedUser {
   user?: UserObject;
   isAllowlisted: boolean;
   twitter: TwitterAccount | null;
+  discord: DiscordConnect;
 }
 
 export interface UserDataValue {
@@ -24,6 +30,7 @@ export interface UserDataValue {
   user: UserData | undefined;
   setUser: React.Dispatch<React.SetStateAction<UserData | undefined>>;
   updateUser: () => Promise<void>;
+  refreshUserData: () => void;
 }
 
 const UserDataContext = React.createContext<UserDataValue>({} as UserDataValue);
@@ -38,46 +45,55 @@ function UserDataProvider({ children }: any) {
   const { address } = useAccount();
   const { status: sessionStatus } = useSession();
 
+  console.log("User Data is ", user);
+
   useEffect(() => {
     updateUser();
   }, [address, sessionStatus]);
 
-  async function updateUser (): Promise<void> {
+  async function updateUser(): Promise<void> {
     return new Promise((resolve, reject) => {
-    setStatus(Status.FETCHING);
-    if (typeof window === "undefined") return;
+      setStatus(Status.FETCHING);
+      if (typeof window === "undefined") return;
 
-    if (!address || address == ADDRESS_ZERO) return;
-    if (sessionStatus !== "authenticated") return;
+      if (!address || address == ADDRESS_ZERO) return;
+      if (sessionStatus !== "authenticated") return;
 
-    axios
-      .get("/api/user/get-user", {
-        params: { address },
-      })
-      .then((res: any) => {
-        console.log("User data", res.data);
-        setUser({
-          ...res.data.user,
-          isAllowlisted: Boolean(res.data.user),
-          id: address.toLowerCase(),
+      axios
+        .get("/api/user/get-user", {
+          params: { address },
+        })
+        .then((res: any) => {
+          console.log("User data", res.data);
+          setUser({
+            ...res.data.user,
+            isAllowlisted: Boolean(res.data.user),
+            id: address.toLowerCase(),
+          });
+          setStatus(Status.SUCCESS);
+          resolve();
+        })
+        .catch((err: any) => {
+          console.log("Error", err);
+          setStatus(Status.ERROR);
+          reject(err);
         });
-        setStatus(Status.SUCCESS);
-        resolve();
-      })
-      .catch((err: any) => {
-        console.log("Error", err);
-        setStatus(Status.ERROR);
-        reject(err);
-      });
     });
   }
+
+  const refreshUserData = () => {
+    updateUser().catch((err) =>
+      console.error("Failed to refresh user data", err)
+    );
+  };
 
   const value: UserDataValue = {
     user,
     setUser,
     status,
     message,
-    updateUser
+    updateUser,
+    refreshUserData,
   };
 
   return (
@@ -91,4 +107,4 @@ export const useUserData = () => {
   return React.useContext(UserDataContext);
 };
 
-export { UserDataProvider, UserDataContext };
+export { UserDataContext, UserDataProvider };

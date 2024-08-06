@@ -13,11 +13,16 @@ import { VARIANT } from "../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import Allowlist from "./Allowlist";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
+import { A11y, Navigation, Pagination, Scrollbar } from "swiper";
 import ImageSlider from "./ImageSlider";
 import { SlideData } from "./SlideData";
 
-export default function GetStarted({ setJoin }: any) {
+export default function Allowlist({ setJoin }: any) {
   const signIn = () => {
     setJoin(true);
   };

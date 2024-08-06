@@ -25,6 +25,8 @@ import { BsClock } from "react-icons/bs";
 import { VARIANT } from "../styles/theme";
 import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 import { motion } from "framer-motion";
+import FollowTwitter from "../components/accounts/quests/FollowTwitter";
+import DiscordConnectQuest from "../components/accounts/quests/DiscordConnectQuest";
 
 Swiper.use([Autoplay, Navigation]);
 
@@ -89,6 +91,12 @@ export default function Account() {
         <Flex gap={4}>
           <Flex w={"50%"}>
             <UsernameSelection />
+          </Flex>
+          <Flex w={"50%"}>
+            <FollowTwitter />
+          </Flex>
+          <Flex w={"50%"}>
+            <DiscordConnectQuest />
           </Flex>
           <Dark600Box2C
             align={"center"}
