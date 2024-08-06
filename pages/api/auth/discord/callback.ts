@@ -47,8 +47,7 @@ export default async function DiscordCallback(
       }
     );
 
-    console.log("Discord User Data", userResponse);
-
+    console.log("first");
     // Check if user account already exists
     const userData = await prisma.allowlistedUser.findUnique({
       where: {
@@ -58,6 +57,7 @@ export default async function DiscordCallback(
         discord: true,
       },
     });
+    console.log("second");
 
     const discordAccountData = {
       name: userResponse.data.username,
@@ -84,7 +84,7 @@ export default async function DiscordCallback(
       await prisma.discordConnect.update({
         where: {
           id: userData?.discord?.id,
-          userId: address,
+          allowlistedUserId: address,
         },
         data: discordAccountData,
       });
@@ -93,7 +93,7 @@ export default async function DiscordCallback(
       await prisma.discordConnect.create({
         data: {
           ...discordAccountData,
-          userId: address,
+          allowlistedUserId: address,
         },
       });
 

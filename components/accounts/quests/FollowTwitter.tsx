@@ -14,12 +14,13 @@ import { VARIANT } from "../../../styles/theme";
 import Dark400Box2C from "../../ui/boxes/Dark400Box2C";
 import Dark600Box2C from "../../ui/boxes/Dark600Box2C";
 import axios from "axios";
+import { useUserData } from "../../context/UserDataProvider";
 
 export default function FollowTwitter() {
-  const [isCompleted, setCompleted] = React.useState(false);
   const toast = useToast();
 
   const { colorMode } = useColorMode();
+  const { updateUser, user } = useUserData();
 
   const handleTwitterFollow = async () => {
     window.open(
@@ -30,7 +31,7 @@ export default function FollowTwitter() {
     await axios
       .post("/api/user/follow-twitter")
       .then((res) => {
-        setCompleted(true);
+        updateUser();
         toast({
           title: "Followed!",
           status: "success",
@@ -41,7 +42,7 @@ export default function FollowTwitter() {
       })
       .catch((err) => {
         toast({
-          title: "Error Following",
+          title: "Error occurred",
           status: "error",
           duration: 9000,
           isClosable: true,
@@ -66,7 +67,7 @@ export default function FollowTwitter() {
                 Simple steps, big rewards. Follow us on Twitter.
               </Text>
             </Box>
-            {isCompleted ? (
+            {user?.user?.isFollowing ? (
               <Flex color={"green.400"} align={"center"}>
                 <BsCheck size={"24px"} />
                 <Text>Completed</Text>
@@ -82,8 +83,15 @@ export default function FollowTwitter() {
               </Flex>
             )}
           </Dark400Box2C>
-          {isCompleted ? (
-            <Flex mt={4} p={4} pt={2} gap={2} align={"center"}>
+          {user?.user?.isFollowing ? (
+            <Flex
+              mt={0}
+              p={4}
+              pt={2}
+              gap={2}
+              alignItems={"start"}
+              justifyContent={"start"}
+            >
               <Text>Quest Completed:</Text>
               <Heading color={"primary.400"} size={"md"}>
                 FOLLOWED!

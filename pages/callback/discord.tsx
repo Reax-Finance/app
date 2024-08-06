@@ -5,10 +5,9 @@ import React, { useEffect } from "react";
 import { useUserData } from "../../components/context/UserDataProvider";
 
 export default function DiscordCallback() {
-  const { user, updateUser } = useUserData();
+  const { updateUser } = useUserData();
   const router = useRouter();
   const toast = useToast();
-  const [loading, setLoading] = React.useState<boolean>(false);
 
   useEffect(() => {
     if (router.query.error) {
@@ -21,8 +20,9 @@ export default function DiscordCallback() {
       });
       router.push("/account");
     }
+    console.log("Query", router.query);
     if (!router.query.code) return;
-    // Post with the code and state and error to the server
+
     axios
       .post("/api/auth/discord/callback", {
         state: router.query.state,

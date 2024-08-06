@@ -28,6 +28,7 @@ export default async function handler(
         },
         include: {
           twitter: true,
+          discord: true,
         },
       }),
       prisma.user.findUnique({

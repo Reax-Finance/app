@@ -17,7 +17,7 @@ export default async function handler(
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const user = await prisma.user.findFirst({
+  await prisma.user.findUniqueOrThrow({
     where: {
       id: address.toLowerCase(),
     },
@@ -29,6 +29,7 @@ export default async function handler(
         id: address.toLowerCase(),
       },
       data: {
+        isFollowing: true,
         balance: {
           increment: TWITTER_FOLLOW_REWARD,
         },

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { MdRefresh } from "react-icons/md";
 import { useUserData } from "../context/UserDataProvider";
 import { VARIANT } from "../../styles/theme";
+import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 
 export const DISCORD_CONNECT_STATE = "discord-connect";
 const DISCORD_SCOPE = ["identify", "guilds", "guilds.members.read"].join(" ");
@@ -45,11 +46,11 @@ export default function DiscordConnect() {
   const { user, refreshUserData } = useUserData();
   const { colorMode } = useColorMode();
 
-  console.log("User Discord", user);
+  console.log("Dicord connect data", user);
 
   if (!user?.discord) {
     return (
-      <div className="p-14">
+      <>
         <Link href={getDiscordOAuthUrl(user?.id!)}>
           <Box
             className={`${VARIANT}-${colorMode}-discordButton`}
@@ -68,12 +69,12 @@ export default function DiscordConnect() {
             </Button>
           </Box>
         </Link>
-      </div>
+      </>
     );
   } else {
     return (
       <>
-        <Flex justifyContent={"space-between"}>
+        <Flex justifyContent={"space-between"} p={4}>
           <Flex alignItems={"center"} gap={2}>
             <Image
               style={{ borderRadius: "100%" }}
@@ -82,6 +83,7 @@ export default function DiscordConnect() {
               height={12}
               alt={"DIscord Avatar"}
             />
+
             <Box>
               <Flex alignItems={"center"} gap={1}>
                 <Text fontWeight={"bold"}>{user?.discord.name}</Text>
@@ -90,26 +92,32 @@ export default function DiscordConnect() {
             </Box>
           </Flex>
           {/* Reconnect Button */}
-          <Tooltip
+          {/* <Tooltip
             label="Reconnect Account"
-            aria-label="Reconnect Twitter"
+            aria-label="Reconnect Discord"
             bg={"white"}
           >
             <Link href={getDiscordOAuthUrl(user?.id!)}>
-              <IconButton
-                aria-label="Reconnect Twitter"
-                icon={<MdRefresh size={"20px"} />}
-                rounded={"8px"}
-                h={"100%"}
-                aspectRatio={1}
-                mr={2}
-                bg={"primary.400"}
-                color={"black"}
-                _hover={{ bg: "brand", color: "white" }}
-                onClick={refreshUserData}
-              />
+              <Box
+                className={`${VARIANT}-${colorMode}-discordButton`}
+                _hover={{ opacity: 0.8 }}
+              >
+                <IconButton
+                  aria-label="Reconnect Discord"
+                  icon={<MdRefresh size={"20px"} />}
+                  rounded={"8px"}
+                  h={"100%"}
+                  aspectRatio={1}
+                  bg={"primary.400"}
+                  color={"black"}
+                  _hover={{ bg: "brand", color: "white" }}
+                  onClick={refreshUserData}
+                  bgColor={"transparent"}
+                  disabled={true}
+                />
+              </Box>
             </Link>
-          </Tooltip>
+          </Tooltip> */}
         </Flex>
       </>
     );

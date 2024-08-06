@@ -21,6 +21,8 @@ model User {
   balance         Int              @default(0)
   // Unique username
   username        String?          @unique @db.VarChar(255)
+  //is folllowing on twiiter
+  isFollowing     Boolean          @default(false)
   // Allowlisted Record
   allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
   // Referral Codes Created
@@ -72,14 +74,14 @@ model TwitterAccount {
 }
 
 model DiscordConnect {
-  id              Int             @id @default(autoincrement())
-  name            String          @db.VarChar(255)
-  userId          String          @unique
-  discordId       String          @unique @db.VarChar(255)
-  username        String          @db.VarChar(255)
-  avatar          String          @default("") @db.VarChar(255)
-  createdAt       DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt       DateTime        @updatedAt @db.Timestamp(6)
-  expiresIn       Int
-  AllowlistedUser AllowlistedUser @relation(fields: [userId], references: [id])
+  id                Int             @id @default(autoincrement())
+  name              String          @db.VarChar(255)
+  allowlistedUserId String          @unique
+  discordId         String          @unique @db.VarChar(255)
+  username          String          @db.VarChar(255)
+  avatar            String          @default("") @db.VarChar(255)
+  allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
+  createdAt         DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime        @updatedAt @db.Timestamp(6)
+  expiresIn         Int
 }
