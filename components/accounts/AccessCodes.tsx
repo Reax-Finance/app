@@ -59,7 +59,7 @@ export default function AccessCodes() {
             </Box>
           </Flex>
         </Flex>
-        <Flex justify={"space-between"}>
+        <Flex justify={"space-between"} mt={6}>
           <Flex gap={4} mt={6} align={"center"}>
             {user?.user?.accessCodes?.map((code, i) => (
               <Box key={i}>

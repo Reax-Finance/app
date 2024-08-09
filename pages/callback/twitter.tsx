@@ -43,6 +43,7 @@ export default function TwitterCallback() {
           });
           // Update userData
           // await updateUser();
+          // navRoute.refresh();
           router.push("/connect"); //still have to confirm
         }
       })

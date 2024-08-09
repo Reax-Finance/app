@@ -55,7 +55,7 @@ export default function DiscordCallback() {
           duration: 9000,
           isClosable: true,
         });
-        router.push("/connect");
+        router.push("/account");
       });
   }, [router.query]);
   return (
