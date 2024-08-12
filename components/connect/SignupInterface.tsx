@@ -71,10 +71,10 @@ export default function SignupInterface({ accessCode }: any) {
             </Text>
 
             <Text mt={6}>
-              You're invited to test-drive our cutting-edge testnet, experiment
-              with synthetic assets, and help us shape the next phases of Reax!
-              Take a peek behind the curtain to check out how we’re redefining
-              investments and trading.
+              You{"'"}re invited to test-drive our cutting-edge testnet,
+              experiment with synthetic assets, and help us shape the next
+              phases of Reax! Take a peek behind the curtain to check out how we
+              {"'"}re redefining investments and trading.
             </Text>
 
             {accessCode && (
