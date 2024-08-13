@@ -109,7 +109,7 @@ export default function FollowTwitter() {
                 >
                   <Button
                     rounded={0}
-                    _hover={"none"}
+                    _hover={{ opacity: 0.8 }}
                     bg={"transparent"}
                     textColor={"black"}
                     onClick={handleTwitterFollow}

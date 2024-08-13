@@ -61,7 +61,7 @@ export default function DiscordConnect() {
           >
             <Button
               rounded={0}
-              _hover={"none"}
+              _hover={{ opacity: 0.8 }}
               bg={"transparent"}
               textColor={"white"}
             >

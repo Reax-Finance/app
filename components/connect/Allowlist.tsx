@@ -1,24 +1,12 @@
-import {
-  Flex,
-  Text,
-  Heading,
-  Image,
-  Box,
-  Button,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
-import React, { use, useEffect } from "react";
-import { VARIANT } from "../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { Box, Button, Heading, Text, useColorMode } from "@chakra-ui/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import { A11y, Navigation, Pagination, Scrollbar } from "swiper";
+import { VARIANT } from "../../styles/theme";
+import Dark400Box2C from "../ui/boxes/Dark400Box2C";
+import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import ImageSlider from "./ImageSlider";
 import { SlideData } from "./SlideData";
 
