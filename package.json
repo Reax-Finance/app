@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && npm install --legacy-peer-deps && next build",
-    "build:staging": "yarn run:config:staging && npm install --legacy-peer-deps && node_modules/next/dist/bin/next build",
-    "start": "node_modules/next/dist/bin/next start",
-    "lint": "node_modules/next/dist/bin/next lint"
+    "build": "prisma generate && next build",
+    "build:staging": "yarn run:config:staging && next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@balancer-labs/sdk": "^1.1.1",
@@ -49,12 +49,12 @@
   },
   "devDependencies": {
     "@types/big.js": "^6.1.6",
-    "@types/node": "^20.12.7",
-    "@types/react": "^18.0.9",
+    "@types/node": "^20.14.15",
+    "@types/react": "^18.3.3",
     "eslint": "^8.15.0",
     "eslint-config-next": "^13.1.3",
     "ethers": "^5.7.2",
-    "typescript": "5.4.5"
+    "typescript": "^5.4.5"
   },
   "resolutions": {
     "react-focus-lock": "2.9.6"
