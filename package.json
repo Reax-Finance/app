@@ -10,7 +10,6 @@
     "lint": "node_modules/next/dist/bin/next lint"
   },
   "dependencies": {
-    "@ajna/pagination": "^1.4.19",
     "@balancer-labs/sdk": "^1.1.1",
     "@chakra-ui/icons": "^2.0.18",
     "@chakra-ui/react": "^2.8.2",
