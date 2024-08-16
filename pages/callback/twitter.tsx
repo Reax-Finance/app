@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Flex, Text, useToast } from "@chakra-ui/react";
+import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
 import { useUserData } from "../../components/context/UserDataProvider";
 
 export default function TwitterCallback() {
@@ -65,15 +65,28 @@ export default function TwitterCallback() {
       bgImage={"/images/whitelist-page-bg.svg"}
       bgSize={"cover"}
       bgRepeat={"no-repeat"}
-      minH={"100vh"}
+      h={"100vh"}
       w={"100%"}
       justifyContent={"center"}
       alignItems={"center"}
     >
-      <Flex w={"100%"} justifyContent={"center"} alignItems={"center"}>
-        <Text color={"white"} fontSize={"2xl"}>
-          Connecting your account...
-        </Text>
+      <Flex flexDir={"column"} align={"center"} justify={"space-between"}>
+        <Image src="/logo.svg" w={100} h={100} alt="" zIndex={2} />
+        <Box
+          display={"flex"}
+          alignItems={"center"}
+          w={"100%"}
+          px={20}
+          maxW={"1350px"}
+          h={"90vh"}
+        >
+          <Flex alignItems={"center"} gap={4}>
+            <Spinner />
+            <Text color={"white"} fontSize={"2xl"}>
+              Connecting your account...
+            </Text>
+          </Flex>
+        </Box>
       </Flex>
     </Flex>
   );

@@ -1,4 +1,11 @@
-import { Flex, Text, Image, Box, useColorMode } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  Image,
+  Box,
+  useColorMode,
+  Spinner,
+} from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
 import { useUserData } from "../context/UserDataProvider";
 import { useSession } from "next-auth/react";
@@ -59,7 +66,12 @@ export default function ConnectPage() {
                 {(userStatus == Status.FETCHING ||
                   status == "connecting" ||
                   status == "reconnecting") && (
-                  <Text zIndex={2}>Loading...</Text>
+                  <>
+                    <Spinner />
+                    <Text zIndex={2} ml={2}>
+                      Loading...
+                    </Text>
+                  </>
                 )}
               </>
             )}

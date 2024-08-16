@@ -1,5 +1,12 @@
-import { Flex, Text, Image, Box, useColorMode } from "@chakra-ui/react";
-import React, { use, useEffect } from "react";
+import {
+  Flex,
+  Text,
+  Image,
+  Box,
+  useColorMode,
+  Spinner,
+} from "@chakra-ui/react";
+import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Status } from "../components/utils/status";
 import { useAccount } from "wagmi";
@@ -15,6 +22,7 @@ export default function ConnectPage() {
   const { status: sessionStatus } = useSession();
   const { address, status } = useAccount();
   const { colorMode } = useColorMode();
+  const [loading, setLoading] = React.useState(false);
 
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
@@ -22,13 +30,16 @@ export default function ConnectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userStatus == Status.SUCCESS && user?.user && user.twitter) {
+    if (userStatus === Status.SUCCESS && user?.user && user.twitter) {
+      setLoading(true);
       router.push("/");
+      setLoading(false);
     }
   }, [router, userStatus, user]);
 
   console.log("user", userStatus);
   console.log("status", status);
+
   return (
     <Box h={"100vh"}>
       <Flex
@@ -50,14 +61,15 @@ export default function ConnectPage() {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status == "disconnected" ||
-                sessionStatus == "unauthenticated" ? (
+                {status === "disconnected" ||
+                sessionStatus === "unauthenticated" ? (
                   <ConnectInterface />
                 ) : null}
-                {status == "connected" &&
-                sessionStatus == "authenticated" &&
-                userStatus == Status.SUCCESS ? (
-                  user?.isAllowlisted && user?.id == address?.toLowerCase() ? (
+
+                {status === "connected" &&
+                sessionStatus === "authenticated" &&
+                userStatus === Status.SUCCESS ? (
+                  user?.isAllowlisted && user?.id === address?.toLowerCase() ? (
                     <GetStarted setJoin={setJoin} />
                   ) : (
                     <NotWhitelisted
@@ -68,9 +80,8 @@ export default function ConnectPage() {
                   )
                 ) : null}
 
-                {status == "connecting" || status == "reconnecting" ? (
-                  <Text>Loading...</Text>
-                ) : null}
+                {(status === "connecting" || status === "reconnecting") &&
+                  userStatus === Status.FETCHING && <Spinner />}
               </>
             )}
           </Flex>

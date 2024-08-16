@@ -1,18 +1,7 @@
-import {
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Image,
-  Text,
-  Tooltip,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Text, useColorMode } from "@chakra-ui/react";
 import Link from "next/link";
-import { MdRefresh } from "react-icons/md";
-import { useUserData } from "../context/UserDataProvider";
 import { VARIANT } from "../../styles/theme";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
+import { useUserData } from "../context/UserDataProvider";
 
 export const DISCORD_CONNECT_STATE = "discord-connect";
 const DISCORD_SCOPE = ["identify", "guilds", "guilds.members.read"].join(" ");
@@ -30,7 +19,7 @@ export const getURLWithQueryParams = (
 
 export const getDiscordOAuthUrl = (
   address: string,
-  redirectUri = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URL!
+  redirectUri = process.env.NEXT_PUBLIC_VERCEL_URL + "/callback/discord"
 ) =>
   getURLWithQueryParams(`https://discord.com/oauth2/authorize`, {
     response_type: "code",
