@@ -31,6 +31,7 @@ export interface UserDataValue {
   setUser: React.Dispatch<React.SetStateAction<UserData | undefined>>;
   updateUser: () => Promise<void>;
   refreshUserData: () => void;
+  loading: boolean;
 }
 
 const UserDataContext = React.createContext<UserDataValue>({} as UserDataValue);
@@ -44,6 +45,7 @@ function UserDataProvider({ children }: any) {
 
   const { address } = useAccount();
   const { status: sessionStatus } = useSession();
+  const [loading, setLoading] = React.useState(false);
 
   console.log("User Data is ", user);
 
@@ -58,12 +60,13 @@ function UserDataProvider({ children }: any) {
 
       if (!address || address == ADDRESS_ZERO) return;
       if (sessionStatus !== "authenticated") return;
-
+      setLoading(true);
       axios
         .get("/api/user/get-user", {
           params: { address },
         })
         .then((res: any) => {
+          setLoading(false);
           console.log("User data", res.data);
           setUser({
             ...res.data.user,
@@ -94,6 +97,7 @@ function UserDataProvider({ children }: any) {
     message,
     updateUser,
     refreshUserData,
+    loading,
   };
 
   return (

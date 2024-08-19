@@ -64,13 +64,21 @@ export default function ConnectPage() {
                 {status === "disconnected" ||
                 sessionStatus === "unauthenticated" ? (
                   <ConnectInterface />
-                ) : null}
+                ) : (
+                  <Flex
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    minH={"50vh"}
+                  >
+                    <Spinner size="xl" />
+                  </Flex>
+                )}
 
                 {status === "connected" &&
                 sessionStatus === "authenticated" &&
                 userStatus === Status.SUCCESS ? (
                   user?.isAllowlisted && user?.id === address?.toLowerCase() ? (
-                    <GetStarted setJoin={setJoin} />
+                    <GetStarted setJoin={setJoin} loading={loading} />
                   ) : (
                     <NotWhitelisted
                       setJoin={setJoin}
