@@ -30,11 +30,19 @@ export default function GetStarted({
     setJoin(true);
   };
 
+  const [showLoader, setShowLoader] = React.useState(false);
+  useEffect(() => {
+    setShowLoader(true);
+    setTimeout(() => {
+      setShowLoader(false);
+    }, 1000);
+  }, []);
+
   const { colorMode } = useColorMode();
 
   return (
     <>
-      {loading ? (
+      {showLoader ? (
         <Spinner />
       ) : (
         <Dark600Box2C zIndex={2} w={"50%"}>

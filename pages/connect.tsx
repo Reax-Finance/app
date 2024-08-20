@@ -65,13 +65,11 @@ export default function ConnectPage() {
                 sessionStatus === "unauthenticated" ? (
                   <ConnectInterface />
                 ) : (
-                  <Flex
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                    minH={"50vh"}
-                  >
-                    <Spinner size="xl" />
-                  </Flex>
+                  <>
+                    {status === "connecting" || status === "reconnecting"
+                      ? userStatus === Status.FETCHING && <Spinner />
+                      : null}
+                  </>
                 )}
 
                 {status === "connected" &&
@@ -88,8 +86,8 @@ export default function ConnectPage() {
                   )
                 ) : null}
 
-                {(status === "connecting" || status === "reconnecting") &&
-                  userStatus === Status.FETCHING && <Spinner />}
+                {/* {(status === "connecting" || status === "reconnecting") &&
+                  userStatus === Status.FETCHING && <Spinner />} */}
               </>
             )}
           </Flex>
