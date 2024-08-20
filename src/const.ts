@@ -178,5 +178,5 @@ export const TWITTER_SCOPE = [
   // "follows.write",
 ].join(" ");
 
-export const X_ACCOUNT_AGE_MIN = 0 * 24 * 60 * 60 * 1000;
-export const X_ACCOUNT_FOLLOWERS_MIN = 0;
+export const X_ACCOUNT_AGE_MIN = 3 * 24 * 60 * 60 * 1000;
+export const X_ACCOUNT_FOLLOWERS_MIN = 10;

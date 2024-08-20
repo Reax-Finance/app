@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   useColorMode,
+  Image
 } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
 import { CustomConnectButton } from "../core/ConnectButton";
@@ -24,7 +25,7 @@ export default function ConnectInterface() {
         // justify={'space-between'}
       >
         <Box className={`${VARIANT}-${colorMode}-containerBody2`} px={6} py={4}>
-          <Heading>Testnet Alpha</Heading>
+          <Heading>Welcome to Reax Testnet!</Heading>
         </Box>
         <Flex
           flexDir={"column"}
@@ -34,9 +35,11 @@ export default function ConnectInterface() {
           h={"100%"}
         >
           <Text mt={2}>
-            Welcome to Reax! To begin your journey, please connect your crypto
+            To begin your journey, please connect your crypto
             wallet
           </Text>
+
+          <Image src={'/bg-tokens.svg'} width={'100%'} alt="" />
 
           <Box mt={6}>
             <CustomConnectButton />
