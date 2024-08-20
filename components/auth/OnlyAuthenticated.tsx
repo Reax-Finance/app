@@ -18,5 +18,6 @@ export default function OnlyAuthenticated() {
       router.push("/connect");
     }
   }, [user, address, sessionStatus, router]);
+
   return <></>;
 }
