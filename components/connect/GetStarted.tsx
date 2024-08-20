@@ -39,13 +39,17 @@ export default function GetStarted({ setJoin }: { setJoin: any }) {
       {showLoader ? (
         <Spinner />
       ) : (
-        <Dark600Box2C zIndex={2} w={"50%"}>
+        <Dark600Box2C zIndex={2} w={{ base: "95vw", md: "70%", lg: "50%" }}>
           <Dark400Box2C py={2} px={8}>
             <Heading>Welcome to REAX!</Heading>
             <Text mt={1}>The future of finance starts here.</Text>
           </Dark400Box2C>
 
-          <Box p={4} h={"50%"}>
+          <Box
+            px={{ base: 2, md: 4, lg: 4 }}
+            py={{ base: 2, md: 4, lg: 4 }}
+            h={"50%"}
+          >
             <Dark400Box2C>
               <Text p={4}>
                 Your gateway to a universe of real-world assets awaits! Get

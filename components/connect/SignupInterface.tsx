@@ -57,7 +57,13 @@ export default function SignupInterface({ accessCode }: any) {
       });
   };
   return (
-    <Flex justifyContent={"center"} gap={4}>
+    <Flex
+      gap={4}
+      flexDir={{ base: "column", md: "row", lg: "row" }}
+      justifyContent={"center"}
+      alignItems={{ base: "center", md: "normal", lg: "normal" }}
+      w={{ base: "95vw", md: "100%", lg: "100%" }}
+    >
       <Dark600Box2C zIndex={2}>
         <Box maxW={"600px"}>
           <Dark400Box2C p={4}>
@@ -70,7 +76,7 @@ export default function SignupInterface({ accessCode }: any) {
               collide.
             </Text>
 
-            <Text mt={6}>
+            <Text mt={{ base: 2, md: 4, lg: 6 }}>
               You{"'"}re invited to test-drive our cutting-edge testnet,
               experiment with synthetic assets, and help us shape the next
               phases of Reax! Take a peek behind the curtain to check out how we
@@ -83,11 +89,11 @@ export default function SignupInterface({ accessCode }: any) {
                 code <b>{accessCode}</b>
               </Text>
             )}
-            <Box mt={6}>
+            <Box mt={{ base: 3, md: 3, lg: 6 }}>
               <XConnect />
             </Box>
 
-            <Box mt={6}>
+            <Box mt={{ base: 3, md: 3, lg: 6 }}>
               <PrimaryButton
                 onClick={signUp}
                 isLoading={loading}

@@ -146,6 +146,7 @@ function NavBar() {
 
 const MobileNav = ({}: any) => {
   const { colorMode } = useColorMode();
+  const { user } = useUserData();
   return (
     <Flex
       w={"100%"}
@@ -162,6 +163,11 @@ const MobileNav = ({}: any) => {
       <NavLocalLink path={"/liquidity"} title={"Liquidity"}></NavLocalLink>
       <Divider orientation={"vertical"} />
       <CustomConnectButton />
+      <Divider orientation={"vertical"} />
+      <NavLocalLink
+        path={"/account"}
+        title={user?.user?.balance + " XP"}
+      ></NavLocalLink>
       <Divider orientation={"vertical"} />
 
       <Flex>

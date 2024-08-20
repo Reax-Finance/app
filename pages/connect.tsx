@@ -50,7 +50,7 @@ export default function ConnectPage() {
   return (
     <Box h={"100vh"}>
       <Flex
-        py={{ base: 4, md: 8, lg: 10 }}
+        py={{ base: 0, md: 8, lg: 10 }}
         flexDir={"column"}
         align={"center"}
         justify={"space-between"}
