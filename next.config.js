@@ -3,14 +3,18 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-const { withSentryConfig } = require('@sentry/nextjs');
+const { withSentryConfig } = require("@sentry/nextjs");
 
 const moduleExports = {
   // Your existing module.exports
   reactStrictMode: false,
   swcMinify: false,
   images: {
-    domains: ['images.unsplash.com', 'cryptologos.cc', 'raw.githubusercontent.com'],
+    domains: [
+      "images.unsplash.com",
+      "cryptologos.cc",
+      "raw.githubusercontent.com",
+    ],
   },
 
   sentry: {
@@ -32,8 +36,8 @@ const sentryWebpackPluginOptions = {
   //   urlPrefix, include, ignore
 
   silent: true, // Suppresses all logs
-  org: 'chainscore',
-  project: 'synthex'
+  org: "chainscore",
+  project: "synthex",
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };

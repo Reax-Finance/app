@@ -46,10 +46,10 @@ export default function TestnetFAQ() {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            Think of it like a final rehearsal for a big show. It's a safe space
-            where we can fine-tune our platform, try out new ideas, and gather
-            valuable feedback from users like you – all before the official
-            launch.
+            Think of it like a final rehearsal for a big show. It&apos;s a safe
+            space where we can fine-tune our platform, try out new ideas, and
+            gather valuable feedback from users like you – all before the
+            official launch.
           </AccordionPanel>
         </AccordionItem>
 
@@ -65,9 +65,9 @@ export default function TestnetFAQ() {
           <AccordionPanel pb={4}>
             <Flex direction={"column"} ml={6} w={"100%"}>
               <li>
-                As you experiment and provide feedback, you'll earn experience
-                points in the form of exclusive testnet tokens. Think of it as
-                leveling up in a game!
+                As you experiment and provide feedback, you&apos;ll earn
+                experience points in the form of exclusive testnet tokens. Think
+                of it as leveling up in a game!
               </li>
 
               <li>
@@ -90,8 +90,9 @@ export default function TestnetFAQ() {
           </h2>
           <AccordionPanel pb={4}>
             <Flex direction={"column"}>
-              To ensure a fair and secure experience for everyone, we're asking
-              you to quickly verify your identity via X (formerly Twitter).
+              To ensure a fair and secure experience for everyone, we&apos;re
+              asking you to quickly verify your identity via X (formerly
+              Twitter).
               <Flex direction={"column"} ml={6} w={"100%"} mt={2}>
                 <li>
                   {" "}
