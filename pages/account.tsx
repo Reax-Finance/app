@@ -107,7 +107,6 @@ export default function Account() {
             justify={"center"}
             p={6}
             w={"100%"}
-            // maxW={"400px"}
             textAlign={"center"}
           >
             <BsClock size={"30px"} />
