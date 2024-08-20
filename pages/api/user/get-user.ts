@@ -11,6 +11,7 @@ export default async function handler(
     const { address } = req.query as { address: string };
 
     // Log the address to ensure it is being received correctly
+
     if (!address) {
       res.status(400).json({ message: "Bad Request: Address is required" });
       return;
