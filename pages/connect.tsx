@@ -78,7 +78,7 @@ export default function ConnectPage() {
                     userStatus === Status.SUCCESS ? (
                       user?.isAllowlisted &&
                       user?.id === address?.toLowerCase() ? (
-                        <GetStarted setJoin={setJoin} loading={loading} />
+                        <GetStarted setJoin={setJoin} />
                       ) : (
                         <NotWhitelisted
                           setJoin={setJoin}
