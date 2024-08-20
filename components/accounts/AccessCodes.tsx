@@ -30,13 +30,18 @@ export default function AccessCodes() {
         <Flex align={"start"} justify={"space-between"}>
           <Box maxW={"80%"}>
             <Heading size={"md"}>Access Codes</Heading>
-            <Text color={"whiteAlpha.600"} mt={2} fontSize={"sm"}>
+            <Text
+              color={"whiteAlpha.600"}
+              mt={2}
+              fontSize={"sm"}
+              pr={{ sm: 2 }}
+            >
               Use these access codes to invite your frens to try out the app.
               You earn 50 XP for each user that signs up using your access code
               and they earn 50 XP too.
             </Text>
           </Box>
-          <Flex>
+          <Flex flexDir={{ base: "column-reverse", md: "row", lg: "row" }}>
             <Box
               p={2}
               minW={"80px"}
@@ -59,8 +64,17 @@ export default function AccessCodes() {
             </Box>
           </Flex>
         </Flex>
-        <Flex justify={"space-between"} mt={6}>
-          <Flex gap={4} mt={6} align={"center"}>
+        <Flex
+          justify={"space-between"}
+          mt={6}
+          flexDir={{ base: "column", md: "row", lg: "row" }}
+        >
+          <Flex
+            gap={{ base: 2, md: 4, lg: 4 }}
+            mt={{ base: 0, md: 6, lg: 6 }}
+            align={"center"}
+            wrap={"wrap"}
+          >
             {user?.user?.accessCodes?.map((code, i) => (
               <Box key={i}>
                 {code && (

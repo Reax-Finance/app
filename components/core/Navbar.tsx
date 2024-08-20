@@ -152,7 +152,7 @@ const MobileNav = ({}: any) => {
       w={"100%"}
       border={"1px"}
       borderColor={"whiteAlpha.400"}
-      h={"14"}
+      h={"100%"}
       align={"center"}
       wrap={"wrap"}
       gap={0}

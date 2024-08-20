@@ -31,7 +31,7 @@ export default function Footer() {
       color={"whiteAlpha.400"}
       bg="transparent"
       pb={2}
-      position={"fixed"}
+      // position={"fixed"}
       bottom={0}
       w={"100%"}
     >

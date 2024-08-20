@@ -42,7 +42,7 @@ const ShareTweetPill = ({ ...args }: { args?: FlexProps }) => {
 
   const router = useRouter();
   return (
-    <Flex {...args}>
+    <Flex {...args} mt={{ sm: 4, md: 0, lg: 0 }}>
       <Box
         className={`${VARIANT}-${colorMode}-copyButton`}
         _hover={{ opacity: 0.8 }}
