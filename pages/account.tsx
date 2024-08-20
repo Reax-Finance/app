@@ -42,7 +42,7 @@ export default function Account() {
       exit={{ opacity: 0, y: 15 }}
       transition={{ duration: 0.25 }}
     >
-      <Box maxW={"1350px"}>
+      <Box maxW={{ base: "95vw", md: "1350px", lg: "1350px" }}>
         <OnlyAuthenticated />
         <Flex gap={10} justify={"space-between"}>
           <Box>
@@ -88,14 +88,18 @@ export default function Account() {
           Quests
         </Heading>
 
-        <Flex gap={4}>
-          <Flex w={"50%"}>
+        <Flex
+          gap={4}
+          flexDirection={{ sm: "column", md: "row", lg: "row" }}
+          maxW={{ sm: "100vw" }}
+        >
+          <Flex w={"100%"}>
             <UsernameSelection />
           </Flex>
-          <Flex w={"50%"}>
+          <Flex w={"100%"}>
             <FollowTwitter />
           </Flex>
-          <Flex w={"50%"}>
+          <Flex w={"100%"}>
             <DiscordConnectQuest />
           </Flex>
           <Dark600Box2C

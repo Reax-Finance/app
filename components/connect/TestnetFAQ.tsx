@@ -34,6 +34,7 @@ export default function TestnetFAQ() {
       rounded={0}
       //   w={"100%"}
       zIndex={2}
+      mb={{ base: 28, md: 0, lg: 0 }}
     >
       <Accordion allowToggle w={"100%"} maxW={"600px"} defaultIndex={[2]}>
         <AccordionItem>

@@ -53,14 +53,26 @@ export default function NotWhitelisted({
     accessCode.length == 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
 
   return (
-    <Dark600Box2C p={6} zIndex={2} display={"flex"} flexDirection={"column"}>
-      <Heading size={"lg"} mb={4}>Not Whitelisted</Heading>
+    <Dark600Box2C
+      p={{ base: 4, md: 6, lg: 6 }}
+      zIndex={2}
+      display={"flex"}
+      flexDirection={"column"}
+      w={{ sm: "93vw", md: "100%", lg: "100%" }}
+    >
+      <Heading size={"lg"} mb={{ base: 1, md: 4, lg: 4 }}>
+        Not Whitelisted
+      </Heading>
       <Text mt={2}>
         Uh oh! It looks like your wallet isn{"'"}t on our allowlist. This might
         be because:
       </Text>
 
-      <Flex direction={"column"} ml={2} pt={4}>
+      <Flex
+        direction={"column"}
+        ml={{ base: 0, md: 2, lg: 2 }}
+        pt={{ base: 1, md: 4, lg: 4 }}
+      >
         <Text>
           → You didn{"'"}t participate in our previous mainnet iteration, or
         </Text>
@@ -68,16 +80,16 @@ export default function NotWhitelisted({
       </Flex>
       <Flex
         flexDir={"column"}
-        p={4}
+        p={{ base: 3, md: 4, lg: 4 }}
         border={"1px"}
         borderColor={"whiteAlpha.600"}
         maxW={"500px"}
-        my={4}
+        my={{ base: 2, md: 4, lg: 4 }}
       >
         <Heading size={"sm"} color={"primary.400"}>
           Allowlists
         </Heading>
-        <Divider my={4} />
+        <Divider my={{ base: 2, md: 3, lg: 4 }} />
         <Box>
           <Text>Reax Mainnet Users (Snapshot 24 July 2024 00:00 GMT)</Text>
           <Text fontSize={"xs"} color={"whiteAlpha.600"}>
@@ -87,7 +99,10 @@ export default function NotWhitelisted({
         </Box>
       </Flex>
 
-      <Box mt={6} className={`${VARIANT}-${colorMode}-primaryButton`}>
+      <Box
+        mt={{ base: 2, md: 4, lg: 6 }}
+        className={`${VARIANT}-${colorMode}-primaryButton`}
+      >
         <Button
           onClick={openAccountModal}
           w={"100%"}
@@ -98,7 +113,7 @@ export default function NotWhitelisted({
         </Button>
       </Box>
 
-      <Flex w={"100%"} align={"center"} gap={2} my={4}>
+      <Flex w={"100%"} align={"center"} gap={2} my={{ base: 2, md: 4, lg: 4 }}>
         <Divider borderColor={"whiteAlpha.600"} />
         <Text>Or</Text>
         <Divider borderColor={"whiteAlpha.600"} />
@@ -107,7 +122,7 @@ export default function NotWhitelisted({
       <Box>
         <Heading size="md">Join with an Access Code</Heading>
 
-        <Flex align={"center"} mt={4}>
+        <Flex align={"center"} mt={{ base: 4, md: 4, lg: 4 }}>
           <Box className={`${VARIANT}-${colorMode}-input`} w={"100%"}>
             <Input
               placeholder="Access Code"

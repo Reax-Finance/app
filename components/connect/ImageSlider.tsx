@@ -17,7 +17,7 @@ const ImageSlider = ({ slides }: { slides: any }) => {
         return (
           <Image
             src={slide.image}
-            height="300px"
+            height={{ base: "200px", md: "300px", lg: "350px" }}
             width="100px"
             key={slide.id}
           />

@@ -39,21 +39,24 @@ export default function GetStarted({ setJoin, accessCode }: { setJoin: any, acce
       {showLoader ? (
         <Spinner />
       ) : (
-        <Dark600Box2C zIndex={2} w={"50%"}>
-          <Dark400Box2C p={4}>
-            <Heading>{accessCode ? 'Get started' : `You're On The Allowlist! 🎉`}</Heading>
-            {/* <Text mt={1}>The future of finance starts here.</Text> */}
+        <Dark600Box2C zIndex={2} w={{ base: "95vw", md: "70%", lg: "50%" }}>
+          <Dark400Box2C py={2} px={8}>
+            <Heading>Welcome to REAX!</Heading>
+            <Text mt={1}>The future of finance starts here.</Text>
           </Dark400Box2C>
 
-          <Box p={4}>
-            <Text py={4}>
-              Welcome to Reax Testnet! 
-            </Text>
-            <Text pb={4}>
-              Your gateway to a universe of real-world assets awaits! Get
-              ready to trade, lend, and borrow with the power of DeFi:
-            </Text>
-            <Box mt={2} w="100%" h={"30%"} pb={2}>
+          <Box
+            px={{ base: 2, md: 4, lg: 4 }}
+            py={{ base: 2, md: 4, lg: 4 }}
+            h={"50%"}
+          >
+            <Dark400Box2C>
+              <Text p={4}>
+                Your gateway to a universe of real-world assets awaits! Get
+                ready to:
+              </Text>
+            </Dark400Box2C>
+            <Box mt={2} w="100%" h={"30%"} p={4} pb={2}>
               <ImageSlider slides={SlideData} />
             </Box>
 

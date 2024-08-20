@@ -29,11 +29,11 @@ export default function FAQ() {
       flexDirection="column"
       gap={10}
       px={6}
-      py={6}
+      py={{ base: 4, md: 8, lg: 10 }}
       className={`${VARIANT}-${colorMode}-containerBody`}
       rounded={0}
       //   w={"100%"}
-      zIndex={2}
+      // zIndex={-2}
     >
       <Accordion allowToggle w={"100%"} maxW={"600px"} defaultIndex={[2]}>
         <AccordionItem>

@@ -16,16 +16,26 @@ export default function ConnectInterface() {
   const { colorMode } = useColorMode();
 
   return (
-    <Flex gap={4}>
+    <Flex
+      gap={4}
+      flexDir={{ base: "column", md: "row", lg: "row" }}
+      justifyContent={"center"}
+      alignItems={{ base: "center", md: "normal", lg: "normal" }}
+      w={{ base: "95vw", md: "100%", lg: "100%" }}
+    >
       <Flex
         flexDir={"column"}
         className={`${VARIANT}-${colorMode}-containerBody`}
         rounded={0}
-        w={"60%"}
-        // justify={'space-between'}
+        w={{ base: "100%", md: "60%", lg: "60%" }}
+        // justify={"space-between"}
       >
         <Box className={`${VARIANT}-${colorMode}-containerBody2`} px={6} py={4}>
-          <Heading>Welcome to Reax Testnet!</Heading>
+          <Heading
+            fontSize={{ base: "x-large", md: "x-large", lg: "xx-large" }}
+          >
+            Testnet Alpha
+          </Heading>
         </Box>
         <Flex
           flexDir={"column"}

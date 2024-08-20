@@ -47,7 +47,7 @@ export default function XConnectButton() {
     );
 
   return (
-    <Flex justify={"space-between"} flex={1}>
+    <Flex justify={"space-between"} flex={1} w={"100%"}>
       <Flex align={"center"} gap={2}>
         <Image
           style={{ borderRadius: "100%" }}

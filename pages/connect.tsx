@@ -50,7 +50,7 @@ export default function ConnectPage() {
   return (
     <Box h={"100vh"}>
       <Flex
-        py={10}
+        py={{ base: 0, md: 8, lg: 10 }}
         flexDir={"column"}
         align={"center"}
         justify={"space-between"}
@@ -60,10 +60,15 @@ export default function ConnectPage() {
           display={"flex"}
           alignItems={"center"}
           w={"100%"}
-          px={20}
+          px={{ base: 4, md: 8, lg: 10 }}
           maxW={"1350px"}
         >
-          <Flex flexDir={"column"} align={"center"} w={"100%"} py={20}>
+          <Flex
+            flexDir={"column"}
+            align={"center"}
+            w={"100%"}
+            py={{ base: 0, md: 12, lg: 20 }}
+          >
             {join ? (
               <SignupInterface accessCode={accessCode} />
             ) : (
@@ -92,8 +97,8 @@ export default function ConnectPage() {
                   </>
                 )}
 
-                {(status === "connecting" || status === "reconnecting") &&
-                  userStatus === Status.FETCHING && <Spinner />}
+                {/* {(status === "connecting" || status === "reconnecting") &&
+                  userStatus === Status.FETCHING && <Spinner />} */}
               </>
             )}
           </Flex>
