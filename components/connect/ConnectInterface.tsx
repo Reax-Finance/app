@@ -15,13 +15,19 @@ export default function ConnectInterface() {
   const { colorMode } = useColorMode();
 
   return (
-    <Flex gap={4}>
+    <Flex
+      gap={4}
+      flexDir={{ base: "column", md: "row", lg: "row" }}
+      justifyContent={"center"}
+      alignItems={{ base: "center", md: "center", lg: "normal" }}
+      w={{ base: "90vw", md: "100%", lg: "100%" }}
+    >
       <Flex
         flexDir={"column"}
         className={`${VARIANT}-${colorMode}-containerBody`}
         rounded={0}
-        w={"60%"}
-        // justify={'space-between'}
+        w={{ base: "100%", md: "60%", lg: "60%" }}
+        // justify={"space-between"}
       >
         <Box className={`${VARIANT}-${colorMode}-containerBody2`} px={6} py={4}>
           <Heading>Testnet Alpha</Heading>

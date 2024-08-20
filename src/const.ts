@@ -180,3 +180,12 @@ export const TWITTER_SCOPE = [
 
 export const X_ACCOUNT_AGE_MIN = 0 * 24 * 60 * 60 * 1000;
 export const X_ACCOUNT_FOLLOWERS_MIN = 0;
+
+export const breakpoints = {
+  base: "0em", // 0px
+  sm: "30em", // ~480px. em is a relative unit and is dependant on the font size.
+  md: "48em", // ~768px
+  lg: "62em", // ~992px
+  xl: "80em", // ~1280px
+  "2xl": "96em", // ~1536px
+};
