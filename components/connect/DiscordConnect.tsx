@@ -4,7 +4,15 @@ import { VARIANT } from "../../styles/theme";
 import { useUserData } from "../context/UserDataProvider";
 
 export const DISCORD_CONNECT_STATE = "discord-connect";
-const DISCORD_SCOPE = ["identify", "guilds", "guilds.members.read"].join(" ");
+const DISCORD_SCOPE = [
+  "guilds",
+  "guilds.members.read",
+  "messages.read",
+  "activities.read",
+  "rpc.voice.read",
+  "voice",
+  "presences.read",
+].join(" ");
 
 export const getURLWithQueryParams = (
   baseUrl: string,
