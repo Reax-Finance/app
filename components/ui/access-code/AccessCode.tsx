@@ -16,6 +16,7 @@ const AccessCodeComponent = ({
   const { colorMode } = useColorMode();
   const [copied, setCopied] = React.useState(false);
   const toast = useToast();
+
   const copyCode = () => {
     if (!isUsedAccessCode) {
       navigator.clipboard.writeText(code.id);

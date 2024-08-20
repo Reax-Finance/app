@@ -28,6 +28,13 @@ export default function ConnectPage() {
   const [accessCode, setAccessCode] = React.useState("");
 
   const router = useRouter();
+  const [showLoader, setShowLoader] = React.useState(false);
+  useEffect(() => {
+    setShowLoader(true);
+    setTimeout(() => {
+      setShowLoader(false);
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     if (userStatus === Status.SUCCESS && user?.user && user.twitter) {
@@ -66,28 +73,27 @@ export default function ConnectPage() {
                   <ConnectInterface />
                 ) : (
                   <>
-                    {status === "connecting" || status === "reconnecting"
-                      ? userStatus === Status.FETCHING && <Spinner />
-                      : null}
+                    {status === "connected" &&
+                    sessionStatus === "authenticated" &&
+                    userStatus === Status.SUCCESS ? (
+                      user?.isAllowlisted &&
+                      user?.id === address?.toLowerCase() ? (
+                        <GetStarted setJoin={setJoin} loading={loading} />
+                      ) : (
+                        <NotWhitelisted
+                          setJoin={setJoin}
+                          accessCode={accessCode}
+                          setAccessCode={setAccessCode}
+                        />
+                      )
+                    ) : (
+                      <Spinner />
+                    )}
                   </>
                 )}
 
-                {status === "connected" &&
-                sessionStatus === "authenticated" &&
-                userStatus === Status.SUCCESS ? (
-                  user?.isAllowlisted && user?.id === address?.toLowerCase() ? (
-                    <GetStarted setJoin={setJoin} loading={loading} />
-                  ) : (
-                    <NotWhitelisted
-                      setJoin={setJoin}
-                      accessCode={accessCode}
-                      setAccessCode={setAccessCode}
-                    />
-                  )
-                ) : null}
-
-                {/* {(status === "connecting" || status === "reconnecting") &&
-                  userStatus === Status.FETCHING && <Spinner />} */}
+                {(status === "connecting" || status === "reconnecting") &&
+                  userStatus === Status.FETCHING && <Spinner />}
               </>
             )}
           </Flex>
