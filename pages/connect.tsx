@@ -67,7 +67,7 @@ export default function ConnectPage() {
             flexDir={"column"}
             align={"center"}
             w={"100%"}
-            py={{ base: -8, md: 12, lg: 20 }}
+            py={{ base: 0, md: 12, lg: 20 }}
           >
             {join ? (
               <SignupInterface accessCode={accessCode} />

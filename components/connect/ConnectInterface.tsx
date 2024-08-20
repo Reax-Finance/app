@@ -19,8 +19,8 @@ export default function ConnectInterface() {
       gap={4}
       flexDir={{ base: "column", md: "row", lg: "row" }}
       justifyContent={"center"}
-      alignItems={{ base: "center", md: "center", lg: "normal" }}
-      w={{ base: "90vw", md: "100%", lg: "100%" }}
+      alignItems={{ base: "center", md: "normal", lg: "normal" }}
+      w={{ base: "95vw", md: "100%", lg: "100%" }}
     >
       <Flex
         flexDir={"column"}
@@ -30,7 +30,11 @@ export default function ConnectInterface() {
         // justify={"space-between"}
       >
         <Box className={`${VARIANT}-${colorMode}-containerBody2`} px={6} py={4}>
-          <Heading>Testnet Alpha</Heading>
+          <Heading
+            fontSize={{ base: "x-large", md: "x-large", lg: "xx-large" }}
+          >
+            Testnet Alpha
+          </Heading>
         </Box>
         <Flex
           flexDir={"column"}
