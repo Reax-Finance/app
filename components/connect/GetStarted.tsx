@@ -19,7 +19,7 @@ import ImageSlider from "./ImageSlider";
 import { SlideData } from "./SlideData";
 import { useUserData } from "../context/UserDataProvider";
 
-export default function GetStarted({ setJoin, accessCode }: { setJoin: any, accessCode: string }) {
+export default function GetStarted({ setJoin }: { setJoin: any }) {
   const signIn = () => {
     setJoin(true);
   };

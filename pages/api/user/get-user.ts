@@ -11,15 +11,12 @@ export default async function handler(
     const { address } = req.query as { address: string };
 
     // Log the address to ensure it is being received correctly
-    console.log("Received Address: ", address);
-
     if (!address) {
       res.status(400).json({ message: "Bad Request: Address is required" });
       return;
     }
 
     const normalizedAddress = address.toLowerCase();
-    console.log("Normalized Address: ", normalizedAddress);
 
     const [allowlistedUser, userRecord] = await prisma.$transaction([
       prisma.allowlistedUser.findUnique({
@@ -48,9 +45,6 @@ export default async function handler(
         },
       }),
     ]);
-
-    console.log("Allowlisted User: ", allowlistedUser);
-    console.log("User Record: ", userRecord);
 
     let user: any = {
       ...allowlistedUser,

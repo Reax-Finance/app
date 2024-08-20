@@ -178,10 +178,6 @@ export const TWITTER_SCOPE = [
   // "follows.write",
 ].join(" ");
 
-<<<<<<< HEAD
-export const X_ACCOUNT_AGE_MIN = 3 * 24 * 60 * 60 * 1000;
-export const X_ACCOUNT_FOLLOWERS_MIN = 10;
-=======
 export const X_ACCOUNT_AGE_MIN = 0 * 24 * 60 * 60 * 1000;
 export const X_ACCOUNT_FOLLOWERS_MIN = 0;
 
@@ -193,4 +189,3 @@ export const breakpoints = {
   xl: "80em", // ~1280px
   "2xl": "96em", // ~1536px
 };
->>>>>>> bbb68901d6173a3c9662f727a5cf7f9d3a16b6d9
