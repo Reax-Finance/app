@@ -34,7 +34,7 @@ export default function ConnectInterface() {
           <Heading
             fontSize={{ base: "x-large", md: "x-large", lg: "xx-large" }}
           >
-            Testnet Alpha
+            Welcome to Reax Testnet!
           </Heading>
         </Box>
         <Flex
@@ -46,7 +46,7 @@ export default function ConnectInterface() {
         >
           <Text mt={2}>
             To begin your journey, please connect your crypto
-            wallet
+            wallet to access the Reax Testnet.
           </Text>
 
           <Image src={'/bg-tokens.svg'} width={'100%'} alt="" />

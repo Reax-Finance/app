@@ -39,10 +39,11 @@ export default function GetStarted({ setJoin }: { setJoin: any }) {
       {showLoader ? (
         <Spinner />
       ) : (
-        <Dark600Box2C zIndex={2} w={{ base: "95vw", md: "70%", lg: "50%" }}>
-          <Dark400Box2C py={2} px={8}>
-            <Heading>Welcome to REAX!</Heading>
-            <Text mt={1}>The future of finance starts here.</Text>
+        <Dark600Box2C zIndex={2} w={{ base: "95vw", md: "70%", lg: "50%" }} mx={{ base: 'auto', md: 4, lg: 4 }} my={{ base: 20, md: 4, lg: 4 }}>
+          <Dark400Box2C p={4}>
+            <Heading fontSize={{ base: "x-large", md: "x-large", lg: "xx-large" }}>
+              Welcome to Reax Testnet!
+            </Heading>
           </Dark400Box2C>
 
           <Box
@@ -50,13 +51,11 @@ export default function GetStarted({ setJoin }: { setJoin: any }) {
             py={{ base: 2, md: 4, lg: 4 }}
             h={"50%"}
           >
-            <Dark400Box2C>
-              <Text p={4}>
+              <Text p={4} px={2}>
                 Your gateway to a universe of real-world assets awaits! Get
-                ready to:
+                ready to trade 100s of stocks, commodities, and more all on-chain.
               </Text>
-            </Dark400Box2C>
-            <Box mt={2} w="100%" h={"30%"} p={4} pb={2}>
+            <Box mt={4} w="100%" h={"30%"} p={0} pb={2}>
               <ImageSlider slides={SlideData} />
             </Box>
 
