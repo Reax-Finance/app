@@ -92,8 +92,8 @@ export default function ConnectPage() {
                   </>
                 )}
 
-                {(status === "connecting" || status === "reconnecting") &&
-                  userStatus === Status.FETCHING && <Spinner />}
+                {/* {(status === "connecting" || status === "reconnecting") &&
+                  userStatus === Status.FETCHING && <Spinner />} */}
               </>
             )}
           </Flex>
