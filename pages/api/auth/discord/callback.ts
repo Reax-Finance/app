@@ -25,7 +25,7 @@ export default async function DiscordCallback(
       grant_type: "authorization_code",
       client_id: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID as string,
       client_secret: process.env.DISCORD_CLIENT_SECRET as string,
-      redirect_uri: process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URL as string,
+      redirect_uri: process.env.NEXT_PUBLIC_VERCEL_URL + "/callback/discord",
     });
     const response = await axios.post(
       "https://discord.com/api/v10/oauth2/token",
