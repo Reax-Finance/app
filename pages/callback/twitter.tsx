@@ -33,6 +33,7 @@ export default function TwitterCallback() {
       .then(async (response) => {
         // Redirect to the dashboard
         if (response.status === 200) {
+          console.log("Response", response);
           await updateUser();
           toast({
             title: "Success",

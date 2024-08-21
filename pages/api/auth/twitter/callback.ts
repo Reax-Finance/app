@@ -17,6 +17,9 @@ export default async function TwitterFallback(
   // Get the authorization token from the parameters
   const { state, code } = req.body;
 
+  console.log("State is", state);
+  console.log("Code is", code);
+
   const session = await getServerSession(req, res, authOptions({ req }));
 
   console.log("Session is", session);
