@@ -38,7 +38,7 @@ export default async function TwitterFallback(
       code: code as string,
       grant_type: "authorization_code",
       client_id: process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID as string,
-      redirect_uri: process.env.NEXT_PUBLIC_VERCEL_URL + `/callback/twitter`,
+      redirect_uri: `${process.env.NEXT_PUBLIC_VERCEL_URL}/callback/twitter`,
       code_verifier: "challenge",
     });
     const response = await axios.post(

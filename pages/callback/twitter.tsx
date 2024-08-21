@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
@@ -9,6 +9,8 @@ export default function TwitterCallback() {
   const router = useRouter();
 
   const toast = useToast();
+
+  const [isLoading, setIsLoading] = useState(true); //trying to stop refreshing
 
   useEffect(() => {
     if (router.query.error) {
@@ -33,6 +35,7 @@ export default function TwitterCallback() {
         error: router.query.error,
       })
       .then(async (response) => {
+        setIsLoading(false);
         // Redirect to the dashboard
         if (response.status === 200) {
           toast({
@@ -42,15 +45,15 @@ export default function TwitterCallback() {
             duration: 9000,
             isClosable: true,
           });
-          await updateUser();
           // Update userData
-          // await updateUser();
-          // navRoute.refresh();
+          await updateUser();
+
           console.log("pushing to /connect after success");
           router.push("/connect"); //still have to confirm
         }
       })
       .catch((error: any) => {
+        setIsLoading(false);
         console.log("Error", error);
         toast({
           title: "An error occurred.",
@@ -60,7 +63,8 @@ export default function TwitterCallback() {
           duration: 9000,
           isClosable: true,
         });
-      });
+      })
+      .finally(() => setIsLoading(false));
     console.log("pushing to /connect after fail");
     router.push("/connect");
   }, [router.query]);
@@ -84,12 +88,14 @@ export default function TwitterCallback() {
           maxW={"1350px"}
           h={"90vh"}
         >
-          <Flex alignItems={"center"} gap={4}>
-            <Spinner />
-            <Text color={"white"} fontSize={"2xl"}>
-              Connecting your account...
-            </Text>
-          </Flex>
+          {isLoading && (
+            <Flex alignItems={"center"} gap={4}>
+              <Spinner />
+              <Text color={"white"} fontSize={"2xl"}>
+                Connecting your account...
+              </Text>
+            </Flex>
+          )}
         </Box>
       </Flex>
     </Flex>
