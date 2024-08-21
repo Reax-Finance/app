@@ -17,13 +17,15 @@ export default async function TwitterFallback(
   // Get the authorization token from the parameters
   const { state, code } = req.body;
 
-  console.log("State is", state);
-  console.log("Code is", code);
+  console.log("Twitter State", state);
+  console.log("Twitter Code", code);
 
   const session = await getServerSession(req, res, authOptions({ req }));
 
   console.log("Session is", session);
+
   let address = session?.user?.name?.toLowerCase();
+
   console.log("Address is", address);
   if (!address) {
     res.status(400).json({ message: "Bad Request" });
@@ -65,6 +67,8 @@ export default async function TwitterFallback(
           "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
       },
     });
+
+    console.log("User Response", userResponse.data);
 
     // If user has less than 20 followers or account less than 3 months of age, reject the connection
     if (
@@ -142,6 +146,8 @@ export default async function TwitterFallback(
         updatedAt: new Date().toISOString(),
       },
     });
+
+    console.log("Twitter Account created", twitterAccountData);
   } catch (error: any) {
     let err =
       error?.response?.data?.error_description ||

@@ -19,10 +19,12 @@ export default function TwitterCallback() {
         duration: 9000,
         isClosable: true,
       });
+
+      console.log("pushing to /");
       router.push("/");
     }
-    console.log("Query", router.query);
     if (!router.query.code) return;
+
     // Post with the code and state and error to the server
     axios
       .post("/api/auth/twitter/callback", {
@@ -33,8 +35,6 @@ export default function TwitterCallback() {
       .then(async (response) => {
         // Redirect to the dashboard
         if (response.status === 200) {
-          console.log("Response", response);
-          await updateUser();
           toast({
             title: "Success",
             description: "You have successfully connected your X account.",
@@ -42,9 +42,11 @@ export default function TwitterCallback() {
             duration: 9000,
             isClosable: true,
           });
+          await updateUser();
           // Update userData
           // await updateUser();
           // navRoute.refresh();
+          console.log("pushing to /connect after success");
           router.push("/connect"); //still have to confirm
         }
       })
@@ -58,8 +60,9 @@ export default function TwitterCallback() {
           duration: 9000,
           isClosable: true,
         });
-        router.push("/connect");
       });
+    console.log("pushing to /connect after fail");
+    router.push("/connect");
   }, [router.query]);
   return (
     <Flex
