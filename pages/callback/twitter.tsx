@@ -56,7 +56,7 @@ export default function TwitterCallback() {
         setIsLoading(false);
         console.log("Error", error);
         toast({
-          title: "An error occurred.",
+          title: "Try Again",
           description:
             error?.response?.data?.message || "Please try again later.",
           status: "error",
