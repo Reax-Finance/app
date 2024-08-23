@@ -43,7 +43,7 @@ export default function TwitterCallback() {
             isClosable: true,
           });
           // Update userData
-          router.push("/connect"); //still have to confirm
+          router.push("/"); //still have to confirm
           await updateUser();
         }
       })
