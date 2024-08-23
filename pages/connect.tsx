@@ -21,7 +21,6 @@ export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
   const { status: sessionStatus } = useSession();
   const { address, status } = useAccount();
-  const { colorMode } = useColorMode();
 
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
@@ -29,13 +28,14 @@ export default function ConnectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userStatus === Status.SUCCESS && user?.user && user.twitter) {
+    if (userStatus === Status.SUCCESS && user?.user && user?.twitter) {
       router.push("/");
     }
   }, [router, userStatus, user]);
 
-  console.log("user", userStatus);
-  console.log("status", status);
+  console.log("UserStatus is", userStatus);
+  console.log("User is", user?.user);
+  console.log("User twitter is", user?.twitter);
 
   return (
     <Box h={"100vh"}>

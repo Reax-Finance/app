@@ -21,8 +21,6 @@ export default function TwitterCallback() {
         duration: 9000,
         isClosable: true,
       });
-
-      console.log("pushing to /");
       router.push("/");
     }
     if (!router.query.code) return;
@@ -36,7 +34,6 @@ export default function TwitterCallback() {
       })
       .then(async (response) => {
         setIsLoading(false);
-        // Redirect to the dashboard
         if (response.status === 200) {
           toast({
             title: "Success",
@@ -46,10 +43,8 @@ export default function TwitterCallback() {
             isClosable: true,
           });
           // Update userData
-          await updateUser();
-
-          console.log("pushing to /connect after success");
           router.push("/connect"); //still have to confirm
+          await updateUser();
         }
       })
       .catch((error: any) => {
@@ -63,6 +58,8 @@ export default function TwitterCallback() {
           duration: 9000,
           isClosable: true,
         });
+
+        router.push("/connect");
       })
       .finally(() => setIsLoading(false));
     console.log("pushing to /connect after fail");

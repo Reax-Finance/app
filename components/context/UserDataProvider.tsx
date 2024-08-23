@@ -80,6 +80,9 @@ function UserDataProvider({ children }: any) {
           console.log("Error", err);
           setStatus(Status.ERROR);
           reject(err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     });
   }
