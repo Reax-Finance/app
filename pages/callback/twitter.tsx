@@ -34,7 +34,7 @@ export default function TwitterCallback() {
         code: router.query.code,
         error: router.query.error,
       })
-      .then((response) => {
+      .then(async (response) => {
         setIsLoading(false);
         // Redirect to the dashboard
         if (response.status === 200) {
@@ -46,7 +46,7 @@ export default function TwitterCallback() {
             isClosable: true,
           });
           // Update userData
-          updateUser();
+          await updateUser();
 
           console.log("pushing to /connect after success");
           router.push("/connect"); //still have to confirm
