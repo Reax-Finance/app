@@ -17,13 +17,7 @@ export default async function TwitterFallback(
   // Get the authorization token from the parameters
   const { state, code } = req.body;
 
-  console.log("Twitter State", state);
-  console.log("Twitter Code", code);
-
   const session = await getServerSession(req, res, authOptions({ req }));
-
-  console.log("Session is", session);
-
   let address = session?.user?.name?.toLowerCase();
 
   console.log("Address is", address);
@@ -68,8 +62,6 @@ export default async function TwitterFallback(
       },
     });
 
-    console.log("User Response", userResponse.data);
-
     // If user has less than 20 followers or account is less than 3 months old, reject the connection
     if (
       userResponse.data.data.public_metrics.followers_count <
@@ -109,12 +101,12 @@ export default async function TwitterFallback(
       },
     });
 
-    if (!alUserRecord) {
-      res.status(400).send({
-        message: `Allowlisted user not found.`,
-      });
-      return;
-    }
+    // if (!alUserRecord) {
+    //   res.status(400).send({
+    //     message: `Allowlisted user not found.`,
+    //   });
+    //   return;
+    // }
 
     // If user has already connected their account, update data and redirect to dashboard (no points)
     if (alUserRecord?.twitter) {
@@ -128,6 +120,7 @@ export default async function TwitterFallback(
       await prisma.twitterAccount.update({
         where: {
           id: userResponse.data.data.id,
+          allowlistedUserId: address,
         },
         data: twitterAccountData,
       });
