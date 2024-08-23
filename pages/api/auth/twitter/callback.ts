@@ -56,7 +56,7 @@ export default async function TwitterFallback(
       }
     );
 
-    // get /2/users/me with query params for all tweet.fields and user.fields
+    // Get /2/users/me with query params for all tweet.fields and user.fields
     const userResponse = await axios.get("https://api.twitter.com/2/users/me", {
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default async function TwitterFallback(
 
     console.log("User Response", userResponse.data);
 
-    // If user has less than 20 followers or account less than 3 months of age, reject the connection
+    // If user has less than 20 followers or account is less than 3 months old, reject the connection
     if (
       userResponse.data.data.public_metrics.followers_count <
       X_ACCOUNT_FOLLOWERS_MIN
@@ -99,6 +99,7 @@ export default async function TwitterFallback(
       refreshToken: response.data.refresh_token,
     };
 
+    // Ensure the AllowlistedUser exists before proceeding
     const alUserRecord = await prisma.allowlistedUser.findUnique({
       where: {
         id: address,
@@ -108,24 +109,30 @@ export default async function TwitterFallback(
       },
     });
 
+    if (!alUserRecord) {
+      res.status(400).send({
+        message: `Allowlisted user not found.`,
+      });
+      return;
+    }
+
     // If user has already connected their account, update data and redirect to dashboard (no points)
     if (alUserRecord?.twitter) {
       // Make sure the user is connecting the account they'd already connected
       if (alUserRecord.twitter.id !== twitterAccountData.id) {
-        // throw new Error(`Account is not connected to your profile. Please try again with @${userData?.twitter?.username}`);
         res.status(400).send({
           message: `Account already connected to another user. Please try again with @${alUserRecord?.twitter?.username}.`,
         });
+        return;
       }
       await prisma.twitterAccount.update({
         where: {
           id: userResponse.data.data.id,
-          allowlistedUserId: address,
         },
         data: twitterAccountData,
       });
     } else {
-      // Store the twitter account in the database
+      // Store the Twitter account in the database
       await prisma.twitterAccount.create({
         data: {
           ...twitterAccountData,
@@ -134,7 +141,7 @@ export default async function TwitterFallback(
       });
     }
 
-    // Sucess
+    // Success response
     res.status(200).send({
       twitter: {
         id: userResponse.data.data.id,
