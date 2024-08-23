@@ -22,25 +22,15 @@ export default function ConnectPage() {
   const { status: sessionStatus } = useSession();
   const { address, status } = useAccount();
   const { colorMode } = useColorMode();
-  const [loading, setLoading] = React.useState(false);
 
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
 
   const router = useRouter();
-  const [showLoader, setShowLoader] = React.useState(false);
-  useEffect(() => {
-    setShowLoader(true);
-    setTimeout(() => {
-      setShowLoader(false);
-    }, 1000);
-  }, []);
 
   useEffect(() => {
     if (userStatus === Status.SUCCESS && user?.user && user.twitter) {
-      setLoading(true);
       router.push("/");
-      setLoading(false);
     }
   }, [router, userStatus, user]);
 
