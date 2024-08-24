@@ -1,28 +1,34 @@
-import { Image } from "@chakra-ui/react";
+import { Box, Image } from "@chakra-ui/react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-// If you want to use your own Selectors look up the Advancaed Story book examples
 const ImageSlider = ({ slides }: { slides: any }) => {
   return (
     <Carousel
       infiniteLoop
       autoPlay
-      width={"100%"}
-      dynamicHeight
+      width="100%"
+      dynamicHeight={false}
       showThumbs={false}
       swipeable
     >
-      {slides.map((slide: any) => {
-        return (
+      {slides.map((slide: any) => (
+        <Box
+          key={slide.id}
+          width="100%"
+          overflow="hidden"
+          position="relative"
+          aspectRatio={{ base: 16 / 9, md: 16 / 9, lg: 16 / 9 }}
+        >
           <Image
             src={slide.image}
-            height={{ base: "200px", md: "300px", lg: "350px" }}
-            width="100px"
-            key={slide.id}
+            alt={`Slide ${slide.id}`}
+            objectFit="cover"
+            width="100%"
+            height="100%"
           />
-        );
-      })}
+        </Box>
+      ))}
     </Carousel>
   );
 };

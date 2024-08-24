@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
@@ -9,6 +9,8 @@ export default function TwitterCallback() {
   const router = useRouter();
 
   const toast = useToast();
+
+  const [isLoading, setIsLoading] = useState(true); //trying to stop refreshing
 
   useEffect(() => {
     if (router.query.error) {
@@ -21,8 +23,8 @@ export default function TwitterCallback() {
       });
       router.push("/");
     }
-    console.log("Query", router.query);
     if (!router.query.code) return;
+
     // Post with the code and state and error to the server
     axios
       .post("/api/auth/twitter/callback", {
@@ -31,9 +33,8 @@ export default function TwitterCallback() {
         error: router.query.error,
       })
       .then(async (response) => {
-        // Redirect to the dashboard
+        setIsLoading(false);
         if (response.status === 200) {
-          await updateUser();
           toast({
             title: "Success",
             description: "You have successfully connected your X account.",
@@ -42,23 +43,27 @@ export default function TwitterCallback() {
             isClosable: true,
           });
           // Update userData
-          // await updateUser();
-          // navRoute.refresh();
-          router.push("/connect"); //still have to confirm
+          router.push("/"); //still have to confirm /connect or /
+          await updateUser();
         }
       })
       .catch((error: any) => {
+        setIsLoading(false);
         console.log("Error", error);
         toast({
-          title: "An error occurred.",
+          title: "Try Again",
           description:
             error?.response?.data?.message || "Please try again later.",
           status: "error",
           duration: 9000,
           isClosable: true,
         });
+
         router.push("/connect");
-      });
+      })
+      .finally(() => setIsLoading(false));
+    console.log("pushing to /connect after fail");
+    router.push("/connect");
   }, [router.query]);
   return (
     <Flex
@@ -80,12 +85,14 @@ export default function TwitterCallback() {
           maxW={"1350px"}
           h={"90vh"}
         >
-          <Flex alignItems={"center"} gap={4}>
-            <Spinner />
-            <Text color={"white"} fontSize={"2xl"}>
-              Connecting your account...
-            </Text>
-          </Flex>
+          {isLoading && (
+            <Flex alignItems={"center"} gap={4}>
+              <Spinner />
+              <Text color={"white"} fontSize={"2xl"}>
+                Connecting your account...
+              </Text>
+            </Flex>
+          )}
         </Box>
       </Flex>
     </Flex>

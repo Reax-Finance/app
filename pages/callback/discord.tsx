@@ -1,4 +1,4 @@
-import { Flex, Text, useToast } from "@chakra-ui/react";
+import { Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
@@ -29,10 +29,10 @@ export default function DiscordCallback() {
         code: router.query.code,
         error: router.query.error,
       })
-      .then(async (response) => {
+      .then((response) => {
         // Redirect to the dashboard
         if (response.status === 200) {
-          await updateUser();
+          updateUser();
           console.log("DiscordCallback Response", response);
           toast({
             title: "Success",
@@ -68,7 +68,8 @@ export default function DiscordCallback() {
       justifyContent={"center"}
       alignItems={"center"}
     >
-      <Flex w={"100%"} justifyContent={"center"} alignItems={"center"}>
+      <Flex w={"100%"} justifyContent={"center"} alignItems={"center"} gap={2}>
+        <Spinner />
         <Text color={"white"} fontSize={"2xl"}>
           Connecting your account...
         </Text>

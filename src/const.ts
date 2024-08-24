@@ -171,7 +171,7 @@ export const TWITTER_SCOPE = [
   "users.read",
   "tweet.read",
   "follows.read",
-  "offline.access",
+  // "offline.access",
   "like.read",
   // "like.write",
   // "tweet.write",

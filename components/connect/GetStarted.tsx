@@ -14,10 +14,8 @@ import { VARIANT } from "../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import Allowlist from "./Allowlist";
 import ImageSlider from "./ImageSlider";
 import { SlideData } from "./SlideData";
-import { useUserData } from "../context/UserDataProvider";
 
 export default function GetStarted({ setJoin }: { setJoin: any }) {
   const signIn = () => {
@@ -39,9 +37,16 @@ export default function GetStarted({ setJoin }: { setJoin: any }) {
       {showLoader ? (
         <Spinner />
       ) : (
-        <Dark600Box2C zIndex={2} w={{ base: "95vw", md: "70%", lg: "50%" }} mx={{ base: 'auto', md: 4, lg: 4 }} my={{ base: 20, md: 4, lg: 4 }}>
+        <Dark600Box2C
+          zIndex={2}
+          w={{ base: "95vw", md: "70%", lg: "50%" }}
+          mx={{ base: "auto", md: 4, lg: 4 }}
+          my={{ base: 20, md: 4, lg: 4 }}
+        >
           <Dark400Box2C p={4}>
-            <Heading fontSize={{ base: "x-large", md: "x-large", lg: "xx-large" }}>
+            <Heading
+              fontSize={{ base: "x-large", md: "x-large", lg: "xx-large" }}
+            >
               Welcome to Reax Testnet!
             </Heading>
           </Dark400Box2C>
@@ -51,10 +56,10 @@ export default function GetStarted({ setJoin }: { setJoin: any }) {
             py={{ base: 2, md: 4, lg: 4 }}
             h={"50%"}
           >
-              <Text p={4} px={2}>
-                Your gateway to a universe of real-world assets awaits! Get
-                ready to trade 100s of stocks, commodities, and more all on-chain.
-              </Text>
+            <Text p={4} px={2}>
+              Your gateway to a universe of real-world assets awaits! Get ready
+              to trade 100s of stocks, commodities, and more all on-chain.
+            </Text>
             <Box mt={4} w="100%" h={"30%"} p={0} pb={2}>
               <ImageSlider slides={SlideData} />
             </Box>

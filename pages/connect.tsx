@@ -21,31 +21,21 @@ export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
   const { status: sessionStatus } = useSession();
   const { address, status } = useAccount();
-  const { colorMode } = useColorMode();
-  const [loading, setLoading] = React.useState(false);
 
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
 
   const router = useRouter();
-  const [showLoader, setShowLoader] = React.useState(false);
-  useEffect(() => {
-    setShowLoader(true);
-    setTimeout(() => {
-      setShowLoader(false);
-    }, 1000);
-  }, []);
 
   useEffect(() => {
-    if (userStatus === Status.SUCCESS && user?.user && user.twitter) {
-      setLoading(true);
+    if (userStatus === Status.SUCCESS && user?.user && user?.twitter) {
       router.push("/");
-      setLoading(false);
     }
   }, [router, userStatus, user]);
 
-  console.log("user", userStatus);
-  console.log("status", status);
+  console.log("UserStatus is", userStatus);
+  console.log("User is", user?.user);
+  console.log("User twitter is", user?.twitter);
 
   return (
     <Box h={"100vh"}>

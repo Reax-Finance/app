@@ -33,9 +33,8 @@ export default function SignupInterface({ accessCode }: any) {
     setLoading(true);
     axios
       .post("/api/user/join", { address, accessCode })
-      .then((res) => {
-        updateUser();
-        setLoading(false);
+      .then(async (res) => {
+        await updateUser();
         toast({
           title: "Success",
           description: "Successfully signed up",
@@ -43,9 +42,9 @@ export default function SignupInterface({ accessCode }: any) {
           duration: 9000,
           isClosable: true,
         });
+        setLoading(false);
       })
       .catch((err) => {
-        setLoading(false);
         console.log(err);
         toast({
           title: "Error",
@@ -54,6 +53,7 @@ export default function SignupInterface({ accessCode }: any) {
           duration: 9000,
           isClosable: true,
         });
+        setLoading(false);
       });
   };
   return (
