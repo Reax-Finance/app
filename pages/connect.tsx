@@ -28,7 +28,7 @@ export default function ConnectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userStatus === Status.SUCCESS && user?.user && user?.twitter && sessionStatus == "authenticated" && status === "connected") {
+    if (userStatus === Status.SUCCESS && user?.user && user?.id == address?.toLowerCase() && user?.twitter && sessionStatus == "authenticated" && status === "connected") {
       router.push("/");
     }
   }, [router, userStatus, user]);

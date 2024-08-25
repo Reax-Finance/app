@@ -37,7 +37,7 @@ export const getServerSideProps = (async () => {
   // Fetch data from external API
   let tasks: Task[] = [];
   try{
-    const res = await axios.get(`http://localhost:3000/api/tasks/get`);
+    const res = await axios.get(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/tasks/get`);
     tasks = res.data.tasks;
   } catch(e) {
     console.log("Error", e);
