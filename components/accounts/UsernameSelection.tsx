@@ -89,7 +89,6 @@ export default function UsernameSelection() {
             {user?.user?.username ? (
               <Flex color={"green.400"} align={"center"}>
                 <BsCheck size={"24px"} />
-                <Text>Completed</Text>
               </Flex>
             ) : (
               <Flex gap={2} align={"center"}>
@@ -103,11 +102,8 @@ export default function UsernameSelection() {
             )}
           </Dark400Box2C>
           {user?.user?.username ? (
-            <Flex mt={4} p={4} pt={2} gap={2} align={"center"}>
-              <Text>Your username is:</Text>
-              <Heading color={"primary.400"} size={"md"}>
-                {user?.user?.username}
-              </Heading>
+            <Flex mt={4} p={4} pt={2} gap={2} align={"flex-end"} justify={'start'}>
+              <Text fontSize={'sm'} fontFamily={'MonumentExtended'} casing={'uppercase'} fontWeight={'semibold'} color={'green.400'}>Completed</Text>
             </Flex>
           ) : (
             <Flex align={"center"} mt={4} p={4} pt={2}>
@@ -162,9 +158,9 @@ export default function UsernameSelection() {
               /> */}
             </Flex>
           )}
-          <Text pb={4} ml={4} fontSize={"sm"} color={"whiteAlpha.600"}>
-            {!isValidInput && error}
-          </Text>
+          {!isValidInput && <Text pb={4} ml={4} fontSize={"sm"} color={"whiteAlpha.600"}>
+            {error}
+          </Text>}
         </>
       </Dark600Box2C>
     </>

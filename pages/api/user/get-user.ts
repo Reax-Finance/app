@@ -34,6 +34,7 @@ export default async function handler(
           id: normalizedAddress,
         },
         include: {
+          userTasks: true,
           accessCodes: {
             include: {
               joinedUser: {

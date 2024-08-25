@@ -1,10 +1,14 @@
-import { Box, Button, Flex, useColorMode, Image } from '@chakra-ui/react';
+import { Box, Button, Flex, useColorMode, Image, Text, IconButton } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { RiArrowDropDownLine } from 'react-icons/ri';
+import { RiArrowDropDownLine, RiDropdownList } from 'react-icons/ri';
 import { VARIANT } from '../../styles/theme';
 import { isSupportedChain } from '../../src/const';
 import { useRouter } from 'next/router';
 import { useUserData } from '../context/UserDataProvider';
+import EthIdenticonGenerator from '../connect/EthIdenticonGenerator';
+import { BsWalletFill } from 'react-icons/bs';
+import { IoIosArrowDropdown } from "react-icons/io";
+import Link from 'next/link';
 
 export const CustomConnectButton = () => {
 	const { colorMode } = useColorMode();
@@ -22,6 +26,7 @@ export const CustomConnectButton = () => {
         openConnectModal,
         authenticationStatus,
         mounted,
+        
       }) => {
         console.log(authenticationStatus, "authenticationStatus");
         // Note: If your app doesn't use authentication, you
@@ -55,16 +60,25 @@ export const CustomConnectButton = () => {
                 );
               }
               return (
-                <Flex >
-                  <Button onClick={openChainModal} rounded={'full'} size={'sm'} py={'18px'} px={'8px'} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
+                <Flex gap={2} align={'center'}>
+                  <Button onClick={openChainModal} rounded={'full'} size={'sm'} py={'18px'} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
                     {chain.hasIcon ? <Image src={`${chain.iconUrl}`} w={'25px'} alt='' /> : chain.name}
                   </Button>
-                  <Button rounded={0} size={'sm'} py={'18px'} onClick={openAccountModal} type='button' bg={'transparent'} _hover={{ opacity: 0.6 }}>
-                    {user?.user?.username || account.displayName}
-                    <Box>
-                      <RiArrowDropDownLine />
+                  <Link href={'/account'} passHref>
+                  <Flex rounded={0} py={'auto'} bg={'transparent'} _hover={{ opacity: 0.6 }}>
+                    <EthIdenticonGenerator ethAddress={account.address} size={30} cellSize={3} />
+                    <Box ml={3} textAlign={'left'}>
+
+                    <Text fontSize={'xs'} fontWeight={'light'}>
+                    My Account
+                    </Text>
+                    <Text mt={-1} fontSize={'sm'} fontWeight={'bold'}>
+                    {"rx."+user?.user?.username || account.displayName}
+                    </Text>
                     </Box>
-                  </Button>
+                  </Flex>
+                  </Link>
+                  <IconButton onClick={openAccountModal} icon={<IoIosArrowDropdown size={'20px'} />} aria-label={''} variant={'ghost'} />                  
                 </Flex>
               );
             })()}

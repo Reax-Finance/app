@@ -28,22 +28,20 @@ export default function ConnectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userStatus === Status.SUCCESS && user?.user && user?.twitter) {
+    if (userStatus === Status.SUCCESS && user?.user && user?.twitter && sessionStatus == "authenticated" && status === "connected") {
       router.push("/");
     }
   }, [router, userStatus, user]);
 
-  console.log("UserStatus is", userStatus);
-  console.log("User is", user?.user);
-  console.log("User twitter is", user?.twitter);
 
   return (
-    <Box h={"100vh"}>
+    <Box h={"90vh"}>
       <Flex
-        py={{ base: 0, md: 8, lg: 10 }}
+        // py={{ base: 0, md: 8, lg: 10 }}
         flexDir={"column"}
         align={"center"}
-        justify={"space-between"}
+        justify={"flex-start"}
+        h={'100%'}
       >
         <Image src="/logo.svg" w={100} h={100} alt="" zIndex={2} />
         <Box
@@ -63,16 +61,12 @@ export default function ConnectPage() {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status === "disconnected" ||
-                sessionStatus === "unauthenticated" ? (
+                {status === "disconnected" || sessionStatus === "unauthenticated" ? (
                   <ConnectInterface />
                 ) : (
                   <>
-                    {status === "connected" &&
-                    sessionStatus === "authenticated" &&
-                    userStatus === Status.SUCCESS ? (
-                      user?.isAllowlisted &&
-                      user?.id === address?.toLowerCase() ? (
+                    {status === "connected" && sessionStatus === "authenticated" && userStatus === Status.SUCCESS ? (
+                      (user?.isAllowlisted && user?.id === address?.toLowerCase()) ? (
                         <GetStarted setJoin={setJoin} />
                       ) : (
                         <NotWhitelisted
@@ -81,8 +75,9 @@ export default function ConnectPage() {
                           setAccessCode={setAccessCode}
                         />
                       )
-                    ) : (
+                    ) : (<>
                       <Spinner />
+                      </>
                     )}
                   </>
                 )}

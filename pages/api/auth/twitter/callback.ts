@@ -20,7 +20,6 @@ export default async function TwitterFallback(
   const session = await getServerSession(req, res, authOptions({ req }));
   let address = session?.user?.name?.toLowerCase();
 
-  console.log("Address is", address);
   if (!address) {
     res.status(400).json({ message: "Bad Request" });
     return;
@@ -147,12 +146,11 @@ export default async function TwitterFallback(
       },
     });
 
-    console.log("Twitter Account created", twitterAccountData);
   } catch (error: any) {
     let err =
       error?.response?.data?.error_description ||
       JSON.stringify(error?.response?.data || error);
-    console.log("Error", err, error);
+    console.log("Error", error);
     if (err.includes("PrismaClientKnownRequestError"))
       err =
         "Account already connected to another user. Please try again with a different account.";

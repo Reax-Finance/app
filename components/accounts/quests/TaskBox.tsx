@@ -10,45 +10,70 @@ import {
 import React from "react";
 import { BsCheck } from "react-icons/bs";
 import "swiper/swiper.min.css";
-import { VARIANT } from "../../../styles/theme";
 import Dark400Box2C from "../../ui/boxes/Dark400Box2C";
 import Dark600Box2C from "../../ui/boxes/Dark600Box2C";
 import axios from "axios";
 import { useUserData } from "../../context/UserDataProvider";
+import { Task, UserTask } from "@prisma/client";
+import { VARIANT } from "../../../styles/theme";
 
-export default function FollowTwitter() {
+const successMessages = [
+  "Bravo! 🎉",
+  "You're on fire! 🔥",
+  "That was easy! 🚀",
+  "You're a pro! 🏆",
+  "Let's go! 🚀",
+  "Reax on! 🤘",
+  "You're a legend! 🦄",
+  "Wagmi! 🔥",
+  "No stopping you! 🚀",
+]
+
+export default function TaskBox({...task}: Task) {
   const toast = useToast();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const { colorMode } = useColorMode();
   const { updateUser, user } = useUserData();
 
-  const handleTwitterFollow = async () => {
+  const userTask = user?.user?.userTasks?.find((t: UserTask) => t.taskId === task.id); 
+
+  const cta = async () => {
     window.open(
-      "https://x.com/intent/follow?screen_name=ReaxFinance",
+      task.redirectUrl,
       "_blank"
     );
 
-    await axios
-      .post("/api/user/follow-twitter")
-      .then((res) => {
-        updateUser();
-        toast({
-          title: "Followed!",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-          position: "bottom",
+    if(task.taskIdentifier === "FOLLOW"){
+      setIsLoading(true);
+      axios
+        .post("/api/tasks/twitter", {taskId: task.id})
+        .then((res) => {
+          updateUser();
+          toast({
+            title: "Bravo! 🎉",
+            description: "Task completed successfully 🛰️",
+            status: "success",
+            duration: 9000,
+            isClosable: true,
+            position: "bottom",
+          });
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          toast({
+            title: "Err, something went wrong 🚨🤒",
+            description: JSON.stringify(err.response.data).slice(0, 100),
+            status: "error",
+            duration: 9000,
+            isClosable: true,
+            position: "bottom",
+          });
+          setIsLoading(false);
         });
-      })
-      .catch((err) => {
-        toast({
-          title: "Error occurred",
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-          position: "bottom",
-        });
-      });
+      } else {
+        
+      }
   };
 
   return (
@@ -62,20 +87,19 @@ export default function FollowTwitter() {
             gap={10}
           >
             <Box>
-              <Heading size={"md"}>Follow Fast, Earn Faster</Heading>
+              <Heading size={"md"}>{task.name}</Heading>
               <Text color={"whiteAlpha.600"} mt={1}>
-                Simple steps, big rewards. Follow us on Twitter.
+                {task.description}
               </Text>
             </Box>
-            {user?.user?.isFollowing ? (
+            {userTask?.completed ? (
               <Flex color={"green.400"} align={"center"}>
                 <BsCheck size={"24px"} />
-                <Text>Completed</Text>
               </Flex>
             ) : (
               <Flex gap={2} align={"center"}>
                 <Heading fontSize={"lg"} color={"secondary.400"}>
-                  +100
+                  +{task.points}
                 </Heading>
                 <Text color={"secondary.400"} mt={0.5}>
                   XP
@@ -83,8 +107,8 @@ export default function FollowTwitter() {
               </Flex>
             )}
           </Dark400Box2C>
-          {user?.user?.isFollowing ? (
-            <Flex
+          {userTask?.completed ? (
+            <Box
               mt={0}
               p={4}
               pt={2}
@@ -92,11 +116,11 @@ export default function FollowTwitter() {
               alignItems={"start"}
               justifyContent={"start"}
             >
-              <Text>Quest Completed:</Text>
-              <Heading color={"primary.400"} size={"md"}>
-                FOLLOWED!
-              </Heading>
-            </Flex>
+              <Text fontSize={'sm'} fontFamily={'MonumentExtended'} casing={'uppercase'} fontWeight={'semibold'} color={'green.400'}>Completed</Text>
+              {/* <Text fontSize={'md'} fontFamily={'MonumentExtended'} fontWeight={'semibold'} casing={'uppercase'} color={"primary.400"} size={"md"}>
+                {successMessages[task.id % successMessages.length]}
+              </Text> */}
+            </Box>
           ) : (
             <Flex align={"center"} mt={4} p={4} pt={2}>
               <Box className={`${VARIANT}-${colorMode}-input`} w={"100%"}>
@@ -112,9 +136,10 @@ export default function FollowTwitter() {
                     _hover={{ opacity: 0.8 }}
                     bg={"transparent"}
                     textColor={"black"}
-                    onClick={handleTwitterFollow}
+                    onClick={cta}
+                    isLoading={isLoading}
                   >
-                    Join the Fun @ReaxFinance
+                    {task.cta}
                   </Button>
                 </Box>
               </Box>

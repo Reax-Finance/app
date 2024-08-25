@@ -4,6 +4,7 @@ import {
   TwitterAccount,
   DiscordConnect,
   User as _User,
+  UserTask,
 } from "@prisma/client";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -15,6 +16,7 @@ import { Status } from "../utils/status";
 
 interface UserObject extends _User {
   accessCodes: AccessCode[];
+  userTasks: UserTask[];
 }
 
 interface UserData extends AllowlistedUser {
@@ -47,8 +49,6 @@ function UserDataProvider({ children }: any) {
   const { status: sessionStatus } = useSession();
   const [loading, setLoading] = React.useState(false);
 
-  console.log("User Data is ", user);
-
   useEffect(() => {
     updateUser();
   }, [address, sessionStatus]);
@@ -58,8 +58,14 @@ function UserDataProvider({ children }: any) {
       setStatus(Status.FETCHING);
       if (typeof window === "undefined") return;
 
-      if (!address || address == ADDRESS_ZERO) return;
-      if (sessionStatus !== "authenticated") return;
+      if (!address || address == ADDRESS_ZERO) {
+        console.log("No address");
+        return;
+      }
+      // if (sessionStatus !== "authenticated") {
+      //   console.log("Not authenticated");
+      //   return;
+      // }
       setLoading(true);
       axios
         .get("/api/user/get-user", {

@@ -8,6 +8,7 @@ import {
   Text,
   useColorMode,
   useToast,
+  Tooltip
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -22,31 +23,70 @@ import { BsClock } from "react-icons/bs";
 import { VARIANT } from "../styles/theme";
 import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 import { motion } from "framer-motion";
-import FollowTwitter from "../components/accounts/quests/FollowTwitter";
 import DiscordConnectQuest from "../components/accounts/quests/DiscordConnectQuest";
+import EthIdenticonGenerator from "../components/connect/EthIdenticonGenerator";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { Task } from "@prisma/client";
+import axios from 'axios';
+import TaskBox from "../components/accounts/quests/TaskBox";
+import Head from "next/head";
 
 Swiper.use([Autoplay, Navigation]);
 
-export default function Account() {
+export const getServerSideProps = (async () => {
+  // Fetch data from external API
+  let tasks: Task[] = [];
+  try{
+    const res = await axios.get(`http://localhost:3000/api/tasks/get`);
+    tasks = res.data.tasks;
+  } catch(e) {
+    console.log("Error", e);
+  }
+  // Pass data to the page via props
+  return { props: { tasks } }
+}) satisfies GetServerSideProps<{ tasks: Task[] }>
+
+export default function Account({
+  tasks,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { address } = useAccount();
   const { user } = useUserData();
   const { colorMode } = useColorMode();
 
+  if(!address) return null;
+
   return (
     <OnlyAuthenticated>
+      <Head>
+        <title>
+          {user?.user?.username
+            ? `${user?.user?.username}`
+            : `${address?.slice(0, 6)}...${address?.slice(-4)}`} | Reax
+        </title>
+        <link
+          rel="icon"
+          type="image/x-icon"
+          href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}
+        ></link>
+      </Head>
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 15 }}
       transition={{ duration: 0.25 }}
     >
-      <Box maxW={{ base: "95vw", md: "1350px", lg: "1350px" }}>
+      <Box maxW={{ base: "95vw", md: "1350px", lg: "1350px" }} my={20}>
         <OnlyAuthenticated />
         <Flex gap={10} justify={"space-between"}>
+          <Flex gap={5} align={'center'}>
+            <EthIdenticonGenerator ethAddress={address} size={80} cellSize={8} />
           <Box>
-            <Heading>
+            <Heading fontFamily={'MonumentExtended'} fontSize={'3xl'}>
               {user?.user?.username
-                ? user?.user.username
+                ? <>
+                  <Box fontSize={'xl'} color={'secondary.400'}>rx</Box>
+                  {user?.user?.username}
+                </>
                 : address?.slice(0, 6) + "..." + address?.slice(-4)}
             </Heading>
             <Text mt={2} color={"whiteAlpha.600"}>
@@ -56,13 +96,14 @@ export default function Account() {
               ).toDateString()}
             </Text>
           </Box>
+          </Flex>
           <Box textAlign={"center"}>
             <Box
               className={`${VARIANT}-${colorMode}-SecondryRightCut`}
               px={6}
               py={2}
             >
-              <Heading>
+              <Heading fontFamily={'MonumentExtended'} size={'lg'}>
                 {tokenFormatter.format(Number(user?.user?.balance))}
               </Heading>
             </Box>
@@ -77,14 +118,34 @@ export default function Account() {
         </Flex>
 
         {/* <Divider my={4} /> */}
-        <Box mt={8}>
-          <AccessCodes />
-        </Box>
+        
 
-        {/* <Divider my={4} /> */}
-        <Heading size={"lg"} my={8}>
-          Quests
-        </Heading>
+        <Divider my={6} />
+        <Flex gap={6} mb={10} align={'end'}>
+          <Heading size={"md"} >
+            Quests
+          </Heading>
+          <Tooltip label="Coming Soon" aria-label="Coming Soon">
+          <Heading size={"sm"} color={'whiteAlpha.600'} cursor={'pointer'}>
+            Competitions
+          </Heading>
+          </Tooltip>
+          <Tooltip label="Coming Soon" aria-label="Coming Soon">
+          <Heading size={"sm"} color={'whiteAlpha.600'} cursor={'pointer'}>
+            Activity
+          </Heading>
+          </Tooltip>
+          <Tooltip label="Coming Soon" aria-label="Coming Soon">
+          <Heading size={"sm"} color={'whiteAlpha.600'} cursor={'pointer'}>
+            Rewards
+          </Heading>
+          </Tooltip>
+          <Tooltip label="Coming Soon" aria-label="Coming Soon">
+          <Heading size={"sm"} color={'whiteAlpha.600'} cursor={'pointer'}>
+            Settings
+          </Heading>
+          </Tooltip>
+        </Flex>
 
         <Flex
           gap={4}
@@ -94,12 +155,13 @@ export default function Account() {
           <Flex w={"100%"}>
             <UsernameSelection />
           </Flex>
-          <Flex w={"100%"}>
-            <FollowTwitter />
-          </Flex>
+          
           <Flex w={"100%"}>
             <DiscordConnectQuest />
           </Flex>
+          {tasks.map((task: any, index) => (<Flex w={"100%"} key={index}>
+            <TaskBox {...task} />
+          </Flex>))}
           <Dark600Box2C
             align={"center"}
             justify={"center"}
@@ -119,6 +181,9 @@ export default function Account() {
             </Text>
           </Dark600Box2C>
         </Flex>
+        <Box mt={8}>
+          <AccessCodes />
+        </Box>
       </Box>
     </motion.div>
     </OnlyAuthenticated>

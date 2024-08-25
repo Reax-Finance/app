@@ -24,7 +24,6 @@ const DiscordConnectQuest = () => {
           {user?.discord ? (
             <Flex color={"green.400"} align={"center"}>
               <BsCheck size={"24px"} />
-              <Text>Completed</Text>
             </Flex>
           ) : (
             <Flex gap={2} align={"center"}>

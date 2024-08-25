@@ -29,7 +29,9 @@ export default function AccessCodes() {
       <Dark600Box2C p={4} mt={4}>
         <Flex align={"start"} justify={"space-between"}>
           <Box maxW={"80%"}>
-            <Heading size={"md"}>Access Codes</Heading>
+            <Heading size={"md"}>
+              Refer Frens & Earn 🤝
+            </Heading>
             <Text
               color={"whiteAlpha.600"}
               mt={2}
@@ -66,6 +68,7 @@ export default function AccessCodes() {
         </Flex>
         <Flex
           justify={"space-between"}
+          align={"end"}
           mt={6}
           flexDir={{ base: "column", md: "row", lg: "row" }}
         >

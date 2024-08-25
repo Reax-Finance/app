@@ -125,10 +125,10 @@ function NavBar() {
                   )}
               </Box>
 
-              <NavLocalLink
+              {/* <NavLocalLink
                 path={"/account"}
                 title={user?.user?.balance + " XP"}
-              ></NavLocalLink>
+              ></NavLocalLink> */}
               <Box>
                 <CustomConnectButton />
               </Box>

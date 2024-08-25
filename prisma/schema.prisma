@@ -21,12 +21,12 @@ model User {
   balance         Int              @default(0)
   // Unique username
   username        String?          @unique @db.VarChar(255)
-  //is folllowing on twiiter
-  isFollowing     Boolean          @default(false)
   // Allowlisted Record
   allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
   // Referral Codes Created
   accessCodes     AccessCode[]     @relation(name: "AccessCode")
+  // Tasks Completed
+  userTasks       UserTask[]
   // Meta
   createdAt       DateTime         @default(now()) @db.Timestamp(6)
   updatedAt       DateTime         @updatedAt @db.Timestamp(6)
@@ -84,4 +84,48 @@ model DiscordConnect {
   createdAt         DateTime        @default(now()) @db.Timestamp(6)
   updatedAt         DateTime        @updatedAt @db.Timestamp(6)
   expiresIn         Int
+}
+
+enum TaskIdentifier {
+  JOIN_SERVER
+  HAS_ROLE
+  FOLLOW
+  LIKE
+  RETWEET
+  POST_TWEET
+  ON_CHAIN_QUERY
+  SUBGRAPH_QUERY
+  API_QUERY
+  XP_COMPLETION
+  FACTION_SELECTION
+  REPEATABLE_SUBGRAPH_QUERY
+}
+
+model Task {
+  id             Int            @id
+  name           String         @unique @db.VarChar(255)
+  description    String         @default("") @db.Text
+  quest          String         @default("") @db.Text
+  ytUrl          String         @default("") @db.VarChar(255)
+  imageUrl       String         @default("") @db.VarChar(255)
+  taskIdentifier TaskIdentifier
+  cta            String         @db.VarChar(255)
+  redirectUrl    String         @default("") @db.VarChar(500)
+  points         Int
+  createdAt      DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime       @default(now()) @updatedAt @db.Timestamp(6)
+  data           String         @default("") @db.Text
+  userTasks   UserTask[]
+}
+
+model UserTask {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  taskId    Int
+  completed Boolean  @default(false)
+  data      String?  @default("") @db.Text
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  user      User     @relation(fields: [userId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id])
 }
