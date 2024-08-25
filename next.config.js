@@ -5,6 +5,7 @@
 
 const { withSentryConfig } = require("@sentry/nextjs");
 
+/** @type {import('next').NextConfig} */
 const moduleExports = {
   // Your existing module.exports
   reactStrictMode: false,
@@ -15,6 +16,9 @@ const moduleExports = {
       "cryptologos.cc",
       "raw.githubusercontent.com",
     ],
+  },
+  experimental: {
+    serverActions: true
   },
 
   sentry: {

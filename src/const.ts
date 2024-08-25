@@ -15,7 +15,7 @@ import {
   cronosTestnet,
   mainnet,
   sepolia,
-} from "wagmi/chains";
+} from "viem/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
 
 const _sepolia = {

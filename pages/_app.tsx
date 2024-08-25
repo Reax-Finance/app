@@ -3,9 +3,7 @@ import "../styles/edgy-dark.css";
 import "../styles/edgy-light.css";
 import "../styles/rounded-dark.css";
 import "../styles/rounded-light.css";
-import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
-import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { Box, ChakraProvider, Flex } from "@chakra-ui/react";
 import Index from "./_index";
 
@@ -14,18 +12,14 @@ import { theme } from "../styles/theme";
 import { supportedChains } from "../src/const";
 import { BalanceContextProvider } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
-import "@rainbow-me/rainbowkit/styles.css";
-import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { SessionProvider } from "next-auth/react";
 import type { Session } from "next-auth";
 import Script from "next/script";
+import { ThirdwebProvider } from "thirdweb/react";
 
-import {
-  RainbowKitSiweNextAuthProvider,
-  GetSiweMessageOptions,
-} from "@rainbow-me/rainbowkit-siwe-next-auth";
 import { UserDataProvider } from "../components/context/UserDataProvider";
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
 import {
   metaMaskWallet,
   rainbowWallet,
@@ -37,6 +31,7 @@ import {
   trustWallet,
   rabbyWallet,
 } from "@rainbow-me/rainbowkit/wallets";
+import { SessionProvider } from "next-auth/react";
 
 const config = getDefaultConfig({
   appName: "REAX",
@@ -47,29 +42,13 @@ const config = getDefaultConfig({
     {
       groupName: "Recommended",
       wallets: [
-        rabbyWallet,
-        metaMaskWallet,
-        walletConnectWallet,
-        coinbaseWallet,
-        uniswapWallet,
+        metaMaskWallet
       ],
-    },
-    {
-      groupName: "Hardware",
-      wallets: [safeWallet, safepalWallet],
-    },
-    {
-      groupName: "Mobile",
-      wallets: [rainbowWallet, trustWallet],
-    },
+    }
   ],
 });
 
 const queryClient = new QueryClient();
-
-const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: "Sign in to REAX",
-});
 
 export default function App({
   Component,
@@ -96,13 +75,10 @@ export default function App({
       </Script>
 
       <ChakraProvider theme={theme}>
+      <ThirdwebProvider>
         <SessionProvider refetchInterval={0} session={pageProps.session}>
           <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
-              <RainbowKitSiweNextAuthProvider
-                getSiweMessageOptions={getSiweMessageOptions}
-              >
-                <RainbowKitProvider>
                   <UserDataProvider>
                     <AppDataProvider>
                       <BalanceContextProvider>
@@ -114,11 +90,10 @@ export default function App({
                       </BalanceContextProvider>
                     </AppDataProvider>
                   </UserDataProvider>
-                </RainbowKitProvider>
-              </RainbowKitSiweNextAuthProvider>
             </QueryClientProvider>
           </WagmiProvider>
         </SessionProvider>
+        </ThirdwebProvider>
       </ChakraProvider>
     </>
   );

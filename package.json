@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "prisma generate && next build",
     "build:staging": "yarn run:config:staging && next build",
     "start": "next start",
@@ -31,11 +31,11 @@
     "fs": "^0.0.1-security",
     "install": "^0.13.0",
     "moment": "^2.29.4",
-    "next": "^13.1.3",
+    "next": "^14.2.6",
     "next-auth": "^4.20.1",
     "prisma": "^5.17.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-icons": "^4.4.0",
     "react-responsive-carousel": "^3.2.18",
     "react-tradingview-embed": "^3.0.6",
@@ -43,8 +43,9 @@
     "siwe": "^2",
     "swiper": "^8.4.7",
     "tailwind-merge": "^2.4.0",
+    "thirdweb": "^5.48.1",
     "viem": "2.x",
-    "wagmi": "^2.8.1",
+    "wagmi": "^2.12.7",
     "web3": "^1.8.0"
   },
   "devDependencies": {
@@ -52,7 +53,7 @@
     "@types/node": "^20.14.15",
     "@types/react": "^18.3.3",
     "eslint": "^8.15.0",
-    "eslint-config-next": "^13.1.3",
+    "eslint-config-next": "^14.2.6",
     "ethers": "^5.7.2",
     "typescript": "^5.4.5"
   },

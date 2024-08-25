@@ -12,7 +12,6 @@ import {
 import React, { use, useEffect } from "react";
 import { VARIANT } from "../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { useAccountModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 import Dark600Box2C from "../ui/boxes/Dark600Box2C";
@@ -23,7 +22,6 @@ export default function NotWhitelisted({
   accessCode,
   setAccessCode,
 }: any) {
-  const { openAccountModal } = useAccountModal();
   const { colorMode } = useColorMode();
   const [error, setError] = React.useState<String | undefined>();
   const [checkingAC, setCheckingAC] = React.useState(false);
@@ -104,7 +102,7 @@ export default function NotWhitelisted({
         className={`${VARIANT}-${colorMode}-primaryButton`}
       >
         <Button
-          onClick={openAccountModal}
+          // onClick={openAccountModal}
           w={"100%"}
           bg={"transparent"}
           _hover={{ opacity: 0.6 }}

@@ -9,7 +9,6 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import * as React from "react";
 import { useEffect } from "react";
-import { useAccount } from "wagmi";
 import { ADDRESS_ZERO } from "../../src/const";
 import { Status } from "../utils/status";
 
@@ -43,7 +42,7 @@ function UserDataProvider({ children }: any) {
   const [message, setMessage] = React.useState<UserDataValue["message"]>("");
   const [user, setUser] = React.useState<UserData>();
 
-  const { address } = useAccount();
+  const { address } = {address: "0x1234"};
   const { status: sessionStatus } = useSession();
   const [loading, setLoading] = React.useState(false);
 

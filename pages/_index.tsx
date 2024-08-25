@@ -18,11 +18,7 @@ import { useRouter } from "next/router";
 import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
 import { useAccount, useSwitchChain } from "wagmi";
-import {
-  useAccountModal,
-  useChainModal,
-  useConnectModal,
-} from "@rainbow-me/rainbowkit";
+
 import ConnectPage from "../components/connect/ConnectPage";
 import { useSession } from "next-auth/react";
 import { useUserData } from "../components/context/UserDataProvider";
@@ -61,8 +57,6 @@ export default function Index({ children }: any) {
   const toast = useToast();
 
   const { switchChain } = useSwitchChain();
-  const { openChainModal } = useChainModal();
-  const { openConnectModal } = useConnectModal();
 
   const switchNetwork = async (chainId: number) => {
     switchChain!({ chainId: chainId });
@@ -108,7 +102,7 @@ export default function Index({ children }: any) {
             _hover={{ bg: "whiteAlpha.800" }}
             color={"black"}
             rounded={"full"}
-            onClick={openChainModal}
+            // onClick={openChainModal}
           >
             Switch Chain
           </Button>
