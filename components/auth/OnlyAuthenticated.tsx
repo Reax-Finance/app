@@ -6,11 +6,10 @@ import { useRouter } from "next/router";
 import { Status } from "../utils/status";
 import { Spinner } from "@chakra-ui/react";
 
-export default function OnlyAuthenticated() {
-  const { user } = useUserData();
+export default function OnlyAuthenticated({children}: any) {
   const { address } = useAccount();
   const { status: sessionStatus } = useSession();
-  const { status: userStatus } = useUserData();
+  const { user, status: userStatus } = useUserData();
   const router = useRouter();
 
   useEffect(() => {
@@ -22,5 +21,7 @@ export default function OnlyAuthenticated() {
     }
   }, [user, address, sessionStatus, router]);
 
-  return <></>;
+  if(userStatus !== Status.SUCCESS) return null;
+
+  return <>{children}</>;
 }

@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import React, { useEffect } from "react";
 import Liquidity from "../components/liquidity/index";
 import Head from "next/head";
-import SwapSkeleton from "../components/swap/Skeleton";
 import { useAppData } from "../components/context/AppDataProvider";
 import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 
@@ -12,7 +11,7 @@ export default function SwapPage() {
 	const { reserveData } = useAppData();
 
 	return (
-		<>
+		<OnlyAuthenticated>
 			<Head>
 				<title>
 					Liquidity | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}
@@ -23,7 +22,6 @@ export default function SwapPage() {
 					href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}
 				></link>
 			</Head>
-			<OnlyAuthenticated />
 			<Flex>
 			<Box w="100%" py={20}>
 				<Flex justify={"center"} align="center" >
@@ -48,6 +46,6 @@ export default function SwapPage() {
 				</Flex>
 			</Box>
 		</Flex>
-		</>
+		</OnlyAuthenticated>
 	);
 }

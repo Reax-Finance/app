@@ -158,6 +158,7 @@ export default function Faucet() {
   };
 
   return (
+    <OnlyAuthenticated>
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
@@ -353,5 +354,6 @@ export default function Faucet() {
         )}
       </Box>
     </motion.div>
+    </OnlyAuthenticated>
   );
 }

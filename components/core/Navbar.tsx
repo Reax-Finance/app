@@ -22,6 +22,7 @@ import { MdFeedback, MdOpenInNew } from "react-icons/md";
 import { RiFeedbackLine } from "react-icons/ri";
 import { useUserData } from "../context/UserDataProvider";
 import { useRouter } from "next/router";
+import OnlyAuthenticated from "../auth/OnlyAuthenticated";
 
 function NavBar() {
   const { isOpen: isToggleOpen, onToggle } = useDisclosure();
@@ -41,7 +42,7 @@ function NavBar() {
   }
 
   return (
-    <>
+    <OnlyAuthenticated>
       <Flex
         mt={{ base: 0, md: 6 }}
         align="center"
@@ -140,7 +141,7 @@ function NavBar() {
           <MobileNav />
         </Collapse>
       </Box>
-    </>
+    </OnlyAuthenticated>
   );
 }
 

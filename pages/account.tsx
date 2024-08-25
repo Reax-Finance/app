@@ -12,9 +12,6 @@ import {
 import React, { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useUserData } from "../components/context/UserDataProvider";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import axios from "axios";
-import AccessCode from "../components/ui/access-code/AccessCode";
 import Swiper, { Autoplay, Navigation } from "swiper";
 import "swiper/swiper.min.css";
 import UsernameSelection from "../components/accounts/UsernameSelection";
@@ -36,6 +33,7 @@ export default function Account() {
   const { colorMode } = useColorMode();
 
   return (
+    <OnlyAuthenticated>
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
@@ -123,5 +121,6 @@ export default function Account() {
         </Flex>
       </Box>
     </motion.div>
+    </OnlyAuthenticated>
   );
 }
