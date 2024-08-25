@@ -73,7 +73,7 @@ export const CustomConnectButton = () => {
                     My Account
                     </Text>
                     <Text mt={-1} fontSize={'sm'} fontWeight={'bold'}>
-                    {"rx."+user?.user?.username || account.displayName}
+                    {user?.user?.username ? "rx."+user?.user?.username : account.displayName}
                     </Text>
                     </Box>
                   </Flex>
