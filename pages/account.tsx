@@ -3,8 +3,6 @@ import {
   Divider,
   Flex,
   Heading,
-  IconButton,
-  Input,
   Text,
   useColorMode,
   useToast,
@@ -30,6 +28,7 @@ import { Task } from "@prisma/client";
 import axios from 'axios';
 import TaskBox from "../components/accounts/quests/TaskBox";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 Swiper.use([Autoplay, Navigation]);
 
@@ -52,8 +51,13 @@ export default function Account({
   const { address } = useAccount();
   const { user } = useUserData();
   const { colorMode } = useColorMode();
+  const router = useRouter();
 
   if(!address) return null;
+
+  if (router.isFallback) {
+    return <>Loading...</>;
+  }
 
   return (
     <OnlyAuthenticated>
@@ -171,7 +175,7 @@ export default function Account({
           >
             <BsClock size={"30px"} />
             <Heading mt={4} mb={4} size={"md"}>
-              Coming Soon
+              1 Quest / Week
             </Heading>
             <Text>
               More quests coming soon! Stay tuned on our{" "}

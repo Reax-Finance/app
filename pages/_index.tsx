@@ -7,7 +7,7 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { Suspense, useContext } from "react";
 import Footer from "../components/core/Footer";
 import Navbar from "../components/core/Navbar";
 import { useEffect } from "react";
@@ -34,26 +34,26 @@ export default function Index({ children }: any) {
 
   const { status: sessionStatus } = useSession();
 
-  // useEffect(() => {
-  // 	const handleStart = (url: any) => {
-  // 		setLoading(true);
-  // 		setRefresh(Math.random());
-  // 	};
-  // 	const handleComplete = (url: any) => {
-  // 		setLoading(false);
-  // 		setRefresh(Math.random());
-  // 	};
+  useEffect(() => {
+  	const handleStart = (url: any) => {
+  		setLoading(true);
+  		setRefresh(Math.random());
+  	};
+  	const handleComplete = (url: any) => {
+  		setLoading(false);
+  		setRefresh(Math.random());
+  	};
 
-  // 	router.events.on("routeChangeStart", handleStart);
-  // 	router.events.on("routeChangeComplete", handleComplete);
-  // 	router.events.on("routeChangeError", handleComplete);
+  	router.events.on("routeChangeStart", handleStart);
+  	router.events.on("routeChangeComplete", handleComplete);
+  	router.events.on("routeChangeError", handleComplete);
 
-  // 	return () => {
-  // 		router.events.off("routeChangeStart", handleStart);
-  // 		router.events.off("routeChangeComplete", handleComplete);
-  // 		router.events.off("routeChangeError", handleComplete);yarn
-  // 	};
-  // }, [loading, refresh]);
+  	return () => {
+  		router.events.off("routeChangeStart", handleStart);
+  		router.events.off("routeChangeComplete", handleComplete);
+  		router.events.off("routeChangeError", handleComplete);
+  	};
+  }, [loading, refresh]);
 
   const { status, message } = useContext(AppDataContext);
   const { chain, isConnected, address } = useAccount();
@@ -117,9 +117,13 @@ export default function Index({ children }: any) {
       {/* Loading */}
       {(status == Status.FETCHING || loading) && (
         <Progress
+          position={"absolute"}
+          top={0}
+          zIndex={100}
+          w={"100%"}
           bg={"blackAlpha.200"}
           colorScheme="primary"
-          size="xs"
+          size="sm"
           isIndeterminate
         />
       )}

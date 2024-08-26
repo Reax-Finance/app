@@ -26,6 +26,10 @@ const moduleExports = {
     // for more information.
     hideSourceMaps: true,
   },
+
+  experimental: {
+    serverComponents: true,
+  },
 };
 
 const sentryWebpackPluginOptions = {
