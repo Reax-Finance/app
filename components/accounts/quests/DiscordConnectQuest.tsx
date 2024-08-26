@@ -18,7 +18,7 @@ const DiscordConnectQuest = () => {
           <Box>
             <Heading size={"md"}>Discord Drop</Heading>
             <Text color={"whiteAlpha.600"} mt={1}>
-              Join our community on Discord and instantly unlock 100XP!
+              Join our community on Discord and instantly unlock 100 RXP!
             </Text>
           </Box>
           {user?.discord ? (
@@ -31,7 +31,7 @@ const DiscordConnectQuest = () => {
                 +100
               </Heading>
               <Text color={"secondary.400"} mt={0.5}>
-                XP
+                RXP
               </Text>
             </Flex>
           )}

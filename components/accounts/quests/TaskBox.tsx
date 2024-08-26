@@ -51,7 +51,8 @@ export default function TaskBox({...task}: Task) {
         .then((res) => {
           updateUser();
           toast({
-            title: "Bravo! 🎉",
+            // random success msg
+            title: successMessages[task.id % successMessages.length],
             description: "Task completed successfully 🛰️",
             status: "success",
             duration: 9000,
@@ -102,7 +103,7 @@ export default function TaskBox({...task}: Task) {
                   +{task.points}
                 </Heading>
                 <Text color={"secondary.400"} mt={0.5}>
-                  XP
+                  RXP
                 </Text>
               </Flex>
             )}

@@ -39,8 +39,8 @@ export default function AccessCodes() {
               pr={{ sm: 2 }}
             >
               Use these access codes to invite your frens to try out the app.
-              You earn 50 XP for each user that signs up using your access code
-              and they earn 50 XP too.
+              You earn 50 RXP for each user that signs up using your access code
+              and they earn 50 RXP too.
             </Text>
           </Box>
           <Flex flexDir={{ base: "column-reverse", md: "row", lg: "row" }}>
@@ -51,7 +51,7 @@ export default function AccessCodes() {
             >
               <Text fontSize={"xs"}>They Earn</Text>
               <Heading size={"sm"} fontWeight={"bold"}>
-                50 XP
+                50 RXP
               </Heading>
             </Box>
             <Box
@@ -61,7 +61,7 @@ export default function AccessCodes() {
             >
               <Text fontSize={"xs"}>You Earn</Text>
               <Heading size={"sm"} fontWeight={"bold"}>
-                50 XP
+                50 RXP
               </Heading>
             </Box>
           </Flex>

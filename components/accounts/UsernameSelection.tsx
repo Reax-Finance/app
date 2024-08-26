@@ -39,7 +39,7 @@ export default function UsernameSelection() {
         updateUser();
         toast({
           title: "Username added",
-          description: "You have earned 100 XP",
+          description: "You have earned 100 RXP",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -96,7 +96,7 @@ export default function UsernameSelection() {
                   +100
                 </Heading>
                 <Text color={"secondary.400"} mt={0.5}>
-                  XP
+                  RXP
                 </Text>
               </Flex>
             )}
