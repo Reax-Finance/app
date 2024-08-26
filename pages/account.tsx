@@ -116,7 +116,7 @@ export default function Account({
               px={6}
               py={1}
             >
-              <Text>XP</Text>
+              <Text>RXP</Text>
             </Box>
           </Box>
         </Flex>
