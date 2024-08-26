@@ -16,6 +16,7 @@ import SignupInterface from "../components/connect/SignupInterface";
 import GetStarted from "../components/connect/GetStarted";
 import { useUserData } from "../components/context/UserDataProvider";
 import { useRouter } from "next/router";
+import BlockLoading from '../components/ui/skeletons/BlockLoading';
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -76,7 +77,7 @@ export default function ConnectPage() {
                         />
                       )
                     ) : (<>
-                      <Spinner />
+                      <BlockLoading />
                       </>
                     )}
                   </>

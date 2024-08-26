@@ -16,6 +16,7 @@ import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 import ImageSlider from "./ImageSlider";
 import { SlideData } from "./SlideData";
+import BlockLoading from "../ui/skeletons/BlockLoading";
 
 export default function GetStarted({ setJoin }: { setJoin: any }) {
   const signIn = () => {
@@ -35,7 +36,7 @@ export default function GetStarted({ setJoin }: { setJoin: any }) {
   return (
     <>
       {showLoader ? (
-        <Spinner />
+        <BlockLoading />
       ) : (
         <Dark600Box2C
           zIndex={2}
