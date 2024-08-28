@@ -9,6 +9,14 @@ interface EthBlockLoadingAnimationProps {
   color?: string;
 }
 
+const LOADING_MESSAGES = [
+  "Bringing you the latest blocks...",
+  "Verifying Access...",
+  "Checking for updates...",
+  "Loading...",
+  "Please wait...",
+]
+
 const BlockLoading: React.FC<EthBlockLoadingAnimationProps> = ({
   blockSize = 10,
   width = 500,
@@ -18,6 +26,16 @@ const BlockLoading: React.FC<EthBlockLoadingAnimationProps> = ({
   const horizontalBlocks = Math.floor(width / blockSize);
   const verticalBlocks = Math.floor(height / blockSize);
   const blocks = [];
+
+  const [loadingMessage, setLoadingMessage] = React.useState<string>(LOADING_MESSAGES[0]);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingMessage(LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length - 1)]);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   for (let i = 0; i < verticalBlocks; i++) {
     for (let j = 0; j < horizontalBlocks; j++) {
@@ -49,7 +67,7 @@ const BlockLoading: React.FC<EthBlockLoadingAnimationProps> = ({
       {blocks}
     </svg>
     <Heading size="md" fontFamily={'MonumentExtended'} color="secondary.500" mt={4} opacity={'0.5'}>
-      Bringing you the latest blocks 🟧
+      {loadingMessage}
     </Heading>
     </Flex>
   );
