@@ -1,40 +1,27 @@
-import {
-  Box,
-  Divider,
-  Flex,
-  Heading,
-  IconButton,
-  Input,
-  Text,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
-import React, { useEffect } from "react";
-import { useAccount } from "wagmi";
-import { useUserData } from "../components/context/UserDataProvider";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import axios from "axios";
-import AccessCode from "../components/ui/access-code/AccessCode";
+"use client";
+
+import { Box, Flex, Heading, Text, useColorMode } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { BsClock } from "react-icons/bs";
 import Swiper, { Autoplay, Navigation } from "swiper";
 import "swiper/swiper.min.css";
-import UsernameSelection from "../components/accounts/UsernameSelection";
-import Dark600Box2C from "../components/ui/boxes/Dark600Box2C";
-import { tokenFormatter } from "../src/const";
-import AccessCodes from "../components/accounts/AccessCodes";
-import { BsClock } from "react-icons/bs";
-import { VARIANT } from "../styles/theme";
-import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
-import { motion } from "framer-motion";
-import FollowTwitter from "../components/accounts/quests/FollowTwitter";
-import DiscordConnectQuest from "../components/accounts/quests/DiscordConnectQuest";
+import AccessCodes from "../../components/accounts/AccessCodes";
+import DiscordConnectQuest from "../../components/accounts/quests/DiscordConnectQuest";
+import FollowTwitter from "../../components/accounts/quests/FollowTwitter";
+import UsernameSelection from "../../components/accounts/UsernameSelection";
+import OnlyAuthenticated from "../../components/auth/OnlyAuthenticated";
+import { useUserData } from "../../components/context/UserDataProvider";
+import Dark600Box2C from "../../components/ui/boxes/Dark600Box2C";
+import { tokenFormatter } from "../../src/const";
+import { VARIANT } from "../../styles/theme";
+import UserAccount from "../../components/utils/useUserAccount";
 
 Swiper.use([Autoplay, Navigation]);
 
-export default function Account() {
-  const { address } = useAccount();
+const Page = () => {
   const { user } = useUserData();
   const { colorMode } = useColorMode();
-
+  const { address } = UserAccount();
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -124,4 +111,6 @@ export default function Account() {
       </Box>
     </motion.div>
   );
-}
+};
+
+export default Page;

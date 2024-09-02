@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "../auth/route";
 import { USERNAME_XP_REWARD } from "../../../src/const";
 
 const prisma = new PrismaClient();
@@ -10,18 +10,19 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const {
-    username
-  }: { username: string; address: string; balance: number } = req.body;
+  const { username }: { username: string; address: string; balance: number } =
+    req.body;
   const session = await getServerSession(req, res, authOptions({ req }));
 
   const address = session?.user?.name;
-  if(!session || !session.user || !address){
+  if (!session || !session.user || !address) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  if(username.length < 3 || username.length > 20){
-    return res.status(400).json({ message: "Username must be between 3 and 20 characters" });
+  if (username.length < 3 || username.length > 20) {
+    return res
+      .status(400)
+      .json({ message: "Username must be between 3 and 20 characters" });
   }
 
   // check if username is already taken
@@ -52,10 +53,9 @@ export default async function handler(
       data: {
         username: username,
         balance: {
-          increment: USERNAME_XP_REWARD
-        }
+          increment: USERNAME_XP_REWARD,
+        },
       },
-      
     })
     .then(() => {
       res.status(200).json({ message: "Username added successfully" });

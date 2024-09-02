@@ -1,19 +1,25 @@
-import React, { useEffect } from "react";
-import { useUserData } from "../context/UserDataProvider";
-import { useAccount } from "wagmi";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { Status } from "../utils/status";
-import { Spinner } from "@chakra-ui/react";
+"use client";
 
-export default function OnlyAuthenticated() {
+import { useSession } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { isLoggedIn } from "../../actions/login";
+import { useUserData } from "../context/UserDataProvider";
+import UserAccount from "../utils/useUserAccount";
+
+export default async function OnlyAuthenticated() {
+  const { address } = UserAccount();
   const { user } = useUserData();
-  const { address } = useAccount();
   const { status: sessionStatus } = useSession();
-  const { status: userStatus } = useUserData();
   const router = useRouter();
 
+  const checkUser = async () => {
+    if (!(await isLoggedIn())) {
+      redirect("/connect");
+    }
+  };
   useEffect(() => {
+    checkUser();
     if (
       !(user?.user && user?.id == address?.toLowerCase()) ||
       sessionStatus !== "authenticated"

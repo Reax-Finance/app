@@ -1,6 +1,5 @@
 import { Box, useDisclosure, Text, Flex, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useAccount, useSignTypedData } from "wagmi";
 import Head from "next/head";
 import TokenSelector from "./TokenSelector";
 import {
@@ -19,10 +18,15 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { parseInput } from "../utils/number";
 import useHandleError, { PlatformType } from "../utils/useHandleError";
 import { useAppData } from "../context/AppDataProvider";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import useApproval from "../context/useApproval";
 import useChainData from "../context/useChainData";
 import ConnectPage from "../connect/ConnectPage";
+import {
+  useActiveAccount,
+  useActiveWalletChain,
+  useActiveWalletConnectionStatus,
+} from "thirdweb/react";
 
 interface ApprovalStep {
   type: "APPROVAL" | "PERMIT" | "DELEGATION";
@@ -40,8 +44,16 @@ function Swap() {
   const [error, setError] = useState("");
 
   const { prices } = usePriceData();
-  const { isConnected, address, chain } = useAccount();
+  // const { isConnected, address, chain } = useAccount();
 
+  const connectionStatus = useActiveWalletConnectionStatus();
+  const activeAccount = useActiveAccount();
+  const isConnected = connectionStatus == "connected" ? true : false;
+  const address = activeAccount?.address;
+  const chain = useActiveWalletChain();
+  const searchParams = useSearchParams();
+  const inCurrency = searchParams.get("inCurrency");
+  const outCurrency = searchParams.get("outCurrency");
   const {
     isOpen: isInputOpen,
     onOpen: onInputOpen,
@@ -88,13 +100,11 @@ function Swap() {
     if (tokens.length > 1) {
       const inAssetIndex = tokens.findIndex(
         (token) =>
-          token.id.toLowerCase() ==
-          router.query?.inCurrency?.toString().toLowerCase()
+          token.id.toLowerCase() == inCurrency?.toString().toLowerCase()
       );
       const outAssetIndex = tokens.findIndex(
         (token) =>
-          token.id.toLowerCase() ==
-          router.query?.outCurrency?.toString().toLowerCase()
+          token.id.toLowerCase() == outCurrency?.toString().toLowerCase()
       );
       if (inAssetIndex >= 0) setInputAssetIndex(inAssetIndex);
       if (outAssetIndex >= 0) setOutputAssetIndex(outAssetIndex);
@@ -135,8 +145,10 @@ function Swap() {
       setOutputAssetIndex(inputAssetIndex);
     }
     setInputAssetIndex(e);
-    router.query.inCurrency = tokens[e].id;
-    router.push(router);
+    const inToken = tokens[e].id;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("inCurrency", inToken);
+    router.push(`?${params.toString()}`);
     setInputAmount("" as any);
     setOutputAmount("0");
     onInputClose();
@@ -150,8 +162,9 @@ function Swap() {
       setInputAssetIndex(outputAssetIndex);
     }
     setOutputAssetIndex(e);
-    router.query.outCurrency = tokens[e].id;
-    router.push(router);
+    const outToken = tokens[e].id;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("outCurrency", outToken);
     setInputAmount("");
     setOutputAmount("0");
     onOutputClose();
@@ -162,9 +175,12 @@ function Swap() {
 
   const switchTokens = () => {
     let temp = inputAssetIndex;
-    router.query.inCurrency = tokens[outputAssetIndex].id;
-    router.query.outCurrency = tokens[temp].id;
-    router.push(router);
+    const inCurrency = tokens[outputAssetIndex].id;
+    const outCurrency = tokens[temp].id;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("inCurrency", inCurrency);
+    params.set("outCurrency", outCurrency);
+    router.push(`?${params.toString()}`);
     setInputAssetIndex(outputAssetIndex);
     setOutputAssetIndex(temp);
     setInputAmount("");
@@ -219,7 +235,8 @@ function Swap() {
                 {`You have swapped ${inputAmount} ${inToken?.symbol} for ${outToken?.symbol}`}
               </Text>
               <Link
-                href={chain?.blockExplorers?.default.url + "/tx/" + res.hash}
+                // href={chain?.blockExplorers?.default.url + "/tx/" + res.hash}
+                href={chain?.blockExplorers![0]?.url + "/tx/" + res.hash}
                 target="_blank"
               >
                 <Flex align={"center"} gap={2}>

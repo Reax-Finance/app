@@ -1,63 +1,42 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-  // Wallet Address
-  id              String           @id @db.VarChar(255)
-  // Amount of XP Earned
-  balance         Int              @default(0)
-  // Unique username
-  username        String?          @unique @db.VarChar(255)
-  //is folllowing on twiiter
-  isFollowing     Boolean          @default(false)
-  // Allowlisted Record
-  allowlistedUser AllowlistedUser? @relation(fields: [id], references: [id])
-  // Referral Codes Created
-  accessCodes     AccessCode[]     @relation(name: "AccessCode")
-  // Meta
-  createdAt       DateTime         @default(now()) @db.Timestamp(6)
-  updatedAt       DateTime         @updatedAt @db.Timestamp(6)
+  id              String          @id @db.VarChar(255)
+  balance         Int             @default(0)
+  username        String?         @unique @db.VarChar(255)
+  createdAt       DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime        @updatedAt @db.Timestamp(6)
+  accessCodes     AccessCode[]    @relation("AccessCode")
+  allowlistedUser AllowlistedUser @relation(fields: [id], references: [id])
+  UserTask        UserTask[]
 }
 
 model AccessCode {
   id           String           @id @db.VarChar(255)
-  // Consumed By
   joinedUserId String?          @unique
-  joinedUser   AllowlistedUser? @relation(name: "JoinedBy", fields: [joinedUserId], references: [id])
-  // Created By
   userId       String
-  user         User             @relation(name: "AccessCode", fields: [userId], references: [id])
+  joinedUser   AllowlistedUser? @relation("JoinedBy", fields: [joinedUserId], references: [id])
+  user         User             @relation("AccessCode", fields: [userId], references: [id])
 }
 
 model AllowlistedUser {
-  // Wallet Address
   id       String          @id
-  // Consumed Access Code
-  joinedBy AccessCode?     @relation(name: "JoinedBy")
-  // Social connections
-  twitter  TwitterAccount?
+  joinedBy AccessCode?     @relation("JoinedBy")
   discord  DiscordConnect?
-  // Created User
+  twitter  TwitterAccount?
   user     User?
 }
 
 model TwitterAccount {
-  // Twitter User ID
   id                String          @id
-  // User Profile
   name              String          @db.VarChar(255)
   username          String          @unique @db.VarChar(255)
   profileImageUrl   String          @default("") @db.VarChar(255)
@@ -66,22 +45,64 @@ model TwitterAccount {
   refreshToken      String          @default("") @db.VarChar(255)
   expiresIn         Int
   joined            DateTime        @default(now()) @db.Timestamp(6)
-  // User ID
   allowlistedUserId String          @unique
-  allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
-  // Meta
   updatedAt         DateTime        @updatedAt @db.Timestamp(6)
+  allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
 }
 
 model DiscordConnect {
   id                Int             @id @default(autoincrement())
   name              String          @db.VarChar(255)
-  allowlistedUserId String          @unique
   discordId         String          @unique @db.VarChar(255)
   username          String          @db.VarChar(255)
   avatar            String          @default("") @db.VarChar(255)
-  allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
   createdAt         DateTime        @default(now()) @db.Timestamp(6)
   updatedAt         DateTime        @updatedAt @db.Timestamp(6)
   expiresIn         Int
+  allowlistedUserId String          @unique
+  allowlistedUser   AllowlistedUser @relation(fields: [allowlistedUserId], references: [id])
+}
+
+model Task {
+  id             Int            @id
+  name           String         @unique @db.VarChar(255)
+  description    String         @default("")
+  quest          String         @default("")
+  ytUrl          String         @default("") @db.VarChar(255)
+  imageUrl       String         @default("") @db.VarChar(255)
+  taskIdentifier TaskIdentifier
+  cta            String         @db.VarChar(255)
+  redirectUrl    String         @default("") @db.VarChar(500)
+  points         Int
+  createdAt      DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime       @default(now()) @db.Timestamp(6)
+  data           String         @default("")
+  UserTask       UserTask[]
+}
+
+model UserTask {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  taskId    Int
+  completed Boolean  @default(false)
+  data      String?  @default("")
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @db.Timestamp(6)
+  Task      Task     @relation(fields: [taskId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+enum TaskIdentifier {
+  JOIN_SERVER
+  HAS_ROLE
+  FOLLOW
+  LIKE
+  RETWEET
+  POST_TWEET
+  ON_CHAIN_QUERY
+  SUBGRAPH_QUERY
+  API_QUERY
+  XP_COMPLETION
+  FACTION_SELECTION
+  REPEATABLE_SUBGRAPH_QUERY
 }

@@ -1,30 +1,26 @@
-import { useContext, useState } from "react";
 import {
   Box,
   Container,
-  Stack,
-  Text,
-  Link,
   Flex,
+  Link,
+  Stack,
+  Switch,
+  Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { FaTwitter, FaDiscord, FaGithub } from "react-icons/fa";
-import { AppDataContext } from "../context/AppDataProvider";
-import { useAccount, useBlockNumber } from "wagmi";
-import { Switch } from "@chakra-ui/react";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { BsBook } from "react-icons/bs";
-import { watch } from "fs";
+import { FaDiscord, FaTwitter } from "react-icons/fa";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import UserAccount from "../utils/useUserAccount";
 
 export default function Footer() {
   // const [block, setBlock] = useState(0);
-  const block = useBlockNumber({
-    // watch: true,
-  });
-
-  const { chain } = useAccount();
+  // const block = useBlockNumber({
+  //   // watch: true,
+  // });
 
   const { colorMode, toggleColorMode } = useColorMode();
+  const { chain, block } = UserAccount();
 
   return (
     <Box
@@ -60,16 +56,14 @@ export default function Footer() {
               <Box
                 h={2}
                 w={2}
-                bgColor={
-                  Number(block.data?.toString()) == 0 ? "red" : "green.400"
-                }
+                bgColor={Number(block?.toString()) == 0 ? "red" : "green.400"}
                 rounded="100"
               ></Box>
               <Text fontSize={"xs"}>
                 {chain?.name} (
-                {Number(block.data?.toString()) == 0
+                {Number(block?.toString()) == 0
                   ? "Not Connected"
-                  : block?.data?.toString()}
+                  : block?.toString()}
                 )
               </Text>
             </Flex>

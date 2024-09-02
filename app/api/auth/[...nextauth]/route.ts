@@ -3,14 +3,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import type { NextAuthOptions } from "next-auth";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 
-// For more information on each option (and a full list of options) go to
-// https://next-auth.js.org/configuration/options
-export default async function auth(req: any, res: any) {
-  return await NextAuth(req, res, authOptions({ req }));
-}
-
+// Define the auth options
 export const authOptions = ({
   req,
 }: {
@@ -41,8 +36,7 @@ export const authOptions = ({
           const result = await siwe.verify({
             signature: credentials?.signature || "",
             domain: nextAuthUrl.host,
-            nonce: await getCsrfToken({ req }),
-            // nonce: await getCsrfToken({ req: { headers: req.headers } }), //possible fix
+            nonce: await getCsrfToken({ req: { headers: req.headers } }),
           });
 
           if (result.success) {
@@ -60,15 +54,16 @@ export const authOptions = ({
     }),
   ];
 
+  // Safeguard: Ensure req.query is defined before accessing nextauth
   const isDefaultSigninPage =
-    req.method === "GET" && req.query.nextauth?.includes("signin");
+    req.method === "GET" && req.query && req.query.nextauth?.includes("signin");
 
   // Hide Sign-In with Ethereum from default sign page
   if (isDefaultSigninPage) {
     providers.pop();
   }
+
   return {
-    // https://next-auth.js.org/configuration/providers/oauth
     providers,
     session: {
       strategy: "jwt",
@@ -84,3 +79,13 @@ export const authOptions = ({
     },
   };
 };
+
+// Define the handler for the POST method
+export async function POST(req: NextApiRequest, res: NextApiResponse) {
+  return NextAuth(req, res, authOptions({ req }));
+}
+
+// Define the handler for the GET method
+export async function GET(req: NextApiRequest, res: NextApiResponse) {
+  return NextAuth(req, res, authOptions({ req }));
+}

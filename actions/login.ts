@@ -1,9 +1,10 @@
+"use server";
 import { VerifyLoginPayloadParams, createAuth } from "thirdweb/auth";
 import { privateKeyAccount } from "thirdweb/wallets";
 import { client } from "../lib/client";
 import { cookies } from "next/headers";
 
-const privateKey = process.env.THIRDWEB_ADMIN_PRIVATE_KEY || "0xAAC3BA926897BC91D8350B574FEABFE0EA2E6D15C8311C7FA9CFAF3ED81B2568";
+const privateKey = process.env.THIRDWEB_ADMIN_PRIVATE_KEY || "";
 
 if (!privateKey) {
   throw new Error("Missing THIRDWEB_ADMIN_PRIVATE_KEY in .env file.");

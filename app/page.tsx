@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Button,
@@ -5,31 +7,22 @@ import {
   Progress,
   Text,
   useColorMode,
-  useToast,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import { motion } from "framer-motion";
+import { useContext } from "react";
+import {
+  useActiveWalletChain,
+  useActiveWalletConnectionStatus,
+  useSwitchActiveWalletChain,
+} from "thirdweb/react";
+import { AppDataContext } from "../components/context/AppDataProvider";
 import Footer from "../components/core/Footer";
 import Navbar from "../components/core/Navbar";
-import { useEffect } from "react";
-import { AppDataContext } from "../components/context/AppDataProvider";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { useRouter } from "next/router";
 import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
-import { useAccount, useSwitchChain } from "wagmi";
-
-import ConnectPage from "../components/connect/ConnectPage";
-import { useSession } from "next-auth/react";
-import { useUserData } from "../components/context/UserDataProvider";
+import { redirect, useRouter } from "next/navigation";
 
 export default function Index({ children }: any) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [refresh, setRefresh] = useState(0);
-
-  const { status: sessionStatus } = useSession();
-
   // useEffect(() => {
   // 	const handleStart = (url: any) => {
   // 		setLoading(true);
@@ -52,29 +45,41 @@ export default function Index({ children }: any) {
   // }, [loading, refresh]);
 
   const { status, message } = useContext(AppDataContext);
-  const { chain, isConnected, address } = useAccount();
 
-  const toast = useToast();
+  const connectionStatus = useActiveWalletConnectionStatus();
+  const isConnected = connectionStatus == "connected" ? true : false;
 
-  const { switchChain } = useSwitchChain();
+  const chain = useActiveWalletChain();
 
-  const switchNetwork = async (chainId: number) => {
-    switchChain!({ chainId: chainId });
-  };
+  // const { switchChain } = useSwitchChain();
 
-  const { user, status: userStatus } = useUserData();
+  // const switchChain = useSwitchActiveWalletChain();
 
+  // const switchNetwork = async (chainId: number) => {
+  //   switchChain!({ chainId: chainId });
+  // };
+
+  // const switchNetwork = (chainId: number, chain: string) => {
+  //   switchChain({
+  //     id: chainId,
+  //     rpc: chain,
+  //   });
+  // };
+
+  // const [hydrated, setHydrated] = useState(false);
+  // useEffect(() => {
+  //   if (!hydrated) {
+  //     setHydrated(true);
+  //   }
+  // }, [hydrated]);
+
+  // if (!hydrated) {
+  //   return <></>;
+  // }
   const { colorMode } = useColorMode();
-
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    if (!hydrated) {
-      setHydrated(true);
-    }
-  }, [hydrated]);
-
-  if (!hydrated) {
-    return <></>;
+  const router = useRouter();
+  if (!isConnected) {
+    redirect("/connect");
   }
   return (
     <Box h={"100vh"}>
@@ -108,15 +113,14 @@ export default function Index({ children }: any) {
           </Button>
         </Flex>
       )}
-      {/* Loading */}
-      {(status == Status.FETCHING || loading) && (
+      {/* {status == Status.FETCHING && (
         <Progress
           bg={"blackAlpha.200"}
           colorScheme="primary"
           size="xs"
           isIndeterminate
         />
-      )}
+      )} */}
       {/* Error */}
       <Box bgColor="gray.800" color={"gray.400"}>
         {status == Status.ERROR && (

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Flex,
   Text,
@@ -10,18 +12,17 @@ import React, { use, useEffect } from "react";
 import { useUserData } from "../context/UserDataProvider";
 import { useSession } from "next-auth/react";
 import { Status } from "../utils/status";
-import { useAccount } from "wagmi";
 import NotWhitelisted from "./NotWhitelisted";
 import ConnectInterface from "./ConnectInterface";
 import SignupInterface from "./SignupInterface";
 import GetStarted from "./GetStarted";
-
+import { useActiveWalletConnectionStatus } from "thirdweb/react";
+import UserAccount from "../utils/useUserAccount";
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
   const { status: sessionStatus } = useSession();
-  const { address, status } = useAccount();
-  const { colorMode } = useColorMode();
-
+  const status = useActiveWalletConnectionStatus();
+  const { address } = UserAccount();
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
 
@@ -63,9 +64,7 @@ export default function ConnectPage() {
                     />
                   )
                 ) : null}
-                {(userStatus == Status.FETCHING ||
-                  status == "connecting" ||
-                  status == "reconnecting") && (
+                {(userStatus == Status.FETCHING || status == "connecting") && (
                   <>
                     <Spinner />
                     <Text zIndex={2} ml={2}>

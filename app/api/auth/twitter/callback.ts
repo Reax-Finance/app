@@ -5,7 +5,7 @@ import {
   X_ACCOUNT_FOLLOWERS_MIN,
 } from "../../../../src/const";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../[...nextauth]";
+import { authOptions } from "../route";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "../auth/route";
 import { TWITTER_FOLLOW_REWARD } from "../../../src/const";
 
 const prisma = new PrismaClient();

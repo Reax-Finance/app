@@ -1,27 +1,23 @@
-import {
-  Flex,
-  Text,
-  Image,
-  Box,
-  useColorMode,
-  Spinner,
-} from "@chakra-ui/react";
-import React, { useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { Status } from "../components/utils/status";
-import { useAccount } from "wagmi";
-import NotWhitelisted from "../components/connect/NotWhitelisted";
-import ConnectInterface from "../components/connect/ConnectInterface";
-import SignupInterface from "../components/connect/SignupInterface";
-import GetStarted from "../components/connect/GetStarted";
-import { useUserData } from "../components/context/UserDataProvider";
-import { useRouter } from "next/router";
+"use client";
 
-export default function ConnectPage() {
+import { Box, Flex, Image, Spinner } from "@chakra-ui/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+import ConnectInterface from "../../components/connect/ConnectInterface";
+import GetStarted from "../../components/connect/GetStarted";
+import NotWhitelisted from "../../components/connect/NotWhitelisted";
+import SignupInterface from "../../components/connect/SignupInterface";
+import { useUserData } from "../../components/context/UserDataProvider";
+import { Status } from "../../components/utils/status";
+import { useActiveWalletConnectionStatus } from "thirdweb/react";
+import UserAccount from "../../components/utils/useUserAccount";
+
+const Page = () => {
+  const { address } = UserAccount();
   const { user, status: userStatus } = useUserData();
   const { status: sessionStatus } = useSession();
-  const { address, status } = useAccount();
-
+  const status = useActiveWalletConnectionStatus();
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
 
@@ -32,10 +28,6 @@ export default function ConnectPage() {
       router.push("/");
     }
   }, [router, userStatus, user]);
-
-  console.log("UserStatus is", userStatus);
-  console.log("User is", user?.user);
-  console.log("User twitter is", user?.twitter);
 
   return (
     <Box h={"100vh"}>
@@ -88,7 +80,7 @@ export default function ConnectPage() {
                 )}
 
                 {/* {(status === "connecting" || status === "reconnecting") &&
-                  userStatus === Status.FETCHING && <Spinner />} */}
+                    userStatus === Status.FETCHING && <Spinner />} */}
               </>
             )}
           </Flex>
@@ -96,4 +88,6 @@ export default function ConnectPage() {
       </Flex>
     </Box>
   );
-}
+};
+
+export default Page;

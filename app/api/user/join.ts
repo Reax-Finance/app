@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { JOINEE_XP_REWARD, REFERRER_XP_REWARD } from "../../../src/const";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "../auth/route";
 
 const prisma = new PrismaClient();
 
@@ -29,22 +29,22 @@ export default async function handler(
       twitter: true,
       joinedBy: true,
       user: true,
-    }
+    },
   });
-  if(!allowlistedUser) {
+  if (!allowlistedUser) {
     res.status(400).json({ message: "User not allowlisted" });
     return;
   }
-  if(allowlistedUser.user) {
+  if (allowlistedUser.user) {
     res.status(400).json({ message: "User already joined" });
     return;
   }
-  if(!allowlistedUser.twitter) {
+  if (!allowlistedUser.twitter) {
     res.status(400).json({ message: "Twitter account not verified" });
     return;
   }
   // If the user has a referrer, increment the initial XP
-  if(allowlistedUser.joinedBy) {
+  if (allowlistedUser.joinedBy) {
     initialXp += JOINEE_XP_REWARD;
     referrer = allowlistedUser.joinedBy.userId;
   }

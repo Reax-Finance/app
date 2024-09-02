@@ -1,9 +1,11 @@
+"use client";
+
 import Big from "big.js";
 import * as React from "react";
-import { useAccount } from "wagmi";
 import { ADDRESS_ZERO } from "../../src/const";
 import { useAppData } from "./AppDataProvider";
 import { Status, SubStatus } from "../utils/status";
+import UserAccount from "../utils/useUserAccount";
 
 const BalanceContext = React.createContext<BalanceValue>({} as BalanceValue);
 
@@ -18,12 +20,12 @@ function BalanceContextProvider({ children }: any) {
   const [subscriptionStatus, setSubscriptionStatus] = React.useState<SubStatus>(
     SubStatus.NOT_SUBSCRIBED
   );
+  const { address } = UserAccount();
 
   const [balances, setBalances] = React.useState<any>({});
   const [allowances, setAllowances] = React.useState<any>({});
 
   const { reserveData, liquidityData } = useAppData();
-  const { address } = useAccount();
 
   React.useEffect(() => {
     if (status == Status.NOT_FETCHING && liquidityData && reserveData) {

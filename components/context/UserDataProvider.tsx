@@ -1,3 +1,5 @@
+"use client";
+
 import {
   AccessCode,
   AllowlistedUser,
@@ -42,12 +44,9 @@ function UserDataProvider({ children }: any) {
   const [message, setMessage] = React.useState<UserDataValue["message"]>("");
   const [user, setUser] = React.useState<UserData>();
 
-  const { address } = {address: "0x1234"};
+  const { address } = { address: "0x1234" };
   const { status: sessionStatus } = useSession();
   const [loading, setLoading] = React.useState(false);
-
-  console.log("User Data is ", user);
-
   useEffect(() => {
     updateUser();
   }, [address, sessionStatus]);

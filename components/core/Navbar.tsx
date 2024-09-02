@@ -14,26 +14,27 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import "../../styles/Home.module.css";
-import { useAccount } from "wagmi";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import NavLocalLink from "./NavLocalLink";
 import { CustomConnectButton } from "./ConnectButton";
 import { MdFeedback, MdOpenInNew } from "react-icons/md";
 import { RiFeedbackLine } from "react-icons/ri";
 import { useUserData } from "../context/UserDataProvider";
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
+import UserAccount from "../utils/useUserAccount";
 
 function NavBar() {
   const { isOpen: isToggleOpen, onToggle } = useDisclosure();
+  const { isConnected } = UserAccount();
 
-  const { isConnected } = useAccount();
   const { user } = useUserData();
 
   const { colorMode } = useColorMode();
 
   const router = useRouter();
+  const pathname = usePathname();
 
-  if (router.pathname == "/connect" || router.pathname.includes("/callback")) {
+  if (pathname == "/connect" || pathname.includes("/callback")) {
     return null;
   }
   if (!isConnected) {

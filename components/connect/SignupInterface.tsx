@@ -1,31 +1,18 @@
-import {
-  Flex,
-  Text,
-  Heading,
-  Image,
-  Box,
-  Button,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
-import React, { use, useEffect } from "react";
-import { useAccount } from "wagmi";
-import { VARIANT } from "../../styles/theme";
+"use client";
 import { ChevronRightIcon } from "@chakra-ui/icons";
+import { Box, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
+import React from "react";
 import { useUserData } from "../context/UserDataProvider";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import XConnect from "./XConnect";
+import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
-import FAQ from "./FAQ";
+import UserAccount from "../utils/useUserAccount";
 import TestnetFAQ from "./TestnetFAQ";
-
+import XConnect from "./XConnect";
 export default function SignupInterface({ accessCode }: any) {
-  const { address } = useAccount();
-  const { colorMode } = useColorMode();
   const { updateUser, user } = useUserData();
-
+  const { address } = UserAccount();
   const [loading, setLoading] = React.useState(false);
 
   const toast = useToast();

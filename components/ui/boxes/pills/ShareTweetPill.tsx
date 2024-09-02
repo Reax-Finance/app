@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Button,
@@ -6,11 +8,10 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import React, { use } from "react";
+import { useRouter } from "next/navigation";
 import { FaCopy, FaXTwitter } from "react-icons/fa6";
 import { VARIANT } from "../../../../styles/theme";
 import { useUserData } from "../../../context/UserDataProvider";
-import { useRouter } from "next/router";
 
 const ShareTweetPill = ({ ...args }: { args?: FlexProps }) => {
   const { colorMode } = useColorMode();

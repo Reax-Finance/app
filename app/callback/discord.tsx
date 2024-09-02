@@ -1,39 +1,44 @@
+"use client";
+
 import { Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { useUserData } from "../../components/context/UserDataProvider";
 
 export default function DiscordCallback() {
   const { updateUser } = useUserData();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const toast = useToast();
 
   useEffect(() => {
-    if (router.query.error) {
+    const error = searchParams.get("error");
+    const code = searchParams.get("code");
+    const state = searchParams.get("state");
+
+    if (error) {
       toast({
         title: "An error occurred.",
-        description: router.query.error,
+        description: error,
         status: "error",
         duration: 9000,
         isClosable: true,
       });
       router.push("/account");
     }
-    console.log("Query", router.query);
-    if (!router.query.code) return;
+
+    if (!code) return;
 
     axios
       .post("/api/auth/discord/callback", {
-        state: router.query.state,
-        code: router.query.code,
-        error: router.query.error,
+        state: state,
+        code: code,
+        error: error,
       })
       .then((response) => {
-        // Redirect to the dashboard
         if (response.status === 200) {
           updateUser();
-          console.log("DiscordCallback Response", response);
           toast({
             title: "Success",
             description:
@@ -46,7 +51,6 @@ export default function DiscordCallback() {
         }
       })
       .catch((error: any) => {
-        console.log("Error in DiscordCallback", error);
         toast({
           title: "An error occurred.",
           description:
@@ -57,7 +61,8 @@ export default function DiscordCallback() {
         });
         router.push("/account");
       });
-  }, [router.query]);
+  }, [router, searchParams, toast, updateUser]);
+
   return (
     <Flex
       bgImage={"/images/whitelist-page-bg.svg"}

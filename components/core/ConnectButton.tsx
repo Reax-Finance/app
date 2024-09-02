@@ -1,42 +1,43 @@
-import { Box, Button, Flex, useColorMode, Image } from '@chakra-ui/react';
-import { RiArrowDropDownLine } from 'react-icons/ri';
-import { VARIANT } from '../../styles/theme';
-import { isSupportedChain } from '../../src/const';
-import { useRouter } from 'next/router';
-import { useUserData } from '../context/UserDataProvider';
-import { ConnectButton } from 'thirdweb/react';
-import { client } from '../../lib/client';
+import { Box, Button, Flex, useColorMode, Image } from "@chakra-ui/react";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { VARIANT } from "../../styles/theme";
+import { isSupportedChain } from "../../src/const";
+import { useRouter } from "next/navigation";
+import { useUserData } from "../context/UserDataProvider";
+import { ConnectButton } from "thirdweb/react";
+import { client } from "../../lib/client";
 import {
   generatePayload,
   isLoggedIn,
   login,
   logout,
 } from "../../actions/login"; // we'll create this file in the next section
- 
-export const CustomConnectButton = () => {
-	const { colorMode } = useColorMode();
-  const router = useRouter();
-  const {user} = useUserData();
 
-  return <ConnectButton
-    client={client}
-    auth={{
-      isLoggedIn: async (address) => {
-        console.log("checking if logged in!", { address });
-        return await isLoggedIn();
-      },
-      doLogin: async (params) => {
-        console.log("logging in!");
-        await login(params);
-      },
-      getLoginPayload: async ({ address }) =>
-        generatePayload({ address }),
-      doLogout: async () => {
-        console.log("logging out!");
-        await logout();
-      },
-    }}
-  />
+export const CustomConnectButton = () => {
+  const { colorMode } = useColorMode();
+  const router = useRouter();
+  const { user } = useUserData();
+
+  return (
+    <ConnectButton
+      client={client}
+      auth={{
+        isLoggedIn: async (address) => {
+          console.log("checking if logged in!", { address });
+          return await isLoggedIn();
+        },
+        doLogin: async (params) => {
+          console.log("logging in!");
+          await login(params);
+        },
+        getLoginPayload: async ({ address }) => generatePayload({ address }),
+        doLogout: async () => {
+          console.log("logging out!");
+          await logout();
+        },
+      }}
+    />
+  );
 
   // return (
   //   <ConnectButton.Custom>

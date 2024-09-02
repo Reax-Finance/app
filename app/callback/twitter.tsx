@@ -1,36 +1,42 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
 import { useUserData } from "../../components/context/UserDataProvider";
 
 export default function TwitterCallback() {
   const { updateUser } = useUserData();
   const router = useRouter();
-
+  const searchParams = useSearchParams();
   const toast = useToast();
-
-  const [isLoading, setIsLoading] = useState(true); //trying to stop refreshing
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (router.query.error) {
+    const error = searchParams.get("error");
+    const code = searchParams.get("code");
+    const state = searchParams.get("state");
+
+    if (error) {
       toast({
         title: "An error occurred.",
-        description: router.query.error,
+        description: error,
         status: "error",
         duration: 9000,
         isClosable: true,
       });
       router.push("/");
+      return;
     }
-    if (!router.query.code) return;
 
-    // Post with the code and state and error to the server
+    if (!code) return;
+
     axios
       .post("/api/auth/twitter/callback", {
-        state: router.query.state,
-        code: router.query.code,
-        error: router.query.error,
+        state: state,
+        code: code,
+        error: error,
       })
       .then(async (response) => {
         setIsLoading(false);
@@ -42,14 +48,12 @@ export default function TwitterCallback() {
             duration: 9000,
             isClosable: true,
           });
-          // Update userData
-          router.push("/"); //still have to confirm /connect or /
           await updateUser();
+          router.push("/");
         }
       })
       .catch((error: any) => {
         setIsLoading(false);
-        console.log("Error", error);
         toast({
           title: "Try Again",
           description:
@@ -58,13 +62,11 @@ export default function TwitterCallback() {
           duration: 9000,
           isClosable: true,
         });
-
         router.push("/connect");
       })
       .finally(() => setIsLoading(false));
-    console.log("pushing to /connect after fail");
-    router.push("/connect");
-  }, [router.query]);
+  }, [router, searchParams, toast, updateUser]);
+
   return (
     <Flex
       bgImage={"/images/whitelist-page-bg.svg"}

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../[...nextauth]";
+import { authOptions } from "../route";
 import { JOIN_DISCORD_REWARD } from "../../../../src/const";
 
 export default async function DiscordCallback(

@@ -1,20 +1,20 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function GET(req: NextRequest) {
   try {
-    const { address } = req.query as { address: string };
+    const { searchParams } = new URL(req.url);
+    const address = searchParams.get("address");
 
     // Log the address to ensure it is being received correctly
 
     if (!address) {
-      res.status(400).json({ message: "Bad Request: Address is required" });
-      return;
+      return NextResponse.json(
+        { message: "Bad Request: Address is required" },
+        { status: 400 }
+      );
     }
 
     const normalizedAddress = address.toLowerCase();
@@ -56,9 +56,12 @@ export default async function handler(
       user = null;
     }
 
-    res.status(200).json({ message: "Success", user });
+    return NextResponse.json({ message: "Success", user }, { status: 200 });
   } catch (error) {
     console.error("Error: ", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

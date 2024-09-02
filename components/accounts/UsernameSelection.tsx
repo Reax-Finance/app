@@ -1,6 +1,6 @@
+"use client";
 import {
   Box,
-  Divider,
   Flex,
   Heading,
   IconButton,
@@ -9,17 +9,14 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
-import { useUserData } from "../context/UserDataProvider";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import "swiper/swiper.min.css";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
 import axios from "axios";
-import { useAccount } from "wagmi";
-import { USERNAME_XP_REWARD } from "../../src/const";
-import { BsCheck } from "react-icons/bs";
+import React from "react";
+import { BsArrowRight, BsCheck } from "react-icons/bs";
+import "swiper/swiper.min.css";
 import { VARIANT } from "../../styles/theme";
+import { useUserData } from "../context/UserDataProvider";
+import Dark400Box2C from "../ui/boxes/Dark400Box2C";
+import Dark600Box2C from "../ui/boxes/Dark600Box2C";
 
 export default function UsernameSelection() {
   const { user, updateUser } = useUserData();
@@ -27,7 +24,6 @@ export default function UsernameSelection() {
   const isValidInput = error === null;
   const [username, setUsername] = React.useState("");
   const toast = useToast();
-  const { address } = useAccount();
   const [loading, setLoading] = React.useState(false);
 
   const submitUsername = async () => {
@@ -133,7 +129,8 @@ export default function UsernameSelection() {
               >
                 <IconButton
                   aria-label="Join"
-                  icon={<ChevronRightIcon />}
+                  // icon={<ChevronRightIcon />}
+                  icon={<BsArrowRight />}
                   rounded={0}
                   isDisabled={!isValidInput}
                   bg={"transparent"}

@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Divider,
   Flex,
   Heading,
   IconButton,
@@ -10,21 +9,18 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React from "react";
 
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  TableContainer,
-  Text,
   Image,
+  Table,
+  TableContainer,
+  Tbody,
+  Text,
+  Thead,
+  Tr,
 } from "@chakra-ui/react";
-import {
-  AppDataContext,
-  useAppData,
-} from "../components/context/AppDataProvider";
+import { useAppData } from "../../components/context/AppDataProvider";
 
 const nonMintable = [
   "ETH",
@@ -51,34 +47,30 @@ import Head from "next/head";
 
 import {
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from "@chakra-ui/react";
-import { useAccount } from "wagmi";
-import { ethers } from "ethers";
-import { useBalanceData } from "../components/context/BalanceProvider";
-import Big from "big.js";
-import { VARIANT } from "../styles/theme";
-import { MdOpenInNew } from "react-icons/md";
-import ThBox from "../components/ui/table/ThBox";
-import TdBox from "../components/ui/table/TdBox";
-import { NATIVE_FAUCET_LINK, isSupportedChain } from "../src/const";
-import useChainData from "../components/context/useChainData";
-import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 import { motion } from "framer-motion";
+import { MdOpenInNew } from "react-icons/md";
+import OnlyAuthenticated from "../../components/auth/OnlyAuthenticated";
+import useChainData from "../../components/context/useChainData";
+import TdBox from "../../components/ui/table/TdBox";
+import ThBox from "../../components/ui/table/ThBox";
+import { NATIVE_FAUCET_LINK, isSupportedChain } from "../../src/const";
+import { VARIANT } from "../../styles/theme";
+import UserAccount from "../../components/utils/useUserAccount";
 
-export default function Faucet() {
+const Page = () => {
   const { reserveData } = useAppData();
   const [loading, setLoading] = React.useState<any>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [openedCollateral, setOpenedCollateral] = React.useState<any>(null);
   const { getContract, send } = useChainData();
-
-  const { address, isConnected, chain } = useAccount();
+  const { chain, isConnected } = UserAccount();
 
   const tokens = reserveData
     ? reserveData.vaults.map((vault: any) => vault.asset)
@@ -152,7 +144,7 @@ export default function Faucet() {
   const validate = () => {
     if (!isConnected)
       return { valid: false, message: "Please connect your wallet." };
-    else if (!isSupportedChain(chain?.id))
+    else if (!isSupportedChain(chain?.id ?? 0))
       return { valid: false, message: "Unsupported network" };
     else return { valid: true, message: "Mint" };
   };
@@ -281,16 +273,17 @@ export default function Faucet() {
             <Image src={"/icons/ETH.svg"} w={"40px"} />
             <Box>
               <Heading size={"md"} mb={2}>
-                {chain.nativeCurrency.name} Faucet
+                {/* {chain.nativeCurrency.name} Faucet */}
+                {chain.nativeCurrency?.name} Faucet
               </Heading>
               <Text fontSize={"sm"} color={"whiteAlpha.600"}>
-                Get some test {chain.nativeCurrency.symbol} on this external
+                Get some test {chain.nativeCurrency?.symbol} on this external
                 faucet.
               </Text>
             </Box>
             <Link href={NATIVE_FAUCET_LINK[chain.id]} target="_blank">
               <Button rounded={0}>
-                Get {chain.nativeCurrency.symbol}{" "}
+                Get {chain.nativeCurrency?.symbol}{" "}
                 <MdOpenInNew style={{ marginLeft: 6 }} />{" "}
               </Button>
             </Link>
@@ -354,4 +347,6 @@ export default function Faucet() {
       </Box>
     </motion.div>
   );
-}
+};
+
+export default Page;
