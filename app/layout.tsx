@@ -5,7 +5,6 @@ import "../styles/globals.css";
 import "../styles/rounded-dark.css";
 import "../styles/rounded-light.css";
 import { Providers } from "./provider";
-import Index from "./page";
 
 export const metadata: Metadata = {
   title: "REAX",
@@ -14,14 +13,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  params: { session, ...params },
 }: {
   children: React.ReactNode;
+  params: { session: any };
 }) {
   return (
     <html lang="en">
       <body>
         <div>
-          <Providers>{children}</Providers>
+          <Providers params={params}>{children}</Providers>
         </div>
       </body>
     </html>

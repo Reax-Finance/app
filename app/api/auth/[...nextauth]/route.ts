@@ -4,13 +4,19 @@ import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import type { NextAuthOptions } from "next-auth";
 import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest } from "next/server";
+
+// Helper function to convert Headers to plain object
+function headersToObject(headers: Headers): Record<string, string> {
+  const obj: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    obj[key] = value;
+  });
+  return obj;
+}
 
 // Define the auth options
-export const authOptions = ({
-  req,
-}: {
-  req: NextApiRequest;
-}): NextAuthOptions => {
+export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
   const providers = [
     CredentialsProvider({
       name: "Ethereum",
@@ -36,7 +42,9 @@ export const authOptions = ({
           const result = await siwe.verify({
             signature: credentials?.signature || "",
             domain: nextAuthUrl.host,
-            nonce: await getCsrfToken({ req: { headers: req.headers } }),
+            nonce: await getCsrfToken({
+              req: { headers: headersToObject(req.headers) as any },
+            }),
           });
 
           if (result.success) {
@@ -54,11 +62,9 @@ export const authOptions = ({
     }),
   ];
 
-  // Safeguard: Ensure req.query is defined before accessing nextauth
   const isDefaultSigninPage =
-    req.method === "GET" && req.query && req.query.nextauth?.includes("signin");
+    req.method === "GET" && req.nextUrl.searchParams.has("signin");
 
-  // Hide Sign-In with Ethereum from default sign page
   if (isDefaultSigninPage) {
     providers.pop();
   }
@@ -82,10 +88,10 @@ export const authOptions = ({
 
 // Define the handler for the POST method
 export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  return NextAuth(req, res, authOptions({ req }));
+  return NextAuth(req, res, authOptions({ req: req as any }));
 }
 
 // Define the handler for the GET method
 export async function GET(req: NextApiRequest, res: NextApiResponse) {
-  return NextAuth(req, res, authOptions({ req }));
+  return NextAuth(req, res, authOptions({ req: req as any }));
 }

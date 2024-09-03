@@ -11,7 +11,7 @@ import {
   isLoggedIn,
   login,
   logout,
-} from "../../actions/login"; // we'll create this file in the next section
+} from "../../app/connect/actions/auth"; // we'll create this file in the next section
 
 export const CustomConnectButton = () => {
   const { colorMode } = useColorMode();

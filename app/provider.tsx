@@ -9,11 +9,17 @@ import { AppDataProvider } from "../components/context/AppDataProvider";
 import { BalanceContextProvider } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { session: any };
+}) {
   return (
     <ChakraProvider theme={theme}>
       <ThirdwebProvider>
-        <SessionProvider refetchInterval={0}>
+        <SessionProvider refetchInterval={0} session={params.session}>
           <UserDataProvider>
             <AppDataProvider>
               <BalanceContextProvider>

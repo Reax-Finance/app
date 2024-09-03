@@ -2,12 +2,16 @@
 
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { isLoggedIn } from "../../actions/login";
+import React, { useEffect } from "react";
 import { useUserData } from "../context/UserDataProvider";
 import UserAccount from "../utils/useUserAccount";
+import { isLoggedIn } from "../../app/connect/actions/auth";
 
-export default async function OnlyAuthenticated() {
+export default async function OnlyAuthenticated({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { address } = UserAccount();
   const { user } = useUserData();
   const { status: sessionStatus } = useSession();
@@ -28,5 +32,5 @@ export default async function OnlyAuthenticated() {
     }
   }, [user, address, sessionStatus, router]);
 
-  return <></>;
+  return <>{children}</>;
 }

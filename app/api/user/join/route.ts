@@ -1,20 +1,16 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
-import { JOINEE_XP_REWARD, REFERRER_XP_REWARD } from "../../../src/const";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/route";
+import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "thirdweb/dist/types/wallets/types";
+import { JOINEE_XP_REWARD, REFERRER_XP_REWARD } from "../../../../src/const";
 
 const prisma = new PrismaClient();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function POST(req: NextRequest) {
   const session = await getServerSession(req, res, authOptions({ req }));
   let address = session?.user?.name?.toLowerCase();
   if (!address) {
-    res.status(400).json({ message: "Bad Request" });
-    return;
+    return NextResponse.json({ message: "Bad Request" }, { status: 400 });
   }
 
   let initialXp = 0;
@@ -32,16 +28,22 @@ export default async function handler(
     },
   });
   if (!allowlistedUser) {
-    res.status(400).json({ message: "User not allowlisted" });
-    return;
+    return NextResponse.json(
+      { message: "User not allowlisted" },
+      { status: 400 }
+    );
   }
   if (allowlistedUser.user) {
-    res.status(400).json({ message: "User already joined" });
-    return;
+    return NextResponse.json(
+      { message: "User already joined" },
+      { status: 400 }
+    );
   }
   if (!allowlistedUser.twitter) {
-    res.status(400).json({ message: "Twitter account not verified" });
-    return;
+    return NextResponse.json(
+      { message: "Twitter account not verified" },
+      { status: 400 }
+    );
   }
   // If the user has a referrer, increment the initial XP
   if (allowlistedUser.joinedBy) {
@@ -83,7 +85,10 @@ export default async function handler(
           },
         });
       }
-      res.status(200).json({ message: "User joined successfully" });
+      NextResponse.json(
+        { message: "User joined successfully" },
+        { status: 200 }
+      );
     })
     .catch(async (err) => {
       await prisma.user.delete({
@@ -91,8 +96,13 @@ export default async function handler(
           id: address,
         },
       });
-      res
-        .status(500)
-        .json({ message: "Error creating referral codes", error: err });
+
+      NextResponse.json(
+        {
+          message: "Error creating referral codes",
+          error: err,
+        },
+        { status: 500 }
+      );
     });
 }

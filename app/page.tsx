@@ -21,6 +21,7 @@ import Navbar from "../components/core/Navbar";
 import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
 import { redirect, useRouter } from "next/navigation";
+import SwapPage from "../components/page/SwapPage";
 
 export default function Index({ children }: any) {
   // useEffect(() => {
@@ -196,7 +197,7 @@ export default function Index({ children }: any) {
               exit={{ opacity: 0, y: 15 }}
               transition={{ duration: 0.25 }}
             >
-              <>{children}</>
+              <SwapPage />
             </motion.div>
           </Flex>
         </Box>

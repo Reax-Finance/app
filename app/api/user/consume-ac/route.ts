@@ -1,19 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/route";
+import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../../auth/[...nextauth]/route";
 const prisma = new PrismaClient();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { accessCode } = req.query as { accessCode: string };
+export default async function POST(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const accessCode = searchParams.get("accessCode")!;
   const session = await getServerSession(req, res, authOptions({ req }));
   let address = session?.user?.name?.toLowerCase();
   if (!address) {
-    res.status(400).json({ message: "Bad Request" });
-    return;
+    return NextResponse.json({ message: "Bad Request" });
   }
 
   const accessCodeRecord = await prisma.accessCode.findUnique({
@@ -23,13 +21,14 @@ export default async function handler(
   });
 
   if (!accessCodeRecord) {
-    res.status(400).json({ message: "Invalid access code" });
-    return;
+    return NextResponse.json({ status: 400, message: "Invalid access code" });
   }
 
   if (accessCodeRecord?.joinedUserId) {
-    res.status(400).json({ message: "Access code already used" });
-    return;
+    return NextResponse.json({
+      status: 400,
+      message: "Access code already used",
+    });
   }
 
   // Check if the user is already in the allowlistedUser table
@@ -59,5 +58,5 @@ export default async function handler(
 
   console.log("updated accessCode");
 
-  res.status(200).json({ message: "Success" });
+  return NextResponse.json({ status: 200, message: "Success" });
 }

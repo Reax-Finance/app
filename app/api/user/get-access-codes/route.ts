@@ -1,21 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function GET(req: NextRequest) {
   try {
-    const { address } = req.query;
+    const searchParams = req.nextUrl.searchParams;
+    const address = searchParams.get("address");
     console.log("Address: ", address);
 
     // const nextAuth = await auth(req, res);
     // console.log("NextAuth: ", nextAuth);
     if (!address) {
-      res.status(400).json({ message: "Bad Request" });
-      return;
+      return NextResponse.json({ message: "Bad Request" }, { status: 400 });
     }
 
     const accessCodes = await prisma.accessCode.findMany({
@@ -25,9 +22,15 @@ export default async function handler(
     });
 
     console.log("Codes: ", ...accessCodes);
-    res.status(200).json({ message: "Success", accessCodes });
+    return NextResponse.json(
+      { message: "Success", accessCodes },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
