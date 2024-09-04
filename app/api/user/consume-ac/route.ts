@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export default async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const accessCode = searchParams.get("accessCode")!;
-  const session = await getServerSession(req, res, authOptions({ req }));
+  const session = await getServerSession(authOptions({ req }));
   let address = session?.user?.name?.toLowerCase();
   if (!address) {
     return NextResponse.json({ message: "Bad Request" });

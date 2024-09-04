@@ -1,20 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "thirdweb/dist/types/wallets/types";
 import { TWITTER_FOLLOW_REWARD } from "../../../../src/const";
+import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getServerSession(req, res, authOptions({ req }));
+export async function POST(req: NextRequest, res: NextResponse) {
+  const session = await getServerSession(authOptions({ req }));
 
   const address = session?.user?.name;
   if (!session || !session.user || !address) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const { taskId } = req.body;
+  const { body } = await req.json();
+  const { taskId } = body;
 
   const userRecord = await prisma.user.findUniqueOrThrow({
     where: {
@@ -30,11 +32,14 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!userRecord) {
-    return res.status(404).json({ message: "User not found" });
+    return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
 
   if (userRecord.UserTask.length > 0) {
-    return res.status(400).json({ message: "Task already completed" });
+    return NextResponse.json(
+      { message: "Task already completed" },
+      { status: 400 }
+    );
   }
 
   prisma
@@ -44,6 +49,7 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
           taskId,
           userId: address.toLowerCase(),
           completed: true,
+          updatedAt: new Date(),
         },
       }),
       prisma.user.update({
@@ -58,9 +64,12 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
       }),
     ])
     .then(() => {
-      res.status(200).json({ message: "Task Completed" });
+      return NextResponse.json({ message: "Task Completed" }, { status: 200 });
     })
     .catch((err) => {
-      res.status(500).json({ message: "Error completing task:", error: err });
+      return NextResponse.json(
+        { message: "Error completing task:", error: err },
+        { status: 500 }
+      );
     });
 }

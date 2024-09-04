@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "thirdweb/dist/types/wallets/types";
 import { JOINEE_XP_REWARD, REFERRER_XP_REWARD } from "../../../../src/const";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(req, res, authOptions({ req }));
+  const session = await getServerSession(authOptions({ req }));
   let address = session?.user?.name?.toLowerCase();
   if (!address) {
     return NextResponse.json({ message: "Bad Request" }, { status: 400 });

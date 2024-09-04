@@ -7,7 +7,7 @@ import { TWITTER_FOLLOW_REWARD } from "../../../../src/const";
 const prisma = new PrismaClient();
 
 export default async function PUT(req: NextRequest, res: NextResponse) {
-  const session = await getServerSession(req, res, authOptions({ req }));
+  const session = await getServerSession(authOptions({ req }));
 
   const address = session?.user?.name;
   if (!session || !session.user || !address) {
@@ -21,7 +21,7 @@ export default async function PUT(req: NextRequest, res: NextResponse) {
       id: address.toLowerCase(),
     },
     include: {
-      userTasks: {
+      UserTask: {
         where: {
           taskId,
         },
@@ -33,7 +33,7 @@ export default async function PUT(req: NextRequest, res: NextResponse) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
 
-  if (userRecord.userTasks.length > 0) {
+  if (userRecord.UserTask.length > 0) {
     return NextResponse.json(
       { message: "Task already completed" },
       { status: 400 }

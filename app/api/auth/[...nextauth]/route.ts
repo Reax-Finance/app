@@ -1,22 +1,16 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
+import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 import { SiweMessage } from "siwe";
-import type { NextAuthOptions } from "next-auth";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextRequest } from "next/server";
-
-// Helper function to convert Headers to plain object
-function headersToObject(headers: Headers): Record<string, string> {
-  const obj: Record<string, string> = {};
-  headers.forEach((value, key) => {
-    obj[key] = value;
-  });
-  return obj;
-}
 
 // Define the auth options
 export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
+  const headerList = headers();
+  const userAgent = headerList.get("user-agent");
+  const acceptLanguage = headerList.get("accept-language");
+  const host = headerList.get("host");
   const providers = [
     CredentialsProvider({
       name: "Ethereum",
@@ -32,7 +26,7 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
           placeholder: "0x0",
         },
       },
-      async authorize(credentials) {
+      async authorize(credentials: any) {
         try {
           const siwe = new SiweMessage(
             JSON.parse(credentials?.message || "{}")
@@ -43,7 +37,13 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
             signature: credentials?.signature || "",
             domain: nextAuthUrl.host,
             nonce: await getCsrfToken({
-              req: { headers: headersToObject(req.headers) as any },
+              req: {
+                headers: {
+                  "user-agent": userAgent ?? "",
+                  host: host ?? "",
+                  accept: acceptLanguage ?? "",
+                },
+              },
             }),
           });
 
@@ -63,7 +63,7 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
   ];
 
   const isDefaultSigninPage =
-    req.method === "GET" && req.nextUrl.searchParams.has("signin");
+    req.method === "GET" && req.nextUrl.searchParams.has("connect");
 
   if (isDefaultSigninPage) {
     providers.pop();
@@ -86,12 +86,11 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
   };
 };
 
-// Define the handler for the POST method
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  return NextAuth(req, res, authOptions({ req: req as any }));
+export async function POST(req: NextRequest) {
+  return NextAuth(authOptions({ req }));
 }
 
 // Define the handler for the GET method
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
-  return NextAuth(req, res, authOptions({ req: req as any }));
+export async function GET(req: NextRequest) {
+  return NextAuth(authOptions({ req }));
 }
