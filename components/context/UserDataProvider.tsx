@@ -8,11 +8,12 @@ import {
   User as _User,
 } from "@prisma/client";
 import axios from "axios";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import * as React from "react";
 import { useEffect } from "react";
 import { ADDRESS_ZERO } from "../../src/const";
 import { Status } from "../utils/status";
+import UserAccount from "../utils/useUserAccount";
 
 interface UserObject extends _User {
   accessCodes: AccessCode[];
@@ -44,12 +45,13 @@ function UserDataProvider({ children }: any) {
   const [message, setMessage] = React.useState<UserDataValue["message"]>("");
   const [user, setUser] = React.useState<UserData>();
 
-  const { address } = { address: "0x1234" };
-  const { status: sessionStatus } = useSession();
+  const { address } = UserAccount();
+  // const { status: sessionStatus } = useSession();
   const [loading, setLoading] = React.useState(false);
   useEffect(() => {
     updateUser();
-  }, [address, sessionStatus]);
+  }, [address]);
+  // }, [address, sessionStatus]);
 
   async function updateUser(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -57,7 +59,7 @@ function UserDataProvider({ children }: any) {
       if (typeof window === "undefined") return;
 
       if (!address || address == ADDRESS_ZERO) return;
-      if (sessionStatus !== "authenticated") return;
+      // if (sessionStatus !== "authenticated") return;
       setLoading(true);
       axios
         .get("/api/user/get-user", {

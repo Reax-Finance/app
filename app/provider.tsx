@@ -8,27 +8,22 @@ import { UserDataProvider } from "../components/context/UserDataProvider";
 import { AppDataProvider } from "../components/context/AppDataProvider";
 import { BalanceContextProvider } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
+import { useEffect, useState } from "react";
 
-export function Providers({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { session: any };
-}) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
+    // <SessionProvider refetchInterval={0} session={session}>
     <ChakraProvider theme={theme}>
       <ThirdwebProvider>
-        <SessionProvider refetchInterval={0} session={params.session}>
-          <UserDataProvider>
-            <AppDataProvider>
-              <BalanceContextProvider>
-                <PriceContextProvider>{children}</PriceContextProvider>
-              </BalanceContextProvider>
-            </AppDataProvider>
-          </UserDataProvider>
-        </SessionProvider>
+        <UserDataProvider>
+          <AppDataProvider>
+            <BalanceContextProvider>
+              <PriceContextProvider>{children}</PriceContextProvider>
+            </BalanceContextProvider>
+          </AppDataProvider>
+        </UserDataProvider>
       </ThirdwebProvider>
     </ChakraProvider>
+    // </SessionProvider>
   );
 }

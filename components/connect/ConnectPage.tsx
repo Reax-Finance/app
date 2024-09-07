@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
 import { useUserData } from "../context/UserDataProvider";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import { Status } from "../utils/status";
 import NotWhitelisted from "./NotWhitelisted";
 import ConnectInterface from "./ConnectInterface";
@@ -18,13 +18,16 @@ import SignupInterface from "./SignupInterface";
 import GetStarted from "./GetStarted";
 import { useActiveWalletConnectionStatus } from "thirdweb/react";
 import UserAccount from "../utils/useUserAccount";
-export default function ConnectPage() {
+import { authedOnly } from "../../app/connect/actions/auth";
+export default async function ConnectPage() {
   const { user, status: userStatus } = useUserData();
-  const { status: sessionStatus } = useSession();
+  // const { status: sessionStatus } = useSession();
   const status = useActiveWalletConnectionStatus();
-  const { address } = UserAccount();
+  // const { address } = UserAccount();
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
+  const parsedJWT = await authedOnly();
+  const address = parsedJWT.sub;
 
   return (
     <Box h={"100vh"}>
@@ -47,11 +50,13 @@ export default function ConnectPage() {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status == "disconnected" ||
-                sessionStatus == "unauthenticated" ? (
+                {status == "disconnected" ? (
+                  //  ||
+                  // sessionStatus == "unauthenticated"
                   <ConnectInterface />
                 ) : null}
-                {status == "connected" && sessionStatus == "authenticated" ? (
+                {status == "connected" && parsedJWT.sub ? (
+                  //  && sessionStatus == "authenticated"
                   userStatus == Status.SUCCESS &&
                   user?.isAllowlisted &&
                   user?.id == address?.toLowerCase() ? (

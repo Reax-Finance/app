@@ -1,4 +1,5 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions, Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { headers } from "next/headers";
@@ -11,6 +12,9 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
   const userAgent = headerList.get("user-agent");
   const acceptLanguage = headerList.get("accept-language");
   const host = headerList.get("host");
+
+  console.log("Request headers:", headerList);
+
   const providers = [
     CredentialsProvider({
       name: "Ethereum",
@@ -28,10 +32,13 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
       },
       async authorize(credentials: any) {
         try {
+          console.log("Received credentials:", credentials);
           const siwe = new SiweMessage(
             JSON.parse(credentials?.message || "{}")
           );
           const nextAuthUrl = new URL(process.env.NEXTAUTH_URL!);
+
+          console.log("Going to verify SIWE message");
 
           const result = await siwe.verify({
             signature: credentials?.signature || "",
@@ -47,15 +54,19 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
             }),
           });
 
+          console.log("SIWE Verification Result:", result);
+
           if (result.success) {
-            console.log(result);
+            console.log("Verification successful. Address:", siwe.address);
             return {
               id: siwe.address,
             };
+          } else {
+            console.log("Verification failed.");
+            return null;
           }
-          return null;
         } catch (e) {
-          console.error("error is", e);
+          console.error("Error in authorization:", e);
           return null;
         }
       },
@@ -63,9 +74,10 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
   ];
 
   const isDefaultSigninPage =
-    req.method === "GET" && req.nextUrl.searchParams.has("connect");
+    req.method === "GET" && req.nextUrl.searchParams.has("signin");
 
   if (isDefaultSigninPage) {
+    console.log("On the default sign-in page, removing providers.");
     providers.pop();
   }
 
@@ -76,10 +88,19 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
     },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-      async session({ session, token }: { session: any; token: any }) {
-        session.address = token.sub;
-        session.user.name = token.sub;
-        session.user.image = "https://www.fillmurray.com/128/128";
+      async jwt({ token, user }) {
+        console.log("JWT Callback. Token:", token, "User:", user);
+        if (user) {
+          token.id = user.id;
+        }
+        return token;
+      },
+      async session({ session, token }: { session: Session; token: JWT }) {
+        console.log("Session Callback. Session:", session, "Token:", token);
+        if (session.user) {
+          session.user.name = token.sub || null;
+          session.user.image = "https://www.fillmurray.com/128/128";
+        }
         return session;
       },
     },
@@ -87,10 +108,25 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
 };
 
 export async function POST(req: NextRequest) {
-  return NextAuth(authOptions({ req }));
+  try {
+    console.log("POST request received", req);
+    const response = await NextAuth(authOptions({ req }));
+    console.log("NextAuth POST Response:", response);
+    return NextResponse.json({ data: response }, { status: 200 });
+  } catch (e) {
+    console.error("Error in POST:", e);
+    return NextResponse.json({ error: e }, { status: 500 });
+  }
 }
 
-// Define the handler for the GET method
 export async function GET(req: NextRequest) {
-  return NextAuth(authOptions({ req }));
+  try {
+    console.log("GET request received", req);
+    const response = await NextAuth(authOptions({ req }));
+    console.log("NextAuth GET Response:", response);
+    return NextResponse.json({ data: response }, { status: 200 });
+  } catch (e) {
+    console.error("Error in GET:", e);
+    return NextResponse.json({ error: e }, { status: 500 });
+  }
 }

@@ -1,20 +1,24 @@
+"use client";
+
 import {
-  Flex,
-  Text,
-  Heading,
   Box,
-  Button,
+  Flex,
+  Heading,
+  Image,
+  Text,
   useColorMode,
-  Image
 } from "@chakra-ui/react";
-import React, { use, useEffect } from "react";
-import { CustomConnectButton } from "../core/ConnectButton";
+// import { useSession } from "next-auth/react";
 import { VARIANT } from "../../styles/theme";
+import { CustomConnectButton } from "../core/ConnectButton";
 import FAQ from "./FAQ";
 
 export default function ConnectInterface() {
   const { colorMode } = useColorMode();
+  // const { data: session, status } = useSession();
 
+  // console.log("Session data:", session);
+  // console.log("Session status:", status);
   return (
     <Flex
       gap={4}
@@ -45,11 +49,11 @@ export default function ConnectInterface() {
           h={"100%"}
         >
           <Text mt={2}>
-            To begin your journey, please connect your crypto
-            wallet to access the Reax Testnet.
+            To begin your journey, please connect your crypto wallet to access
+            the Reax Testnet.
           </Text>
 
-          <Image src={'/bg-tokens.svg'} width={'100%'} alt="" />
+          <Image src={"/bg-tokens.svg"} width={"100%"} alt="" />
 
           <Box mt={6}>
             <CustomConnectButton />

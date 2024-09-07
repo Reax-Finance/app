@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Flex, Image, Spinner } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import ConnectInterface from "../../components/connect/ConnectInterface";
@@ -16,7 +16,7 @@ import UserAccount from "../../components/utils/useUserAccount";
 const Page = () => {
   const { address } = UserAccount();
   const { user, status: userStatus } = useUserData();
-  const { status: sessionStatus } = useSession();
+  // const { status: sessionStatus } = useSession();
   const status = useActiveWalletConnectionStatus();
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
@@ -25,6 +25,7 @@ const Page = () => {
 
   useEffect(() => {
     if (userStatus === Status.SUCCESS && user?.user && user?.twitter) {
+      console.log("redirecting to home");
       router.push("/");
     }
   }, [router, userStatus, user]);
@@ -55,13 +56,13 @@ const Page = () => {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status === "disconnected" ||
-                sessionStatus === "unauthenticated" ? (
+                {status === "disconnected" ? (
+                  // || sessionStatus === "unauthenticated"
                   <ConnectInterface />
                 ) : (
                   <>
                     {status === "connected" &&
-                    sessionStatus === "authenticated" &&
+                    // sessionStatus === "authenticated" &&
                     userStatus === Status.SUCCESS ? (
                       user?.isAllowlisted &&
                       user?.id === address?.toLowerCase() ? (

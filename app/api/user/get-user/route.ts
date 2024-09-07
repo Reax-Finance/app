@@ -7,9 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const address = searchParams.get("address");
-
-    // Log the address to ensure it is being received correctly
-
+    console.log("address is ", address);
     if (!address) {
       return NextResponse.json(
         { message: "Bad Request: Address is required" },
@@ -51,6 +49,8 @@ export async function GET(req: NextRequest) {
       ...allowlistedUser,
       user: userRecord,
     };
+
+    console.log("user is ", user);
 
     if (!allowlistedUser && !userRecord) {
       user = null;

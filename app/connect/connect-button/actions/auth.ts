@@ -1,9 +1,8 @@
 "use server";
 import { VerifyLoginPayloadParams, createAuth } from "thirdweb/auth";
 import { privateKeyToAccount } from "thirdweb/wallets";
-import { client } from "../../../lib/client";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { client } from "../../../../lib/client";
 
 const privateKey = process.env.THIRDWEB_ADMIN_PRIVATE_KEY || "";
 
@@ -18,33 +17,27 @@ const thirdwebAuth = createAuth({
 
 export const generatePayload = thirdwebAuth.generatePayload;
 
-export async function login(
-  payload: VerifyLoginPayloadParams,
-  redirectUrl: string
-) {
+export async function login(payload: VerifyLoginPayloadParams) {
   const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
   if (verifiedPayload.valid) {
     const jwt = await thirdwebAuth.generateJWT({
       payload: verifiedPayload.payload,
     });
     cookies().set("jwt", jwt);
-    // redirect to the secure page
-    return redirect(redirectUrl);
   }
 }
 
-export async function authedOnly() {
+export async function isLoggedIn() {
   const jwt = cookies().get("jwt");
-  console.log("jwt", jwt);
   if (!jwt?.value) {
-    redirect("/connect");
+    return false;
   }
 
   const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
   if (!authResult.valid) {
-    redirect("/connect");
+    return false;
   }
-  return authResult.parsedJWT;
+  return true;
 }
 
 export async function logout() {

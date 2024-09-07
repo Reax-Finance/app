@@ -13,16 +13,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  params: { session, ...params },
 }: {
   children: React.ReactNode;
-  params: { session: any };
 }) {
   return (
     <html lang="en">
       <body>
         <div>
-          <Providers params={params}>{children}</Providers>
+          <Providers>{children}</Providers>
         </div>
       </body>
     </html>
