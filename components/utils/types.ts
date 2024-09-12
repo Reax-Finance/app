@@ -54,6 +54,12 @@ export interface LiquidityData {
 	synths: Asset[];
 }
 
+export interface PairData {
+	id: string;
+	synth1: SynthData;
+	synth2: SynthData;
+}
+
 // ------------------------------
 
 export interface UIData {

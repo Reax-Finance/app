@@ -9,6 +9,7 @@ import {
 	LiquidityData,
 	SynthData,
 	UIData,
+	PairData,
 } from "../utils/types";
 import useUpdateData from "../utils/useUpdateData";
 import useChainData from "./useChainData";
@@ -23,12 +24,6 @@ export interface AppDataValue {
 	routerAddress: string | undefined;
 	blockNumber: number;
 	pairs: PairData[];
-}
-
-interface PairData {
-	id: string;
-	synth1: SynthData;
-	synth2: SynthData;
 }
 
 const AppDataContext = React.createContext<AppDataValue>({} as AppDataValue);
@@ -77,7 +72,7 @@ function AppDataProvider({ children }: any) {
 
 				if (synth1AcceptsSynth2 && synth2AcceptsSynth1) {
 					newPairs.push({
-						id: `${synth1.synth.id}-${synth2.synth.id}`,
+						id: `${synth1.synth.symbol}-${synth2.synth.symbol}`,
 						synth1,
 						synth2,
 					});

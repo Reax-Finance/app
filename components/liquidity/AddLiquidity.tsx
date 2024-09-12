@@ -1,9 +1,7 @@
 import { Box, useDisclosure, Text, Flex, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
-import Head from "next/head";
 import { ADDRESS_ZERO, ONE_ETH, isSupportedChain } from "../../src/const";
-import SwapSkeleton from "./Skeleton";
 import { useToast } from "@chakra-ui/react";
 import useUpdateData from "../utils/useUpdateData";
 import LiquidityLayout from "./AddLiquidityLayout";

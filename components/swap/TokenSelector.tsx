@@ -32,9 +32,7 @@ const POPULAR_TOKENS = ['WETH', 'MNT', 'USDT', 'cUSD']
 
 function TokenSelector({
 	onTokenSelected,
-	onPoolChange,
 	isOpen,
-	onOpen,
 	onClose,
 	tokens
 }: any) {
