@@ -19,7 +19,6 @@ import { AppDataProvider } from "../components/context/AppDataProvider";
 import { theme } from "../styles/theme";
 import { supportedChains } from "../src/const";
 import {
-	BalanceContext,
 	BalanceContextProvider,
 } from "../components/context/BalanceProvider";
 import { PriceContextProvider } from "../components/context/PriceContext";
@@ -28,10 +27,10 @@ import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 const config = getDefaultConfig({
-	appName: "My RainbowKit App",
-	projectId: "YOUR_PROJECT_ID",
+	appName: "Chainscore",
+	projectId: "f9872886c0114c52fea9f273f6b2b2fb",
 	chains: supportedChains as any,
-	ssr: true, // If your dApp uses server side rendering (SSR)
+	ssr: false, // If your dApp uses server side rendering (SSR)
 });
 
 const queryClient = new QueryClient();

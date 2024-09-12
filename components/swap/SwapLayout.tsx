@@ -75,7 +75,7 @@ export default function SwapLayout({
     const handleMax = () => {
         updateInputAmount(
             tokens[inputAssetIndex]
-                ? Big(tokens[inputAssetIndex].balance.toString())
+                ? Big(tokens[inputAssetIndex].walletBalance.toString())
                         .div(10**(tokens[inputAssetIndex]?.decimals ?? 18))
                         .toString()
                 : 0
@@ -152,7 +152,7 @@ export default function SwapLayout({
                             {" "}
                             {tokenFormatter.format(
                                 tokens[inputAssetIndex]
-                                    ? Big(tokens[inputAssetIndex].balance.toString())
+                                    ? Big(tokens[inputAssetIndex].walletBalance.toString())
                                             .div(10**(tokens[inputAssetIndex]?.decimals ?? 18))
                                             .toNumber()
                                     : 0
@@ -229,7 +229,7 @@ export default function SwapLayout({
                             {" "}
                             {tokenFormatter.format(
                                 tokens[outputAssetIndex]
-                                    ? Big(tokens[outputAssetIndex].balance.toString())
+                                    ? Big(tokens[outputAssetIndex].walletBalance.toString())
                                             .div(10**(tokens[outputAssetIndex].decimals))
                                             .toNumber()
                                     : 0

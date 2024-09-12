@@ -60,9 +60,9 @@ function Swap() {
 
 	const router = useRouter();
 	
-	const { liquidityData } = useAppData();
-	
-    const tokens = liquidityData ? liquidityData.synths.concat([{...liquidityData.lpToken, price: liquidityData.lpToken.price.div('10000000000')}]) : [];
+	const { synths } = useAppData();
+	console.log("liquidityData.synths", synths);
+    const tokens = synths.map((s) => s.synth) // .concat([{...liquidityData.lpToken, price: liquidityData.lpToken.price.div('10000000000')}]) : [];
 	const inToken = tokens[inputAssetIndex];
 	const outToken = tokens[outputAssetIndex];
 	useEffect(() => {
@@ -209,7 +209,7 @@ function Swap() {
 		else if (error.length > 0) return {valid: false, message: error}
 		else if (Number(inputAmount) <= 0) return {valid: false, message: "Enter Amount"}
 		else if (Number(outputAmount) <= 0) return {valid: false, message: "Insufficient Liquidity"}
-		else if (Big(Number(inputAmount) || 0).mul(Big(10).pow(inToken.decimals)).gt(inToken.balance.toString())) return {valid: false, message: "Insufficient Balance"}
+		else if (Big(Number(inputAmount) || 0).mul(Big(10).pow(inToken.decimals)).gt(inToken.walletBalance.toString())) return {valid: false, message: "Insufficient Balance"}
 		else if (getSteps().length > 0) return { valid: false, message: "Approve"}
 		else if (Number(deadline_m) == 0) return {valid: false, message: "Please set deadline"}
 		else if (maxSlippage == 0) return {valid: false, message: "Please set slippage"}

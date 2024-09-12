@@ -17,7 +17,7 @@ export default function useUpdateData() {
                 pythFeeds.push(synths[i].synth.pythId);
                 // Add vaults
                 for(let j in synths[i].market.vaults){
-                    pythFeeds.push(synths[i].market.vaults[j].vaultToken.pythId);
+                    pythFeeds.push(synths[i].market.vaults[j].asset.pythId);
                 }
             }
         }
