@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import "../styles/rounded-dark.css";
 import "../styles/rounded-light.css";
 import { Providers } from "./provider";
+import ComponentLayout from "./ComponentLayout";
 
 export const metadata: Metadata = {
   title: "REAX",
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div>
-          <Providers>{children}</Providers>
+          <Providers>
+            <ComponentLayout>{children}</ComponentLayout>
+          </Providers>
         </div>
       </body>
     </html>

@@ -1,34 +1,23 @@
 "use client";
 
-import {
-  Flex,
-  Text,
-  Image,
-  Box,
-  useColorMode,
-  Spinner,
-} from "@chakra-ui/react";
-import React, { use, useEffect } from "react";
+import { Box, Flex, Image, Spinner, Text } from "@chakra-ui/react";
+import React from "react";
 import { useUserData } from "../context/UserDataProvider";
 // import { useSession } from "next-auth/react";
-import { Status } from "../utils/status";
-import NotWhitelisted from "./NotWhitelisted";
-import ConnectInterface from "./ConnectInterface";
-import SignupInterface from "./SignupInterface";
-import GetStarted from "./GetStarted";
 import { useActiveWalletConnectionStatus } from "thirdweb/react";
+import { Status } from "../utils/status";
 import UserAccount from "../utils/useUserAccount";
-import { authedOnly } from "../../app/connect/actions/auth";
-export default async function ConnectPage() {
+import ConnectInterface from "./ConnectInterface";
+import GetStarted from "./GetStarted";
+import NotWhitelisted from "./NotWhitelisted";
+import SignupInterface from "./SignupInterface";
+export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
   // const { status: sessionStatus } = useSession();
   const status = useActiveWalletConnectionStatus();
-  // const { address } = UserAccount();
+  const { address } = UserAccount();
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
-  const parsedJWT = await authedOnly();
-  const address = parsedJWT.sub;
-
   return (
     <Box h={"100vh"}>
       <Flex
@@ -55,7 +44,7 @@ export default async function ConnectPage() {
                   // sessionStatus == "unauthenticated"
                   <ConnectInterface />
                 ) : null}
-                {status == "connected" && parsedJWT.sub ? (
+                {status == "connected" ? (
                   //  && sessionStatus == "authenticated"
                   userStatus == Status.SUCCESS &&
                   user?.isAllowlisted &&

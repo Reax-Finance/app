@@ -67,7 +67,7 @@ export default function FollowTwitter() {
                 Simple steps, big rewards. Follow us on Twitter.
               </Text>
             </Box>
-            {user?.user?.isFollowing ? (
+            {user?.twitter?.isFollowing ? (
               <Flex color={"green.400"} align={"center"}>
                 <BsCheck size={"24px"} />
                 <Text>Completed</Text>

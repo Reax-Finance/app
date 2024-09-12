@@ -1,3 +1,4 @@
+"use client";
 import { Box, useDisclosure, Text, Flex, Link } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Head from "next/head";
@@ -27,6 +28,7 @@ import {
   useActiveWalletChain,
   useActiveWalletConnectionStatus,
 } from "thirdweb/react";
+import ConnectInterface from "../connect/ConnectInterface";
 
 interface ApprovalStep {
   type: "APPROVAL" | "PERMIT" | "DELEGATION";

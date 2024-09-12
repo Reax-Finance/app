@@ -1,3 +1,5 @@
+"use client";
+
 import { useToast } from "@chakra-ui/react";
 import { BigNumber, ethers } from "ethers";
 import { useState } from "react";
