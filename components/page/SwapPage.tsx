@@ -1,8 +1,9 @@
-import { Box, Flex, useColorMode } from "@chakra-ui/react";
+"use client";
+
+import { Box, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import React, { useEffect } from "react";
-import Swap from "../swap/index";
 import OnlyAuthenticated from "../auth/OnlyAuthenticated";
+import Swap from "../swap/index";
 
 export default function SwapPage() {
   return (

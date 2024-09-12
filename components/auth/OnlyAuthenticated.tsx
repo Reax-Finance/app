@@ -7,7 +7,7 @@ import { useUserData } from "../context/UserDataProvider";
 import UserAccount from "../utils/useUserAccount";
 import { checkUser } from "./checkUser";
 
-export default async function OnlyAuthenticated({}: {}) {
+export default function OnlyAuthenticated({}: {}) {
   const { address } = UserAccount();
   const { user } = useUserData();
   const { status: sessionStatus } = useSession();
