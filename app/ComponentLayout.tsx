@@ -2,7 +2,6 @@
 
 import { Box, Button, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { redirect } from "next/navigation";
 import { useContext } from "react";
 import {
   useActiveWalletChain,

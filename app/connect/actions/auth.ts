@@ -18,10 +18,7 @@ const thirdwebAuth = createAuth({
 
 export const generatePayload = thirdwebAuth.generatePayload;
 
-export async function login(
-  payload: VerifyLoginPayloadParams,
-  redirectUrl: string
-) {
+export async function login(payload: VerifyLoginPayloadParams) {
   const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
   if (verifiedPayload.valid) {
     const jwt = await thirdwebAuth.generateJWT({
@@ -29,7 +26,7 @@ export async function login(
     });
     cookies().set("jwt", jwt);
     // redirect to the secure page
-    return redirect(redirectUrl);
+    redirect("/");
   }
 }
 

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useUserData } from "../context/UserDataProvider";
 import UserAccount from "../utils/useUserAccount";
-import { checkUser } from "./checkUser";
 
 export default function OnlyAuthenticated({}: {}) {
   const { address } = UserAccount();
@@ -14,7 +13,6 @@ export default function OnlyAuthenticated({}: {}) {
   const router = useRouter();
 
   useEffect(() => {
-    checkUser();
     if (
       !(user?.user && user?.id == address?.toLowerCase()) ||
       sessionStatus !== "authenticated"

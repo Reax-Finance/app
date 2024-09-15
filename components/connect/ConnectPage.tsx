@@ -11,9 +11,10 @@ import ConnectInterface from "./ConnectInterface";
 import GetStarted from "./GetStarted";
 import NotWhitelisted from "./NotWhitelisted";
 import SignupInterface from "./SignupInterface";
+import { useSession } from "next-auth/react";
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
-  // const { status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
   const status = useActiveWalletConnectionStatus();
   const { address } = UserAccount();
   const [join, setJoin] = React.useState(false);
@@ -39,13 +40,11 @@ export default function ConnectPage() {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status == "disconnected" ? (
-                  //  ||
-                  // sessionStatus == "unauthenticated"
+                {status == "disconnected" ||
+                sessionStatus == "unauthenticated" ? (
                   <ConnectInterface />
                 ) : null}
-                {status == "connected" ? (
-                  //  && sessionStatus == "authenticated"
+                {status == "connected" && sessionStatus == "authenticated" ? (
                   userStatus == Status.SUCCESS &&
                   user?.isAllowlisted &&
                   user?.id == address?.toLowerCase() ? (
@@ -58,14 +57,14 @@ export default function ConnectPage() {
                     />
                   )
                 ) : null}
-                {(userStatus == Status.FETCHING || status == "connecting") && (
+                {/* {(userStatus == Status.FETCHING || status == "connecting") && (
                   <>
                     <Spinner />
                     <Text zIndex={2} ml={2}>
                       Loading...
                     </Text>
                   </>
-                )}
+                )} */}
               </>
             )}
           </Flex>

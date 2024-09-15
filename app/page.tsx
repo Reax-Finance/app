@@ -4,12 +4,23 @@ import { Box, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
 import Swap from "../components/swap/index";
-import { checkUser } from "../components/auth/checkUser";
+
 import { useEffect } from "react";
+import { useUserData } from "../components/context/UserDataProvider";
+import { useSession } from "next-auth/react";
 
 export default function SwapPage() {
+  const { user } = useUserData();
+  const { status: sessionStatus } = useSession();
   useEffect(() => {
-    checkUser();
+    if (
+      !user ||
+      !user.user ||
+      !user.twitter ||
+      sessionStatus !== "authenticated"
+    ) {
+      window.location.href = "/connect";
+    }
   }, []);
 
   return (

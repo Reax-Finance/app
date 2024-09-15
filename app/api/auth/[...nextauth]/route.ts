@@ -13,8 +13,6 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
   const acceptLanguage = headerList.get("accept-language");
   const host = headerList.get("host");
 
-  console.log("Request headers:", headerList);
-
   const providers = [
     CredentialsProvider({
       name: "Ethereum",
@@ -32,13 +30,10 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
       },
       async authorize(credentials: any) {
         try {
-          console.log("Received credentials:", credentials);
           const siwe = new SiweMessage(
             JSON.parse(credentials?.message || "{}")
           );
           const nextAuthUrl = new URL(process.env.NEXTAUTH_URL!);
-
-          console.log("Going to verify SIWE message");
 
           const result = await siwe.verify({
             signature: credentials?.signature || "",
@@ -54,15 +49,11 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
             }),
           });
 
-          console.log("SIWE Verification Result:", result);
-
           if (result.success) {
-            console.log("Verification successful. Address:", siwe.address);
             return {
               id: siwe.address,
             };
           } else {
-            console.log("Verification failed.");
             return null;
           }
         } catch (e) {
@@ -77,7 +68,6 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
     req.method === "GET" && req.nextUrl.searchParams.has("signin");
 
   if (isDefaultSigninPage) {
-    console.log("On the default sign-in page, removing providers.");
     providers.pop();
   }
 
@@ -89,17 +79,15 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
       async jwt({ token, user }) {
-        console.log("JWT Callback. Token:", token, "User:", user);
         if (user) {
           token.id = user.id;
         }
         return token;
       },
       async session({ session, token }: { session: Session; token: JWT }) {
-        console.log("Session Callback. Session:", session, "Token:", token);
         if (session.user) {
           session.user.name = token.sub || null;
-          session.user.image = "https://www.fillmurray.com/128/128";
+          session.user.image = "https://www.fillmurray.com/128/128"; // Example image
         }
         return session;
       },
@@ -109,24 +97,25 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("POST request received", req);
+    // const response = await NextAuth(authOptions({ req }));
     const response = await NextAuth(authOptions({ req }));
-    console.log("NextAuth POST Response:", response);
-    return NextResponse.json({ data: response }, { status: 200 });
-  } catch (e) {
+    if (response.error) {
+      console.error("Error in POST:", response.error);
+      return NextResponse.json({ error: response.error }, { status: 500 });
+    }
+    return NextResponse.json(response);
+  } catch (e: any) {
     console.error("Error in POST:", e);
-    return NextResponse.json({ error: e }, { status: 500 });
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
-    console.log("GET request received", req);
     const response = await NextAuth(authOptions({ req }));
-    console.log("NextAuth GET Response:", response);
-    return NextResponse.json({ data: response }, { status: 200 });
-  } catch (e) {
+    return NextResponse.json(response);
+  } catch (e: any) {
     console.error("Error in GET:", e);
-    return NextResponse.json({ error: e }, { status: 500 });
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
