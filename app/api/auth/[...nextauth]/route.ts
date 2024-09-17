@@ -99,11 +99,17 @@ export async function POST(req: NextRequest) {
   try {
     // const response = await NextAuth(authOptions({ req }));
     const response = await NextAuth(authOptions({ req }));
-    if (response.error) {
-      console.error("Error in POST:", response.error);
-      return NextResponse.json({ error: response.error }, { status: 500 });
+    if (!response) {
+      return NextResponse.json(
+        { error: "Bad Request. No response" },
+        { status: 500 }
+      );
     }
-    return NextResponse.json(response);
+    // if (response.error) {
+    //   console.error("Error in POST:", response.error);
+    //   return NextResponse.json({ error: response.error }, { status: 500 });
+    // }
+    return NextResponse.json(response.data);
   } catch (e: any) {
     console.error("Error in POST:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });

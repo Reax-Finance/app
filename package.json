@@ -41,7 +41,7 @@
     "siwe": "^2",
     "swiper": "^8.4.7",
     "tailwind-merge": "^2.4.0",
-    "thirdweb": "^5.11.0",
+    "thirdweb": "^5.55.0",
     "viem": "2.x",
     "web3": "^1.8.0"
   },

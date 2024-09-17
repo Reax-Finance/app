@@ -4,7 +4,6 @@ import { Box, Flex, Image, Spinner, Text } from "@chakra-ui/react";
 import React from "react";
 import { useUserData } from "../context/UserDataProvider";
 // import { useSession } from "next-auth/react";
-import { useActiveWalletConnectionStatus } from "thirdweb/react";
 import { Status } from "../utils/status";
 import UserAccount from "../utils/useUserAccount";
 import ConnectInterface from "./ConnectInterface";
@@ -12,6 +11,7 @@ import GetStarted from "./GetStarted";
 import NotWhitelisted from "./NotWhitelisted";
 import SignupInterface from "./SignupInterface";
 import { useSession } from "next-auth/react";
+import { useActiveWalletConnectionStatus } from "thirdweb/react";
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
   const { status: sessionStatus } = useSession();
