@@ -12,16 +12,18 @@ import { useUserData } from "../../components/context/UserDataProvider";
 import { Status } from "../../components/utils/status";
 import { useActiveWalletConnectionStatus } from "thirdweb/react";
 import UserAccount from "../../components/utils/useUserAccount";
+import { useSession } from "next-auth/react";
 
 const Page = () => {
   const { address } = UserAccount();
   const { user, status: userStatus } = useUserData();
-  // const { status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
   const status = useActiveWalletConnectionStatus();
   const [join, setJoin] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState("");
 
   const router = useRouter();
+  console.log(sessionStatus, status, userStatus);
 
   useEffect(() => {
     if (userStatus === Status.SUCCESS && user?.user && user?.twitter) {
@@ -56,13 +58,13 @@ const Page = () => {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status === "disconnected" ? (
-                  // || sessionStatus === "unauthenticated"
+                {status === "disconnected" ||
+                sessionStatus === "unauthenticated" ? (
                   <ConnectInterface />
                 ) : (
                   <>
                     {status === "connected" &&
-                    // sessionStatus === "authenticated" &&
+                    sessionStatus === "authenticated" &&
                     userStatus === Status.SUCCESS ? (
                       user?.isAllowlisted &&
                       user?.id === address?.toLowerCase() ? (

@@ -8,6 +8,7 @@ import Swap from "../components/swap/index";
 import { useEffect } from "react";
 import { useUserData } from "../components/context/UserDataProvider";
 import { useSession } from "next-auth/react";
+import ConnectPage from "../components/connect/ConnectPage";
 
 export default function SwapPage() {
   const { user } = useUserData();
@@ -23,27 +24,36 @@ export default function SwapPage() {
     }
   }, []);
 
-  return (
-    <Box>
-      <OnlyAuthenticated />
-      <Flex justify={"center"} align="center">
-        <Box>
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 15 }}
-            transition={{ duration: 0.45 }}
-          >
-            <Box
-              animation={"fadeIn 0.5s ease-in-out"}
-              boxShadow={"xl"}
-              minW={{ base: "100%", md: "500px" }}
+  if (
+    !user ||
+    !user.user ||
+    !user.twitter ||
+    sessionStatus !== "authenticated"
+  ) {
+    return <ConnectPage />;
+  } else {
+    return (
+      <Box>
+        <OnlyAuthenticated />
+        <Flex justify={"center"} align="center">
+          <Box>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+              transition={{ duration: 0.45 }}
             >
-              <Swap />
-            </Box>
-          </motion.div>
-        </Box>
-      </Flex>
-    </Box>
-  );
+              <Box
+                animation={"fadeIn 0.5s ease-in-out"}
+                boxShadow={"xl"}
+                minW={{ base: "100%", md: "500px" }}
+              >
+                <Swap />
+              </Box>
+            </motion.div>
+          </Box>
+        </Flex>
+      </Box>
+    );
+  }
 }

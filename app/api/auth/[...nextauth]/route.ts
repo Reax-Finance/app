@@ -49,6 +49,8 @@ export const authOptions = ({ req }: { req: NextRequest }): NextAuthOptions => {
             }),
           });
 
+          console.log("SIWE Verification Result:", result);
+
           if (result.success) {
             return {
               id: siwe.address,
@@ -99,7 +101,12 @@ export async function POST(req: NextRequest) {
   try {
     // const response = await NextAuth(authOptions({ req }));
     const response = await NextAuth(authOptions({ req }));
-    if (!response) {
+
+    const serializedResponse = {
+      user: response.user || null,
+      data: response.data || null,
+    };
+    if (!serializedResponse) {
       return NextResponse.json(
         { error: "Bad Request. No response" },
         { status: 500 }
@@ -109,7 +116,7 @@ export async function POST(req: NextRequest) {
     //   console.error("Error in POST:", response.error);
     //   return NextResponse.json({ error: response.error }, { status: 500 });
     // }
-    return NextResponse.json(response.data);
+    return NextResponse.json({ data: serializedResponse }, { status: 200 });
   } catch (e: any) {
     console.error("Error in POST:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -119,7 +126,23 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const response = await NextAuth(authOptions({ req }));
-    return NextResponse.json(response);
+
+    console.log("Full GET response", response);
+
+    const serializedResponse = {
+      user: response?.user || null,
+      data: response?.data || null,
+      response: response || null,
+    };
+    if (!serializedResponse) {
+      return NextResponse.json(
+        { error: "Bad Request. No response" },
+        { status: 500 }
+      );
+    }
+
+    console.log("GET response", serializedResponse);
+    return NextResponse.json({ data: serializedResponse }, { status: 200 });
   } catch (e: any) {
     console.error("Error in GET:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });

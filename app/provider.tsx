@@ -10,7 +10,13 @@ import { UserDataProvider } from "../components/context/UserDataProvider";
 import { theme } from "../styles/theme";
 import { useEffect, useState } from "react";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session: any;
+}) {
   const [mounted, setMounted] = useState<boolean>(false);
   useEffect(() => {
     setMounted(true);
@@ -19,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return null;
   }
   return (
-    <SessionProvider refetchInterval={0}>
+    <SessionProvider session={session}>
       <ChakraProvider theme={theme}>
         <ThirdwebProvider>
           <UserDataProvider>

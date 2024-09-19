@@ -6,22 +6,24 @@ import "../styles/rounded-dark.css";
 import "../styles/rounded-light.css";
 import { Providers } from "./provider";
 import ComponentLayout from "./ComponentLayout";
+import { getServerSession } from "next-auth";
 
 export const metadata: Metadata = {
   title: "REAX",
   description: "Welcome to REAX",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
   return (
     <html lang="en">
       <body>
         <div>
-          <Providers>
+          <Providers session={session}>
             <ComponentLayout>{children}</ComponentLayout>
           </Providers>
         </div>
