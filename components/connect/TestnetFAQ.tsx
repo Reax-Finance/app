@@ -131,6 +131,7 @@ export default function TestnetFAQ() {
             _hover={{ opacity: 0.6 }}
             w={"100%"}
             leftIcon={<BsDiscord fill="white" />}
+            onClick={() => window.open("https://discord.gg/4b4SKTsh", "_blank")}
           >
             Join Discord
           </Button>
