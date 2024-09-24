@@ -10,11 +10,9 @@ import ConnectInterface from "./ConnectInterface";
 import GetStarted from "./GetStarted";
 import NotWhitelisted from "./NotWhitelisted";
 import SignupInterface from "./SignupInterface";
-import { useSession } from "next-auth/react";
 import { useActiveWalletConnectionStatus } from "thirdweb/react";
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
-  const { status: sessionStatus } = useSession();
   const status = useActiveWalletConnectionStatus();
   const { address } = UserAccount();
   const [join, setJoin] = React.useState(false);
@@ -40,11 +38,8 @@ export default function ConnectPage() {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status == "disconnected" ||
-                sessionStatus == "unauthenticated" ? (
-                  <ConnectInterface />
-                ) : null}
-                {status == "connected" && sessionStatus == "authenticated" ? (
+                {status == "disconnected" ? <ConnectInterface /> : null}
+                {status == "connected" ? (
                   userStatus == Status.SUCCESS &&
                   user?.isAllowlisted &&
                   user?.id == address?.toLowerCase() ? (

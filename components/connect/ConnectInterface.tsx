@@ -12,6 +12,7 @@ import {
 import { VARIANT } from "../../styles/theme";
 import { CustomConnectButton } from "../core/ConnectButton";
 import FAQ from "./FAQ";
+import { SignIn } from "@clerk/nextjs";
 
 export default function ConnectInterface() {
   const { colorMode } = useColorMode();
@@ -56,7 +57,9 @@ export default function ConnectInterface() {
           <Image src={"/bg-tokens.svg"} width={"100%"} alt="" />
 
           <Box mt={6}>
-            <CustomConnectButton />
+            <SignIn />
+
+            {/* <CustomConnectButton /> */}
           </Box>
         </Flex>
       </Flex>

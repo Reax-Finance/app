@@ -1,15 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession();
   try {
     const { searchParams } = new URL(req.url);
     const address = searchParams.get("address");
-    console.log("address is ", address, " and session is", session);
     if (!address) {
       return NextResponse.json(
         { message: "Bad Request: Address is required" },

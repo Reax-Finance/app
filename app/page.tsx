@@ -7,18 +7,17 @@ import Swap from "../components/swap/index";
 
 import { useEffect } from "react";
 import { useUserData } from "../components/context/UserDataProvider";
-import { useSession } from "next-auth/react";
 import ConnectPage from "../components/connect/ConnectPage";
 
 export default function SwapPage() {
   const { user } = useUserData();
-  const { status: sessionStatus } = useSession();
+  // const { status: sessionStatus } = useSession();
   useEffect(() => {
     if (
       !user ||
       !user.user ||
-      !user.twitter ||
-      sessionStatus !== "authenticated"
+      !user.twitter
+      // sessionStatus !== "authenticated"
     ) {
       window.location.href = "/connect";
     }
@@ -27,8 +26,8 @@ export default function SwapPage() {
   if (
     !user ||
     !user.user ||
-    !user.twitter ||
-    sessionStatus !== "authenticated"
+    !user.twitter
+    // sessionStatus !== "authenticated"
   ) {
     return <ConnectPage />;
   } else {

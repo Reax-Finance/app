@@ -1,7 +1,6 @@
 "use client";
 
 import { ChakraProvider } from "@chakra-ui/react";
-import { SessionProvider } from "next-auth/react";
 import { ThirdwebProvider } from "thirdweb/react";
 import { AppDataProvider } from "../components/context/AppDataProvider";
 import { BalanceContextProvider } from "../components/context/BalanceProvider";
@@ -10,13 +9,7 @@ import { UserDataProvider } from "../components/context/UserDataProvider";
 import { theme } from "../styles/theme";
 import { useEffect, useState } from "react";
 
-export function Providers({
-  children,
-  session,
-}: {
-  children: React.ReactNode;
-  session: any;
-}) {
+export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState<boolean>(false);
   useEffect(() => {
     setMounted(true);
@@ -25,18 +18,16 @@ export function Providers({
     return null;
   }
   return (
-    <SessionProvider session={session}>
-      <ChakraProvider theme={theme}>
-        <ThirdwebProvider>
-          <UserDataProvider>
-            <AppDataProvider>
-              <BalanceContextProvider>
-                <PriceContextProvider>{children}</PriceContextProvider>
-              </BalanceContextProvider>
-            </AppDataProvider>
-          </UserDataProvider>
-        </ThirdwebProvider>
-      </ChakraProvider>
-    </SessionProvider>
+    <ChakraProvider theme={theme}>
+      <ThirdwebProvider>
+        <UserDataProvider>
+          <AppDataProvider>
+            <BalanceContextProvider>
+              <PriceContextProvider>{children}</PriceContextProvider>
+            </BalanceContextProvider>
+          </AppDataProvider>
+        </UserDataProvider>
+      </ThirdwebProvider>
+    </ChakraProvider>
   );
 }

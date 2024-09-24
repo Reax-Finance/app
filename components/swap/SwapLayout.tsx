@@ -26,7 +26,6 @@ import {
   useActiveAccount,
   useActiveWalletConnectionStatus,
 } from "thirdweb/react";
-import { useSession } from "next-auth/react";
 
 const inputStyle = {
   variant: "unstyled",
@@ -70,7 +69,7 @@ export default function SwapLayout({
 
   const connectionStatus = useActiveWalletConnectionStatus();
   const isConnected = connectionStatus == "connected" ? true : false;
-  const { status: sessionStatus } = useSession();
+  // const { status: sessionStatus } = useSession();
 
   const inputValue = Big(Number(inputAmount) || 0)
     .mul(tokens[inputAssetIndex].price)
@@ -174,7 +173,7 @@ export default function SwapLayout({
             mt={4}
           >
             <Text>{dollarFormatter.format(inputValue)}</Text>
-            {isConnected && sessionStatus === "authenticated" && (
+            {isConnected && (
               <Flex align={"center"} gap={1}>
                 <Text>Max</Text>
                 <Text
@@ -264,7 +263,7 @@ export default function SwapLayout({
             mb={-4}
           >
             <Text>{dollarFormatter.format(outputValue)}</Text>
-            {isConnected && sessionStatus === "authenticated" && (
+            {isConnected && (
               <Flex align={"center"} gap={1}>
                 <AiOutlineWallet size={"16px"} />
                 <Text>
