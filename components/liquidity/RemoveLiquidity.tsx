@@ -75,7 +75,7 @@ function RemoveLiquidity({
     approvedAmount: approvedLpAmount,
     reset: resetApprovalLp,
   } = useApproval({});
-  const { getContract, send, rxRouter } = useChainData();
+  const { getContract, send } = useChainData();
 
   // only if vaults[i].userBalance > 0
   const tokens = synths[marketIndex]

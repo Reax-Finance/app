@@ -48,7 +48,7 @@ function AppDataProvider({ children }: any) {
 
 	const { getUpdateData, getAllPythFeeds } = useUpdateData();
 	const [updateData, setUpdateData] = React.useState<any[]>([]);
-	const { getContract, send, uidp: _uidp } = useChainData();
+	const { getContract } = useChainData();
 
 	const [pairs, setPairs] = React.useState<PairData[]>([]);
 
@@ -91,7 +91,7 @@ function AppDataProvider({ children }: any) {
 		const fetchData = () => {
 			let _address = address || ADDRESS_ZERO;
 			const start = Date.now();
-			const uidp = _uidp();
+			const uidp = getContract("UIDataProvider");
 			// console.log("Fetching data for", _address, chain?.id, updateData);
 			// if(first) setStatus(Status.FETCHING);
 			uidp.callStatic

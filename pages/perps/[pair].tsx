@@ -1,4 +1,3 @@
-import { Box, Flex, Heading } from '@chakra-ui/react'
 import React from 'react'
 import Perps from '../../components/perps'
 import router, { useRouter } from 'next/router';
@@ -46,7 +45,7 @@ export default function PerpsPair() {
                             <p>Total Assets: {pair.synth2.market.totalAssetsUSD.toString()} USD</p>
                             <p>Total Debt: {pair.synth2.market.totalDebtUSD.toString()} USD</p>
                         </div>
-                    </div>
+                    </div>``
                 </div>
             ))}
         </div> */}

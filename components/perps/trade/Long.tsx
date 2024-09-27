@@ -21,8 +21,6 @@ import {
 } from "@chakra-ui/react";
 import { BigNumber, ethers } from "ethers";
 import { useAccount, useSignTypedData } from "wagmi";
-import { useBalanceData } from "../../context/BalanceProvider";
-import router from "next/router";
 import {
 	Slider,
 	SliderTrack,
@@ -30,8 +28,7 @@ import {
 	SliderThumb,
 	SliderMark,
 } from "@chakra-ui/react";
-import { usePriceData } from "../../context/PriceContext";
-import { ADDRESS_ZERO, EIP712_VERSION, ESYX_PRICE, ROUTER_ENDPOINT, dollarFormatter, isSupportedChain, tokenFormatter } from "../../../src/const";
+import { dollarFormatter, isSupportedChain, tokenFormatter } from "../../../src/const";
 import { ExternalLinkIcon, InfoIcon, InfoOutlineIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import Big from "big.js";
 import useHandleError, { PlatformType } from "../../utils/useHandleError";
@@ -42,7 +39,6 @@ import SelectBody2 from "./SelectBody2";
 import TokenSelector from "../../swap/TokenSelector";
 import { AiOutlineDown } from "react-icons/ai";
 import { useAppData } from "../../context/AppDataProvider";
-import axios from 'axios';
 import { motion } from "framer-motion";
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 // import RouteDetails from "../../swap/RouteDetails";
@@ -58,7 +54,7 @@ const labelStyles = {
 export default function Long({ pair }: { pair: PairData }) {
 	const [inAmount, setInAmount] = React.useState("");
 	const [outAmount, setOutAmount] = React.useState("");
-	const [inAssetIndex, setInAssetIndex] = React.useState(6);
+	const [inAssetIndex, setInAssetIndex] = React.useState(0);
 	const [leverage, setLeverage] = React.useState(5);
 	const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedPosition, setSelectedPosition] = React.useState(0);
@@ -66,14 +62,15 @@ export default function Long({ pair }: { pair: PairData }) {
   const vaults: any[] = [];
   const [dataLoading, setDataLoading] = useState(false);
 
-	const { prices } = usePriceData();
   const [error, setError] = useState(null);
 
 	const onInputTokenSelected = (i: number) => {
+    console.log("Selected", i);
 		setInAssetIndex(i);
     setInAmount('');
 		setOutAmount('');
     resetApproval();
+    onClose();
 	};
 
 	const setOutputAmount = (e: any) => {
@@ -83,7 +80,7 @@ export default function Long({ pair }: { pair: PairData }) {
 	};
 
 	const setMax = (multiplier: number) => {
-		let v1 = Big(pair.synth2.synth.walletBalance.toString()).div(10 ** pair.synth2.synth.decimals).mul(multiplier);
+		let v1 = Big(synths[inAssetIndex].synth.walletBalance.toString()).div(10 ** synths[inAssetIndex].synth.decimals).mul(multiplier);
 		let v2 = Big(availableLiquidity()).mul(0.99).div(pair.synth2.synth.price.toNumber()).div(leverage).mul(multiplier);
 		let min = v1.lt(v2) ? v1 : v2;
 		if(min.lt(0)) min = Big(0);
@@ -94,48 +91,48 @@ export default function Long({ pair }: { pair: PairData }) {
     setError(null)
 		e = parseInput(e);
 		setInAmount(e);
-    if(Number(e) == 0 || pair.synth2.synth.id == pair.synth1.synth.id) {
-      setOutAmount(Big(Number(e)).mul(leverage).toString());
-			return;
-		}
+    console.log(e, leverage, synths[inAssetIndex].synth.price.toString(), pair.synth1.synth.price.toString())
+    setOutAmount(
+      Big(Number(e)).mul(leverage).mul(synths[inAssetIndex].synth.price.toString()).div(pair.synth1.synth.price.toString()).toString()
+    );
+    return;
     
-    setDataLoading(true);
-    axios.get(ROUTER_ENDPOINT, {
-      params: {
-        tokenIn: pair.synth2.synth.id,
-        tokenOut: pair.synth1.synth.id,
-        amount: e,
-        kind: 0,
-        sender: ADDRESS_ZERO,
-        recipient: ADDRESS_ZERO,
-        deadline: (Date.now()/1000).toFixed(0) + 5 * 60,
-        slipage: maxSlippage
-      }
-    })
-      .then((res: any) => {
-        setDataLoading(false);
-        const swapData = res.data.data;
-        setSwapData(swapData);
-        setOutAmount(
-          Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pair.synth1.synth.decimals).toString()
-        );
-      })
-      .catch((err: any) => {
-        setDataLoading(false);
-        setOutAmount('');
-        setSwapData(null);
-        console.log(err);
-        setError(err.response?.data?.message ?? "Error fetching data")
-      })
+    // setDataLoading(true);
+    // axios.get(ROUTER_ENDPOINT, {
+    //   params: {
+    //     tokenIn: pair.synth2.synth.id,
+    //     tokenOut: pair.synth1.synth.id,
+    //     amount: e,
+    //     kind: 0,
+    //     sender: ADDRESS_ZERO,
+    //     recipient: ADDRESS_ZERO,
+    //     deadline: (Date.now()/1000).toFixed(0) + 5 * 60,
+    //     slipage: maxSlippage
+    //   }
+    // })
+    //   .then((res: any) => {
+    //     setDataLoading(false);
+    //     const swapData = res.data.data;
+    //     setSwapData(swapData);
+    //     setOutAmount(
+    //       Big(swapData.fData.estimatedOut).mul(leverage).div(10 ** pair.synth1.synth.decimals).toString()
+    //     );
+    //   })
+    //   .catch((err: any) => {
+    //     setDataLoading(false);
+    //     setOutAmount('');
+    //     setSwapData(null);
+    //     console.log(err);
+    //     setError(err.response?.data?.message ?? "Error fetching data")
+    //   })
 	};
 
 	const _setLeverage = (e: number) => {
 		setLeverage(e);
 		if(!Number(inAmount)) return;
-		setOutAmount(Big(e).mul(inAmount).mul(pair.synth2.synth.price.toNumber()).div(pair.synth1.synth.price.toNumber()).toString());
+		setOutAmount(Big(Number(inAmount)).mul(e).mul(synths[inAssetIndex].synth.price.toString()).div(pair.synth1.synth.price.toString()).toString());
 	}
 
-	const { signTypedDataAsync } = useSignTypedData();
   const { address, isConnected, chain } = useAccount();
 	const [loading, setLoading] = useState(false);
   const [swapData, setSwapData] = useState<any>(null);
@@ -174,28 +171,27 @@ export default function Long({ pair }: { pair: PairData }) {
         stage: 0,
         message: "Enter Amount"
       }
-    } else if (Big(Number(inAmount)).gt(Big(pair.synth2.synth.walletBalance.toString()).div(10**pair.synth2.synth.decimals))) {
+    } else if (Big(Number(inAmount)).gt(Big(synths[inAssetIndex].synth.walletBalance.toString()).div(10**synths[inAssetIndex].synth.decimals))) {
       return {
         stage: 0,
         message: "Amount Exceeds Balance"
       }
     } 
-    else if (Big(Number(outAmount)).mul(pair.synth1.synth.price.toNumber()).gt(availableLiquidity())) {
+    else if (Big(Number(outAmount)).mul(pair.synth1.synth.price.toString()).div(10**8).gt(availableLiquidity())) {
       return {
         stage: 0,
         message: "Insufficient Liquidity"
       }
     } 
-    else if (!vaults[selectedPosition]?.id) {
-      return {
-        stage: 0,
-        message: "Loading..."
-      }
-    } 
+    // else if (!vaults[selectedPosition]?.id) {
+    //   return {
+    //     stage: 0,
+    //     message: "Loading..."
+    //   }
+    // }
     
     // TODO: check allowance if not native
-    // if (pair.synth2.synth.id !== ethers.constants.AddressZero && !data) {
-    //   // if not approved
+      // if not approved
     //   if(Big(allowances[pair.synth2.synth.id]?.[vaults[selectedPosition]?.id] ?? 0).add(Big(approvedAmount).mul(10 ** (pair.synth1.decimals ?? 18))).lt(
     //     Big(inAmount).mul(10 ** (pair.synth1.decimals ?? 18))
     //   )) {
@@ -209,7 +205,7 @@ export default function Long({ pair }: { pair: PairData }) {
     //       message: "Approve Use Of" + " " + pair.synth2.synth.symbol
     //     }
     //   }
-    // } else {
+    //  else {
     //   return {
     //     stage: 3,
     //     message: "Long"
@@ -389,8 +385,8 @@ export default function Long({ pair }: { pair: PairData }) {
 
 	const { colorMode } = useColorMode();
 
-  const inputValue = (Number(inAmount) || 0) * pair.synth2.synth.price.toNumber();
-  const outputValue = Number(outAmount) * pair.synth1.synth.price.toNumber() / leverage
+  const inputValue = Big(Number(inAmount) || 0).mul(synths[inAssetIndex].synth.price.toString()).div(10**8).toNumber();
+  const outputValue = Big(Number(outAmount)).mul(pair.synth1.synth.price.toString()).div(10**8).toNumber();
 
   const priceImpact = (100*((outputValue - inputValue)/inputValue) || 0);
 	const { getButtonProps, getDisclosureProps, isOpen: isButtonOpen } = useDisclosure()
@@ -416,7 +412,7 @@ export default function Long({ pair }: { pair: PairData }) {
                 
                 <Box w="40%">
                   <SelectBody2
-                    asset={pair.synth1}
+                    asset={synths[inAssetIndex]}
                     onOpen={onOpen}
                     // size={"md"}
                   />
@@ -445,7 +441,7 @@ export default function Long({ pair }: { pair: PairData }) {
             >
               <Flex align={'center'}>
                 <Box>
-                  <Text fontSize={'xs'} mb={-6} mx={2}  color={colorMode == 'dark' ? 'whiteAlpha.600': 'blackAlpha.600'}>Position Size ({dollarFormatter.format(outputValue * leverage)})</Text>
+                  <Text fontSize={'xs'} mb={-6} mx={2}  color={colorMode == 'dark' ? 'whiteAlpha.600': 'blackAlpha.600'}>Position Size ({dollarFormatter.format(outputValue)})</Text>
                   <NumberInputField disabled={true} _disabled={{color: "white"}} rounded={0} p={2} py={2} pt={6} fontSize={'2xl'} placeholder="0" />
                 </Box>
                 

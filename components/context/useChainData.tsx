@@ -3,6 +3,7 @@ import { useAccount } from "wagmi";
 import { ADDRESS_ZERO, isSupportedChain } from "../../src/const";
 import dotenv from "dotenv";
 import { baseSepolia, sepolia } from "viem/chains";
+import * as data from "../../deployments/84532/development_pool_0.json"
 
 dotenv.config();
 
@@ -16,7 +17,8 @@ export default function useChainData() {
     return artifact.abi;
   };
 
-  const getContract = (contractName: string, address: string) => {
+  const getContract = (contractName: string, address?: string) => {
+
     let provider = new ethers.providers.JsonRpcProvider(
       (chain ?? baseSepolia)?.rpcUrls.default.http[0]
     );
@@ -27,8 +29,15 @@ export default function useChainData() {
       isSupportedChain(
         BigNumber.from(window?.ethereum?.chainId || 0).toNumber()
       )
-    )
+    ){
       provider = new ethers.providers.Web3Provider(window.ethereum as any);
+    }
+    if (!address) {
+      address = (data as any)[contractName];
+      if (!address)
+        throw new Error(contractName + " not found");
+    }
+    console.log("address", address)
     let contract = new ethers.Contract(address, getABI(contractName), provider);
     return contract;
   };
@@ -46,25 +55,9 @@ export default function useChainData() {
       [method](...params, { value: value });
   };
 
-  const uidpAddress: { [key: number]: string | undefined } = {
-    11155111: process.env.NEXT_PUBLIC_UIDP_ADDRESS_11155111,
-    84532: process.env.NEXT_PUBLIC_UIDP_ADDRESS_84532,
-    421614: process.env.NEXT_PUBLIC_UIDP_ADDRESS_421614,
-    1337: process.env.NEXT_PUBLIC_UIDP_ADDRESS_1337,
-  };
-
-  //Issue: We are getting 11155111 as chain?.id
-  //Fix: Added env for 11155111
-  const rxRouter = () =>
-    getContract("ReaxRouter", uidpAddress[chain?.id ?? baseSepolia.id]!);
-
-  const uidp = () =>
-    getContract("UIDataProvider", uidpAddress[chain?.id ?? baseSepolia.id]!);
   return {
     getABI,
     getContract,
     send,
-    rxRouter,
-    uidp,
   };
 }

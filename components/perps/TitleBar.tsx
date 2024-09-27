@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, Text, Tooltip, useColorMode } from '@chakra-ui/react'
+import { Box, Divider, Flex, Heading, Text, Tooltip, useColorMode, Image } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import PairSelector from './PairSelector'
 import { usePriceData } from '../context/PriceContext';
@@ -6,8 +6,9 @@ import router from 'next/router';
 import { useAppData } from '../context/AppDataProvider';
 import { SynthData } from '../utils/types';
 
+const HEIGHT = '80px';
+
 export default function TitleBar({pair}: any) {
-    const { prices } = usePriceData();
     const { pairs, synths } = useAppData();
 
     const [token0Rate, setToken0Rate] = React.useState(['0', '0']);
@@ -18,43 +19,42 @@ export default function TitleBar({pair}: any) {
     useEffect(() => {
         if (!pair || !pairs) return;
 
-        const currentPair = pairs.find(p => p.id === pair);
-        if (!currentPair) return;
-
         const updateRates = (synth: SynthData, setRate: React.Dispatch<React.SetStateAction<string[]>>) => {
             const interestRate = synth.market.interestRate;
             setRate([
-                (Number(interestRate) / 1e18).toFixed(2),
-                (-Number(interestRate) / 1e18).toFixed(2)
+                (interestRate.toNumber() / 100).toFixed(2),
+                (((interestRate).toNumber()/100) * -1).toFixed(2)
             ]);
         };
 
-        updateRates(currentPair.synth1, setToken0Rate);
-        updateRates(currentPair.synth2, setToken1Rate);
+        updateRates(pair.synth1, setToken0Rate);
+        updateRates(pair.synth2, setToken1Rate);
     }, [pair, pairs, synths]);
-
-    const getCurrentPair = () => pairs?.find(p => p.id === pair);
 
     return (
         <>
-        <Flex minH={'80px'} align={'center'}>
+        <Flex minH={HEIGHT} px={5} align={'center'} bg={`${colorMode}Bg.400`}>
             <Box>
-            <PairSelector />
+            {/* <PairSelector /> */}
+            <Flex gap={4} pr={10}>
+                <Image src={`/icons/${pair?.id?.split('-')[0]}.svg`} w={'30px'} alt="pair"/>
+                <Heading fontSize={{sm: '3xl', md: "3xl", lg: '30px'}} fontWeight='bold'>
+                    {pair?.id}
+                </Heading>
+            </Flex>
             </Box>
-            <Divider orientation="vertical" h={'80px'} />
+            <Divider orientation="vertical" h={HEIGHT} />
             <Box px={10}>
                 <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'sm'}>Index Price</Text>
                 <Heading size={'md'}>
                     {(() => {
-                        const currentPair = getCurrentPair();
-                        if (!currentPair) return '0';
-                        const price0 = Number(currentPair.synth1.synth.price) / 1e18;
-                        const price1 = Number(currentPair.synth2.synth.price) / 1e18;
+                        const price0 = Number(pair.synth1.synth.price) / 1e18;
+                        const price1 = Number(pair.synth2.synth.price) / 1e18;
                         return (price0 / price1).toFixed(4);
                     })()}
                 </Heading>
             </Box>
-            <Divider orientation="vertical" h={'80px'} />
+            <Divider orientation="vertical" h={HEIGHT} />
             <Box px={6}>
                 <Text color={colorMode == 'dark' ? 'whiteAlpha.600' : 'blackAlpha.600'} fontSize={'sm'}>Base APY</Text>
                 <Flex>

@@ -82,7 +82,7 @@ export default function SwapLayout({
         );
     }
 
-  return (
+    return (
     <>
         <Box className={`${VARIANT}-${colorMode}-containerBody`} maxW={'540px'}>
             <Box className={`${VARIANT}-${colorMode}-containerHeader`} px={5} py={4}>

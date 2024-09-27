@@ -59,9 +59,6 @@ import {
 	ModalCloseButton,
 } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
-import { ethers } from "ethers";
-import { useBalanceData } from "../components/context/BalanceProvider";
-import Big from "big.js";
 import { VARIANT } from "../styles/theme";
 import { MdOpenInNew } from "react-icons/md";
 import ThBox from "../components/ui/table/ThBox";
@@ -322,6 +319,9 @@ export default function Faucet() {
 										<Text color={"gray.400"}>
 											You are about to mint{" "}
 											{openedCollateral.symbol}.
+										</Text>
+										<Text color={"red.400"} fontSize={'sm'} mt={1}>
+											NOTE: Claimable only once every 24 hrs.
 										</Text>
 									</Box>
 								</Flex>

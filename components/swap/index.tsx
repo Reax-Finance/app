@@ -54,7 +54,7 @@ function Swap() {
 	const [maxSlippage, setMaxSlippage] = useState(0.5);
 	const [deadline_m, setDeadline_m] = useState(20);
 	const { getUpdateData, getUpdateFee } = useUpdateData();
-	const { getContract, send, rxRouter: _rxRouter } = useChainData();
+	const { getContract, send } = useChainData();
 
 	const { approve, loading: approvalLoading, data, deadline, approvedAmount, reset } = useApproval({});
 
@@ -142,7 +142,7 @@ function Swap() {
 		const updateData = await getUpdateData();
 		const updateFee = await getUpdateFee();
 		const calls = [];
-		const rxRouter = _rxRouter();
+		const rxRouter = getContract("ReaxRouter");
 		calls.push(rxRouter.interface.encodeFunctionData("updateOracleData", [updateData]));
 		if(Big(approvedAmount ?? 0).gt(0)){
 			const { v, r, s } = ethers.utils.splitSignature(data);
@@ -196,7 +196,7 @@ function Swap() {
 					amount: inputAmount,
 					token: inToken
 				},
-				execute: () => approve(inToken, _rxRouter().address!)
+				execute: () => approve(inToken, getContract("ReaxRouter").address!)
 			})
 		}
 		return steps;

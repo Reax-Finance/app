@@ -15,7 +15,7 @@ const RED = "#ff631b";
 const DARK_BACKGROUND = "#191D25"
 const LIGHT_BACKGROUND = "#C1C1C1"
 
-const HEIGHT = "640px";
+const HEIGHT = "540px";
 
 const widgetOptions = (props, ref) => { 
 	return {
@@ -42,11 +42,12 @@ const widgetOptions = (props, ref) => {
 		"narrow_chart_enabled",
 		"study_templates",
 		"show_logo_on_all_charts",
-		"hide_left_toolbar_by_default"
+		"hide_left_toolbar_by_default",
+		"hide_side_toolbar"
 	],
 	logo: {
 		image: "/logo-square.svg",
-		link: "https://app.reax.one"
+		link: "https://app.reax.fi"
 	},
 	theme: 'dark',
 	toolbar_bg: props.colorMode == 'dark' ? DARK_BACKGROUND : LIGHT_BACKGROUND,
