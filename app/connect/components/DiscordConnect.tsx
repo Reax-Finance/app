@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Image, Text, useColorMode } from "@chakra-ui/react";
 import Link from "next/link";
-import { VARIANT } from "../../styles/theme";
-import { useUserData } from "../context/UserDataProvider";
+import { VARIANT } from "../../../styles/theme";
+import { useUserData } from "../../../components/context/UserDataProvider";
 
 export const DISCORD_CONNECT_STATE = "discord-connect";
 const DISCORD_SCOPE = ["identify", "guilds", "guilds.members.read"].join(" ");

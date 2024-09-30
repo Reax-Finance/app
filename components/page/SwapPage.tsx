@@ -2,13 +2,11 @@
 
 import { Box, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import OnlyAuthenticated from "../auth/OnlyAuthenticated";
-import Swap from "../swap/index";
+import Swap from "../../app/swap/components/index";
 
 export default function SwapPage() {
   return (
     <Box>
-      <OnlyAuthenticated />
       <Flex justify={"center"} align="center">
         <Box>
           <motion.div

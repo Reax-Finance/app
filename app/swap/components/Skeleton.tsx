@@ -1,6 +1,6 @@
 import { Box, Flex, Skeleton, useColorMode } from '@chakra-ui/react'
 import React from 'react'
-import { VARIANT } from '../../styles/theme';
+import { VARIANT } from '../../../styles/theme';
 
 export default function SwapSkeleton() {
     const {colorMode} = useColorMode();
@@ -35,6 +35,7 @@ export default function SwapSkeleton() {
 					height={"20px"}
 					width={"150px"}
 				></Skeleton>
+				
 			</Box>
 		</Flex>
 		<Flex

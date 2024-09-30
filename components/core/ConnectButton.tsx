@@ -1,7 +1,6 @@
 import { ConnectButton } from "thirdweb/react";
-import { generatePayload, login, logout } from "../../app/connect/actions/auth";
+import { generatePayload, isLoggedIn, login, logout } from "../../app/connect/actions/auth";
 import { client } from "../../lib/client";
-import { isLoggedIn } from "../../app/connect/connect-button/actions/auth";
 
 export const CustomConnectButton = () => {
   return (
@@ -9,26 +8,17 @@ export const CustomConnectButton = () => {
       client={client}
       auth={{
         isLoggedIn: async (address) => {
-          console.log("Checking if logged in for address:", address);
-          const loggedIn = await isLoggedIn();
-          console.log("Logged in:", loggedIn);
-          return loggedIn;
+          console.log("checking if logged in!", { address });
+          return await isLoggedIn();
         },
         doLogin: async (params) => {
-          console.log("Logging in with params:", params);
+          console.log("logging in!");
           await login(params);
-          console.log("Login successful!");
         },
-        getLoginPayload: async ({ address }) => {
-          console.log("Generating login payload for address:", address);
-          const payload = await generatePayload({ address });
-          console.log("Generated payload:", payload);
-          return payload;
-        },
+        getLoginPayload: async ({ address }) => generatePayload({ address }),
         doLogout: async () => {
-          console.log("Logging out!");
+          console.log("logging out!");
           await logout();
-          console.log("Logout successful!");
         },
       }}
     />

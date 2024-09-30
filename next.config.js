@@ -18,7 +18,9 @@ const moduleExports = {
     ],
   },
   experimental: {
-    serverActions: true
+    serverActions: {
+      allowedOrigins: ["http://localhost:3000"],
+    }
   },
 
   sentry: {

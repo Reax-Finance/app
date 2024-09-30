@@ -8,17 +8,13 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-// import { useSession } from "next-auth/react";
-import { VARIANT } from "../../styles/theme";
-import { CustomConnectButton } from "../core/ConnectButton";
+import { VARIANT } from "../../../../styles/theme";
+import { CustomConnectButton } from "../../../../components/core/ConnectButton";
 import FAQ from "./FAQ";
 
-export default function ConnectInterface() {
+export default function SignInBox() {
   const { colorMode } = useColorMode();
-  // const { data: session, status } = useSession();
 
-  // console.log("Session data:", session);
-  // console.log("Session status:", status);
   return (
     <Flex
       gap={4}
@@ -32,7 +28,6 @@ export default function ConnectInterface() {
         className={`${VARIANT}-${colorMode}-containerBody`}
         rounded={0}
         w={{ base: "100%", md: "60%", lg: "60%" }}
-        // justify={"space-between"}
       >
         <Box className={`${VARIANT}-${colorMode}-containerBody2`} px={6} py={4}>
           <Heading

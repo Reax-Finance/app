@@ -4,11 +4,11 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import { VARIANT } from "../../styles/theme";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
-import ImageSlider from "./ImageSlider";
-import { SlideData } from "./SlideData";
+import { VARIANT } from "../../../styles/theme";
+import Dark400Box2C from "../../../components/ui/boxes/Dark400Box2C";
+import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
+import ImageSlider from "../get-started/components/ImageSlider";
+import { SlideData } from "../get-started/components/SlideData";
 
 export default function Allowlist({ setJoin }: any) {
   const signIn = () => {

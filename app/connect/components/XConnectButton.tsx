@@ -3,9 +3,9 @@ import React from "react";
 import Link from "next/link";
 import { MdRefresh } from "react-icons/md";
 import { FaXTwitter } from "react-icons/fa6";
-import { TWITTER_SCOPE } from "../../src/const";
-import { useUserData } from "../context/UserDataProvider";
-import TwitterButton from "../ui/buttons/TwitterButton";
+import { TWITTER_SCOPE } from "../../../src/const";
+import { useUserData } from "../../../components/context/UserDataProvider";
+import TwitterButton from "../../../components/ui/buttons/TwitterButton";
 
 export const TWITTER_CONNECT_STATE = "twitter-connect";
 

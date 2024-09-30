@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import { BigNumber, ethers } from "ethers";
 import { baseSepolia } from "viem/chains";
 import { isSupportedChain } from "../../src/const";
-import { useAccount } from "wagmi";
 import { useActiveWalletChain } from "thirdweb/react";
 
 dotenv.config();

@@ -3,15 +3,17 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import React from "react";
-import { useUserData } from "../context/UserDataProvider";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
-import PrimaryButton from "../ui/buttons/PrimaryButton";
-import UserAccount from "../utils/useUserAccount";
-import TestnetFAQ from "./TestnetFAQ";
-import XConnect from "./XConnect";
-export default function SignupInterface({ accessCode }: any) {
-  const { updateUser, user } = useUserData();
+import { useUserData } from "../../../components/context/UserDataProvider";
+import Dark400Box2C from "../../../components/ui/boxes/Dark400Box2C";
+import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
+import PrimaryButton from "../../../components/ui/buttons/PrimaryButton";
+import UserAccount from "../../../components/utils/useUserAccount";
+import TestnetFAQ from "../components/TestnetFAQ";
+import XConnect from "../components/XConnect";
+
+export default function RegisterPage() {
+
+const { updateUser, user } = useUserData();
   const { address } = UserAccount();
   const [loading, setLoading] = React.useState(false);
 
@@ -19,7 +21,7 @@ export default function SignupInterface({ accessCode }: any) {
   const signUp = () => {
     setLoading(true);
     axios
-      .post("/api/user/join", { address, accessCode })
+      .post("/api/user/join", { address })
       .then(async (res) => {
         await updateUser();
         toast({
@@ -70,12 +72,6 @@ export default function SignupInterface({ accessCode }: any) {
               {"'"}re redefining investments and trading.
             </Text>
 
-            {accessCode && (
-              <Text mt={6}>
-                You have been invited to join the Reax Testnet with the access
-                code <b>{accessCode}</b>
-              </Text>
-            )}
             <Box mt={{ base: 3, md: 3, lg: 6 }}>
               <XConnect />
             </Box>

@@ -2,40 +2,25 @@
 
 import { Box, Button, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useContext } from "react";
 import {
   useActiveWalletChain,
-  useActiveWalletConnectionStatus,
 } from "thirdweb/react";
-import { AppDataContext } from "../components/context/AppDataProvider";
+import { useAppData } from "../components/context/AppDataProvider";
 import Footer from "../components/core/Footer";
 import Navbar from "../components/core/Navbar";
-import SwapPage from "../components/page/SwapPage";
 import { Status } from "../components/utils/status";
 import { isSupportedChain } from "../src/const";
 
 export default function ComponentLayout({ children }: any) {
-  const { status, message } = useContext(AppDataContext);
-
-  const connectionStatus = useActiveWalletConnectionStatus();
-  const isConnected = connectionStatus == "connected" ? true : false;
+  // const { status, message } = useAppData();
 
   const chain = useActiveWalletChain();
-  // const [hydrated, setHydrated] = useState(false);
-  // useEffect(() => {
-  //   if (!hydrated) {
-  //     setHydrated(true);
-  //   }
-  // }, [hydrated]);
-
-  // if (!hydrated) {
-  //   return <></>;
-  // }
+  
   const { colorMode } = useColorMode();
   return (
     <Box h={"100vh"}>
       {/* Wrong Chain */}
-      {isConnected && !isSupportedChain(chain?.id || 0) && (
+      {/* {isConnected && !isSupportedChain(chain?.id || 0) && (
         <Flex
           align={"center"}
           justify={"center"}
@@ -63,7 +48,7 @@ export default function ComponentLayout({ children }: any) {
             Switch Chain
           </Button>
         </Flex>
-      )}
+      )} */}
       {/* {status == Status.FETCHING && (
         <Progress
           bg={"blackAlpha.200"}
@@ -73,7 +58,7 @@ export default function ComponentLayout({ children }: any) {
         />
       )} */}
       {/* Error */}
-      <Box bgColor="gray.800" color={"gray.400"}>
+      {/* <Box bgColor="gray.800" color={"gray.400"}>
         {status == Status.ERROR && (
           <Text
             textAlign={"center"}
@@ -85,7 +70,7 @@ export default function ComponentLayout({ children }: any) {
             {message}
           </Text>
         )}
-      </Box>
+      </Box> */}
 
       {/* BG */}
       <Flex
@@ -147,7 +132,7 @@ export default function ComponentLayout({ children }: any) {
               exit={{ opacity: 0, y: 15 }}
               transition={{ duration: 0.25 }}
             >
-              <SwapPage />
+              {children}
             </motion.div>
           </Flex>
         </Box>

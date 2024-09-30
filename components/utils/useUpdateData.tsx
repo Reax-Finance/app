@@ -1,3 +1,4 @@
+"use client";
 import React, { useContext } from 'react'
 import { AppDataContext } from '../context/AppDataProvider';
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';

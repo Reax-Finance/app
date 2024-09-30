@@ -1,8 +1,8 @@
 import React from "react";
 import XConnectButton from "./XConnectButton";
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import { useUserData } from "../context/UserDataProvider";
+import Dark400Box2C from "../../../components/ui/boxes/Dark400Box2C";
+import { useUserData } from "../../../components/context/UserDataProvider";
 
 export default function XConnect() {
   const { user } = useUserData();

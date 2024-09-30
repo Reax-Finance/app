@@ -7,8 +7,7 @@ import {
   Button,
   useColorMode,
 } from "@chakra-ui/react";
-import { CustomConnectButton } from "../core/ConnectButton";
-import { VARIANT } from "../../styles/theme";
+import { VARIANT } from "../../../../styles/theme";
 import {
   Accordion,
   AccordionItem,
@@ -17,11 +16,9 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { BsDiscord } from "react-icons/bs";
-import { useRouter } from "next/navigation";
 
-export default function TestnetFAQ() {
+export default function FAQ() {
   const { colorMode } = useColorMode();
-  const router = useRouter();
 
   return (
     <Box
@@ -29,28 +26,27 @@ export default function TestnetFAQ() {
       flexDirection="column"
       gap={10}
       px={6}
-      py={6}
+      py={{ base: 4, md: 8, lg: 10 }}
       className={`${VARIANT}-${colorMode}-containerBody`}
       rounded={0}
       //   w={"100%"}
-      zIndex={2}
-      mb={{ base: 28, md: 0, lg: 0 }}
+      // zIndex={-2}
     >
       <Accordion allowToggle w={"100%"} maxW={"600px"} defaultIndex={[2]}>
         <AccordionItem>
           <h2>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
-                What is a testnet?
+                What{"'"}s a wallet?
               </Box>
               <AccordionIcon />
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            Think of it like a final rehearsal for a big show. It&apos;s a safe
-            space where we can fine-tune our platform, try out new ideas, and
-            gather valuable feedback from users like you – all before the
-            official launch.
+            Think of it like a digital bank account for your crypto assets. It
+            {"'"}s where you{"'"}ll securely store your digital keys and assets
+            to interact with our platform. Your wallet will be essential for
+            managing your investments.
           </AccordionPanel>
         </AccordionItem>
 
@@ -58,62 +54,46 @@ export default function TestnetFAQ() {
           <h2>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
-                Testnet Token System:
+                Don{"'"}t have a wallet?
               </Box>
               <AccordionIcon />
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <Flex direction={"column"} ml={6} w={"100%"}>
-              <li>
-                As you experiment and provide feedback, you&apos;ll earn
-                experience points in the form of exclusive testnet tokens. Think
-                of it as leveling up in a game!
-              </li>
-
-              <li>
-                Psst… These points not only track your progress but also open up
-                new features and opportunities within the testnet. Keep
-                tinkering with our platform and try to stay on top of the
-                leaderboard! May the odds be ever in your favor, tradoor.
-              </li>
-            </Flex>
+            No worries! Creating a wallet is quick and easy. We recommend
+            popular options listed to the left, for their security and ease of
+            use.
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem>
           <h2>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
-                Sybil Verification:
+                How to connect?
               </Box>
               <AccordionIcon />
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
             <Flex direction={"column"}>
-              To ensure a fair and secure experience for everyone, we&apos;re
-              asking you to quickly verify your identity via X (formerly
-              Twitter).
-              <Flex direction={"column"} ml={6} w={"100%"} mt={2}>
-                <li>
+              Now that you{"'"}ve created a wallet, follow these steps to get
+              started on Reax!
+              <Flex direction={"column"} ml={6} w={"100%"}>
+                <Text>
                   {" "}
-                  Your account must have at least 10 followers and 3 months of
-                  activity.
-                </li>
+                  1. Choose your wallet: Select your preferred wallet from the
+                  options provided.
+                </Text>
 
-                <li>
-                  This helps us prevent bots and make sure real people are
-                  testing our platform. We appreciate your understanding!
-                </li>
+                <Text>
+                  2. Follow the prompts: Your wallet will guide you through a
+                  few simple steps to connect with Reax.
+                </Text>
+                <Text>
+                  3. Dive in: Once connected, you{"'"}ll be ready to explore all
+                  the exciting functionalities on our platform.
+                </Text>
               </Flex>
-              <Text
-                fontSize={"lg"}
-                mt={2}
-                fontStyle={"italic"}
-                fontWeight={"bold"}
-              >
-                See you on the inside!
-              </Text>
             </Flex>
           </AccordionPanel>
         </AccordionItem>

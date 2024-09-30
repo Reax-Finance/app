@@ -1,5 +1,5 @@
 import React from "react";
-import DiscordConnect from "../../connect/DiscordConnect";
+import DiscordConnect from "../../../app/connect/components/DiscordConnect";
 import Dark600Box2C from "../../ui/boxes/Dark600Box2C";
 import Dark400Box2C from "../../ui/boxes/Dark400Box2C";
 import { Box, Flex, Heading, Text, useColorMode } from "@chakra-ui/react";

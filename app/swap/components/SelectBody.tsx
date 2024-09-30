@@ -1,7 +1,7 @@
 import { Box, Flex, Image, Text, useColorMode } from '@chakra-ui/react';
 import React from 'react'
 import { RiArrowDropDownLine } from 'react-icons/ri';
-import { VARIANT } from '../../styles/theme';
+import { VARIANT } from '../../../styles/theme';
 
 export default function SelectBody({ asset, onOpen }: any) {
 	const { colorMode } = useColorMode();

@@ -20,7 +20,7 @@ import { ONE_ETH } from "../../src/const";
 import { useAppData } from "../context/AppDataProvider";
 import useApproval from "../context/useApproval";
 import useChainData from "../context/useChainData";
-import TokenSelector from "../swap/TokenSelector";
+import TokenSelector from "../../app/swap/components/TokenSelector";
 import { parseInput } from "../utils/number";
 import { Asset } from "../utils/types";
 import useUpdateData from "../utils/useUpdateData";

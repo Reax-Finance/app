@@ -14,12 +14,12 @@ export default function NavLink({
 }: any) {
   const [isPath, setIsPath] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
-  useEffect(() => {
-    // search path
-    setIsPath(pathname.split("/")[1] == path.split("/")[1]);
-  }, [setIsPath, pathname, path]);
+  // useEffect(() => {
+  //   // search path
+  //   setIsPath(pathname.split("/")[1] == path.split("/")[1]);
+  // }, [setIsPath, pathname, path]);
 
   const { colorMode } = useColorMode();
 

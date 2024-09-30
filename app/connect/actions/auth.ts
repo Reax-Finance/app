@@ -25,23 +25,21 @@ export async function login(payload: VerifyLoginPayloadParams) {
       payload: verifiedPayload.payload,
     });
     cookies().set("jwt", jwt);
-    // redirect to the secure page
-    redirect("/");
+    redirect("/connect/get-started");
   }
 }
 
-export async function authedOnly() {
+export async function isLoggedIn() {
   const jwt = cookies().get("jwt");
-  console.log("jwt", jwt);
   if (!jwt?.value) {
-    redirect("/connect");
+    return false;
   }
 
   const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
   if (!authResult.valid) {
-    redirect("/connect");
+    return false
   }
-  return authResult.parsedJWT;
+  return true;
 }
 
 export async function logout() {

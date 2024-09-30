@@ -33,11 +33,11 @@ function NavBar() {
   const { colorMode } = useColorMode();
 
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
-  if (pathname == "/connect" || pathname.includes("/callback")) {
-    return null;
-  }
+  // if (pathname == "/connect" || pathname.includes("/callback")) {
+  //   return null;
+  // }
   if (!isConnected) {
     return null;
   }

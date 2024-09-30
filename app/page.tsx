@@ -1,49 +1,11 @@
-"use client";
+import { redirect } from "next/navigation";
+import { isLoggedIn } from "./connect/actions/auth";
+import Swap from "./swap/components/Swap";
 
-import { Box, Flex } from "@chakra-ui/react";
-import { motion } from "framer-motion";
-import OnlyAuthenticated from "../components/auth/OnlyAuthenticated";
-import Swap from "../components/swap/index";
+export default async function SwapPage() {
+  if (!(await isLoggedIn())) {
+    redirect("/connect");
+  }
 
-import { useEffect } from "react";
-import { useUserData } from "../components/context/UserDataProvider";
-import { useSession } from "next-auth/react";
-
-export default function SwapPage() {
-  const { user } = useUserData();
-  const { status: sessionStatus } = useSession();
-  useEffect(() => {
-    if (
-      !user ||
-      !user.user ||
-      !user.twitter ||
-      sessionStatus !== "authenticated"
-    ) {
-      window.location.href = "/connect";
-    }
-  }, []);
-
-  return (
-    <Box>
-      <OnlyAuthenticated />
-      <Flex justify={"center"} align="center">
-        <Box>
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 15 }}
-            transition={{ duration: 0.45 }}
-          >
-            <Box
-              animation={"fadeIn 0.5s ease-in-out"}
-              boxShadow={"xl"}
-              minW={{ base: "100%", md: "500px" }}
-            >
-              <Swap />
-            </Box>
-          </motion.div>
-        </Box>
-      </Flex>
-    </Box>
-  );
+  return <Swap />;
 }

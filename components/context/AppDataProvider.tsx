@@ -1,8 +1,7 @@
 "use client";
 
-import * as React from "react";
-import { ADDRESS_ZERO, isSupportedChain } from "../../src/const";
-import { useEffect } from "react";
+import { ADDRESS_ZERO } from "../../src/const";
+import React, { useContext, useEffect } from "react";
 import { Status } from "../utils/status";
 import { Account, ReserveData, LiquidityData } from "../utils/types";
 import useUpdateData from "../utils/useUpdateData";
@@ -145,7 +144,7 @@ function AppDataProvider({ children }: any) {
 }
 
 export const useAppData = () => {
-  return React.useContext(AppDataContext);
+  return useContext(AppDataContext);
 };
 
 export { AppDataProvider, AppDataContext };

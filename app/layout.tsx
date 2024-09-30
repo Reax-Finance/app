@@ -4,7 +4,7 @@ import "../styles/edgy-light.css";
 import "../styles/globals.css";
 import "../styles/rounded-dark.css";
 import "../styles/rounded-light.css";
-import { Providers } from "./provider";
+import { Providers } from "./providers";
 import ComponentLayout from "./ComponentLayout";
 
 export const metadata: Metadata = {
@@ -12,11 +12,8 @@ export const metadata: Metadata = {
   description: "Welcome to REAX",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <html lang="en">
       <body>

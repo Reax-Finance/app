@@ -20,7 +20,7 @@ import { formatInput, parseInput } from "../utils/number";
 import { useAppData } from "../context/AppDataProvider";
 import { ArrowRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { BigNumber, ethers } from "ethers";
-import TokenSelector from "../swap/TokenSelector";
+import TokenSelector from "../../app/swap/components/TokenSelector";
 import { useRouter, useSearchParams } from "next/navigation";
 import useApproval from "../context/useApproval";
 import useDelegate from "../context/useDelegate";

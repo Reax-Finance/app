@@ -10,14 +10,13 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import React, { use, useEffect } from "react";
-import { VARIANT } from "../../styles/theme";
+import { VARIANT } from "../../../styles/theme";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import axios from "axios";
-import Dark400Box2C from "../ui/boxes/Dark400Box2C";
-import Dark600Box2C from "../ui/boxes/Dark600Box2C";
-import { useUserData } from "../context/UserDataProvider";
+import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
+import { useUserData } from "../../../components/context/UserDataProvider";
 
-export default function NotWhitelisted({
+export default function WhitelistPage({
   setJoin,
   accessCode,
   setAccessCode,

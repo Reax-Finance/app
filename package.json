@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "build": "prisma generate && next build",
     "build:staging": "yarn run:config:staging && next build",
     "start": "next start",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@balancer-labs/sdk": "^1.1.1",
     "@chakra-ui/icons": "^2.0.18",
+    "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
     "@chakra-ui/theme-tools": "2.0.14",
     "@emotion/react": "^11.11.4",
@@ -31,6 +32,7 @@
     "moment": "^2.29.4",
     "next": "^14.2.6",
     "next-auth": "^4.20.1",
+    "pino-pretty": "^11.2.2",
     "prisma": "^5.17.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

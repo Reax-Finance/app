@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useCallback, useEffect, useState } from "react";
-import { tokenFormatter } from "../../src/const";
+import { tokenFormatter } from "../../../src/const";
 
 import {
   Modal,
@@ -29,7 +29,7 @@ import {
   useActiveAccount,
   useActiveWalletConnectionStatus,
 } from "thirdweb/react";
-import { VARIANT } from "../../styles/theme";
+import { VARIANT } from "../../../styles/theme";
 
 const POPULAR_TOKENS = ["WETH", "MNT", "USDT", "cUSD"];
 

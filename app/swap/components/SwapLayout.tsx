@@ -16,10 +16,10 @@ import Big from "big.js";
 import { AiOutlineWallet } from "react-icons/ai";
 import { FaBoltLightning } from "react-icons/fa6";
 import { MdOutlineSwapVert } from "react-icons/md";
-import { dollarFormatter, tokenFormatter } from "../../src/const";
-import { VARIANT } from "../../styles/theme";
-import { useAppData } from "../context/AppDataProvider";
-import { formatInput } from "../utils/number";
+import { dollarFormatter, tokenFormatter } from "../../../src/const";
+import { VARIANT } from "../../../styles/theme";
+import { useAppData } from "../../../components/context/AppDataProvider";
+import { formatInput } from "../../../components/utils/number";
 import SelectBody from "./SelectBody";
 import Settings from "./Settings";
 import {

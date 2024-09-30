@@ -19,7 +19,7 @@ import {
   useRadioGroup,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { VARIANT } from "../../styles/theme";
+import { VARIANT } from "../../../styles/theme";
 
 const OptionNames: any = {
   "0.1": "Low (0.1%)",
