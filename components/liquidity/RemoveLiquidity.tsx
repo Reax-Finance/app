@@ -78,7 +78,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
     approvedAmount: approvedLpAmount,
     reset: resetApprovalLp,
   } = useApproval({});
-  const { getContract, send, rxRouter } = useChainData();
+  const { getContract, send } = useChainData();
 
   // only if vaults[i].userBalance > 0
   const tokens = reserveData
@@ -161,7 +161,7 @@ function RemoveLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
     });
   }, [inputAmount, outputAmount]);
 
-  if (!account || !reserveData || !liquidityData || !outToken) return <></>;
+  if (!account || !reserveData || !liquidityData || !outToken) return null;
 
   const updateInputAmount = (value: any) => {
     value = parseInput(value);

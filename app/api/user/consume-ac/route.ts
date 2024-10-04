@@ -2,14 +2,14 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { isLoggedIn } from "../../../connect/actions/auth";
 const prisma = new PrismaClient();
 
-export default async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const accessCode = searchParams.get("accessCode")!;
-  const session = await getServerSession(authOptions({ req }));
-  let address = session?.user?.name?.toLowerCase();
+  const { isAuthenticated, payload } = await isLoggedIn();
+  const address = payload?.parsedJWT.sub as string;
   if (!address) {
     return NextResponse.json({ message: "Bad Request" });
   }

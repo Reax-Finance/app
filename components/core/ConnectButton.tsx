@@ -1,5 +1,10 @@
 import { ConnectButton } from "thirdweb/react";
-import { generatePayload, isLoggedIn, login, logout } from "../../app/connect/actions/auth";
+import {
+  generatePayload,
+  isLoggedIn,
+  login,
+  logout,
+} from "../../app/connect/actions/auth";
 import { client } from "../../lib/client";
 
 export const CustomConnectButton = () => {
@@ -9,7 +14,8 @@ export const CustomConnectButton = () => {
       auth={{
         isLoggedIn: async (address) => {
           console.log("checking if logged in!", { address });
-          return await isLoggedIn();
+          const result = await isLoggedIn();
+          return result.isAuthenticated;
         },
         doLogin: async (params) => {
           console.log("logging in!");

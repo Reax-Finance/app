@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
 import { USERNAME_XP_REWARD } from "../../../../src/const";
+import { isLoggedIn } from "../../../connect/actions/auth";
 
 const prisma = new PrismaClient();
 
@@ -11,9 +11,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { username }: { username: string } = body;
 
-    const session = await getServerSession(authOptions({ req }));
-    const address = session?.user?.name;
-    if (!session || !session.user || !address) {
+    const { isAuthenticated, payload } = await isLoggedIn();
+    const address = payload?.parsedJWT.sub as string;
+    if (!isAuthenticated || !address) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

@@ -1,56 +1,152 @@
+// import { BigNumber } from "ethers";
+
+// export interface Account {
+// 	healthFactor: string;
+// 	availableToMintUSD: string;
+// 	userTotalBalanceUSD: string;
+// 	userAdjustedBalanceUSD: string;
+// 	userThresholdBalanceUSD: string;
+// 	userTotalDebtUSD: string;
+// }
+
+// export interface ReserveData {
+// 	totalAssetsUSD: BigNumber;
+// 	userTotalBalanceUSD: BigNumber;
+// 	userAdjustedBalanceUSD: BigNumber;
+// 	userThresholdBalanceUSD: BigNumber;
+// 	vaults: VaultData[];
+// }
+
+// export interface VaultData {
+// 	asset: Asset;
+// 	vaultToken: Asset;
+// 	totalAssets: BigNumber;
+// 	userBalance: BigNumber;
+// 	config: ReserveConfig;
+// }
+
+// export interface Asset {
+// 	id: string;
+// 	name: string;
+// 	symbol: string;
+// 	decimals: number;
+// 	totalSupply: BigNumber;
+// 	pythId: string;
+// 	price: BigNumber;
+// 	balance: BigNumber;
+// 	approvalToRouter: BigNumber;
+// }
+
+// export interface ReserveConfig {
+// 	vault: string;
+// 	baseLTV: BigNumber;
+// 	liquidationThreshold: BigNumber;
+// 	liquidationBonus: BigNumber;
+// 	liquidationFee: BigNumber;
+// 	maxDeposits: BigNumber;
+// 	active: boolean;
+// }
+
+// export interface LiquidityData {
+// 	totalDebtUSD: BigNumber;
+// 	userTotalDebtUSD: BigNumber;
+// 	lpToken: Asset;
+// 	debtToken: Asset;
+// 	synths: Asset[];
+// }
+
 import { BigNumber } from "ethers";
 
 export interface Account {
-	healthFactor: string;
-	availableToMintUSD: string;
-	userTotalBalanceUSD: string;
-	userAdjustedBalanceUSD: string;
-	userThresholdBalanceUSD: string;
-	userTotalDebtUSD: string;
+  userTotalBalanceUSD: BigNumber;
+  userAdjustedBalanceUSD: BigNumber;
+  userThresholdBalanceUSD: BigNumber;
+  userDebtUSD: BigNumber;
+  accountHealth: BigNumber;
 }
 
 export interface ReserveData {
-	totalAssetsUSD: BigNumber;
-	userTotalBalanceUSD: BigNumber;
-	userAdjustedBalanceUSD: BigNumber;
-	userThresholdBalanceUSD: BigNumber;
-	vaults: VaultData[];
+  totalAssetsUSD: BigNumber;
+  userTotalBalanceUSD: BigNumber;
+  userAdjustedBalanceUSD: BigNumber;
+  userThresholdBalanceUSD: BigNumber;
+  vaults: VaultData[];
 }
 
-export interface VaultData {
-	asset: Asset;
-	vaultToken: Asset;
-	totalAssets: BigNumber;
-	userBalance: BigNumber;
-	config: ReserveConfig;
-}
+// export interface VaultData {
+// 	asset: Asset;
+// 	vaultToken: Asset;
+// 	totalAssets: BigNumber;
+// 	userBalance: BigNumber;
+// 	config: ReserveConfig;
+// }
 
 export interface Asset {
-	id: string;
-	name: string;
-	symbol: string;
-	decimals: number;
-	totalSupply: BigNumber;
-	pythId: string;
-	price: BigNumber;
-	balance: BigNumber;
-	approvalToRouter: BigNumber;
+  id: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  totalSupply: BigNumber;
+  pythId: string;
+  price: BigNumber;
+  walletBalance: BigNumber;
+  approvalToRouter: BigNumber;
 }
 
 export interface ReserveConfig {
-	vault: string;
-	baseLTV: BigNumber;
-	liquidationThreshold: BigNumber;
-	liquidationBonus: BigNumber;
-	liquidationFee: BigNumber;
-	maxDeposits: BigNumber;
-	active: boolean;
+  vault: string;
+  baseLTV: BigNumber;
+  liquidationThreshold: BigNumber;
+  liquidationBonus: BigNumber;
+  liquidationFee: BigNumber;
+  maxDeposits: BigNumber;
+  active: boolean;
 }
 
 export interface LiquidityData {
-	totalDebtUSD: BigNumber;
-	userTotalDebtUSD: BigNumber;
-	lpToken: Asset;
-	debtToken: Asset;
-	synths: Asset[];
+  totalDebtUSD: BigNumber;
+  userTotalDebtUSD: BigNumber;
+  lpToken: Asset;
+  debtToken: Asset;
+  synths: Asset[];
+}
+
+export interface PairData {
+  id: string;
+  synth1: SynthData;
+  synth2: SynthData;
+}
+
+// ------------------------------
+
+export interface UIData {
+  synths: SynthData[];
+  router: string;
+  blockNumber: number;
+}
+
+export interface SynthData {
+  synth: Asset;
+  market: MarketData;
+}
+
+export interface MarketData {
+  exists: boolean;
+  totalAssetsUSD: BigNumber;
+  totalDebtUSD: BigNumber;
+  userTotalBalanceUSD: BigNumber;
+  userAdjustedBalanceUSD: BigNumber;
+  userThresholdBalanceUSD: BigNumber;
+  userDebtUSD: BigNumber;
+  accountHealth: BigNumber;
+  interestRate: BigNumber;
+  debtToken: Asset;
+  vaults: VaultData[];
+}
+
+export interface VaultData {
+  asset: Asset;
+  vaultToken: Asset;
+  ratio: BigNumber;
+  config: ReserveConfig;
 }

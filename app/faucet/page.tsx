@@ -56,7 +56,6 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { MdOpenInNew } from "react-icons/md";
-import OnlyAuthenticated from "../../components/auth/OnlyAuthenticated";
 import useChainData from "../../components/context/useChainData";
 import TdBox from "../../components/ui/table/TdBox";
 import ThBox from "../../components/ui/table/ThBox";
@@ -157,7 +156,6 @@ const Page = () => {
       transition={{ duration: 0.25 }}
     >
       <Box h={"60vh"}>
-        <OnlyAuthenticated />
         <Head>
           <title>Test Faucet | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
           <link
@@ -313,6 +311,9 @@ const Page = () => {
                     <Box mb={2}>
                       <Text color={"gray.400"}>
                         You are about to mint {openedCollateral.symbol}.
+                      </Text>
+                      <Text color={"red.400"} fontSize={"sm"} mt={1}>
+                        NOTE: Claimable only once every 24 hrs.
                       </Text>
                     </Box>
                   </Flex>

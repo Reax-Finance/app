@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { ADDRESS_ZERO } from "../../src/const";
 import { Status } from "../utils/status";
 import UserAccount from "../utils/useUserAccount";
+import { isLoggedIn } from "../../app/connect/actions/auth";
 
 interface UserObject extends _User {
   accessCodes: AccessCode[];
@@ -54,18 +55,20 @@ function UserDataProvider({ children }: any) {
   // }, [address, sessionStatus]);
 
   async function updateUser(): Promise<void> {
+    const { isAuthenticated } = await isLoggedIn();
     return new Promise((resolve, reject) => {
       setStatus(Status.FETCHING);
       if (typeof window === "undefined") return;
 
       if (!address || address == ADDRESS_ZERO) return;
-      // if (sessionStatus !== "authenticated") return;
+      if (!isAuthenticated) return;
       setLoading(true);
       axios
         .get("/api/user/get-user", {
           params: { address },
         })
         .then((res: any) => {
+          console.log("Res is", res);
           setLoading(false);
           console.log("User data", res.data);
           setUser({

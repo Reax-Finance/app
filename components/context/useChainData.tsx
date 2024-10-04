@@ -3,6 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import { baseSepolia } from "viem/chains";
 import { isSupportedChain } from "../../src/const";
 import { useActiveWalletChain } from "thirdweb/react";
+import * as data from "../../deployments/84532/development_pool_0.json";
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ export default function useChainData() {
     return artifact.abi;
   };
 
-  const getContract = (contractName: string, address: string) => {
+  const getContract = (contractName: string, address?: string) => {
     let provider = new ethers.providers.JsonRpcProvider(
       // (chain ?? baseSepolia)?.rpcUrls?.default?.http[0] ?? ""
       chain ? chain.rpc : baseSepolia.rpcUrls.default.http[0]
@@ -42,6 +43,10 @@ export default function useChainData() {
       isSupportedChain(BigNumber.from(window.ethereum.chainId || 0).toNumber())
     ) {
       provider = new ethers.providers.Web3Provider(window.ethereum);
+    }
+    if (!address) {
+      address = (data as any)[contractName];
+      if (!address) throw new Error(contractName + " not found");
     }
     const contract = new ethers.Contract(
       address,

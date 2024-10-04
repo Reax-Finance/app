@@ -9,12 +9,11 @@ import AccessCodes from "../../components/accounts/AccessCodes";
 import DiscordConnectQuest from "../../components/accounts/quests/DiscordConnectQuest";
 import FollowTwitter from "../../components/accounts/quests/FollowTwitter";
 import UsernameSelection from "../../components/accounts/UsernameSelection";
-import OnlyAuthenticated from "../../components/auth/OnlyAuthenticated";
 import { useUserData } from "../../components/context/UserDataProvider";
 import Dark600Box2C from "../../components/ui/boxes/Dark600Box2C";
+import UserAccount from "../../components/utils/useUserAccount";
 import { tokenFormatter } from "../../src/const";
 import { VARIANT } from "../../styles/theme";
-import UserAccount from "../../components/utils/useUserAccount";
 
 Swiper.use([Autoplay, Navigation]);
 
@@ -30,7 +29,6 @@ const Page = () => {
       transition={{ duration: 0.25 }}
     >
       <Box maxW={{ base: "95vw", md: "1350px", lg: "1350px" }}>
-        <OnlyAuthenticated />
         <Flex gap={10} justify={"space-between"}>
           <Box>
             <Heading>

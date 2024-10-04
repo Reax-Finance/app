@@ -1,12 +1,29 @@
+"use client";
+
 import { Box, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Head from "next/head";
-import OnlyAuthenticated from "../../components/auth/OnlyAuthenticated";
 import Liquidity from "../../components/liquidity/index";
+import { useEffect } from "react";
+import { checkUser } from "../../components/auth/checkUser";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const authenticate = async () => {
+      try {
+        await checkUser();
+      } catch (error) {
+        router.push("/connect");
+      }
+    };
+
+    authenticate();
+  }, [router]);
+
   return (
-    <>
+    <div>
       <Head>
         <title>Liquidity | {process.env.NEXT_PUBLIC_TOKEN_SYMBOL}</title>
         <link
@@ -15,7 +32,6 @@ const Page = () => {
           href={`/${process.env.NEXT_PUBLIC_VESTED_TOKEN_SYMBOL}.svg`}
         ></link>
       </Head>
-      <OnlyAuthenticated />
       <Flex>
         <Box w="100%" py={20}>
           <Flex justify={"center"} align="center">
@@ -40,7 +56,7 @@ const Page = () => {
           </Flex>
         </Box>
       </Flex>
-    </>
+    </div>
   );
 };
 

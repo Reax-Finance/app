@@ -2,7 +2,7 @@
 
 import { Box, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import Swap from "../../app/swap/components/index";
+import Swap from "../../app/swap/components/Swap";
 
 export default function SwapPage() {
   return (

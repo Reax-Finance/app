@@ -43,7 +43,7 @@ function NavBar() {
   }
 
   return (
-    <>
+    <div>
       <Flex
         mt={{ base: 0, md: 6 }}
         align="center"
@@ -117,12 +117,12 @@ function NavBar() {
               <Box>
                 {isConnected &&
                   process.env.NEXT_PUBLIC_NETWORK == "testnet" && (
-                    <>
+                    <div>
                       <NavLocalLink
                         path={"/faucet"}
                         title="Faucet"
                       ></NavLocalLink>
-                    </>
+                    </div>
                   )}
               </Box>
 
@@ -142,7 +142,7 @@ function NavBar() {
           <MobileNav />
         </Collapse>
       </Box>
-    </>
+    </div>
   );
 }
 

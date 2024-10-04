@@ -1,30 +1,41 @@
-import {
-  Flex,
-  Text,
-  Heading,
-  Box,
-  Divider,
-  Button,
-  useColorMode,
-  Input,
-  IconButton,
-} from "@chakra-ui/react";
-import React, { use, useEffect } from "react";
-import { VARIANT } from "../../../styles/theme";
+"use client";
+
 import { ChevronRightIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  IconButton,
+  Input,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 import axios from "axios";
-import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
+import { useEffect, useState } from "react";
 import { useUserData } from "../../../components/context/UserDataProvider";
+import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
+import { VARIANT } from "../../../styles/theme";
+import { useDisconnect } from "thirdweb/react";
+import { checkUser } from "../../../components/auth/checkUser";
 
 export default function WhitelistPage({
   setJoin,
   accessCode,
   setAccessCode,
 }: any) {
-  const { colorMode } = useColorMode();
-  const [error, setError] = React.useState<String | undefined>();
-  const [checkingAC, setCheckingAC] = React.useState(false);
+  const [error, setError] = useState<string | undefined>();
+  const [checkingAC, setCheckingAC] = useState(false);
   const { updateUser } = useUserData();
+
+  const { colorMode } = useColorMode();
+
+  const disconnectWallet = useDisconnect();
+
+  const handleClick = () => {
+    disconnectWallet.disconnect;
+  };
 
   const consumeAndJoin = () => {
     setCheckingAC(true);
@@ -47,7 +58,7 @@ export default function WhitelistPage({
   };
 
   const isValidInput =
-    accessCode.length == 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
+    accessCode?.length == 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
 
   return (
     <Dark600Box2C
@@ -101,7 +112,7 @@ export default function WhitelistPage({
         className={`${VARIANT}-${colorMode}-primaryButton`}
       >
         <Button
-          // onClick={openAccountModal}
+          onClick={handleClick}
           w={"100%"}
           bg={"transparent"}
           _hover={{ opacity: 0.6 }}

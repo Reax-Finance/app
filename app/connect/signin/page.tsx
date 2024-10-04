@@ -3,10 +3,11 @@ import { isLoggedIn } from "../actions/auth";
 import SignInBox from "./components/SignIn";
 
 export default async function ConnectPage() {
+  const { isAuthenticated } = await isLoggedIn();
 
-  if(await isLoggedIn()) {
+  if (isAuthenticated) {
     redirect("/connect/get-started");
   }
 
-  return (<SignInBox />);
+  return <SignInBox />;
 }

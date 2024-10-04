@@ -17,6 +17,8 @@ import {
   sepolia,
 } from "viem/chains";
 export const ADDRESS_ZERO = ethers.constants.AddressZero;
+export const ADDRESS_FIRST = "0xE8019c9C942336205f565CC3D2F299Bf37a8e1aE";
+export const ADDRESS_SECOND = "0x62CB28c5a24CBE8307f19530bf94Bd3b5D3Ec7Cf";
 
 const _sepolia = {
   ...sepolia,
@@ -179,7 +181,9 @@ export const TWITTER_SCOPE = [
 ].join(" ");
 
 export const X_ACCOUNT_AGE_MIN = 3 * 24 * 60 * 60 * 1000;
-export const X_ACCOUNT_FOLLOWERS_MIN = 10;
+
+//RESET TO 10;
+export const X_ACCOUNT_FOLLOWERS_MIN = 0;
 
 export const breakpoints = {
   base: "0em", // 0px

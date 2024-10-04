@@ -4,9 +4,9 @@ import { Flex, Spinner, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useUserData } from "../../components/context/UserDataProvider";
+import { useUserData } from "../../../components/context/UserDataProvider";
 
-export default function DiscordCallback() {
+export default function Page() {
   const { updateUser } = useUserData();
   const router = useRouter();
   const searchParams = useSearchParams();

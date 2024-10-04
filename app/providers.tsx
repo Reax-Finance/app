@@ -8,8 +8,16 @@ import { PriceContextProvider } from "../components/context/PriceContext";
 import { UserDataProvider } from "../components/context/UserDataProvider";
 import { theme } from "../styles/theme";
 import { CacheProvider } from "@chakra-ui/next-js";
+import { useEffect, useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const [hydrated, setHydrated] = useState<boolean>(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) return null;
 
   return (
     <CacheProvider>

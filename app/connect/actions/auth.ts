@@ -32,14 +32,14 @@ export async function login(payload: VerifyLoginPayloadParams) {
 export async function isLoggedIn() {
   const jwt = cookies().get("jwt");
   if (!jwt?.value) {
-    return false;
+    return { isAuthenticated: false, payload: null };
   }
 
   const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
   if (!authResult.valid) {
-    return false
+    return { isAuthenticated: false, payload: null };
   }
-  return true;
+  return { isAuthenticated: true, payload: authResult };
 }
 
 export async function logout() {

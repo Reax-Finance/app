@@ -1,16 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
 import { TWITTER_FOLLOW_REWARD } from "../../../../src/const";
+import { isLoggedIn } from "../../../connect/actions/auth";
 
 const prisma = new PrismaClient();
 
-export default async function PUT(req: NextRequest, res: NextResponse) {
-  const session = await getServerSession(authOptions({ req }));
-
-  const address = session?.user?.name;
-  if (!session || !session.user || !address) {
+export async function POST(req: NextRequest, res: NextResponse) {
+  const { isAuthenticated, payload } = await isLoggedIn();
+  const address = payload?.parsedJWT.sub as string;
+  if (!isAuthenticated || !address) {
     return NextResponse.json({ status: 401, message: "Unauthorized" });
   }
   const body = await req.json();

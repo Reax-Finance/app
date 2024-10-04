@@ -2,7 +2,7 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 import { useUserData } from "../../../components/context/UserDataProvider";
 import Dark400Box2C from "../../../components/ui/boxes/Dark400Box2C";
 import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
@@ -10,12 +10,30 @@ import PrimaryButton from "../../../components/ui/buttons/PrimaryButton";
 import UserAccount from "../../../components/utils/useUserAccount";
 import TestnetFAQ from "../components/TestnetFAQ";
 import XConnect from "../components/XConnect";
+import {
+  useActiveWallet,
+  useActiveWalletConnectionStatus,
+} from "thirdweb/react";
+import { redirect, useRouter } from "next/navigation";
+import { connect } from "http2";
 
 export default function RegisterPage() {
-
-const { updateUser, user } = useUserData();
+  const { updateUser, user } = useUserData();
   const { address } = UserAccount();
   const [loading, setLoading] = React.useState(false);
+
+  const router = useRouter();
+  const status = useActiveWalletConnectionStatus();
+  useEffect(() => {
+    console.log("updateUser");
+    updateUser();
+    console.log("updated User", user);
+
+    if (status !== "connected") {
+      ("use server");
+      redirect("/connect/sign-in");
+    }
+  }, []);
 
   const toast = useToast();
   const signUp = () => {
@@ -45,6 +63,9 @@ const { updateUser, user } = useUserData();
         setLoading(false);
       });
   };
+  if (status !== "connected") {
+    return <Text>Wallet is disconnected.</Text>;
+  }
   return (
     <Flex
       gap={4}

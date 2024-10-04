@@ -1,12 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export default async function GET(res: NextResponse) {
+export async function GET(req: NextRequest) {
   // Return all tasks
-  const tasks = await prisma.task.findMany();
-
-  NextResponse.json({ status: 200, message: "Success", tasks });
+  try {
+    const tasks = await prisma.task.findMany();
+    return NextResponse.json({ status: 200, message: "success", tasks });
+  } catch (error: any) {
+    return NextResponse.json({
+      status: 400,
+      message: "Failed to fetch tasks",
+      error: error.message,
+    });
+  }
 }

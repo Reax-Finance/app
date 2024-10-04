@@ -362,7 +362,7 @@ function AddLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
   };
 
   return (
-    <>
+    <div>
       <LiquidityLayout
         inputAmount={inputAmount}
         updateInputAmount={updateInputAmount}
@@ -386,7 +386,7 @@ function AddLiquidity({ updatedAccount, setUpdatedAccount, tabIndex }: any) {
         onTokenSelected={onInputTokenSelected}
         tokens={tokens}
       />
-    </>
+    </div>
   );
 }
 

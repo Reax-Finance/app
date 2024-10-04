@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
-import { useUserData } from "../../components/context/UserDataProvider";
+import { useUserData } from "../../../components/context/UserDataProvider";
 
-export default function TwitterCallback() {
+export default function Page() {
   const { updateUser } = useUserData();
   const router = useRouter();
   const searchParams = useSearchParams();

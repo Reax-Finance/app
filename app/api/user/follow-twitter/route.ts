@@ -3,15 +3,14 @@ import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { TWITTER_FOLLOW_REWARD } from "../../../../src/const";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { isLoggedIn } from "../../../connect/actions/auth";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const session = await getServerSession(authOptions({ req }));
-
-  const address = session?.user?.name;
-  if (!session || !session.user || !address) {
+  const { isAuthenticated, payload } = await isLoggedIn();
+  const address = payload?.parsedJWT.sub;
+  if (!isAuthenticated || !address) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 

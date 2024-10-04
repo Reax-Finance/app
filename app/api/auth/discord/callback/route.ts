@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../[...nextauth]/route";
 import { JOIN_DISCORD_REWARD } from "../../../../../src/const";
+import { isLoggedIn } from "../../../../connect/actions/auth";
 
 const prisma = new PrismaClient();
 
@@ -11,10 +11,9 @@ export async function POST(req: NextRequest) {
   try {
     const { state, code } = await req.json();
 
-    const session = await getServerSession(authOptions({ req }));
-    const address = session?.user?.name?.toLowerCase();
-
-    if (!address) {
+    const { isAuthenticated, payload } = await isLoggedIn();
+    const address = payload?.parsedJWT.sub as string;
+    if (!isAuthenticated) {
       return NextResponse.json(
         { message: "Bad Request: Unauthorized" },
         { status: 400 }

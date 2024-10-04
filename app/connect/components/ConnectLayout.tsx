@@ -1,7 +1,11 @@
 "use client";
 import { Box, Flex, Image } from "@chakra-ui/react";
 
-export default function ConnectLayout({ children }: { children: React.ReactNode }) {
+export default function ConnectLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <Box h={"100vh"}>
       <Flex
@@ -30,4 +34,4 @@ export default function ConnectLayout({ children }: { children: React.ReactNode 
       </Flex>
     </Box>
   );
-};
+}
