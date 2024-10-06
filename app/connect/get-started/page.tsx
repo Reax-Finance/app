@@ -28,11 +28,6 @@ export default function RegisterPage() {
     console.log("updateUser");
     updateUser();
     console.log("updated User", user);
-
-    if (status !== "connected") {
-      ("use server");
-      redirect("/connect/sign-in");
-    }
   }, []);
 
   const toast = useToast();
