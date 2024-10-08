@@ -1,7 +1,6 @@
+import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { PrismaClient } from "@prisma/client";
 import {
   X_ACCOUNT_AGE_MIN,
   X_ACCOUNT_FOLLOWERS_MIN,
@@ -11,19 +10,24 @@ import { isLoggedIn } from "../../../../connect/actions/auth";
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
+  console.log("Incoming POST request to /api/auth/twitter/callback");
+  const { state, code } = await req.json();
+
+  if (!state || !code) {
+    return NextResponse.json(
+      { message: "Missing state or code" },
+      { status: 400 }
+    );
+  }
+  const { payload } = await isLoggedIn();
+  let address = (payload?.parsedJWT.sub as string).toLowerCase();
+
+  if (!address) {
+    return NextResponse.json({ message: "Bad Request" }, { status: 400 });
+  }
+
+  // Exchange the authorization token for an access token
   try {
-    const { state, code } = await req.json();
-
-    const { isAuthenticated, payload } = await isLoggedIn();
-    const address = payload?.parsedJWT.sub as string;
-
-    if (!isAuthenticated) {
-      return NextResponse.json(
-        { message: "Bad Request: Unauthorized" },
-        { status: 400 }
-      );
-    }
-
     const args = new URLSearchParams({
       code: code as string,
       grant_type: "authorization_code",
@@ -31,7 +35,6 @@ export async function POST(req: NextRequest) {
       redirect_uri: `${process.env.NEXT_PUBLIC_VERCEL_URL}/callback/twitter`,
       code_verifier: "challenge",
     });
-
     const response = await axios.post(
       "https://api.twitter.com/2/oauth2/token",
       args.toString(),
@@ -47,6 +50,7 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    // Get /2/users/me with query params for all tweet.fields and user.fields
     const userResponse = await axios.get("https://api.twitter.com/2/users/me", {
       headers: {
         "Content-Type": "application/json",
@@ -58,19 +62,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // If user has less than 20 followers or account is less than 3 months old, reject the connection
     if (
       userResponse.data.data.public_metrics.followers_count <
       X_ACCOUNT_FOLLOWERS_MIN
     ) {
-      return NextResponse.json(
-        {
-          message: `Your account must have at least 20 followers to connect. Please try again with a different account.`,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (
+      return NextResponse.json({
+        message: `Your account must have at least 20 followers to connect. Please try again with a different account.`,
+      });
+    } else if (
       new Date().getTime() -
         new Date(userResponse.data.data.created_at).getTime() <
       X_ACCOUNT_AGE_MIN
@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       refreshToken: response.data.refresh_token,
     };
 
+    // Ensure the AllowlistedUser exists before proceeding
     const alUserRecord = await prisma.allowlistedUser.findUnique({
       where: {
         id: address,
@@ -103,14 +104,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // if (!alUserRecord) {
+    //   res.status(400).send({
+    //     message: `Allowlisted user not found.`,
+    //   });
+    //   return;
+    // }
+
+    // If user has already connected their account, update data and redirect to dashboard (no points)
     if (alUserRecord?.twitter) {
+      // Make sure the user is connecting the account they'd already connected
       if (alUserRecord.twitter.id !== twitterAccountData.id) {
-        return NextResponse.json(
-          {
-            message: `Account already connected to another user. Please try again with @${alUserRecord?.twitter?.username}.`,
-          },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          message: `Account already connected to another user. Please try again with @${alUserRecord?.twitter?.username}.`,
+        });
+        return;
       }
       await prisma.twitterAccount.update({
         where: {
@@ -120,6 +128,7 @@ export async function POST(req: NextRequest) {
         data: twitterAccountData,
       });
     } else {
+      // Store the Twitter account in the database
       await prisma.twitterAccount.create({
         data: {
           ...twitterAccountData,
@@ -128,32 +137,29 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(
-      {
-        twitter: {
-          id: userResponse.data.data.id,
-          name: userResponse.data.data.name,
-          username: userResponse.data.data.username,
-          verified: userResponse.data.data.verified,
-          profileImageUrl: userResponse.data.data.profile_image_url,
-          followersCount: userResponse.data.data.public_metrics.followers_count,
-          updatedAt: new Date().toISOString(),
-        },
+    // Success response
+    return NextResponse.json({
+      twitter: {
+        id: userResponse.data.data.id,
+        name: userResponse.data.data.name,
+        username: userResponse.data.data.username,
+        verified: userResponse.data.data.verified,
+        profileImageUrl: userResponse.data.data.profile_image_url,
+        followersCount: userResponse.data.data.public_metrics.followers_count,
+        updatedAt: new Date().toISOString(),
       },
-      { status: 200 }
-    );
+    });
   } catch (error: any) {
-    let errMessage =
+    let err =
       error?.response?.data?.error_description ||
       JSON.stringify(error?.response?.data || error);
-    if (errMessage.includes("PrismaClientKnownRequestError")) {
-      errMessage =
+    console.log("Error", error);
+    if (err.includes("PrismaClientKnownRequestError"))
+      err =
         "Account already connected to another user. Please try again with a different account.";
-    }
-
     return NextResponse.json(
       {
-        message: errMessage,
+        message: err,
       },
       { status: 400 }
     );

@@ -13,25 +13,23 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useDisconnect } from "thirdweb/react";
 import { useUserData } from "../../../components/context/UserDataProvider";
 import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
 import { VARIANT } from "../../../styles/theme";
-import { useDisconnect } from "thirdweb/react";
-import { checkUser } from "../../../components/auth/checkUser";
 
-export default function WhitelistPage({
-  setJoin,
-  accessCode,
-  setAccessCode,
-}: any) {
+export default function WhitelistPage() {
   const [error, setError] = useState<string | undefined>();
   const [checkingAC, setCheckingAC] = useState(false);
-  const { updateUser } = useUserData();
+  const [accessCode, setAccessCode] = useState<string>("");
+  const [join, setJoin] = useState(false);
 
+  const { user, updateUser, refreshUserData } = useUserData();
   const { colorMode } = useColorMode();
-
   const disconnectWallet = useDisconnect();
+  const router = useRouter();
 
   const handleClick = () => {
     disconnectWallet.disconnect;
@@ -39,16 +37,23 @@ export default function WhitelistPage({
 
   const consumeAndJoin = () => {
     setCheckingAC(true);
+    setError(undefined);
+
     axios
-      .get(`/api/user/consume-ac?accessCode=${accessCode}`)
+      .get(`/api/user/consume-ac?access-code=${accessCode}`)
       .then((res) => {
+        console.log("Response from API:", res);
+
         setCheckingAC(false);
-        updateUser();
-        setJoin(true);
+
+        if (res.data.status === 200) {
+          updateUser();
+          setJoin(true);
+        }
       })
       .catch((err) => {
         setCheckingAC(false);
-        setError("Invalid access code");
+        setError(err.response.data.message);
       });
   };
 
@@ -57,8 +62,22 @@ export default function WhitelistPage({
     setAccessCode(e.target.value);
   };
 
+  useEffect(() => {
+    console.log("getting User");
+    refreshUserData();
+    console.log("updated User", user);
+    if (join || user?.isAllowlisted) {
+      router.push("/connect/get-started");
+    }
+  }, [join, router]);
+
   const isValidInput =
-    accessCode?.length == 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
+    accessCode?.length === 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;
+
+  if (user?.isAllowlisted) {
+    router.push("/connect/get-started");
+    return null;
+  }
 
   return (
     <Dark600Box2C

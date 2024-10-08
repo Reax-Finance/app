@@ -2,9 +2,7 @@
 
 import { Box, Button, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import {
-  useActiveWalletChain,
-} from "thirdweb/react";
+import { useActiveWalletChain } from "thirdweb/react";
 import { useAppData } from "../components/context/AppDataProvider";
 import Footer from "../components/core/Footer";
 import Navbar from "../components/core/Navbar";
@@ -15,7 +13,7 @@ export default function ComponentLayout({ children }: any) {
   // const { status, message } = useAppData();
 
   const chain = useActiveWalletChain();
-  
+
   const { colorMode } = useColorMode();
   return (
     <Box h={"100vh"}>

@@ -27,10 +27,13 @@ export default function Page() {
         isClosable: true,
       });
       router.push("/");
-      return;
     }
 
     if (!code) return;
+
+    console.log("state", state);
+    console.log("code", code);
+    console.log("error", error);
 
     axios
       .post("/api/auth/twitter/callback", {
@@ -40,6 +43,7 @@ export default function Page() {
       })
       .then(async (response) => {
         setIsLoading(false);
+        console.log("response on twitter", response);
         if (response.status === 200) {
           toast({
             title: "Success",
@@ -48,11 +52,15 @@ export default function Page() {
             duration: 9000,
             isClosable: true,
           });
+
+          console.log("updating user");
           await updateUser();
+          console.log("user updated");
           router.push("/");
         }
       })
       .catch((error: any) => {
+        console.log("error on twitter", error);
         setIsLoading(false);
         toast({
           title: "Try Again",
@@ -65,7 +73,7 @@ export default function Page() {
         router.push("/connect");
       })
       .finally(() => setIsLoading(false));
-  }, [router, searchParams, toast, updateUser]);
+  }, [router, searchParams]);
 
   return (
     <Flex

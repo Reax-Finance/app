@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import { ADDRESS_FIRST, ADDRESS_ZERO } from "../../src/const";
 // import React, { useContext, useEffect } from "react";
@@ -162,20 +162,19 @@
 // export { AppDataProvider, AppDataContext };
 
 import * as React from "react";
-import { ADDRESS_ZERO, isSupportedChain } from "../../src/const";
 import { useEffect } from "react";
+import { useActiveAccount, useActiveWalletChain } from "thirdweb/react";
+import { ADDRESS_FIRST, ADDRESS_ZERO } from "../../src/const";
 import { Status } from "../utils/status";
 import {
   Account,
-  ReserveData,
   LiquidityData,
-  SynthData,
-  UIData,
   PairData,
+  ReserveData,
+  SynthData,
 } from "../utils/types";
 import useUpdateData from "../utils/useUpdateData";
 import useChainData from "./useChainData";
-import { useActiveAccount, useActiveWalletChain } from "thirdweb/react";
 
 export interface AppDataValue {
   status: Status;
@@ -255,7 +254,7 @@ function AppDataProvider({ children }: any) {
     let intervalId: NodeJS.Timeout;
 
     const fetchData = () => {
-      let _address = address || ADDRESS_ZERO;
+      let _address = address || ADDRESS_FIRST;
       const start = Date.now();
       const uidp = getContract("UIDataProvider");
       // console.log("Fetching data for", _address, chain?.id, updateData);
@@ -348,4 +347,4 @@ export const useAppData = () => {
   return React.useContext(AppDataContext);
 };
 
-export { AppDataProvider, AppDataContext };
+export { AppDataContext, AppDataProvider };

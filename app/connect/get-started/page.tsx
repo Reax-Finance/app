@@ -26,9 +26,14 @@ export default function RegisterPage() {
   const status = useActiveWalletConnectionStatus();
   useEffect(() => {
     console.log("updateUser");
+    console.log("status", status);
     updateUser();
     console.log("updated User", user);
-  }, []);
+
+    if (!user?.isAllowlisted) {
+      router.push("/connect/whitelist");
+    }
+  }, [user, router]);
 
   const toast = useToast();
   const signUp = () => {
@@ -58,9 +63,6 @@ export default function RegisterPage() {
         setLoading(false);
       });
   };
-  if (status !== "connected") {
-    return <Text>Wallet is disconnected.</Text>;
-  }
   return (
     <Flex
       gap={4}

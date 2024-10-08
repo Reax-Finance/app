@@ -299,7 +299,7 @@ function Swap() {
     else if (
       Big(Number(inputAmount) || 0)
         .mul(Big(10).pow(inToken.decimals))
-        .gt(inToken.balance.toString())
+        .gt(inToken.walletBalance.toString())
     )
       return { valid: false, message: "Insufficient Balance" };
     else if (getSteps().length > 0) return { valid: false, message: "Approve" };

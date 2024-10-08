@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const address = searchParams.get("address");
-    console.log("address on get user route  is ", address);
+
     if (!address) {
       return NextResponse.json(
         { success: false, message: "Bad Request: Address is required" },
@@ -16,8 +16,6 @@ export async function GET(req: NextRequest) {
     }
 
     const normalizedAddress = address.toLowerCase();
-
-    console.log("Going to fetch user data for address: ", normalizedAddress);
 
     const [allowlistedUser, userRecord] = await prisma.$transaction([
       prisma.allowlistedUser.findUnique({
@@ -47,18 +45,13 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    console.log("Allowlisted user result:", allowlistedUser);
-    console.log("User record result:", userRecord);
+    let user: any = null;
 
-    let user: any = {
-      ...allowlistedUser,
-      user: userRecord,
-    };
-
-    console.log("user from get-user is ", user);
-
-    if (!allowlistedUser && !userRecord) {
-      user = null;
+    if (allowlistedUser || userRecord) {
+      user = {
+        ...allowlistedUser,
+        user: userRecord,
+      };
     }
 
     return NextResponse.json(
@@ -66,7 +59,6 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error: ", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

@@ -15,6 +15,7 @@ import { ADDRESS_ZERO } from "../../src/const";
 import { Status } from "../utils/status";
 import UserAccount from "../utils/useUserAccount";
 import { isLoggedIn } from "../../app/connect/actions/auth";
+import { useActiveAccount } from "thirdweb/react";
 
 interface UserObject extends _User {
   accessCodes: AccessCode[];
@@ -46,31 +47,49 @@ function UserDataProvider({ children }: any) {
   const [message, setMessage] = React.useState<UserDataValue["message"]>("");
   const [user, setUser] = React.useState<UserData>();
 
-  const { address } = UserAccount();
-  // const { status: sessionStatus } = useSession();
+  const activeAccount = useActiveAccount();
+  const address = activeAccount?.address;
   const [loading, setLoading] = React.useState(false);
   useEffect(() => {
     updateUser();
   }, [address]);
-  // }, [address, sessionStatus]);
 
   async function updateUser(): Promise<void> {
-    const { isAuthenticated } = await isLoggedIn();
+    const { isAuthenticated, payload } = await isLoggedIn();
+
+    const address = payload?.parsedJWT.sub;
+
     return new Promise((resolve, reject) => {
       setStatus(Status.FETCHING);
-      if (typeof window === "undefined") return;
 
-      if (!address || address == ADDRESS_ZERO) return;
-      if (!isAuthenticated) return;
+      if (typeof window === "undefined") return;
+      if (!address || address == ADDRESS_ZERO) {
+        return;
+      }
+
+      if (!isAuthenticated) {
+        return;
+      }
+
       setLoading(true);
       axios
         .get("/api/user/get-user", {
           params: { address },
         })
         .then((res: any) => {
-          console.log("Res is", res);
           setLoading(false);
-          console.log("User data", res.data);
+
+          if (!res.data.user) {
+            console.log("User not found");
+            setMessage("User not found");
+            setUser(undefined);
+            setStatus(Status.ERROR);
+            resolve();
+            return;
+          }
+
+          console.log("User found", res.data.user);
+
           setUser({
             ...res.data.user,
             isAllowlisted: Boolean(res.data.user),
@@ -80,7 +99,6 @@ function UserDataProvider({ children }: any) {
           resolve();
         })
         .catch((err: any) => {
-          console.log("Error", err);
           setStatus(Status.ERROR);
           reject(err);
         })
@@ -91,9 +109,8 @@ function UserDataProvider({ children }: any) {
   }
 
   const refreshUserData = () => {
-    updateUser().catch((err) =>
-      console.error("Failed to refresh user data", err)
-    );
+    updateUser();
+    console.log("refreshed user data", user);
   };
 
   const value: UserDataValue = {
