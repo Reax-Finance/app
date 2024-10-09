@@ -1,5 +1,5 @@
-import { isLoggedIn } from "./actions/auth";
 import { redirect } from "next/navigation";
+import { isLoggedIn } from "./actions/auth";
 
 export default async function ConnectPage() {
   const { isAuthenticated, payload } = await isLoggedIn();

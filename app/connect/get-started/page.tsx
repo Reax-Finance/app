@@ -2,45 +2,64 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import {
+  useActiveAccount,
+  useActiveWalletConnectionStatus,
+} from "thirdweb/react";
 import { useUserData } from "../../../components/context/UserDataProvider";
 import Dark400Box2C from "../../../components/ui/boxes/Dark400Box2C";
 import Dark600Box2C from "../../../components/ui/boxes/Dark600Box2C";
 import PrimaryButton from "../../../components/ui/buttons/PrimaryButton";
-import UserAccount from "../../../components/utils/useUserAccount";
 import TestnetFAQ from "../components/TestnetFAQ";
 import XConnect from "../components/XConnect";
-import {
-  useActiveWallet,
-  useActiveWalletConnectionStatus,
-} from "thirdweb/react";
-import { redirect, useRouter } from "next/navigation";
-import { connect } from "http2";
 
 export default function RegisterPage() {
-  const { updateUser, user } = useUserData();
-  const { address } = UserAccount();
-  const [loading, setLoading] = React.useState(false);
-
-  const router = useRouter();
-  const status = useActiveWalletConnectionStatus();
-  useEffect(() => {
-    console.log("updateUser");
-    console.log("status", status);
-    updateUser();
-    console.log("updated User", user);
-
-    if (!user?.isAllowlisted) {
-      router.push("/connect/whitelist");
-    }
-  }, [user, router]);
-
   const toast = useToast();
+  const router = useRouter();
+  const connectionStatus = useActiveWalletConnectionStatus();
+  const activeAccount = useActiveAccount();
+  const { updateUser, user } = useUserData();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const address = activeAccount?.address;
+
+  useEffect(() => {
+    if (connectionStatus !== "connected") {
+      router.push("/connect/signin");
+      return;
+    }
+
+    if (
+      connectionStatus === "connected" &&
+      user?.isAllowlisted &&
+      user.twitter &&
+      user.user &&
+      user.user?.accessCodes.length > 0
+    ) {
+      router.push("/");
+    }
+
+    updateUser();
+    if (connectionStatus === "connected" && !user?.isAllowlisted) {
+      router.push("/connect/whitelist");
+    } else if (
+      connectionStatus === "connected" &&
+      user?.isAllowlisted &&
+      user.twitter &&
+      user.user
+    ) {
+      router.push("/");
+    }
+  }, [user, router, connectionStatus]);
+
   const signUp = () => {
     setLoading(true);
     axios
-      .post("/api/user/join", { address })
+      .post("/api/user/join")
       .then(async (res) => {
+        console.log("join", res.data);
         await updateUser();
         toast({
           title: "Success",
@@ -63,6 +82,7 @@ export default function RegisterPage() {
         setLoading(false);
       });
   };
+
   return (
     <Flex
       gap={4}
@@ -77,11 +97,14 @@ export default function RegisterPage() {
             <Heading>Get started!</Heading>
           </Dark400Box2C>
           <Box p={4}>
-            <Text>
+            <Text>{JSON.stringify(user?.user)}</Text>
+            <Text>Address:{address}</Text>
+            <Text>Status: {connectionStatus}</Text>
+            {/* <Text>
               This is your front-row seat to the future of finance! Get ready
               for an immersive experience where the worlds of TradFi and DeFi
               collide.
-            </Text>
+            </Text> */}
 
             <Text mt={{ base: 2, md: 4, lg: 6 }}>
               You{"'"}re invited to test-drive our cutting-edge testnet,

@@ -11,8 +11,9 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   console.log("Incoming POST request to /api/auth/twitter/callback");
-  const { state, code } = await req.json();
-
+  const data = await req.json();
+  const state = data["state"];
+  const code = data["code"];
   if (!state || !code) {
     return NextResponse.json(
       { message: "Missing state or code" },
@@ -104,13 +105,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // if (!alUserRecord) {
-    //   res.status(400).send({
-    //     message: `Allowlisted user not found.`,
-    //   });
-    //   return;
-    // }
-
     // If user has already connected their account, update data and redirect to dashboard (no points)
     if (alUserRecord?.twitter) {
       // Make sure the user is connecting the account they'd already connected
@@ -138,17 +132,21 @@ export async function POST(req: NextRequest) {
     }
 
     // Success response
-    return NextResponse.json({
-      twitter: {
-        id: userResponse.data.data.id,
-        name: userResponse.data.data.name,
-        username: userResponse.data.data.username,
-        verified: userResponse.data.data.verified,
-        profileImageUrl: userResponse.data.data.profile_image_url,
-        followersCount: userResponse.data.data.public_metrics.followers_count,
-        updatedAt: new Date().toISOString(),
+    return NextResponse.json(
+      {
+        message: "Successfully connected your Twitter account",
+        twitter: {
+          id: userResponse.data.data.id,
+          name: userResponse.data.data.name,
+          username: userResponse.data.data.username,
+          verified: userResponse.data.data.verified,
+          profileImageUrl: userResponse.data.data.profile_image_url,
+          followersCount: userResponse.data.data.public_metrics.followers_count,
+          updatedAt: new Date().toISOString(),
+        },
       },
-    });
+      { status: 200 }
+    );
   } catch (error: any) {
     let err =
       error?.response?.data?.error_description ||

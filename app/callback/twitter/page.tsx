@@ -26,7 +26,7 @@ export default function Page() {
         duration: 9000,
         isClosable: true,
       });
-      router.push("/");
+      router.push("/connect");
     }
 
     if (!code) return;

@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, message: "Success", user },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error) {
     return NextResponse.json(

@@ -8,7 +8,10 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const { payload } = await isLoggedIn();
 
-  const address = payload?.parsedJWT.sub;
+  const addr = payload?.parsedJWT.sub as string;
+  const address = addr.toLowerCase();
+
+  console.log("address", address);
   if (!address) {
     return NextResponse.json({ message: "Bad Request" }, { status: 400 });
   }
@@ -27,6 +30,8 @@ export async function POST(req: NextRequest) {
       user: true,
     },
   });
+
+  console.log("allowlistedUser", allowlistedUser);
   if (!allowlistedUser) {
     return NextResponse.json(
       { message: "User not allowlisted" },
@@ -85,7 +90,7 @@ export async function POST(req: NextRequest) {
           },
         });
       }
-      NextResponse.json(
+      return NextResponse.json(
         { message: "User joined successfully" },
         { status: 200 }
       );
@@ -97,7 +102,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      NextResponse.json(
+      return NextResponse.json(
         {
           message: "Error creating referral codes",
           error: err,

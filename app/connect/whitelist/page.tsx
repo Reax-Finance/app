@@ -31,6 +31,13 @@ export default function WhitelistPage() {
   const disconnectWallet = useDisconnect();
   const router = useRouter();
 
+  useEffect(() => {
+    refreshUserData();
+    if (join || user?.isAllowlisted) {
+      router.push("/connect/get-started");
+    }
+  }, [join, router, user]);
+
   const handleClick = () => {
     disconnectWallet.disconnect;
   };
@@ -61,15 +68,6 @@ export default function WhitelistPage() {
     setError(undefined);
     setAccessCode(e.target.value);
   };
-
-  useEffect(() => {
-    console.log("getting User");
-    refreshUserData();
-    console.log("updated User", user);
-    if (join || user?.isAllowlisted) {
-      router.push("/connect/get-started");
-    }
-  }, [join, router]);
 
   const isValidInput =
     accessCode?.length === 6 && accessCode.match(/^[0-9a-zA-Z]+$/) && !error;

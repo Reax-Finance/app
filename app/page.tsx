@@ -1,34 +1,36 @@
 "use client";
 
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { isLoggedIn } from "./connect/actions/auth";
 import Swap from "./swap/components/Swap";
 import { useUserData } from "../components/context/UserDataProvider";
+import { useEffect, useState } from "react";
 
-export default async function SwapPage() {
+export default function SwapPage() {
   const { user } = useUserData();
   const router = useRouter();
-  const { isAuthenticated, payload } = await isLoggedIn();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  console.log("user from home", user);
-  if (!isAuthenticated) {
-    // redirect("/connect");
-    router.push("/connect");
-  } else if (
-    isAuthenticated &&
-    payload?.parsedJWT.sub &&
-    !user?.isAllowlisted
-  ) {
-    // redirect("/connect/whitelist");
-    router.push("/connect/whitelist");
-  } else if (
-    isAuthenticated &&
-    payload?.parsedJWT.sub &&
-    user?.isAllowlisted &&
-    !user?.twitter
-  ) {
-    // redirect("/connect/get-started");
-    router.push("/connect/get-started");
-  }
+  useEffect(() => {
+    async function checkLoginStatus() {
+      const { payload } = await isLoggedIn();
+      if (!payload?.parsedJWT.sub) {
+        router.push("/connect");
+      } else {
+        setIsAuthenticated(true);
+      }
+    }
+
+    checkLoginStatus();
+    console.log("user from home", user);
+    if (!isAuthenticated) {
+      router.push("/connect");
+    } else if (isAuthenticated && !user?.isAllowlisted) {
+      router.push("/connect/whitelist");
+    } else if (isAuthenticated && user?.isAllowlisted && !user?.twitter) {
+      router.push("/connect/get-started");
+    }
+  }, [router, user, isAuthenticated]);
+
   return <Swap />;
 }

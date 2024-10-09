@@ -42,12 +42,12 @@ import useUpdateData from "../../utils/useUpdateData";
 import { formatInput, parseInput } from "../../utils/number";
 import { VARIANT } from "../../../styles/theme";
 import SelectBody2 from "./SelectBody2";
-import TokenSelector from "../../../app/swap/components/TokenSelector";
+import TokenSelector from "../../swap/TokenSelector";
 import { AiOutlineDown } from "react-icons/ai";
 import { useAppData } from "../../context/AppDataProvider";
 import { motion } from "framer-motion";
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
-import RouteDetails from "../../swap/RouteDetails";
+// import RouteDetails from "../../swap/RouteDetails";
 import { PairData } from "../../utils/types";
 import useApproval from "../../context/useApproval";
 
