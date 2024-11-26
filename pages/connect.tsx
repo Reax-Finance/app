@@ -1,22 +1,15 @@
-import {
-  Flex,
-  Text,
-  Image,
-  Box,
-  useColorMode,
-  Spinner,
-} from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import { Box, Flex, Image } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
-import { Status } from "../components/utils/status";
-import { useAccount } from "wagmi";
-import NotWhitelisted from "../components/connect/NotWhitelisted";
-import ConnectInterface from "../components/connect/ConnectInterface";
-import SignupInterface from "../components/connect/SignupInterface";
-import GetStarted from "../components/connect/GetStarted";
-import { useUserData } from "../components/context/UserDataProvider";
 import { useRouter } from "next/router";
-import BlockLoading from '../components/ui/skeletons/BlockLoading';
+import React, { useEffect } from "react";
+import { useAccount } from "wagmi";
+import ConnectInterface from "../components/connect/ConnectInterface";
+import GetStarted from "../components/connect/GetStarted";
+import NotWhitelisted from "../components/connect/NotWhitelisted";
+import SignupInterface from "../components/connect/SignupInterface";
+import { useUserData } from "../components/context/UserDataProvider";
+import BlockLoading from "../components/ui/skeletons/BlockLoading";
+import { Status } from "../components/utils/status";
 
 export default function ConnectPage() {
   const { user, status: userStatus } = useUserData();
@@ -29,11 +22,17 @@ export default function ConnectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userStatus === Status.SUCCESS && user?.user && user?.id == address?.toLowerCase() && user?.twitter && sessionStatus == "authenticated" && status === "connected") {
+    if (
+      userStatus === Status.SUCCESS &&
+      user?.user &&
+      user?.id == address?.toLowerCase() &&
+      user?.twitter &&
+      sessionStatus == "authenticated" &&
+      status === "connected"
+    ) {
       router.push("/");
     }
   }, [router, userStatus, user]);
-
 
   return (
     <Box h={"90vh"}>
@@ -42,7 +41,7 @@ export default function ConnectPage() {
         flexDir={"column"}
         align={"center"}
         justify={"flex-start"}
-        h={'100%'}
+        h={"100%"}
       >
         <Image src="/logo.svg" w={100} h={100} alt="" zIndex={2} />
         <Box
@@ -62,12 +61,16 @@ export default function ConnectPage() {
               <SignupInterface accessCode={accessCode} />
             ) : (
               <>
-                {status === "disconnected" || sessionStatus === "unauthenticated" ? (
+                {status === "disconnected" ||
+                sessionStatus === "unauthenticated" ? (
                   <ConnectInterface />
                 ) : (
                   <>
-                    {status === "connected" && sessionStatus === "authenticated" && userStatus === Status.SUCCESS ? (
-                      (user?.isAllowlisted && user?.id === address?.toLowerCase()) ? (
+                    {status === "connected" &&
+                    sessionStatus === "authenticated" &&
+                    userStatus === Status.SUCCESS ? (
+                      user?.isAllowlisted &&
+                      user?.id === address?.toLowerCase() ? (
                         <GetStarted setJoin={setJoin} />
                       ) : (
                         <NotWhitelisted
@@ -76,8 +79,9 @@ export default function ConnectPage() {
                           setAccessCode={setAccessCode}
                         />
                       )
-                    ) : (<>
-                      <BlockLoading />
+                    ) : (
+                      <>
+                        <BlockLoading />
                       </>
                     )}
                   </>

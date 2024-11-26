@@ -84,6 +84,8 @@ export default function App({
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
       />
 
+      <Script src="/static/datafeeds/udf/dist/bundle.js" />
+
       <Script id="google-analytics-script" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];

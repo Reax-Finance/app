@@ -65,6 +65,7 @@ function NavBar() {
                     path={"/liquidity"}
                     title={"Liquidity"}
                   ></NavLocalLink>
+                  <NavLocalLink path={"/perps"} title={"Perps"}></NavLocalLink>
                 </Flex>
               </Flex>
 
